@@ -51,11 +51,8 @@ module.exports = function(grunt) {
 		},
 
 		jshint: {
-			// define the files to lint
 			files: ['src/*.js'],
-			// configure JSHint (documented at http://www.jshint.com/docs/)
-			options: {
-				// more options here if you want to override JSHint defaults
+			options: { // documentation: http://www.jshint.com/docs/
 				globals: {
 					console: true,
 					module: true
@@ -73,11 +70,12 @@ module.exports = function(grunt) {
 	});
 
 	// Load plugins
-	grunt.loadNpmTasks('grunt-contrib-uglify');
-	grunt.loadNpmTasks('grunt-contrib-concat');
 	grunt.loadNpmTasks('grunt-contrib-clean');
-	grunt.loadNpmTasks('grunt-contrib-watch');
+	grunt.loadNpmTasks('grunt-contrib-copy');
 	grunt.loadNpmTasks('grunt-contrib-jshint');
+	grunt.loadNpmTasks('grunt-contrib-concat');
+	grunt.loadNpmTasks('grunt-contrib-uglify');
+	grunt.loadNpmTasks('grunt-contrib-watch');
 
 	// Define task(s).
 	grunt.registerTask('default', ['jshint', 'clean:dev', 'concat:dev', 'concat:indexDev']);
