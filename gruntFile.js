@@ -2,8 +2,7 @@ module.exports = function(grunt) {
 
 	// Project configuration.
 	grunt.initConfig({
-		developmentDir: 'dev',
-		productionDir: 'build',
+		activeDir: 'dev', // this gets overloaded with setPath
 		pkg: grunt.file.readJSON('package.json'),
 		banner:
 			'/*! <%= pkg.title || pkg.name %> - v<%= pkg.version %> - <%= grunt.template.today("yyyy-mm-dd") %>\n' +
@@ -15,58 +14,104 @@ module.exports = function(grunt) {
 			options: {
 				banner: "<%= banner %>"
 			},
-			prod: {
-				src: 'src/*.js',
-				dest: '<%= productionDir %>/<%= pkg.name %>.js'
+			release: {
+				files: {
+					'<%= activeDir %>/<%= pkg.name %>.js': ['src/**/*.js']
+				},
+			},
+			vendor: {
+				files: {
+					'<%= activeDir %>/angular.js': ['vendor/angular/*.js'],
+					'<%= activeDir %>/angular-ui.js': ['vendor/angular-ui/*.js']
+				}
 			}
 		},
 
 		concat:{
-			dev:{
+			build:{
 				options: {
 					banner: "<%= banner %>"
 				},
-				src:['src/*.js'],
-				dest:'<%= developmentDir %>/<%= pkg.name %>.js'
-			},
-			indexDev: {
-				src: ['src/index.html'],
-				dest: '<%= developmentDir %>/index.html',
-				options: {
-					process: true
+				files: {
+					'<%= activeDir %>/<%= pkg.name %>.js': ['src/**/*.js']
 				}
 			},
-			indexProd: {
-				src: ['src/index.html'],
-				dest: '<%= productionDir %>/index.html',
+			index: {
 				options: {
 					process: true
+				}, 
+				files: {
+					'<%= activeDir %>/index.html': ['src/index.html']
+				}
+			},
+			vendor: {
+				files: {
+					'<%= activeDir %>/angular.js': ['vendor/angular/angular.js', 'vendor/angular/*.js'],
+					'<%= activeDir %>/angular-ui.js': ['vendor/angular-ui/*.js']
 				}
 			}
 		},
 
-		clean: {
-			dev: ['<%= developmentDir %>/*'],
-			prod: ['<%= productionDir %>/*']
-		},
+		clean: ['<%= activeDir %>/*'],
 
 		jshint: {
-			files: ['src/*.js'],
+			files: ['src/**/*.js'],
 			options: { // documentation: http://www.jshint.com/docs/
 				globals: {
 					console: true,
 					module: true
-				}
+				},
+				smarttabs: true
 			}
 		},
 
 		watch: {
-			files: ['src/*.js'],
-			tasks: ['default'],
+			files: ['src/**/*.js', 'src/index.html', 'src/partials/**/*.tpl.html'],
+			tasks: ['build'],
 			options: {
-				livereload: true
+				livereload: 9003,
+				interrupt: true
+			}
+		},
+
+		copy: {
+			assets: {
+				dest: '<%= activeDir %>',
+				src: '**',
+				expand: true,
+				cwd: 'src/assets/'
+			},
+			partials: {
+				flatten: true,
+				expand: true,
+				cwd: 'src/partials/',
+				dest: '<%= activeDir %>/partials/',
+				src: '*.tpl.html'
+			}
+		},
+
+		connect: {
+			server: {
+				options: {
+					port: 9001,
+					base: 'build/',
+					// livereload: 9003
+				}
 			}
 		}
+
+		// php: { // install php to make this work
+		// 	test: {
+		// 		base: 'dev',
+		// 		// open: true,
+		// 		port: 5000
+		// 	}
+		// }
+	});
+
+	grunt.registerTask('setPath', function( arg1 ) {
+		grunt.config.set( 'activeDir', arg1 );
+		grunt.log.writeln('Setting build path to: ' + arg1 );
 	});
 
 	// Load plugins
@@ -76,10 +121,12 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-concat');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-contrib-watch');
+	grunt.loadNpmTasks('grunt-contrib-connect');
+	// grunt.loadNpmTasks('grunt-php');
 
-	// Define task(s).
-	grunt.registerTask('default', ['jshint', 'clean:dev', 'concat:dev', 'concat:indexDev']);
-	grunt.registerTask('prod', ['jshint', 'clean:prod', 'uglify:prod', 'concat:indexProd']);
-	grunt.registerTask('view', ['watch']);
+	// Define task(s)
+	grunt.registerTask('default', ['connect', 'watch']);
+	grunt.registerTask('build', ['setPath:build', 'jshint', 'clean', 'concat', 'copy']);
+	grunt.registerTask('release', ['setPath:release', 'jshint', 'clean', 'uglify', 'concat:index', 'copy']);
 
 };
