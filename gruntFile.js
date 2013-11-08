@@ -47,7 +47,8 @@ module.exports = function(grunt) {
 			vendor: {
 				files: {
 					'<%= activeDir %>/angular.js': ['vendor/angular/angular.js', 'vendor/angular/*.js'],
-					'<%= activeDir %>/angular-ui.js': ['vendor/angular-ui/*.js']
+					'<%= activeDir %>/angular-ui.js': ['vendor/angular-ui/*.js'],
+					'<%= activeDir %>/bootstrap.css': ['vendor/bootstrap/bootstrap.css']
 				}
 			}
 		},
@@ -69,7 +70,7 @@ module.exports = function(grunt) {
 			files: ['src/**/*.js', 'src/index.html', 'src/partials/**/*.tpl.html'],
 			tasks: ['build'],
 			options: {
-				livereload: 9003,
+				// livereload: 1337,
 				interrupt: true
 			}
 		},
@@ -95,7 +96,7 @@ module.exports = function(grunt) {
 				options: {
 					port: 9001,
 					base: 'build/',
-					// livereload: 9003
+					// livereload: 1337
 				}
 			}
 		}
