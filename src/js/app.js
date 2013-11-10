@@ -2,7 +2,8 @@
 
 angular.module('myApp', [
 	'ngRoute',
-	'myApp.controllers'
+	'myApp.controllers',
+	'myApp.filters'
 ]).
 
 config(['$routeProvider', function( $routeProvider ){

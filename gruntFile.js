@@ -70,8 +70,9 @@ module.exports = function(grunt) {
 			files: ['src/**/*.js', 'src/index.html', 'src/partials/**/*.tpl.html'],
 			tasks: ['build'],
 			options: {
-				// livereload: 1337,
-				interrupt: true
+				livereload: 1337,
+				interrupt: true,
+				// spawn: false
 			}
 		},
 
@@ -96,8 +97,14 @@ module.exports = function(grunt) {
 				options: {
 					port: 9001,
 					base: 'build/',
-					// livereload: 1337
+					livereload: 1337
 				}
+			}
+		},
+
+		open: {
+			all: {
+				path: 'http://localhost:<%= connect.server.options.port%>'
 			}
 		}
 
@@ -123,10 +130,11 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks('grunt-contrib-connect');
+	grunt.loadNpmTasks('grunt-open');
 	// grunt.loadNpmTasks('grunt-php');
 
 	// Define task(s)
-	grunt.registerTask('default', ['connect', 'watch']);
+	grunt.registerTask('default', ['build', 'connect', 'open', 'watch']);
 	grunt.registerTask('build', ['setPath:build', 'jshint', 'clean', 'concat', 'copy']);
 	grunt.registerTask('release', ['setPath:release', 'jshint', 'clean', 'uglify', 'concat:index', 'copy']);
 
