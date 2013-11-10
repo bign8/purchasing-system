@@ -1,8 +1,9 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
 	<meta charset="utf-8">
 	<title><%= grunt.config.get('pkg.name') %></title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 	<!-- for angular -->
 	<script src="angular.js"></script>
@@ -21,7 +22,9 @@
 		<div class="header" ng-controller="HeadCtrl">
 			<div class="pull-right"><a href="#/cart">Cart <span class="badge">5</span></a></div>
 
-			<h1>{{myPage.getTitle()}} <small>{{myPage.getSubTitle()}}</small></h1>
+			<div class="page-header">
+				<h1>{{myPage.getTitle()}} <small>{{myPage.getSubTitle()}}</small></h1>
+			</div>
 
 			<div class="navbar navbar-default" role="navigation">
 				<div class="navbar-header">
@@ -54,6 +57,9 @@
 			</ul>
 		</div>
 		<ng-view>Loading Application...</ng-view>
+		<div class="footer">
+			<p>Copyright NOW</p>
+		</div>
 	</div>
 </body>
 </html>
