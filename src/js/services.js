@@ -67,7 +67,7 @@ factory('myCart', function() {
 			return cart.length;
 		},
 		add: function(item) {
-			cart.push(item);
+			cart.push(item.productID);
 			update();
 		},
 		rem: function(index) {
@@ -78,7 +78,7 @@ factory('myCart', function() {
 			return cart;
 		},
 		contains: function(item) {
-			return cart.indexOf(item) !== -1;
+			return cart.indexOf(item.productID) !== -1;
 		},
 		total: function() {
 			var tot = 0;

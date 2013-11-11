@@ -25,7 +25,7 @@ config(['$routeProvider', function( $routeProvider ){
 							link: 'product-' + ("0" + i).slice(-2),
 							desc: 'Description of product ' + ("0" + i).slice(-2),
 							cost: Math.floor(Math.random() * 10000)/100,
-							pic: 'http://lorempixel.com/300/200/business/?' + Math.random()
+							pic: 'http://lorempixel.com/300/200/business/?' + Math.floor(Math.random()*10)
 						});
 					}
 					return products;
