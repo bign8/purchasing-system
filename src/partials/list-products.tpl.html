@@ -2,7 +2,7 @@
 	<div class="col-md-offset-1 col-md-10">
 
 		<div class="form-group clearfix">
-			<div class="btn-group btn-group-sm col-md-2">
+			<div class="btn-group btn-group-sm col-sm-2 hidden-xs">
 				<a type="button" class="btn btn-default" ng-class="{active:!showAsList}" ng-click="showAsList=false">
 					<span class="glyphicon glyphicon-th-large"></span>
 				</a>
@@ -11,19 +11,21 @@
 				</a>
 			</div>
 
-			<div class="input-group col-md-5 col-md-offset-1">
+			<div class="input-group col-sm-5 col-sm-offset-1">
 				<span class="input-group-addon">Search: </span>
 				<input class="form-control input-sm" id="query" ng-model="query" />
 			</div>
 
-			<div class="input-group col-md-3 pull-right" ng-hide="filteredProducts.length < 10">
-				<span class="input-group-addon">Page Size: </span>
-				<select ng-model="pageSize" class="form-control input-sm">
-					<option value="12">12</option>
-					<option value="30">30</option>
-					<option value="60">60</option>
-					<option value="120">120</option>
-				</select>
+			<div class="col-md-3 col-sm-4 pull-right hidden-xs">
+				<div class="input-group " ng-hide="filteredProducts.length < 10">
+					<span class="input-group-addon">Page Size: </span>
+					<select ng-model="pageSize" class="form-control input-sm">
+						<option value="12">12</option>
+						<option value="30">30</option>
+						<option value="60">60</option>
+						<option value="120">120</option>
+					</select>
+				</div>
 			</div>
 		</div>
 
