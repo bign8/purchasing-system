@@ -53,4 +53,45 @@ factory('breadcrumbs', ['$rootScope', '$location', function ($rootScope, $locati
 			return crumb == (breadcrumbs[breadcrumbs.length-1] || {name:'undefined'}).name;
 		}
 	};
-}]);
+}]).
+
+factory('myCart', function() {
+	var cart = JSON.parse(localStorage.azUAcart || '[]');
+
+	var update = function() {
+		localStorage.azUAcart = JSON.stringify(cart);
+	};
+
+	return {
+		len: function() {
+			return cart.length;
+		},
+		add: function(item) {
+			cart.push(item);
+			update();
+		},
+		rem: function(index) {
+			cart.splice(index, 1);
+			update();
+		},
+		list: function() {
+			return cart;
+		},
+		contains: function(item) {
+			return cart.indexOf(item) !== -1;
+		},
+		total: function() {
+			var tot = 0;
+			for (var x in cart) {
+				tot += cart[x].cost;
+			}
+			return tot;
+		},
+		clear: function() {
+			cart = [];
+			update();
+		}
+	};
+});
+
+// http://www.codeproject.com/Articles/576246/A-Shopping-Cart-Application-Built-with-AngularJS

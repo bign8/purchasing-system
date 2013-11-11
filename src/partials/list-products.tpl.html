@@ -2,17 +2,17 @@
 	<div class="col-md-offset-1 col-md-10">
 
 		<div class="form-group clearfix">
-			<div class="btn-group btn-group-sm col-md-2">
+			<!-- <div class="btn-group btn-group-sm col-md-2">
 				<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-th-large"></span></button>
 				<button type="button" class="btn btn-default"><span class="glyphicon glyphicon-list"></span></button>
-			</div>
+			</div> -->
 
-			<div class="input-group col-md-5 col-md-offset-1">
+			<div class="input-group col-md-5 col-md-offset-0">
 				<span class="input-group-addon">Search: </span>
 				<input class="form-control input-sm" id="query" ng-model="query" />
 			</div>
 
-			<div class="input-group col-md-3 pull-right">
+			<div class="input-group col-md-3 pull-right" ng-hide="filteredProducts.length < 10">
 				<span class="input-group-addon">Page Size: </span>
 				<select ng-model="pageSize" class="form-control input-sm">
 					<option value="10">10</option>
@@ -32,12 +32,16 @@
 					<th ng-click="sort('desc')">
 						Description <span class="glyphicon {{sortIcon('desc')}}"></span>
 					</th>
+					<th>Cost</th>
+					<th>Add to Cart</th>
 				</tr>
 			</thead>
 			<tbody>
 				<tr ng-repeat="product in filteredProducts = (products | filter:query | orderBy:sortField:reverse) | pagination:pageNo:pageSize">
 					<td><a href="#/products/{{product.link}}">{{product.name}}</a></td>
 					<td>{{product.desc}}</td>
+					<td>{{product.cost | currency}}<img src="{{product.pic}}" /></td>
+					<td><a ng-click="myCart.add(product)" ng-hide="myCart.contains(product)">Add to Cart</a></td>
 				</tr>
 			</tbody>
 		</table>
@@ -47,7 +51,7 @@
 			<span ng-hide="filteredProducts.length == products.length"> of {{products.length}}</span>
 		</div>
 
-		<pagination boundary-links="true" total-items="filteredProducts.length" page="pageNo" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;" items-per-page="pageSize"></pagination><!--  -->
+		<pagination boundary-links="true" total-items="filteredProducts.length" page="pageNo" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;" items-per-page="pageSize" max-size="5"></pagination><!--  -->
 
 		
 	</div>

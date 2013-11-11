@@ -14,7 +14,23 @@ config(['$routeProvider', function( $routeProvider ){
 		}).
 		when('/products', { // List Products - render list of offered products
 			templateUrl: 'partials/list-products.tpl.html',
-			controller: 'ListProdCtrl'
+			controller: 'ListProdCtrl',
+			resolve: {
+				prodList: function() {
+					var products = [];
+					for (var i=0; i<99; i++) {
+						products.push({
+							productID: i,
+							name: 'Product ' + ("0" + i).slice(-2),
+							link: 'product-' + ("0" + i).slice(-2),
+							desc: 'Description of product ' + ("0" + i).slice(-2),
+							cost: Math.floor(Math.random() * 10000)/100,
+							pic: 'http://lorempixel.com/300/200/business/?' + Math.random()
+						});
+					}
+					return products;
+				}
+			}
 		}).
 		when('/products/:prodID', { // List Items - render list of items offered within product
 			templateUrl: 'partials/list-items.tpl.html',
