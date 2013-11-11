@@ -12,11 +12,16 @@ controller('IndexCtrl', ['$scope', 'myPage', function ($scope, myPage) {
 controller('ListProdCtrl', ['$scope', 'myPage', 'prodList', 'myCart', function ($scope, myPage, prodList, myCart) {
 	myPage.setTitle("Our Products", "Some quote about products");
 
+	// Set global passed variables
 	$scope.myCart = myCart;
+	$scope.products = prodList;
 
+	// Handle toggling list view style
+	$scope.showAsList = false;
+
+	// Handling list sort
 	$scope.sortField = undefined;
 	$scope.reverse = false;
-
 	$scope.sort = function (fieldName) {
 		if ($scope.sortField === fieldName) {
 			$scope.reverse = !$scope.reverse;
@@ -25,7 +30,6 @@ controller('ListProdCtrl', ['$scope', 'myPage', 'prodList', 'myCart', function (
 			$scope.reverse = false;
 		}
 	};
-
 	$scope.sortIcon = function (fieldName) {
 		if ($scope.sortField === fieldName) {
 			return $scope.reverse ? 'glyphicon-chevron-down' : 'glyphicon-chevron-up' ;
@@ -34,10 +38,10 @@ controller('ListProdCtrl', ['$scope', 'myPage', 'prodList', 'myCart', function (
 		}
 	};
 
+	// Handling pagination
 	$scope.pageNo = 1;
-	$scope.pageSize = 10;
+	$scope.pageSize = 12;
 
-	$scope.products = prodList;
 }]).
 
 controller('ListItemCtrl', ['$scope', 'myPage', '$routeParams', function ($scope, myPage, $routeParams) {

@@ -17,3 +17,5 @@ dev
 build
 *.sublime-*
 un-used
+
+config.php
