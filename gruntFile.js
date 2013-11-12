@@ -67,12 +67,18 @@ module.exports = function(grunt) {
 		},
 
 		watch: {
-			files: ['src/**/*.js', 'src/index.html', 'src/partials/**/*.tpl.html'],
-			tasks: ['build'],
 			options: {
 				livereload: 1337,
 				interrupt: true,
 				// spawn: false
+			},
+			src: {
+				files: ['src/**/*.js', 'src/index.html', 'src/partials/**/*.tpl.html'],
+				tasks: ['build']
+			},
+			php: {
+				files: ['src/php/**/*'],
+				tasks: ['ftp-deploy:phpOnly']
 			}
 		},
 
@@ -106,6 +112,18 @@ module.exports = function(grunt) {
 			all: {
 				path: 'http://localhost:<%= connect.server.options.port%>'
 			}
+		},
+
+		'ftp-deploy': {
+			phpOnly: {
+				auth: {
+					host: 'uastore.wha.la',
+					port: 21,
+					authKey: 'uastore'
+				},
+				src: 'src/php',
+				dest: '/'
+			},
 		}
 
 		// php: { // install php to make this work
@@ -131,10 +149,11 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks('grunt-contrib-connect');
 	grunt.loadNpmTasks('grunt-open');
+	grunt.loadNpmTasks('grunt-ftp-deploy');
 	// grunt.loadNpmTasks('grunt-php');
 
 	// Define task(s)
-	grunt.registerTask('default', ['build', 'connect', 'open', 'watch']);
+	grunt.registerTask('default', ['build', 'ftp-deploy:phpOnly', 'connect', 'open', 'watch']);
 	grunt.registerTask('build', ['setPath:build', 'jshint', 'clean', 'concat', 'copy']);
 	grunt.registerTask('release', ['setPath:release', 'jshint', 'clean', 'uglify', 'concat:index', 'copy']);
 
