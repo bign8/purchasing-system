@@ -1,25 +1,25 @@
 <div class="row">
-	<div class="col-md-offset-1 col-md-10">
+	<div class="offset1 span10">
 
-		<div class="form-group clearfix">
-			<div class="btn-group btn-group-sm col-sm-2 hidden-xs">
+		<div class="form-group row-fluid">
+			<!-- <div class="btn-group span2 hidden-phone">
 				<a type="button" class="btn btn-default" ng-class="{active:!showAsList}" ng-click="showAsList=false">
-					<span class="glyphicon glyphicon-th-large"></span>
+					<span class="icon-th-large"></span>
 				</a>
 				<a type="button" class="btn btn-default" ng-class="{active:showAsList}" ng-click="showAsList=true">
-					<span class="glyphicon glyphicon-list"></span>
+					<span class="icon-list"></span>
 				</a>
+			</div> -->
+
+			<div class="input-prepend pull-left">
+				<span class="add-on">Search: </span>
+				<input type="text" id="query" ng-model="query" />
 			</div>
 
-			<div class="input-group col-sm-5 col-sm-offset-1">
-				<span class="input-group-addon">Search: </span>
-				<input class="form-control input-sm" id="query" ng-model="query" />
-			</div>
-
-			<div class="col-md-3 col-sm-4 pull-right hidden-xs">
-				<div class="input-group " ng-hide="filteredProducts.length < 10">
-					<span class="input-group-addon">Page Size: </span>
-					<select ng-model="pageSize" class="form-control input-sm">
+			<div class="pull-right hidden-phone">
+				<div class="input-prepend" ng-hide="filteredProducts.length < 10">
+					<span class="add-on">Page Size: </span>
+					<select ng-model="pageSize">
 						<option value="12">12</option>
 						<option value="30">30</option>
 						<option value="60">60</option>
@@ -29,11 +29,11 @@
 			</div>
 		</div>
 
-		<div ng-switch on="showAsList">
+		<div ng-switch on="showAsList" class="row-fluid">
 
-			<!-- Display in blocks -->
-			<div ng-switch-when="false" class="row">
-				<div class="col-sm-6 col-md-4" ng-repeat="product in $parent.filteredProducts = (products | filter:{name:query, desc:query} | orderBy:sortField:reverse) | pagination:pageNo:pageSize">
+			<!-- Display in blocks
+			<div ng-switch-when="false" class="row thumbnails">
+				<div class="col-sm-6 span4" ng-repeat="product in $parent.filteredProducts = (products | filter:{name:query, desc:query} | orderBy:sortField:reverse) | pagination:pageNo:pageSize">
 					<div class="thumbnail">
 						<img ng-src="{{product.pic}}" alt="...">
 						<div class="caption">
@@ -46,7 +46,7 @@
 						</div>
 					</div>
 				</div>
-			</div>
+			</div> -->
 
 			<!-- Display in rows -->
 			<table class="table table-striped table-hover" ng-switch-default>
@@ -75,11 +75,11 @@
 		</div>
 
 		<div class="pull-right" style="margin-top:20px">
-			<label>Total:</label> {{filteredProducts.length}}
+			Total: {{filteredProducts.length}}
 			<span ng-hide="filteredProducts.length == products.length"> of {{products.length}}</span>
 		</div>
 
-		<pagination boundary-links="true" total-items="filteredProducts.length" page="pageNo" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;" items-per-page="pageSize" max-size="5"></pagination>
+		<pagination boundary-links="true" total-items="filteredProducts.length" page="pageNo" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;" items-per-page="pageSize" max-size="5" style="text-align:center"></pagination>
 
 		
 	</div>

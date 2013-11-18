@@ -3,10 +3,11 @@
 angular.module('myApp', [
 	'ngRoute',
 	'myApp.controllers',
-	'myApp.filters'
+	'myApp.filters',
+	'security'
 ]).
 
-config(['$routeProvider', function( $routeProvider ){
+config(['$routeProvider', 'securityAuthorizationProvider', function( $routeProvider, securityAuthorizationProvider ){
 	$routeProvider.
 		when('/', { // Home - statically generated (static tpl with links)
 			templateUrl: 'partials/index.tpl.html',
@@ -46,7 +47,10 @@ config(['$routeProvider', function( $routeProvider ){
 		}).
 		when('/cart/checkout', { // generated checkout form (ask all the questions here)
 			templateUrl: 'partials/checkout-questions.tpl.html',
-			controller: 'CheckoutCtrl'
+			controller: 'CheckoutCtrl',
+			resolve: {
+				user: securityAuthorizationProvider.requireAuthenticatedUser
+			}
 		}).
 		otherwise({ redirectTo: '/' });
 }]);
