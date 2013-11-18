@@ -19,12 +19,12 @@ module.exports = function(grunt) {
 					'<%= activeDir %>/<%= pkg.name %>.js': ['src/**/*.js']
 				},
 			},
-			vendor: {
-				files: {
-					'<%= activeDir %>/angular.js': ['vendor/angular/*.js'],
-					'<%= activeDir %>/angular-ui.js': ['vendor/angular-ui/*.js']
-				}
-			}
+			// vendor: {
+			// 	files: {
+			// 		'<%= activeDir %>/angular.js': ['vendor/angular/*.js'],
+			// 		'<%= activeDir %>/angular-ui.js': ['vendor/angular-ui/*.js']
+			// 	}
+			// }
 		},
 
 		concat:{
@@ -44,13 +44,13 @@ module.exports = function(grunt) {
 					'<%= activeDir %>/index.html': ['src/index.html']
 				}
 			},
-			vendor: {
-				files: {
-					'<%= activeDir %>/angular.js': ['vendor/angular/angular.js', 'vendor/angular/*.js'],
-					'<%= activeDir %>/angular-ui.js': ['vendor/angular-ui/*.js'],
-					'<%= activeDir %>/bootstrap.css': ['vendor/bootstrap/bootstrap.css']
-				}
-			}
+			// vendor: {
+			// 	files: {
+			// 		'<%= activeDir %>/angular.js': ['vendor/angular/angular.js', 'vendor/angular/*.js'],
+			// 		'<%= activeDir %>/angular-ui.js': ['vendor/angular-ui/*.js'],
+			// 		'<%= activeDir %>/bootstrap.css': ['vendor/bootstrap/bootstrap.css']
+			// 	}
+			// }
 		},
 
 		clean: ['<%= activeDir %>/*'],
@@ -95,6 +95,12 @@ module.exports = function(grunt) {
 				cwd: 'src/partials/',
 				dest: '<%= activeDir %>/partials/',
 				src: '*.tpl.html'
+			},
+			js_partials: {
+				expand: true,
+				cwd: 'src/js/',
+				src: ['**/*.tpl.html'],
+				dest: '<%= activeDir %>/'
 			}
 		},
 
