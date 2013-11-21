@@ -22,6 +22,8 @@ provider('securityAuthorization', {
 				var promise = security.requestCurrentUser().then(function(userInfo) {
 					if ( !security.isAuthenticated() ) {
 						return queue.pushRetryFn('unauthenticated-client', service.requireAuthenticatedUser);
+					} else {
+						return userInfo;
 					}
 				});
 				return promise;
@@ -33,6 +35,8 @@ provider('securityAuthorization', {
 				var promise = security.requestCurrentUser().then(function(userInfo) {
 					if ( !security.isAdmin() ) {
 						return queue.pushRetryFn('unauthorized-client', service.requireAdminUser);
+					} else {
+						return userInfo;
 					}
 				});
 				return promise;

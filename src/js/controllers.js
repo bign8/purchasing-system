@@ -32,7 +32,7 @@ controller('ListProdCtrl', ['$scope', 'myPage', 'prodList', 'myCart', function (
 	};
 	$scope.sortIcon = function (fieldName) {
 		if ($scope.sortField === fieldName) {
-			return $scope.reverse ? 'glyphicon-chevron-down' : 'glyphicon-chevron-up' ;
+			return $scope.reverse ? 'icon-chevron-down' : 'icon-chevron-up' ;
 		} else {
 			return '';
 		}
@@ -62,7 +62,7 @@ controller('ListItemCtrl', ['$scope', 'myPage', '$routeParams', function ($scope
 
 	$scope.sortIcon = function (fieldName) {
 		if ($scope.sortField === fieldName) {
-			return $scope.reverse ? 'glyphicon-chevron-down' : 'glyphicon-chevron-up' ;
+			return $scope.reverse ? 'icon-chevron-down' : 'icon-chevron-up' ;
 		} else {
 			return '';
 		}

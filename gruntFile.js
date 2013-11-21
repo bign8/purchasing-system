@@ -123,7 +123,8 @@ module.exports = function(grunt) {
 		'ftp-deploy': {
 			phpOnly: {
 				auth: {
-					host: 'uastore.wha.la',
+					// host: 'uastore.wha.la',
+					host: 'nate.youdontcare.com',
 					port: 21,
 					authKey: 'uastore'
 				},
