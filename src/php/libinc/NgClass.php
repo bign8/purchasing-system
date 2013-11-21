@@ -45,7 +45,7 @@ abstract class NgClass {
 
 	// Worker(security): returns current user or null
 	public function currentUser() {
-		return json_encode(array( 'user' => $_SESSION['user'] ), JSON_PRETTY_PRINT );
+		return json_encode(array( 'user' => $_SESSION['user'] ) );
 	}
 
 	// Worker(security): grabs authentication from child class
