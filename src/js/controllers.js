@@ -9,13 +9,17 @@ controller('IndexCtrl', ['$scope', 'myPage', function ($scope, myPage) {
 	myPage.setTitle("Upstream Academy", "Guiding accounting firms to high performance");
 }]).
 
-controller('ListProdCtrl', ['$scope', 'myPage', 'prodList', 'prodList2', 'myCart', function ($scope, myPage, prodList, prodList2, myCart) {
+controller('ListProdCtrl', ['$scope', 'myPage', 'prodList', function ($scope, myPage, prodList) {
 	myPage.setTitle("Our Products", "Some quote about products");
 
 	// Set global passed variables
-	$scope.myCart = myCart;
-	$scope.products = prodList;
-	$scope.prodList2 = prodList2.data;
+	prodList.data.forEach(function(ele) {
+		console.log(ele);
+		if (ele.img === null) {
+			ele.img = 'http://lorempixel.com/360/250/business';
+		}
+	});
+	$scope.products = prodList.data;
 
 	// toggling list view style
 	$scope.showAsList = false;
@@ -45,10 +49,22 @@ controller('ListProdCtrl', ['$scope', 'myPage', 'prodList', 'prodList2', 'myCart
 
 }]).
 
-controller('ListItemCtrl', ['$scope', 'myPage', '$routeParams', function ($scope, myPage, $routeParams) {
-	console.log($routeParams);
+controller('ListItemCtrl', ['$scope', 'myPage', '$routeParams', 'itemList', 'myCart', function ($scope, myPage, $routeParams, itemList, myCart) {
 	myPage.setTitle("Products", $routeParams.prodID);
 
+	// Set global passed variables
+	$scope.myCart = myCart;
+	itemList.data.forEach(function(ele) {
+		if (ele.img === null) {
+			ele.img = 'http://lorempixel.com/360/250/business';
+		}
+	});
+	$scope.items = itemList.data;
+
+	// toggling list view style
+	$scope.showAsList = false;
+
+	// list sort
 	$scope.sortField = undefined;
 	$scope.reverse = false;
 
@@ -69,18 +85,36 @@ controller('ListItemCtrl', ['$scope', 'myPage', '$routeParams', function ($scope
 		}
 	};
 
+	// pagination
 	$scope.pageNo = 1;
-	$scope.pageSize = 10;
+	$scope.pageSize = 12;
 }]).
 
-controller('ShowItemCtrl', ['$scope', 'myPage', function ($scope, myPage) {
-	myPage.setTitle("Item YYY");
+controller('ShowItemCtrl', ['$scope', 'myPage', 'itemDetail', function ($scope, myPage, itemDetail) {
+	myPage.setTitle(itemDetail.data.name);
+
+	if (itemDetail.data.img === null) {
+		itemDetail.data.img = 'http://lorempixel.com/360/250/business';
+	}
+
+	$scope.item = itemDetail.data;
 }]).
 
-controller('CartCtrl', ['$scope', 'myPage', 'myCart', function ($scope, myPage, myCart) {
+controller('CartCtrl', ['$scope', 'myPage', 'myCart', 'fullCart', 'security', function ($scope, myPage, myCart, fullCart, security) {
 	myPage.setTitle("Shopping Cart");
 
+	myCart.setFull(fullCart.data);
 	$scope.myCart = myCart;
+
+	$scope.checkout = function() {
+		console.log('TODO: Check if user is logged in, then checkout or go through user add process');
+		if (security.currentUser === null) {
+			console.log('needs auth');
+		} else {
+			console.log('auth granted');
+		}
+		// console.log(security.currentUser);
+	};
 }]).
 
 controller('CheckoutCtrl', ['$scope', 'myPage', function ($scope, myPage) {

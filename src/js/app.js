@@ -17,37 +17,37 @@ config(['$routeProvider', 'securityAuthorizationProvider', function( $routeProvi
 			templateUrl: 'partials/list-products.tpl.html',
 			controller: 'ListProdCtrl',
 			resolve: {
-				prodList: function() {
-					var products = [];
-					for (var i=0; i<99; i++) {
-						products.push({
-							productID: i,
-							name: 'Product ' + ("0" + i).slice(-2),
-							link: 'product-' + ("0" + i).slice(-2),
-							desc: 'Description of product ' + ("0" + i).slice(-2),
-							cost: Math.floor(Math.random() * 10000)/100,
-							pic: 'http://lorempixel.com/300/200/business/?' + Math.floor(Math.random()*10)
-						});
-					}
-					return products;
-				},
-
-				prodList2: function(interface, $route) {
+				prodList: function(interface, $route) {
 					return interface.call('getProducts', $route.current.params);
 				}
 			}
 		}).
 		when('/products/:prodID', { // List Items - render list of items offered within product
 			templateUrl: 'partials/list-items.tpl.html',
-			controller: 'ListItemCtrl'
+			controller: 'ListItemCtrl',
+			resolve: {
+				itemList: function(interface, $route) {
+					return interface.call('getItems', $route.current.params);
+				}
+			}
 		}).
 		when('/products/:prodID/:itemID', { // Show Item details - include add to cart button
 			templateUrl: 'partials/show-item.tpl.html',
-			controller: 'ShowItemCtrl'
+			controller: 'ShowItemCtrl',
+			resolve: {
+				itemDetail: function(interface, $route) {
+					return interface.call('getItem', $route.current.params);
+				}
+			}
 		}).
 		when('/cart', { // list items in cart
 			templateUrl: 'partials/show-cart.tpl.html',
-			controller: 'CartCtrl'
+			controller: 'CartCtrl',
+			resolve: {
+				fullCart: function(interface) {
+					return interface.call('getCart', {'ids': localStorage.azUAcart});
+				}
+			}
 		}).
 		when('/cart/checkout', { // generated checkout form (ask all the questions here)
 			templateUrl: 'partials/checkout-questions.tpl.html',
@@ -56,5 +56,17 @@ config(['$routeProvider', 'securityAuthorizationProvider', function( $routeProvi
 				user: securityAuthorizationProvider.requireAuthenticatedUser
 			}
 		}).
+		when('/myPurchases', {
+			// TODO: show list of past purchases and allow modification/re-download
+		}).
+		when('/admin', {
+			// TODO: build administration section
+		}).
 		otherwise({ redirectTo: '/' });
+}])
+
+.run(['security', function(security) {
+  // Get the current user when the application starts
+  // (in case they are still logged in from a previous session)
+  security.requestCurrentUser();
 }]);

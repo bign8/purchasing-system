@@ -57,6 +57,7 @@ factory('breadcrumbs', ['$rootScope', '$location', function ($rootScope, $locati
 
 factory('myCart', function() {
 	var cart = JSON.parse(localStorage.azUAcart || '[]');
+	var fullCart = [];
 
 	var update = function() {
 		localStorage.azUAcart = JSON.stringify(cart);
@@ -67,28 +68,38 @@ factory('myCart', function() {
 			return cart.length;
 		},
 		add: function(item) {
-			cart.push(item.productID);
+			cart.push(item.itemID);
 			update();
 		},
 		rem: function(index) {
 			cart.splice(index, 1);
+			fullCart.splice(index, 1);
 			update();
 		},
-		list: function() {
-			return cart;
-		},
 		contains: function(item) {
-			return cart.indexOf(item.productID) !== -1;
+			return cart.indexOf(item.itemID) !== -1;
+		},
+
+		// fullCart data
+		list: function() {
+			return fullCart;
+		},
+		setFull: function(data) {
+			fullCart = data;
 		},
 		total: function() {
 			var tot = 0;
-			for (var x in cart) {
-				tot += cart[x].cost;
-			}
+			fullCart.forEach(function(ele){
+				tot += parseFloat(ele.cost);
+			});
+			// for (var x in fullCart) {
+			// 	tot += parseFloat(fullCart[x].cost);
+			// }
 			return tot;
 		},
 		clear: function() {
 			cart = [];
+			fullCart = [];
 			update();
 		}
 	};
