@@ -11,15 +11,15 @@
 				</a>
 			</div>
 
-			<div class="input-prepend pull-left">
+			<div class="input-prepend offset2 span5 pull-left">
 				<span class="add-on">Search: </span>
-				<input type="text" id="query" ng-model="query" />
+				<input type="text" id="query" ng-model="query" style="width:auto" />
 			</div>
 
-			<div class="pull-right hidden-phone">
+			<div class=" hidden-phone offset1 span2">
 				<div class="input-prepend" ng-hide="filteredProducts.length < 10">
 					<span class="add-on">Page Size: </span>
-					<select ng-model="pageSize">
+					<select ng-model="pageSize" style="width:auto">
 						<option value="12">12</option>
 						<option value="30">30</option>
 						<option value="60">60</option>
@@ -40,7 +40,7 @@
 							<h3>{{product.name}} <small>{{product.cost | currency}}</small></h3>
 							<p>{{product.desc}}</p>
 							<div>
-								<a ng-href="#/products/{{product.productID}}" class="btn btn-default" role="button">View Details</a>
+								<a ng-href="#/products/{{product.productID}}" class="btn btn-default" role="button">Details</a>
 								<a ng-click="myCart.add(product)" ng-hide="myCart.contains(product)" class="btn btn-primary pull-right" role="button">Add to Cart</a>
 							</div>
 						</div>
@@ -53,12 +53,14 @@
 				<thead>
 					<tr>
 						<th ng-click="sort('name')">
-							Name <span class="glyphicon {{sortIcon('name')}}"></span>
+							Name <span class="{{sortIcon('name')}}"></span>
 						</th>
 						<th ng-click="sort('desc')">
-							Description <span class="glyphicon {{sortIcon('desc')}}"></span>
+							Description <span class="{{sortIcon('desc')}}"></span>
 						</th>
-						<th>Cost</th>
+						<th ng-click="sort('cost')">
+							Cost <span class="{{sortIcon('cost')}}">
+						</th>
 						<th>Add to Cart</th>
 					</tr>
 				</thead>
@@ -81,6 +83,7 @@
 
 		<pagination boundary-links="true" total-items="filteredProducts.length" page="pageNo" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;" items-per-page="pageSize" max-size="5" style="text-align:center"></pagination>
 
-		
+		<pre>{{prodList2 | json}}</pre>
+
 	</div>
 </div>

@@ -1,13 +1,10 @@
 <?php
 
-// require_once('./libinc/main_include.php');
-
-// $db = new myPDO();
-// $STH = $db->query("SELECT * FROM item;");
-
-// while ($row = $STH->fetch( PDO::FETCH_ASSOC )) {
-// 	print_r($row);
-// }
+// Handle cross site stuff (for development)
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type');
+if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') { exit(0); }
 
 require_once('./libinc/main_include.php');
 
@@ -50,6 +47,14 @@ class formsManager extends NgClass {
 		$this->requiresAdmin();
 		return 'hello administrator user';
 	}
+
+	// Main application funcitons
+
+	// Worker(app): returns product list
+	public function getProducts() {
+		$STH = $this->db->query("SELECT * FROM `product` WHERE visible = 'yes';");
+		return json_encode($STH->fetchAll(PDO::FETCH_ASSOC));
+	}
 }
 
 /*
@@ -63,6 +68,9 @@ switch ($_REQUEST['action']) {
 	case 'currentUser': echo $obj->currentUser(); break;
 	case 'login': echo $obj->login(); break;
 	case 'logout': echo $obj->logout(); break;
+
+	// Main app functions
+	case 'getProducts': echo $obj->getProducts(); break;
 
 	// Test case statements
 	case 'testAuth': echo $obj->testAuth(); break;

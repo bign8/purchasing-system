@@ -9,17 +9,18 @@ controller('IndexCtrl', ['$scope', 'myPage', function ($scope, myPage) {
 	myPage.setTitle("Upstream Academy", "Guiding accounting firms to high performance");
 }]).
 
-controller('ListProdCtrl', ['$scope', 'myPage', 'prodList', 'myCart', function ($scope, myPage, prodList, myCart) {
+controller('ListProdCtrl', ['$scope', 'myPage', 'prodList', 'prodList2', 'myCart', function ($scope, myPage, prodList, prodList2, myCart) {
 	myPage.setTitle("Our Products", "Some quote about products");
 
 	// Set global passed variables
 	$scope.myCart = myCart;
 	$scope.products = prodList;
+	$scope.prodList2 = prodList2.data;
 
-	// Handle toggling list view style
+	// toggling list view style
 	$scope.showAsList = false;
 
-	// Handling list sort
+	// list sort
 	$scope.sortField = undefined;
 	$scope.reverse = false;
 	$scope.sort = function (fieldName) {
@@ -38,7 +39,7 @@ controller('ListProdCtrl', ['$scope', 'myPage', 'prodList', 'myCart', function (
 		}
 	};
 
-	// Handling pagination
+	// pagination
 	$scope.pageNo = 1;
 	$scope.pageSize = 12;
 
