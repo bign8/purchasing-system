@@ -20,3 +20,5 @@ un-used
 
 config.php
 .ftppass
+
+src/assets/img/*

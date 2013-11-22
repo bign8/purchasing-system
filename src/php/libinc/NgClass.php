@@ -46,6 +46,11 @@ abstract class NgClass {
 		return $_SESSION['user'];
 	}
 
+	// Helper(security) grabs user if available
+	protected function getCurrentUser() {
+		return $_SESSION['user'];
+	}
+
 	// Worker(security): returns current user or null
 	public function currentUser() {
 		return json_encode(array( 'user' => $_SESSION['user'] ) );

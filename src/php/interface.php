@@ -55,6 +55,83 @@ class formsManager extends NgClass {
 		$STH = $this->db->query("SELECT * FROM `product` WHERE visible = 'yes';");
 		return json_encode($STH->fetchAll(PDO::FETCH_ASSOC));
 	}
+
+	// Helper(app): returns interpolated item (see: https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-3-logger-interface.md)
+	private function interpolate( $message, $context = array()) {
+		// build a replacement array with braces around the context keys
+		$replace = array();
+		foreach ($context as $key => $val) {
+			$replace['{' . $key . '}'] = $val;
+		}
+
+		// interpolate replacement values into the message and return
+		return strtr($message, $replace);
+	}
+
+	// Helper(app): return cost for a productID
+	private function getProductCost( $productID ) {
+		$user = $this->getCurrentUser(); // TODO: use this to adjust price as it is set
+
+		$costSTH = $this->db->prepare("SELECT settings, pretty FROM `price` p JOIN `option` o ON o.optionID = p.optionID WHERE productID = ?;");
+		$costSTH->execute( $productID );
+		$costRow = $costSTH->fetch(PDO::FETCH_ASSOC);
+		return $this->interpolate($costRow['pretty'], json_decode($costRow['settings']));
+	}
+
+	// Worker(app): returns item list
+	public function getItems() {
+		$data = $this->getPostData();
+
+		// Get cost for all the items
+		$cost = $this->getProductCost( $data->prodID );
+
+		// Get All the items
+		$itemSTH = $this->db->prepare("SELECT * FROM `item` WHERE productID = ?;");
+		$itemSTH->execute( $data->prodID );
+
+		// Properly pre-format return data
+		$retData = $itemSTH->fetchAll(PDO::FETCH_ASSOC);
+		foreach ($retData as &$item) {
+			$item['settings'] = json_decode($item['settings']);
+			$item['cost'] = $cost;
+		}
+
+		return json_encode($retData);
+	}
+
+	// Worker(app): return specific item detail
+	public function getItem() {
+		$data = $this->getPostData();
+		// die(print_r($data, true));
+		return json_encode($this->getItemByID($data->itemID));
+	}
+
+	// Helper(app): return specific item detail by id
+	private function getItemByID( $itemID ) {
+		$itemSTH = $this->db->prepare("SELECT * FROM `item` WHERE itemID = ?;");
+		$itemSTH->execute( $itemID );
+		$row = $itemSTH->fetch(PDO::FETCH_ASSOC);
+		$row['settings'] = json_decode($row['settings']);
+		$row['cost'] = $this->getProductCost( $row['productID'] );
+		return $row;
+	}
+
+	// Worker(app): return cart with current prices
+	public function getCart() {
+		$data = $this->getPostData();
+
+		// Iterate through ID's
+		$retData = array();
+		foreach (json_decode($data->ids) as $itemID) {
+			// $itemSTH->execute( $itemID );
+			// $row = $itemSTH->fetch(PDO::FETCH_ASSOC);
+			// $row['cost'] = $this->getProductCost( $row['productID'] );
+
+			array_push($retData, $this->getItemByID( $itemID ));
+		}
+
+		return json_encode($retData);
+	}
 }
 
 /*
@@ -71,6 +148,9 @@ switch ($_REQUEST['action']) {
 
 	// Main app functions
 	case 'getProducts': echo $obj->getProducts(); break;
+	case 'getItems': echo $obj->getItems(); break;
+	case 'getCart': echo $obj->getCart(); break;
+	case 'getItem': echo $obj->getItem(); break;
 
 	// Test case statements
 	case 'testAuth': echo $obj->testAuth(); break;
