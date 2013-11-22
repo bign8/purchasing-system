@@ -30,6 +30,10 @@ config(['$routeProvider', 'securityAuthorizationProvider', function( $routeProvi
 						});
 					}
 					return products;
+				},
+
+				prodList2: function(interface, $route) {
+					return interface.call('getProducts', $route.current.params);
 				}
 			}
 		}).

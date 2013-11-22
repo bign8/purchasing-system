@@ -2,10 +2,11 @@
 angular.module('security.service', [
 	'security.retryQueue',	// Keeps track of failed requests that need to be retried once the user logs in
 	'security.login',			// Contains the login form template and controller
-	'ui.bootstrap'
+	'ui.bootstrap',
+	'myApp.services'
 ]).
 
-factory('security', ['$http', '$q', '$location', 'securityRetryQueue', '$modal', function($http, $q, $location, queue, $modal) {
+factory('security', ['$http', '$q', '$location', 'securityRetryQueue', '$modal', 'interface', function($http, $q, $location, queue, $modal, interface) {
 // factory('security', ['$http', '$q', '$location', 'securityRetryQueue', function($http, $q, $location, queue) {
 
 	// Redirect to the given url (defaults to '/')
@@ -75,7 +76,8 @@ factory('security', ['$http', '$q', '$location', 'securityRetryQueue', '$modal',
 
 		// Attempt to authenticate a user by the given email and password
 		login: function(email, password) {
-			var request = $http.post('interface.php', {email: email, password: password}, {params:{action:'login'}});
+			// var request = $http.post('interface.php', {email: email, password: password}, {params:{action:'login'}});
+			var request = interface.call('login', {email: email, password: password});
 			return request.then(function(response) {
 				service.currentUser = response.data.user;
 				if ( service.isAuthenticated() ) {
@@ -93,7 +95,8 @@ factory('security', ['$http', '$q', '$location', 'securityRetryQueue', '$modal',
 
 		// Logout the current user and redirect
 		logout: function(redirectTo) {
-			$http.post('interface.php', {}, {params:{action:'logout'}}).then(function() {
+			// $http.post('interface.php', {}, {params:{action:'logout'}}).then(function() {
+			interface.call('logout', {}).then(function() {
 				service.currentUser = null;
 				redirect(redirectTo);
 			});
@@ -104,7 +107,8 @@ factory('security', ['$http', '$q', '$location', 'securityRetryQueue', '$modal',
 			if ( service.isAuthenticated() ) {
 				return $q.when(service.currentUser);
 			} else {
-				return $http.get('interface.php', {params: {action:'currentUser'}}).then(function(response) {
+				// return $http.get('interface.php', {params: {action:'currentUser'}}).then(function(response) {
+				return interface.call('currentUser', {}).then(function(response) {
 					service.currentUser = response.data.user;
 					return service.currentUser;
 				});

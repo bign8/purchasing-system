@@ -92,6 +92,15 @@ factory('myCart', function() {
 			update();
 		}
 	};
-});
+}).
+
+factory('interface', ['$http', function ($http) {
+
+	return {
+		call: function(myAction, data) {
+			return $http.post('http://uastore.wha.la/interface.php', data, {params:{action: myAction}});
+		}
+	};
+}]);
 
 // http://www.codeproject.com/Articles/576246/A-Shopping-Cart-Application-Built-with-AngularJS

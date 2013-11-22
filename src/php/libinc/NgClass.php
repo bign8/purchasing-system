@@ -33,7 +33,9 @@ abstract class NgClass {
 			header('HTTP/1.1 401 Unauthorized');
 			die( 'no-auth' );
 		}
+		return $_SESSION['user'];
 	}
+
 	// Helper(security) ensures user is administrator
 	protected function requiresAdmin() {
 		$this->requiresAuth();
@@ -41,6 +43,7 @@ abstract class NgClass {
 			header('HTTP/1.1 401 Unauthorized');
 			die( 'no-admin' );
 		}
+		return $_SESSION['user'];
 	}
 
 	// Worker(security): returns current user or null
