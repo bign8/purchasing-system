@@ -56,11 +56,17 @@ config(['$routeProvider', 'securityAuthorizationProvider', function( $routeProvi
 				user: securityAuthorizationProvider.requireAuthenticatedUser
 			}
 		}).
-		when('/myPurchases', {
+		when('/purchases', {
 			// TODO: show list of past purchases and allow modification/re-download
+			resolve: {
+				user: securityAuthorizationProvider.requireAuthenticatedUser
+			}
 		}).
 		when('/admin', {
 			// TODO: build administration section
+			resolve: {
+				user: securityAuthorizationProvider.requireAdminUser
+			}
 		}).
 		otherwise({ redirectTo: '/' });
 }])

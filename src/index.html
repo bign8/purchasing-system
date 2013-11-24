@@ -46,6 +46,7 @@
 						<ul class="nav">
 							<li ng-class="{active: breadcrumbs.onPage('products')}"><a href="#/products">Products</a></li>
 							<li ng-class="{active: breadcrumbs.onPage('cart')}"><a href="#/cart">Shopping Cart</a></li>
+							<li ng-class="{active: breadcrumbs.onPage('purchases')}" ng-show="security.isAuthenticated()"><a href="#/purchases">Past Products</a></li>
 						</ul>
 
 						<login-toolbar class="visible-desktop"></login-toolbar>
