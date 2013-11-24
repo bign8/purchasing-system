@@ -139,7 +139,8 @@ module.exports = function(grunt) {
 					authKey: 'uastore'
 				},
 				src: 'build/',
-				dest: '/'
+				dest: '/',
+				exclusions: ['build/**/*.png']
 			}
 		}
 

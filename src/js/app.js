@@ -45,7 +45,7 @@ config(['$routeProvider', 'securityAuthorizationProvider', function( $routeProvi
 			controller: 'CartCtrl',
 			resolve: {
 				fullCart: function(interface) {
-					return interface.call('getCart', {'ids': localStorage.azUAcart});
+					return interface.call('getCart', {'ids': JSON.parse(localStorage.azUAcart || '[]')});
 				}
 			}
 		}).
