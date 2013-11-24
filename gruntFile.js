@@ -132,6 +132,15 @@ module.exports = function(grunt) {
 				src: 'src/php',
 				dest: '/'
 			},
+			theApp: {
+				auth: {
+					host: 'uastore.wha.la',
+					port: 21,
+					authKey: 'uastore'
+				},
+				src: 'build/',
+				dest: '/'
+			}
 		}
 
 		// php: { // install php to make this work
@@ -161,8 +170,8 @@ module.exports = function(grunt) {
 	// grunt.loadNpmTasks('grunt-php');
 
 	// Define task(s)
-	grunt.registerTask('default', ['build', 'ftp-deploy:phpOnly', 'connect', 'open', 'watch']);
-	grunt.registerTask('build', ['setPath:build', 'jshint', 'clean', 'concat', 'copy']);
+	grunt.registerTask('default', ['build', 'connect', 'open', 'watch']);
+	grunt.registerTask('build', ['setPath:build', 'jshint', 'clean', 'concat', 'copy', 'ftp-deploy']);
 	grunt.registerTask('release', ['setPath:release', 'jshint', 'clean', 'uglify', 'concat:index', 'copy']);
 
 };
