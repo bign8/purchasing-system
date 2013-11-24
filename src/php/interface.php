@@ -122,7 +122,7 @@ class formsManager extends NgClass {
 
 		// Iterate through ID's
 		$retData = array();
-		foreach (json_decode($data->ids) as $itemID) {
+		foreach ($data->ids as $itemID) {
 			// $itemSTH->execute( $itemID );
 			// $row = $itemSTH->fetch(PDO::FETCH_ASSOC);
 			// $row['cost'] = $this->getProductCost( $row['productID'] );
