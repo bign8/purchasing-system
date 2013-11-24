@@ -121,9 +121,9 @@ controller('CheckoutCtrl', ['$scope', 'myPage', function ($scope, myPage) {
 	myPage.setTitle("Checkout");
 }]).
 
-controller('HeadCtrl', ['$scope', 'myPage', 'breadcrumbs', 'myCart', function ($scope, myPage, breadcrumbs, myCart) {
+controller('HeadCtrl', ['$scope', 'myPage', 'breadcrumbs', 'myCart', 'security', function ($scope, myPage, breadcrumbs, myCart, security) {
 	$scope.myPage = myPage;
 	$scope.breadcrumbs = breadcrumbs;
 	$scope.myCart = myCart;
-
+	$scope.security = security;
 }]);
