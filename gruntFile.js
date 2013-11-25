@@ -172,7 +172,8 @@ module.exports = function(grunt) {
 
 	// Define task(s)
 	grunt.registerTask('default', ['build', 'connect', 'open', 'watch']);
-	grunt.registerTask('build', ['setPath:build', 'jshint', 'clean', 'concat', 'copy', 'ftp-deploy']);
+	grunt.registerTask('build', ['setPath:build', 'jshint', 'clean', 'concat', 'copy', 'ftp-deploy:phpOnly']);
+	grunt.registerTask('build-remote', ['build', 'ftp-deploy:theApp']);
 	grunt.registerTask('release', ['setPath:release', 'jshint', 'clean', 'uglify', 'concat:index', 'copy']);
 
 };
