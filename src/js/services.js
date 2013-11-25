@@ -56,19 +56,32 @@ factory('breadcrumbs', ['$rootScope', '$location', function ($rootScope, $locati
 }]).
 
 factory('myCart', function() {
+	// TODO: Handle local storage changes in other tabs
 	var cart = JSON.parse(localStorage.azUAcart || '[]');
 	var fullCart = [];
 
 	var update = function() {
-		localStorage.azUAcart = JSON.stringify(cart);
+		// localStorage.azUAcart = JSON.stringify(cart);
+		localStorage.setItem('azUAcart', JSON.stringify(cart));
 	};
+
+	window.addEventListener(window, 'storage', function (event) {
+		if (event.key == 'azUAcart') {
+			console.log('data changed');
+		}
+	});
 
 	return {
 		len: function() {
-			return cart.length;
+			return cart.length || '';
 		},
 		add: function(item) {
 			cart.push(item.itemID);
+			update();
+		},
+		addObj: function(item) {
+			console.log('here');
+			cart.push(item);
 			update();
 		},
 		rem: function(index) {

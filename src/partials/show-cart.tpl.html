@@ -1,7 +1,7 @@
 <div class="row">
 	<div class="offset0 span12" ng-switch="myCart.len()">
 
-		<div style="text-align:center" ng-switch-when="0">
+		<div style="text-align:center" ng-switch-when="">
 			<a href="#/products" class="btn btn-primary btn-lg" role="button">Cart is Empty - Go Shop!</a>
 		</div>
 
@@ -34,7 +34,7 @@
 			</table>
 
 			<div style="text-align:center">
-				<a ng-click="checkout()" class="btn btn-primary btn-lg" role="button">Checkout - {{myCart.total() | currency}}</a>
+				<a ng-click="checkout()" class="btn btn-primary btn-lg" role="button">Checkout ({{myCart.total() | currency}})</a>
 			</div>
 		</div>
 	</div>
