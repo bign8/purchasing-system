@@ -126,4 +126,12 @@ controller('HeadCtrl', ['$scope', 'myPage', 'breadcrumbs', 'myCart', 'security',
 	$scope.breadcrumbs = breadcrumbs;
 	$scope.myCart = myCart;
 	$scope.security = security;
+}]).
+
+controller('LististPurchasesCtrl', ['$scope', 'myPage', function ($scope, myPage){
+	myPage.setTitle("Previously purchased items");
+}]).
+
+controller('CustPayFormCtrl', ['$scope', 'myPage', function ($scope, myPage){
+	myPage.setTitle("Custom Payment Form");
 }]);

@@ -46,10 +46,14 @@
 						<ul class="nav">
 							<li ng-class="{active: breadcrumbs.onPage('products')}"><a href="#/products">Products</a></li>
 							<li ng-class="{active: breadcrumbs.onPage('cart')}"><a href="#/cart">Shopping Cart</a></li>
-							<li ng-class="{active: breadcrumbs.onPage('purchases')}" ng-show="security.isAuthenticated()"><a href="#/purchases">Past Products</a></li>
+							<!-- <li ng-class="{active: breadcrumbs.onPage('purchases')}" ng-show="security.isAuthenticated()"><a href="#/purchases">Past Products</a></li> -->
 						</ul>
 
-						<login-toolbar class="visible-desktop"></login-toolbar>
+						<ul class="nav pull-right">
+							<li><a href="#/payment">Make A Payment</a></li>
+							<li><login-toolbar class="visible-desktop"></login-toolbar></li>
+						</ul>
+
 					</div>
 				</div>
 			</div>

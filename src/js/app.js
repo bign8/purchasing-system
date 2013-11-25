@@ -58,9 +58,15 @@ config(['$routeProvider', 'securityAuthorizationProvider', function( $routeProvi
 		}).
 		when('/purchases', {
 			// TODO: show list of past purchases and allow modification/re-download
+			templateUrl: 'partials/list-purchases.tpl.html',
+			controller: 'LististPurchasesCtrl',
 			resolve: {
 				user: securityAuthorizationProvider.requireAuthenticatedUser
 			}
+		}).
+		when('/payment', {
+			templateUrl: 'partials/custom-payment-form.tpl.html',
+			controller: 'CustPayFormCtrl'
 		}).
 		when('/admin', {
 			// TODO: build administration section
