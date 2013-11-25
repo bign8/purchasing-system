@@ -57,7 +57,7 @@ class formsManager extends NgClass {
 	}
 
 	// Helper(app): returns interpolated item (see: https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-3-logger-interface.md)
-	private function interpolate( $message, $context = array()) {
+	private function interpolate( $message, array $context = array()) {
 		// build a replacement array with braces around the context keys
 		$replace = array();
 		foreach ($context as $key => $val) {
@@ -75,7 +75,7 @@ class formsManager extends NgClass {
 		$costSTH = $this->db->prepare("SELECT settings, pretty FROM `price` p JOIN `option` o ON o.optionID = p.optionID WHERE productID = ?;");
 		$costSTH->execute( $productID );
 		$costRow = $costSTH->fetch(PDO::FETCH_ASSOC);
-		return $this->interpolate($costRow['pretty'], json_decode($costRow['settings']));
+		return $this->interpolate($costRow['pretty'], (array)json_decode($costRow['settings']));
 	}
 
 	// Worker(app): returns item list
@@ -126,8 +126,12 @@ class formsManager extends NgClass {
 			// $itemSTH->execute( $itemID );
 			// $row = $itemSTH->fetch(PDO::FETCH_ASSOC);
 			// $row['cost'] = $this->getProductCost( $row['productID'] );
+			if (is_string($itemID)) {
+				array_push($retData, $this->getItemByID( $itemID ));
+			} else {
+				array_push($retData, $itemID);
+			}
 
-			array_push($retData, $this->getItemByID( $itemID ));
 		}
 
 		return json_encode($retData);

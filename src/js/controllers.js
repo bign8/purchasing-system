@@ -132,6 +132,17 @@ controller('LististPurchasesCtrl', ['$scope', 'myPage', function ($scope, myPage
 	myPage.setTitle("Previously purchased items");
 }]).
 
-controller('CustPayFormCtrl', ['$scope', 'myPage', function ($scope, myPage){
+controller('CustPayFormCtrl', ['$scope', 'myPage', 'myCart', function ($scope, myPage, myCart){
 	myPage.setTitle("Custom Payment Form");
+
+	$scope.myCart = myCart;
+
+	$scope.item = {
+		itemID: -1,
+		productID: -1,
+		name: 'Custom Payment',
+		settings: null,
+		img: null,
+		blurb: 'This is a custom field'
+	};
 }]);
