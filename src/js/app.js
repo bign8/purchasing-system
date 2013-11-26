@@ -41,6 +41,8 @@ config(['$routeProvider', 'securityAuthorizationProvider', function( $routeProvi
 				}
 			}
 		}).
+
+		// CART
 		when('/cart', { // list items in cart
 			templateUrl: 'partials/show-cart.tpl.html',
 			controller: 'CartCtrl',
@@ -56,6 +58,11 @@ config(['$routeProvider', 'securityAuthorizationProvider', function( $routeProvi
 			resolve: {
 				user: securityAuthorizationProvider.requireAuthenticatedUser
 			}
+		}).
+
+		// USER STUFF
+		when('/register', {
+			templateUrl: 'partials/register-form.tpl.html'
 		}).
 		when('/purchases', {
 			// TODO: show list of past purchases and allow modification/re-download

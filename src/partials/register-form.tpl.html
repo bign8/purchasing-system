@@ -1,0 +1,106 @@
+<form class="form-horizontal row" name="registration">
+	<fieldset class="span6">
+		<legend>User Information</legend>
+
+		<div class="control-group">
+			<label class="control-label" for="legalName">Legal Name</label>
+			<div class="controls">
+				<input type="text" id="legalName" ng-model="user.legalName" placeholder="Legal Name">
+			</div>
+		</div>
+
+		<div class="control-group">
+			<label class="control-label" for="preName">Preferred Name</label>
+			<div class="controls">
+				<input type="text" id="preName" ng-model="user.preName" placeholder="Preferred Name">
+				<span class="help-inline">(i.e., Bill instead of William, etc.)</span>
+			</div>
+		</div>
+
+		<div class="control-group">
+			<label class="control-label" for="title">Title / Position</label>
+			<div class="controls">
+				<input type="text" id="title" ng-model="user.title" placeholder="Title / Position">
+				<!-- <span class="help-inline">(i.e., Bill instead of William, etc.)</span> -->
+			</div>
+		</div>
+
+		<div class="control-group">
+			<label class="control-label" for="phone">Phone</label>
+			<div class="controls">
+				<input type="text" id="phone" ng-model="user.phone" placeholder="Phone">
+				<span class="help-inline">(xxx-xxx-xxxx)</span>
+			</div>
+		</div>
+
+		<div class="control-group">
+			<label class="control-label" for="email">Email Address</label>
+			<div class="controls">
+				<input type="email" id="email" ng-model="user.email" placeholder="Email Address">
+			</div>
+		</div>
+
+		<div class="control-group">
+			<label class="control-label" for="inputPassword">Password</label>
+			<div class="controls">
+				<input type="password" id="inputPassword" ng-model="user.pass" placeholder="Password">
+			</div>
+		</div>
+
+		<div class="control-group">
+			<label class="control-label" for="inputPassword">Re-type Password</label>
+			<div class="controls">
+				<input type="password" id="inputPassword" ng-model="passVerify" placeholder="Password">
+			</div>
+		</div>
+	</fieldset>
+
+	<fieldset class="span6">
+		<legend>User Address</legend>
+
+		// Ask is same as firm
+
+		<div class="control-group">
+			<label class="control-label" for="addr1">Address 1</label>
+			<div class="controls">
+				<input type="text" id="addr1" ng-model="user.addr1" placeholder="Address 1">
+				<!-- <span class="help-inline">(xxx-xxx-xxxx)</span> -->
+			</div>
+		</div>
+
+		<div class="control-group">
+			<label class="control-label" for="addr2">Address 2</label>
+			<div class="controls">
+				<input type="text" id="addr2" ng-model="user.addr2" placeholder="Address 2">
+				<!-- <span class="help-inline">(xxx-xxx-xxxx)</span> -->
+			</div>
+		</div>
+
+		<div class="control-group">
+			<label class="control-label" for="city">City</label>
+			<div class="controls">
+				<input type="text" id="city" ng-model="user.city" placeholder="City">
+				<!-- <span class="help-inline">(xxx-xxx-xxxx)</span> -->
+			</div>
+		</div>
+
+		<div class="control-group">
+			<label class="control-label" for="state">State</label>
+			<div class="controls">
+				<input type="text" id="state" ng-model="user.state" placeholder="State">
+				<!-- <span class="help-inline">(xxx-xxx-xxxx)</span> -->
+			</div>
+		</div>
+
+		<div class="control-group">
+			<label class="control-label" for="zip">Zip Code</label>
+			<div class="controls">
+				<input type="text" id="zip" ng-model="user.zip" placeholder="Zip Code">
+				<!-- <span class="help-inline">(xxx-xxx-xxxx)</span> -->
+			</div>
+		</div>
+
+	</fieldset>
+</form>
+
+<pre class="">{{user | json}}</pre>

@@ -144,4 +144,10 @@ controller('CustPayFormCtrl', ['$scope', 'myPage', 'myCart', function ($scope, m
 		img: null,
 		blurb: 'This is a custom field'
 	};
+}]).
+
+controller('RegisterFormCtrl', ['$scope', 'myPage', function ($scope, myPage){
+	myPage.setTitle("Registration Form");
+
+	
 }]);

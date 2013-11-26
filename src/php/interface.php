@@ -118,6 +118,7 @@ class formsManager extends NgClass {
 
 	// Worker(app): return cart with current prices
 	public function getCart() {
+		// $user = $this->requiresAuth(); // upon cart completion
 		$data = $this->getPostData();
 
 		// Iterate through ID's

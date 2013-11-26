@@ -39,7 +39,13 @@ angular.module('security.login.form', [])
 		$scope.user = {};
 	};
 
-	$scope.cancelLogin = function() {
-		security.cancelLogin();
+	$scope.cancelLogin = function(path) {
+		console.log(path);
+		console.log('cancelingLogin in security.login.form');
+		security.cancelLogin(path);
+	};
+
+	$scope.register = function() {
+		security.register();
 	};
 }]);
