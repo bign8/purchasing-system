@@ -100,11 +100,11 @@ controller('ShowItemCtrl', ['$scope', 'myPage', 'itemDetail', function ($scope, 
 	$scope.item = itemDetail.data;
 }]).
 
-controller('CartCtrl', ['$scope', 'myPage', 'myCart', 'fullCart', 'security', function ($scope, myPage, myCart, fullCart, security) {
+controller('CartCtrl', ['$scope', 'myPage', 'myCart', 'security', 'printCart', function ($scope, myPage, myCart, security, printCart) {
 	myPage.setTitle("Shopping Cart");
 
-	myCart.setFull(fullCart.data);
 	$scope.myCart = myCart;
+	$scope.printCart = printCart;
 
 	$scope.checkout = function() {
 		console.log('TODO: Check if user is logged in, then checkout or go through user add process');
@@ -113,7 +113,6 @@ controller('CartCtrl', ['$scope', 'myPage', 'myCart', 'fullCart', 'security', fu
 		} else {
 			console.log('auth granted');
 		}
-		// console.log(security.currentUser);
 	};
 }]).
 

@@ -55,21 +55,32 @@ factory('breadcrumbs', ['$rootScope', '$location', function ($rootScope, $locati
 	};
 }]).
 
-factory('myCart', function() {
-	// TODO: Handle local storage changes in other tabs
+factory('myCart', ['$rootScope', function($rootScope) {
 	var cart = JSON.parse(localStorage.azUAcart || '[]');
-	var fullCart = [];
+	var observerCallbacks = []; // Observer Pattern
 
 	var update = function() {
-		// localStorage.azUAcart = JSON.stringify(cart);
 		localStorage.setItem('azUAcart', JSON.stringify(cart));
+		angular.forEach(observerCallbacks, function(callback) { // Notify observers
+			callback();
+		});
 	};
 
-	window.addEventListener(window, 'storage', function (event) {
-		if (event.key == 'azUAcart') {
-			console.log('data changed');
-		}
-	});
+	// Attach storage change event
+	if (window.addEventListener) { // See: http://diveintohtml5.info/storage.html
+		window.addEventListener('storage', handle_storage, false);
+	} else {
+		window.attachEvent('onstorage', handle_storage);
+	}
+
+	// Update cart and notify world of changes
+	function handle_storage(e) { // allow multi-tab updates
+		if (!e) { e = window.event; }
+		cart = JSON.parse(localStorage.getItem('azUAcart') || '[]');
+		$rootScope.$digest();
+		update();
+	}
+
 
 	return {
 		len: function() {
@@ -80,43 +91,61 @@ factory('myCart', function() {
 			update();
 		},
 		addObj: function(item) {
-			console.log('here');
 			cart.push(item);
 			update();
 		},
 		rem: function(index) {
 			cart.splice(index, 1);
-			fullCart.splice(index, 1);
 			update();
 		},
 		contains: function(item) {
 			return cart.indexOf(item.itemID) !== -1;
 		},
+		get: function() {
+			return cart;
+		},
+		clear: function() {
+			cart = [];
+			update();
+		},
 
-		// fullCart data
+		// Observer pattern
+		registerObserver: function(callback) {
+			observerCallbacks.push(callback);
+		}
+	};
+}]).
+
+factory('printCart', ['interface', 'myCart', function (interface, myCart) {
+	var fullCart = [];
+
+	// Nice observer pattern! http://stackoverflow.com/a/17558885
+	myCart.registerObserver(load_me);
+
+	function load_me() {
+			var promise = interface.call('getCart', {'ids': myCart.get()});
+			promise.then(function(response) {
+				fullCart = response.data;
+			});
+			return promise;
+	}
+
+	return {
+		load: function() {
+			return load_me();
+		},
 		list: function() {
 			return fullCart;
-		},
-		setFull: function(data) {
-			fullCart = data;
 		},
 		total: function() {
 			var tot = 0;
 			fullCart.forEach(function(ele){
 				tot += parseFloat(ele.cost);
 			});
-			// for (var x in fullCart) {
-			// 	tot += parseFloat(fullCart[x].cost);
-			// }
 			return tot;
-		},
-		clear: function() {
-			cart = [];
-			fullCart = [];
-			update();
 		}
 	};
-}).
+}]).
 
 factory('interface', ['$http', function ($http) {
 
