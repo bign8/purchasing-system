@@ -73,7 +73,7 @@ module.exports = function(grunt) {
 				// spawn: false
 			},
 			src: {
-				files: ['src/**/*.js', 'src/index.html', 'src/partials/**/*.tpl.html'],
+				files: ['src/**/*.js', 'src/index.html', 'src/**/*.tpl.html'],
 				tasks: ['build']
 			},
 			php: {

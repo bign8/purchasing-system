@@ -16,10 +16,10 @@ factory('security', ['$http', '$q', '$location', 'securityRetryQueue', '$modal',
 	}
 
 	// Login form dialog stuff
-	var loginDialog = null;
+	// var loginDialog = null;
 	var loginModal = null;
 	function openLoginDialog() {
-		if ( loginDialog ) {
+		if ( loginModal ) {
 			throw new Error('Trying to open a dialog that is already open!');
 		}
 		// loginDialog = $dialog.dialog();
@@ -100,6 +100,11 @@ factory('security', ['$http', '$q', '$location', 'securityRetryQueue', '$modal',
 				service.currentUser = null;
 				redirect(redirectTo);
 			});
+		},
+
+		register: function() {
+			loginModal.dismiss();
+			redirect('/register');
 		},
 
 		// Ask the backend to see if a user is already authenticated - this may be from a previous session.
