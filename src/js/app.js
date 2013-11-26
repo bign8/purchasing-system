@@ -4,7 +4,8 @@ angular.module('myApp', [
 	'ngRoute',
 	'myApp.controllers',
 	'myApp.filters',
-	'security'
+	'security',
+	'myApp.services'
 ]).
 
 config(['$routeProvider', 'securityAuthorizationProvider', function( $routeProvider, securityAuthorizationProvider ){
@@ -44,8 +45,8 @@ config(['$routeProvider', 'securityAuthorizationProvider', function( $routeProvi
 			templateUrl: 'partials/show-cart.tpl.html',
 			controller: 'CartCtrl',
 			resolve: {
-				fullCart: function(interface) {
-					return interface.call('getCart', {'ids': JSON.parse(localStorage.azUAcart || '[]')});
+				fullCart: function(printCart) {
+					return printCart.load();
 				}
 			}
 		}).

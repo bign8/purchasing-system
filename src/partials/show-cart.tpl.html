@@ -18,7 +18,7 @@
 				</thead>
 				<tbody>
 					<!-- <tr ng-repeat="product in fullCart"> -->
-					<tr ng-repeat="item in myCart.list()">
+					<tr ng-repeat="item in printCart.list()">
 						<td><a href="#/products/{{item.productID}}/{{item.itemID}}">{{item.name}}</a></td>
 						<td>{{item.description}}</td>
 						<td>{{item.cost | currency}} <a href ng-click="myCart.rem($index)" role="button" class="close">&times;</a></td>
@@ -28,13 +28,13 @@
 					<tr>
 						<th></th>
 						<th></th>
-						<th><span class="pull-right">Total: {{myCart.total() | currency}}</span></th>
+						<th><span class="pull-right">Total: {{printCart.total() | currency}}</span></th>
 					</tr>
 				</tfoot>
 			</table>
 
 			<div style="text-align:center">
-				<a ng-click="checkout()" class="btn btn-primary btn-lg" role="button">Checkout ({{myCart.total() | currency}})</a>
+				<a ng-click="checkout()" class="btn btn-primary btn-lg" role="button">Checkout ({{printCart.total() | currency}})</a>
 			</div>
 		</div>
 	</div>
