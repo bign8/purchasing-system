@@ -24,14 +24,16 @@ class formsManager extends NgClass {
 	// Worker(security): Implements Abstract: returns database user object or null
 	protected function getUser( $data ) {
 		$user = NULL;
-		if (isset($data->email) && isset($data->password) && $data->email == 'nwoods@carroll.edu' && $data->password == 'asdfasdf') {
-			$user = array(
-				'userID' => '1234',
-				'email' => 'nwoods@carroll.edu',
-				'firstName' => 'Nathan',
-				'lastName' => 'Woods',
-				'admin' => false
-			);
+
+		$STH = $this->db->prepare("SELECT * FROM `contact` WHERE `email`=? AND `pass`=ENCRYPT(?,?) LIMIT 1;");
+		$STH->execute( $data->email, $data->password, config::encryptSTR );
+		if ( $STH->rowCount() > 0 ) {
+			$user = $STH->fetch( PDO::FETCH_ASSOC );
+			$user['admin'] = $user['isAdmin'] == 'yes';
+			unset( $user['pass'], $user['resetHash'], $user['resetExpires'], $user['isAdmin'] );
+
+			$updateSTH = $this->db->prepare( "UPDATE `contact` SET lastLogin=NOW() WHERE `contactID`=?;" );
+			$updateSTH->execute( $user['contactID'] );
 		}
 		return $user;
 	}
