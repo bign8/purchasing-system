@@ -1,5 +1,37 @@
 <form class="form-horizontal row" name="registration">
 	<fieldset class="span6">
+		<legend>Firm Information</legend>
+
+		<div class="control-group">
+			<label class="control-label" for="firmName">Firm Name</label>
+			<div class="controls">
+				<input type="text" id="firmName" ng-model="user.firm.name" placeholder="Firm Name">
+				<!-- <span class="help-inline">(xxx-xxx-xxxx)</span> -->
+			</div>
+		</div>
+
+		<div class="control-group">
+			<label class="control-label" for="firmWeb">Firm Website</label>
+			<div class="controls">
+				<input type="url" id="firmWeb" ng-model="user.firm.website" placeholder="Firm Website">
+				<!-- <span class="help-inline">(xxx-xxx-xxxx)</span> -->
+			</div>
+		</div>
+
+		<div class="control-group">
+			<label class="control-label" for="firmName">Firm Address</label>
+			<div class="controls">
+				<div class="input-append" ng-switch="user.firm">
+					<span class="input-medium uneditable-input">Click 'set' to assign</span>
+					<button class="btn btn-info" ng-switch-when="null" ng-click="setAddr('firm')">Set</button>
+					<button class="btn btn-warning" ng-switch-default>Edit</button>
+				</div>
+			</div>
+		</div>
+
+	</fieldset>
+
+	<fieldset class="span6">
 		<legend>User Information</legend>
 
 		<div class="control-group">
@@ -41,6 +73,18 @@
 		</div>
 
 		<div class="control-group">
+			<label class="control-label">Address</label>
+			<div class="controls">
+				<div class="input-append" ng-switch="user.addr">
+					<span class="input-medium uneditable-input" title="Click 'set' to assign an address">Click 'set' to assign</span>
+					<button class="btn btn-info" ng-switch-when="null" ng-click="setAddr('addr')">Set</button>
+					<button class="btn btn-warning" ng-switch-default>Edit</button>
+				</div>
+				<label class="checkbox"><input type="checkbox">Same as Firm</label>
+			</div>
+		</div>
+
+		<div class="control-group">
 			<label class="control-label" for="inputPassword">Password</label>
 			<div class="controls">
 				<input type="password" id="inputPassword" ng-model="user.pass" placeholder="Password">
@@ -53,54 +97,9 @@
 				<input type="password" id="inputPassword" ng-model="passVerify" placeholder="Password">
 			</div>
 		</div>
-	</fieldset>
-
-	<fieldset class="span6">
-		<legend>User Address</legend>
-
-		// Ask is same as firm
-
-		<div class="control-group">
-			<label class="control-label" for="addr1">Address 1</label>
-			<div class="controls">
-				<input type="text" id="addr1" ng-model="user.addr1" placeholder="Address 1">
-				<!-- <span class="help-inline">(xxx-xxx-xxxx)</span> -->
-			</div>
-		</div>
-
-		<div class="control-group">
-			<label class="control-label" for="addr2">Address 2</label>
-			<div class="controls">
-				<input type="text" id="addr2" ng-model="user.addr2" placeholder="Address 2">
-				<!-- <span class="help-inline">(xxx-xxx-xxxx)</span> -->
-			</div>
-		</div>
-
-		<div class="control-group">
-			<label class="control-label" for="city">City</label>
-			<div class="controls">
-				<input type="text" id="city" ng-model="user.city" placeholder="City">
-				<!-- <span class="help-inline">(xxx-xxx-xxxx)</span> -->
-			</div>
-		</div>
-
-		<div class="control-group">
-			<label class="control-label" for="state">State</label>
-			<div class="controls">
-				<input type="text" id="state" ng-model="user.state" placeholder="State">
-				<!-- <span class="help-inline">(xxx-xxx-xxxx)</span> -->
-			</div>
-		</div>
-
-		<div class="control-group">
-			<label class="control-label" for="zip">Zip Code</label>
-			<div class="controls">
-				<input type="text" id="zip" ng-model="user.zip" placeholder="Zip Code">
-				<!-- <span class="help-inline">(xxx-xxx-xxxx)</span> -->
-			</div>
-		</div>
 
 	</fieldset>
+
 </form>
 
 <pre class="">{{user | json}}</pre>
