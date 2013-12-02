@@ -72,13 +72,13 @@ module.exports = function(grunt) {
 				interrupt: true,
 				// spawn: false
 			},
-			src: {
-				files: ['src/**/*.js', 'src/index.html', 'src/**/*.tpl.html'],
+			local: {
+				files: ['src/**/*.js', 'src/index.html', 'src/**/*.tpl.html', 'src/php/**/*'],
 				tasks: ['build']
 			},
-			php: {
-				files: ['src/php/**/*'],
-				tasks: ['ftp-deploy:phpOnly']
+			remote: {
+				files: ['src/**/*.js', 'src/index.html', 'src/**/*.tpl.html', 'src/php/**/*'],
+				tasks: ['build-remote']
 			}
 		},
 
@@ -171,9 +171,12 @@ module.exports = function(grunt) {
 	// grunt.loadNpmTasks('grunt-php');
 
 	// Define task(s)
-	grunt.registerTask('default', ['build', 'connect', 'open', 'watch']);
+	grunt.registerTask('default', ['build', 'connect', 'open', 'watch:local']);
+	grunt.registerTask('remote', ['build-remote', 'watch:remote']);
+
 	grunt.registerTask('build', ['setPath:build', 'jshint', 'clean', 'concat', 'copy', 'ftp-deploy:phpOnly']);
 	grunt.registerTask('build-remote', ['build', 'ftp-deploy:theApp']);
+
 	grunt.registerTask('release', ['setPath:release', 'jshint', 'clean', 'uglify', 'concat:index', 'copy']);
 
 };
