@@ -62,7 +62,8 @@ config(['$routeProvider', 'securityAuthorizationProvider', function( $routeProvi
 
 		// USER STUFF
 		when('/register', {
-			templateUrl: 'partials/register-form.tpl.html'
+			templateUrl: 'partials/register-form.tpl.html',
+			controller: 'RegisterFormCtrl'
 		}).
 		when('/purchases', {
 			// TODO: show list of past purchases and allow modification/re-download

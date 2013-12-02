@@ -149,5 +149,14 @@ controller('CustPayFormCtrl', ['$scope', 'myPage', 'myCart', function ($scope, m
 controller('RegisterFormCtrl', ['$scope', 'myPage', function ($scope, myPage){
 	myPage.setTitle("Registration Form");
 
-	
+	$scope.user = {
+		firm: null,
+		addr: null
+	};
+
+	$scope.setAddr = function (slug) {
+		// open modal here with address form
+		// modal insterts into db and returns full object
+		console.log('open set addr '  + slug);
+	};
 }]);
