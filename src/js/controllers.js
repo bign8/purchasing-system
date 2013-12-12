@@ -14,7 +14,7 @@ controller('ListProdCtrl', ['$scope', 'myPage', 'prodList', function ($scope, my
 
 	// Set global passed variables
 	prodList.data.forEach(function(ele) {
-		console.log(ele);
+		// console.log(ele);
 		if (ele.img === null) {
 			ele.img = 'http://lorempixel.com/360/250/business';
 		}
@@ -146,16 +146,46 @@ controller('CustPayFormCtrl', ['$scope', 'myPage', 'myCart', function ($scope, m
 	};
 }]).
 
-controller('RegisterFormCtrl', ['$scope', 'myPage', '$modal', function ($scope, myPage, $modal){
+controller('RegisterFormCtrl', ['$scope', 'myPage', '$modal', 'interface', 'security', function ($scope, myPage, $modal, interface, security){
 	myPage.setTitle("Registration Form");
 
+	// initialize empty user
 	$scope.user = {
 		preName: '',
 		firm: {addr: {addrID: null, addr2: null}},
 		addr: {addrID: null, addr2: null}
 	};
 
-	$scope.same = false; // set based on the similarity of the id's (when editing)
+	// handle registration clicks
+	$scope.register = function( invalid ) {
+		if (invalid) {
+			return alert('Form is not valid\nPlease try again.');
+		}
+		if ($scope.passVerify !== $scope.user.password) {
+			return alert('Passwords do not match\nPlease try again.');
+		}
+		if ($scope.user.firm.addr.addrID === null) {
+			return alert('Please assign a firm address');
+		}
+		if ($scope.user.addr.addrID === null) {
+			return alert('Please assign a user address');
+		}
+		interface.call('addUser', $scope.user).then(function() {
+			alert('Your account has successfully been created');
+			security.requestCurrentUser();
+			security.redirect('/cart');
+		}, function (err) {
+			if (err.data == 'dup') {
+				alert('This email already has an account\nPlease click the login button and attempt a password reset.');
+			} else {
+				alert('There was an unknown error creating your account\nPlease try again or contact Upstream Academy for help.');
+			}
+			console.log(err);
+		});
+	};
+
+	// For same address handling
+	$scope.same = false;
 	var firstLoad = true, oldUserAddr = null;
 	$scope.$watch('same', function(value) {
 		if (firstLoad) {
@@ -170,20 +200,12 @@ controller('RegisterFormCtrl', ['$scope', 'myPage', '$modal', function ($scope, 
 		}
 	});
 
+	// handle set address clicks
 	$scope.setAddr = function (slug) {
 		// open modal here with address form
 		// modal insterts into db and returns full object
-		
 		var myAddress = (slug == 'firm') ? $scope.user.firm.addr : $scope.user.addr ;
-
-		function applyAddr(addr) {
-			if (slug == 'firm') {
-				$scope.user.firm.addr = addr;
-			} else {
-				$scope.user.addr = addr;
-			}
-		}
-
+		
 		var modalInstance = $modal.open({
 			templateUrl: 'partials/modal-address.tpl.html',
 			controller: 'ModalAddressCtrl',
@@ -193,8 +215,11 @@ controller('RegisterFormCtrl', ['$scope', 'myPage', '$modal', function ($scope, 
 		});
 
 		modalInstance.result.then(function(address) {
-			console.log(address);
-			applyAddr(address);
+			if (slug == 'firm') {
+				$scope.user.firm.addr = address;
+			} else {
+				$scope.user.addr = address;
+			}
 		});
 	};
 }]).

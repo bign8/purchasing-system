@@ -15,7 +15,7 @@
 				<label class="control-label" for="firmWeb">Firm Website</label>
 				<div class="controls">
 					<input type="url" id="firmWeb" ng-model="user.firm.website" placeholder="Firm Website" required>
-					<!-- <span class="help-inline">(xxx-xxx-xxxx)</span> -->
+					<span class="help-inline">http://www.UpstreamAcademy.com/</span>
 				</div>
 			</div>
 
@@ -69,8 +69,8 @@
 			<div class="control-group">
 				<label class="control-label" for="phone">Phone</label>
 				<div class="controls">
-					<input type="text" id="phone" ng-model="user.phone" placeholder="Phone" required>
-					<span class="help-inline">(xxx-xxx-xxxx)</span>
+					<input type="text" id="phone" ng-model="user.phone" placeholder="Phone" name="phone" required>
+					<span class="help-inline">(xxx) xxx-xxxx</span>
 				</div>
 			</div>
 
@@ -104,7 +104,7 @@
 			<div class="control-group">
 				<label class="control-label" for="inputPassword">Password</label>
 				<div class="controls">
-					<input type="password" id="inputPassword" ng-model="user.pass" placeholder="Password" required>
+					<input type="password" id="inputPassword" ng-model="user.password" placeholder="Password" required>
 				</div>
 			</div>
 
@@ -119,7 +119,7 @@
 	</div>
 
 	<div class="form-actions">
-		<button type="submit" class="btn btn-primary" ng-disabled="registration.$invalid">Create an Account</button>
+		<button type="submit" class="btn btn-primary" ng-click="register( registration.$invalid )">Create an Account</button>
 		<a href="#/" class="btn">Cancel</a>
 	</div>	
 
