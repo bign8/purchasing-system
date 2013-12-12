@@ -104,6 +104,7 @@ factory('security', ['$http', '$q', '$location', 'securityRetryQueue', '$modal',
 
 		register: function() {
 			loginModal.dismiss();
+			loginModal = null;
 			redirect('/register');
 		},
 
@@ -131,6 +132,11 @@ factory('security', ['$http', '$q', '$location', 'securityRetryQueue', '$modal',
 		// Is the current user an adminstrator?
 		isAdmin: function() {
 			return !!(service.currentUser && service.currentUser.admin);
+		},
+
+		// wanted simple redirect script
+		redirect: function(url) {
+			redirect(url);
 		}
 	};
 

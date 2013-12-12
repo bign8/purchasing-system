@@ -146,7 +146,6 @@ class formsManager extends NgClass {
 
 		$STH = $this->db->prepare("INSERT INTO `address` (addrName, addr1, addr2, city, state, zip) VALUES (?,?,?,?,?,?);");
 		if (!$STH->execute( $data->addrName, $data->addr1, $data->addr2, $data->city, $data->state, $data->zip )) {
-			// return conflict!
 			header('HTTP/ 409 Conflict');
 			print_r($STH->errorInfo());
 		}
@@ -160,12 +159,45 @@ class formsManager extends NgClass {
 
 		$STH = $this->db->prepare("UPDATE `address` SET addrName=?, addr1=?, addr2=?, city=?, state=?, zip=? WHERE addressID=?;");
 		if (!$STH->execute( $data->addrName, $data->addr1, $data->addr2, $data->city, $data->state, $data->zip, $data->addrID )) {
-			// return conflict!
 			header('HTTP/ 409 Conflict');
 			print_r($STH->errorInfo());
 		}
 
 		return $data->addrID;
+	}
+
+	// Worker(app/user): register a user to the database
+	public function addUser() {
+		$data = $this->getPostData();
+
+		$checkSTH = $this->db->prepare("SELECT * FROM `contact` WHERE email=?;");
+		if (!$checkSTH->execute($data->email)) {
+			header('HTTP/ 409 Conflict');
+			return print_r($STH->errorInfo(), true);
+		}
+		if ($checkSTH->rowCount() > 0) {
+			header('HTTP/ 409 Conflict');
+			return 'dup';
+		}
+
+		// TODO: check to see if user is already in system (email)
+
+		$firmSTH = $this->db->prepare("INSERT INTO `firm` (addressID, name, website) VALUES (?,?,?);");
+		if (!$firmSTH->execute( $data->firm->addr->addrID, $data->firm->name, $data->firm->website )) {
+			header('HTTP/ 409 Conflict');
+			return print_r($STH->errorInfo(), true);
+		}
+		$firmID = $this->db->lastInsertId();
+
+		$contSTH = $this->db->prepare("INSERT INTO `contact` (firmID, addressID, legalName, preName, title, email, phone, pass) VALUES (?,?,?,?,?,?,?,ENCRYPT(?,?));");
+		if (!$contSTH->execute( $firmID, $data->addr->addrID, $data->legalName, $data->preName, $data->title, $data->email, $data->phone, $data->password, config::encryptSTR )) {
+			header('HTTP/ 409 Conflict');
+			return print_r($STH->errorInfo(), true);
+		}
+
+		session_start();
+		$_SESSION['user'] = $this->getUser( $data );
+		return $this->db->lastInsertId();
 	}
 }
 
@@ -190,7 +222,7 @@ switch ($_REQUEST['action']) {
 	// user registration functions
 	case 'addAddress': echo $obj->addAddress(); break;
 	case 'editAddress': echo $obj->editAddress(); break;
-
+	case 'addUser': echo $obj->addUser(); break;
 
 	// Test case statements
 	case 'testAuth': echo $obj->testAuth(); break;

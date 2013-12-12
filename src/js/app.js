@@ -5,7 +5,8 @@ angular.module('myApp', [
 	'myApp.controllers',
 	'myApp.filters',
 	'security',
-	'myApp.services'
+	'myApp.services',
+	'myApp.directives'
 ]).
 
 config(['$routeProvider', 'securityAuthorizationProvider', function( $routeProvider, securityAuthorizationProvider ){
