@@ -146,17 +146,73 @@ controller('CustPayFormCtrl', ['$scope', 'myPage', 'myCart', function ($scope, m
 	};
 }]).
 
-controller('RegisterFormCtrl', ['$scope', 'myPage', function ($scope, myPage){
+controller('RegisterFormCtrl', ['$scope', 'myPage', '$modal', function ($scope, myPage, $modal){
 	myPage.setTitle("Registration Form");
 
 	$scope.user = {
-		firm: null,
-		addr: null
+		preName: '',
+		firm: {addr: {addrID: null, addr2: null}},
+		addr: {addrID: null, addr2: null}
 	};
+
+	$scope.same = false; // set based on the similarity of the id's (when editing)
+	var firstLoad = true, oldUserAddr = null;
+	$scope.$watch('same', function(value) {
+		if (firstLoad) {
+			firstLoad = false;
+			return;
+		}
+		if (value) {
+			oldUserAddr = $scope.user.addr;
+			$scope.user.addr = $scope.user.firm.addr;
+		} else {
+			$scope.user.addr = oldUserAddr;
+		}
+	});
 
 	$scope.setAddr = function (slug) {
 		// open modal here with address form
 		// modal insterts into db and returns full object
-		console.log('open set addr '  + slug);
+		
+		var myAddress = (slug == 'firm') ? $scope.user.firm.addr : $scope.user.addr ;
+
+		function applyAddr(addr) {
+			if (slug == 'firm') {
+				$scope.user.firm.addr = addr;
+			} else {
+				$scope.user.addr = addr;
+			}
+		}
+
+		var modalInstance = $modal.open({
+			templateUrl: 'partials/modal-address.tpl.html',
+			controller: 'ModalAddressCtrl',
+			resolve: {
+				address: function() { return angular.copy( myAddress ); }
+			}
+		});
+
+		modalInstance.result.then(function(address) {
+			console.log(address);
+			applyAddr(address);
+		});
+	};
+}]).
+
+controller('ModalAddressCtrl', ['$scope', '$modalInstance', 'address', 'interface', function($scope, $modalInstance, address, interface){
+	$scope.address = address;
+	$scope.ok = function() {
+		// use interface to add/edit address in db
+		var fun = ($scope.address.addrID === null) ? 'add' : 'edit' ;
+		interface.call(fun + 'Address', $scope.address).then(function (res) {
+			$scope.address.addrID = res.data;
+			$modalInstance.close($scope.address);
+		}, function (err) {
+			console.log(err);
+			console.log("There has been an error adding you address\nPlease try again or contact Upstream Academy for further assistance");
+		});
+	};
+	$scope.cancel = function() {
+		$modalInstance.dismiss();
 	};
 }]);
