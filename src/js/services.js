@@ -123,9 +123,18 @@ factory('printCart', ['interface', 'myCart', function (interface, myCart) {
 	myCart.registerObserver(load_me);
 
 	function load_me() {
-			var promise = interface.call('getCart', {'ids': myCart.get()});
+			localCart = myCart.get();
+			var promise = interface.call('getCart', {'ids': localCart});
 			promise.then(function(response) {
 				fullCart = response.data;
+
+				// remove myCart elements that don't correspond to fullCart elements
+				for (var i=0; i < response.data.length; i++) {
+					while (response.data[i].itemID != localCart[i]) { // thanks for being sequential!
+						myCart.rem(i);
+						localCart = myCart.get();
+					}
+				}
 			});
 			return promise;
 	}

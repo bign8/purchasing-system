@@ -113,6 +113,9 @@ class formsManager extends NgClass {
 		$itemSTH = $this->db->prepare("SELECT * FROM `item` WHERE itemID = ?;");
 		$itemSTH->execute( $itemID );
 		$row = $itemSTH->fetch(PDO::FETCH_ASSOC);
+		if (!isset($row['productID'])) {
+			return null;
+		}
 		$row['settings'] = json_decode($row['settings']);
 		$row['cost'] = $this->getProductCost( $row['productID'] );
 		return $row;
@@ -130,7 +133,10 @@ class formsManager extends NgClass {
 			// $row = $itemSTH->fetch(PDO::FETCH_ASSOC);
 			// $row['cost'] = $this->getProductCost( $row['productID'] );
 			if (is_string($itemID)) {
-				array_push($retData, $this->getItemByID( $itemID ));
+				$item = $this->getItemByID( $itemID );
+				if ($item != null) {
+					array_push($retData, $item);
+				}
 			} else {
 				array_push($retData, $itemID);
 			}
