@@ -1,0 +1,57 @@
+<div class="modal-header" ng-switch="address.addrID">
+	<h3 ng-switch-when="null">Add an Address</h3>
+	<h3 ng-switch-default>Edit an Address</h3>
+</div>
+<div class="modal-body">
+	<form class="form-horizontal" name="addrForm">
+
+		<div class="control-group">
+			<label class="control-label" for="inputEmail">Name</label>
+			<div class="controls">
+				<input type="text" id="inputEmail" placeholder="Name" ng-model="address.addrName" required>
+			</div>
+		</div>
+
+		<div class="control-group">
+			<label class="control-label" for="addr1">Address 1</label>
+			<div class="controls">
+				<input type="text" id="addr1" placeholder="Address 1" ng-model="address.addr1" required>
+			</div>
+		</div>
+
+		<div class="control-group">
+			<label class="control-label" for="addr2">Address 2</label>
+			<div class="controls">
+				<input type="text" id="addr2" placeholder="Address 2" ng-model="address.addr2">
+			</div>
+		</div>
+
+		<div class="control-group">
+			<label class="control-label" for="city">City</label>
+			<div class="controls">
+				<input type="text" id="city" placeholder="City" ng-model="address.city" required>
+			</div>
+		</div>
+
+		<div class="control-group">
+			<label class="control-label" for="state">State</label>
+			<div class="controls">
+				<input type="text" id="state" placeholder="State" ng-model="address.state" required>
+			</div>
+		</div>
+
+		<div class="control-group">
+			<label class="control-label" for="zip">Zip Code</label>
+			<div class="controls">
+				<input type="text" id="zip" placeholder="Zip Code" ng-model="address.zip" required>
+			</div>
+		</div>
+
+	</form>
+	
+	<!-- <pre>{{address | json}}</pre> -->
+</div>
+<div class="modal-footer">
+	<button class="btn btn-primary" ng-click="ok()" ng-disabled="addrForm.$invalid">OK</button>
+	<button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+</div>

@@ -139,6 +139,34 @@ class formsManager extends NgClass {
 
 		return json_encode($retData);
 	}
+
+	// Worker(app/user): add an address to the database
+	public function addAddress() {
+		$data = $this->getPostData();
+
+		$STH = $this->db->prepare("INSERT INTO `address` (addrName, addr1, addr2, city, state, zip) VALUES (?,?,?,?,?,?);");
+		if (!$STH->execute( $data->addrName, $data->addr1, $data->addr2, $data->city, $data->state, $data->zip )) {
+			// return conflict!
+			header('HTTP/ 409 Conflict');
+			print_r($STH->errorInfo());
+		}
+
+		return $this->db->lastInsertId();
+	}
+
+	// Worker(app/user): add an address to the database
+	public function editAddress() {
+		$data = $this->getPostData();
+
+		$STH = $this->db->prepare("UPDATE `address` SET addrName=?, addr1=?, addr2=?, city=?, state=?, zip=? WHERE addressID=?;");
+		if (!$STH->execute( $data->addrName, $data->addr1, $data->addr2, $data->city, $data->state, $data->zip, $data->addrID )) {
+			// return conflict!
+			header('HTTP/ 409 Conflict');
+			print_r($STH->errorInfo());
+		}
+
+		return $data->addrID;
+	}
 }
 
 /*
@@ -158,6 +186,11 @@ switch ($_REQUEST['action']) {
 	case 'getItems': echo $obj->getItems(); break;
 	case 'getCart': echo $obj->getCart(); break;
 	case 'getItem': echo $obj->getItem(); break;
+
+	// user registration functions
+	case 'addAddress': echo $obj->addAddress(); break;
+	case 'editAddress': echo $obj->editAddress(); break;
+
 
 	// Test case statements
 	case 'testAuth': echo $obj->testAuth(); break;
