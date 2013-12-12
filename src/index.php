@@ -20,6 +20,22 @@
 
 	<!-- for app -->
 	<script src="<%= grunt.config.get('pkg.name') %>.js"></script>
+	<script>
+		Array.prototype.unique = function() { // thanks: http://stackoverflow.com/a/1584377
+		    var a = this.concat();
+		    for(var i=0; i<a.length; ++i)
+		    	for(var j=i+1; j<a.length; ++j)
+		    		if(a[i] === a[j])
+		    			a.splice(j--, 1);
+		    return a;
+		};
+
+		var phpCart = <?php session_start();echo json_encode($_SESSION['cart']); $_SESSION['cart']=array(/*empty php cart*/); ?>; // grab cart from php session
+		var activeCart = JSON.parse(localStorage.getItem('azUAcart') || '[]'); // grab localStorage cart
+		var newCart = phpCart.concat( activeCart ).unique(); // join the two
+		localStorage.setItem('azUAcart', JSON.stringify(newCart)); // re-assign to localStorage
+
+	</script>
 </head>
 <body>
 	<div ng-app="myApp" class="container">
