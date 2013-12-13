@@ -118,6 +118,7 @@ factory('myCart', ['$rootScope', function($rootScope) {
 
 factory('printCart', ['interface', 'myCart', function (interface, myCart) {
 	var fullCart = [];
+	var options = {};
 
 	// Nice observer pattern! http://stackoverflow.com/a/17558885
 	myCart.registerObserver(load_me);
@@ -147,11 +148,18 @@ factory('printCart', ['interface', 'myCart', function (interface, myCart) {
 			return fullCart;
 		},
 		total: function() {
-			var tot = 0;
-			fullCart.forEach(function(ele){
-				tot += parseFloat(ele.cost);
-			});
-			return tot;
+			// var tot = 0;
+			// fullCart.forEach(function(ele){
+			// 	tot += parseFloat(ele.cost);
+			// });
+			// return tot;
+			return undefined;
+		},
+		getOpt: function() {
+			return options;
+		},
+		setOpt: function(opt) {
+			options = opt;
 		}
 	};
 }]).

@@ -100,20 +100,115 @@ controller('ShowItemCtrl', ['$scope', 'myPage', 'itemDetail', function ($scope, 
 	$scope.item = itemDetail.data;
 }]).
 
-controller('CartCtrl', ['$scope', 'myPage', 'myCart', 'security', 'printCart', function ($scope, myPage, myCart, security, printCart) {
+controller('CartCtrl', ['$scope', 'myPage', 'myCart', 'security', 'printCart', '$modal', function ($scope, myPage, myCart, security, printCart, $modal) {
 	myPage.setTitle("Shopping Cart");
 
 	$scope.myCart = myCart;
-	$scope.printCart = printCart;
+	$scope.printList = [];
+	$scope.total = 0;
+	$scope.options = printCart.getOpt; // load options cashe
 
-	$scope.checkout = function() {
-		console.log('TODO: Check if user is logged in, then checkout or go through user add process');
-		if (security.currentUser === null) {
-			console.log('needs auth');
-		} else {
-			console.log('auth granted');
+	// calculate totals on the fly and specifically for different templates
+	var watchHandle = function(newValue) {
+		printCart.setOpt($scope.options); // update options store
+		$scope.total = 0; // reset total
+		$scope.printList = angular.copy(newValue); // assign new list
+		$scope.printList.pop(); // remove the concatenated options
+
+		// Compute different costs on cart changes
+		$scope.printList.forEach(function(ele) {
+			ele.cost.calc = 0;
+			switch (ele.template) {
+				case 'conference':
+					ele.cost.calc = parseFloat(ele.cost.settings.initial); // initial cost always in effect
+					if ($scope.options.hasOwnProperty(ele.itemID)) { // apply pricing based on the number of attendees
+						var multiply = $scope.options[ele.itemID].attendees.length - parseFloat(ele.cost.settings.after); // how many more
+						if (multiply > 0) ele.cost.calc += parseFloat(ele.cost.settings.later) * multiply; // for additional attendees
+					}
+					break;
+				case 'download':
+					ele.cost.calc = parseFloat(ele.cost.settings.cost); // straight assignment (no options)
+					break;
+			}
+			$scope.total += ele.cost.calc; // compute total
+		});
+	};
+	$scope.$watch(function() {
+		return printCart.list().concat([$scope.options]); // watch for list and option changes
+	}, watchHandle, true);
+
+	$scope.showOptions = function(tpl) { // should we show the options button
+		var opt = ['conference'];
+		return opt.indexOf(tpl) != -1;
+	};
+
+	$scope.callOptions = function(tpl, item) {
+		if (!$scope.showOptions(tpl)) return; // make sure template is implemented/has dialog
+
+		var modalInstance = $modal.open({
+			templateUrl: 'partials/modal-options-' + tpl + '.tpl.html',
+			controller: 'CartOptions' + tpl + 'Ctrl',
+			resolve: {
+				item: function() { return item; },
+				opt: function() {
+					if ( $scope.options.hasOwnProperty(item.itemID) ) {
+						return $scope.options[item.itemID];
+					} else {
+						return undefined;
+					}
+				}
+			}
+		});
+		modalInstance.result.then(function( res ){
+			$scope.options[item.itemID] = res;
+			watchHandle(printCart.list().concat(['x'])); // force update
+		});
+	};
+
+	$scope.palOut = function() {
+		console.log('send to paypal');
+	};
+	$scope.checkOut = function() {
+		console.log('send to check');
+	};
+}]).
+
+controller('CartOptionsconferenceCtrl', ['$scope', '$modalInstance', 'item', 'opt', function($scope, $modalInstance, item, opt) {
+	$scope.item = item;
+	$scope.opt = opt || {attendees: [
+		{name:'Alfred', phone:'111 222 3333'},
+		{name:'Betty', phone:'111 222 3333'},
+		{name:'Charles', phone:'111 222 3333'}
+	]};
+	$scope.total = 0;
+
+	var updatePrice = function() {
+		$scope.total = 0;
+		for (var i = 0; i < $scope.opt.attendees.length; i++) {
+			if ( i === 0 ) {
+				$scope.opt.attendees[i].price = parseFloat(item.cost.settings.initial);
+			} else if ( i >= parseFloat(item.cost.settings.after) ) {
+				$scope.opt.attendees[i].price = parseFloat(item.cost.settings.later);
+			} else {
+				$scope.opt.attendees[i].price = 0;
+			}
+			$scope.total += $scope.opt.attendees[i].price;
 		}
 	};
+	updatePrice();
+
+	$scope.ok = function () {
+		$modalInstance.close($scope.opt);
+	};
+	$scope.rem = function(index) {
+		$scope.opt.attendees.splice(index,1);
+		updatePrice();
+	};
+	$scope.add = function () {
+		$scope.opt.attendees.push({name:'new guy', phone:'111 222 3333'});
+		updatePrice();
+	};
+	$scope.cancel = function () { $modalInstance.dismiss('cancel'); };
 }]).
 
 controller('CheckoutCtrl', ['$scope', 'myPage', function ($scope, myPage) {
