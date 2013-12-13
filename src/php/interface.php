@@ -77,7 +77,22 @@ class formsManager extends NgClass {
 		$costSTH = $this->db->prepare("SELECT settings, pretty FROM `price` p JOIN `option` o ON o.optionID = p.optionID WHERE productID = ?;");
 		$costSTH->execute( $productID );
 		$costRow = $costSTH->fetch(PDO::FETCH_ASSOC);
-		return $this->interpolate($costRow['pretty'], (array)json_decode($costRow['settings']));
+		$subs = (array)json_decode($costRow['settings']);
+		$pretty = $subs;
+
+		// convert specific values to currency (excluding the values mentioned in the case statements)
+		setlocale(LC_MONETARY, 'en_US');
+		foreach ($pretty as $key => $value) {
+			switch ($key) {
+				case 'after': continue; break;
+				default: $pretty[$key] = money_format('%n', $value); break;
+			}
+		}
+
+		return array(
+			'pretty' => $this->interpolate($costRow['pretty'], $pretty),
+			'settings' => $subs
+		);
 	}
 
 	// Worker(app): returns item list
@@ -110,7 +125,8 @@ class formsManager extends NgClass {
 
 	// Helper(app): return specific item detail by id
 	private function getItemByID( $itemID ) {
-		$itemSTH = $this->db->prepare("SELECT * FROM `item` WHERE itemID = ?;");
+		$itemSTH = $this->db->prepare("SELECT i.*, t.template FROM (SELECT * FROM `item` WHERE itemID = ?) i JOIN product p ON p.productID=i.productID JOIN template t ON t.templateID = p.templateID;");
+		// $itemSTH = $this->db->prepare("SELECT * FROM `item` WHERE itemID = ?;");
 		$itemSTH->execute( $itemID );
 		$row = $itemSTH->fetch(PDO::FETCH_ASSOC);
 		if (!isset($row['productID'])) {
@@ -123,7 +139,7 @@ class formsManager extends NgClass {
 
 	// Worker(app): return cart with current prices
 	public function getCart() {
-		// $user = $this->requiresAuth(); // upon cart completion
+		$user = $this->requiresAuth(); // upon cart completion
 		$data = $this->getPostData();
 
 		// Iterate through ID's

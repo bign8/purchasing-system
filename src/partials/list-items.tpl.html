@@ -37,7 +37,7 @@
 					<div class="thumbnail">
 						<img ng-src="{{item.img}}" alt="...">
 						<div class="caption">
-							<h3>{{item.name}} <small>{{item.cost | currency}}</small></h3>
+							<h3>{{item.name}} <small>{{item.cost.pretty}}</small></h3>
 							<p>{{item.description}}</p>
 							<div>
 								<a ng-href="#/products/{{item.productID}}/{{item.itemID}}" class="btn btn-default" role="button">Details</a>
@@ -68,7 +68,7 @@
 					<tr ng-repeat="item in  $parent.filteredProducts = (items | filter:{name:query, description:query} | orderBy:sortField:reverse) | pagination:pageNo:pageSize">
 						<td><a href="#/products/{{item.productID}}/{{item.itemID}}">{{item.name}}</a></td>
 						<td>{{item.description}}</td>
-						<td>{{item.cost | currency}}</td>
+						<td>{{item.cost.pretty}}</td>
 						<td><a ng-click="myCart.add(item)" ng-hide="myCart.contains(item)">Add to Cart</a></td>
 					</tr>
 				</tbody>

@@ -50,7 +50,8 @@ config(['$routeProvider', 'securityAuthorizationProvider', function( $routeProvi
 			resolve: {
 				fullCart: function(printCart) {
 					return printCart.load();
-				}
+				},
+				user: securityAuthorizationProvider.requireAuthenticatedUser
 			}
 		}).
 		when('/cart/checkout', { // generated checkout form (ask all the questions here)
