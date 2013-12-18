@@ -106,7 +106,7 @@ controller('CartCtrl', ['$scope', 'myPage', 'myCart', 'security', 'printCart', '
 	$scope.myCart = myCart;
 	$scope.printList = [];
 	$scope.total = 0;
-	$scope.options = printCart.getOpt; // load options cashe
+	$scope.options = printCart.getOpt(); // load options cashe
 
 	// calculate totals on the fly and specifically for different templates
 	var watchHandle = function(newValue) {
@@ -137,25 +137,21 @@ controller('CartCtrl', ['$scope', 'myPage', 'myCart', 'security', 'printCart', '
 		return printCart.list().concat([$scope.options]); // watch for list and option changes
 	}, watchHandle, true);
 
-	$scope.showOptions = function(tpl) { // should we show the options button
-		var opt = ['conference'];
-		return opt.indexOf(tpl) != -1;
+	$scope.showOptions = function(item) { // should we show the options button
+		return item.options > 0;
 	};
 
 	$scope.callOptions = function(tpl, item) {
-		if (!$scope.showOptions(tpl)) return; // make sure template is implemented/has dialog
-
 		var modalInstance = $modal.open({
-			templateUrl: 'partials/modal-options-' + tpl + '.tpl.html',
-			controller: 'CartOptions' + tpl + 'Ctrl',
+			templateUrl: 'partials/modal-options.tpl.html',
+			controller: 'CartOptionCtrl',
 			resolve: {
 				item: function() { return item; },
 				opt: function() {
-					if ( $scope.options.hasOwnProperty(item.itemID) ) {
-						return angular.copy($scope.options[item.itemID]); // insurance (breaks tie incase of cancel)
-					} else {
-						return undefined;
-					}
+					return angular.copy( $scope.options[item.itemID] ); // insurance (breaks tie incase of cancel)
+				},
+				options: function(interface) {
+					return interface.call('getItemOptions', item);
 				}
 			}
 		});
@@ -174,23 +170,51 @@ controller('CartCtrl', ['$scope', 'myPage', 'myCart', 'security', 'printCart', '
 }]).
 
 // CartOptionCtrl that loads questions (from db) and sub controller based on template type
+controller('CartOptionCtrl', ['$scope', '$modalInstance', '$modal', 'options', 'opt', 'item', function($scope, $modalInstance, $modal, options, opt, item){
+	$scope.options = options.data;
+	$scope.opt = opt || {};
+
+	$scope.attendees = function(option) {
+		var modalInstance = $modal.open({
+			templateUrl: 'partials/modal-options-conference.tpl.html',
+			controller: 'CartOptionsconferenceCtrl',
+			resolve: {
+				item: function() { return item; },
+				opt: function() {
+					if ($scope.opt.attendees) {
+						return angular.copy( $scope.opt.attendees );
+					} else {
+						return undefined;
+					}
+				}
+			}
+		});
+		modalInstance.result.then(function(res) {
+			$scope.opt[option.fieldID] = '+'; // Added Attendee (allow hidden field to pass)
+			$scope.opt.attendees = res;
+		});
+	};
+
+	$scope.ok = function () { $modalInstance.close($scope.opt); };
+	$scope.cancel = function () { $modalInstance.dismiss('cancel'); };
+}]).
 
 controller('CartOptionsconferenceCtrl', ['$scope', '$modalInstance', 'item', 'opt', '$modal', function($scope, $modalInstance, item, opt, $modal) {
 	$scope.item = item;
-	$scope.opt = opt || {attendees: []};
+	$scope.opt = opt || [];
 	$scope.total = 0;
 
 	var updatePrice = function() {
 		$scope.total = 0;
-		for (var i = 0; i < $scope.opt.attendees.length; i++) {
+		for (var i = 0; i < $scope.opt.length; i++) {
 			if ( i === 0 ) {
-				$scope.opt.attendees[i].price = parseFloat(item.cost.settings.initial);
+				$scope.opt[i].price = parseFloat(item.cost.settings.initial);
 			} else if ( i >= parseFloat(item.cost.settings.after) ) {
-				$scope.opt.attendees[i].price = parseFloat(item.cost.settings.later);
+				$scope.opt[i].price = parseFloat(item.cost.settings.later);
 			} else {
-				$scope.opt.attendees[i].price = 0;
+				$scope.opt[i].price = 0;
 			}
-			$scope.total += $scope.opt.attendees[i].price;
+			$scope.total += $scope.opt[i].price;
 		}
 		if ($scope.total === 0) { // cannot have a 0 priced thing (for consistency)
 			$scope.total = parseFloat(item.cost.settings.initial);
@@ -203,7 +227,7 @@ controller('CartOptionsconferenceCtrl', ['$scope', '$modalInstance', 'item', 'op
 	};
 	$scope.rem = function(index, $event) {
 		$event.preventDefault();
-		$scope.opt.attendees.splice(index,1);
+		$scope.opt.splice(index,1);
 		updatePrice();
 	};
 	$scope.add = function () {
@@ -227,11 +251,11 @@ controller('CartOptionsconferenceCtrl', ['$scope', '$modalInstance', 'item', 'op
 		});
 
 		modalInstance.result.then(function (modContact) {
-			var index = $scope.opt.attendees.indexOf(contact);
+			var index = $scope.opt.indexOf(contact);
 			if (index === -1) {
-				$scope.opt.attendees.push(modContact); // {name:'new guy', phone:'111 222 3333'}
+				$scope.opt.push(modContact); // {name:'new guy', phone:'111 222 3333'}
 			} else {
-				$scope.opt.attendees[index] = modContact;
+				$scope.opt[index] = modContact;
 			}
 			updatePrice();
 		});

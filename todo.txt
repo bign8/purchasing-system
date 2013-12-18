@@ -1,0 +1,12 @@
+ToDo: 
+- Implement Form constraints for checkout
+- PayPal checkout
+- Check checkout
+- Store data on checkout
+- Previous purchases
+- Prevent repeat purchases
+
+
+Notes:
+- Add conference type product -> Force insert into tie_product_field
+

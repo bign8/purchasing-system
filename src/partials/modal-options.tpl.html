@@ -1,0 +1,38 @@
+<div class="modal-header">
+	<h3>Modify Item Options</h3>
+</div>
+<div class="modal-body">
+
+	<form class="form-horizontal" name="optionsForm">
+		<div class="control-group" ng-repeat="option in options">
+
+			<div ng-show="option.type=='attendees'">
+				<label class="control-label" for="legalName">{{option.name}}</label>
+				<div class="controls">
+					<button type="button" class="btn btn-success" ng-click="attendees(option)">
+						Assign 
+						<span class="badge">{{opt.attendees.length}}</span>
+					</button>
+					<span ng-repeat="person in opt.attendees">
+						{{person.legalName}}<span ng-hide="$last">, </span>
+					</span>
+					<input type="hidden" id="test" ng-model="opt[option.fieldID]" required>
+				</div>
+			</div>
+
+			<div ng-show="option.type=='text'">
+				<label class="control-label" for="legalName">{{option.name}}</label>
+				<div class="controls">
+					<input type="text" id="legalName" ng-model="opt[option.fieldID]" placeholder="{{option.name}}" required>
+				</div>
+			</div>
+
+		</div>
+	</form>
+
+	<!-- <pre>{{opt | json}}</pre> -->
+</div>
+<div class="modal-footer">
+	<button class="btn btn-primary" ng-disabled="optionsForm.$invalid" ng-click="ok()">OK</button>
+	<button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+</div>

@@ -24,20 +24,20 @@
 						<td ng-switch="options.hasOwnProperty(item.itemID)">
 							<button 
 								ng-switch-when="false" 
-								ng-show="showOptions(item.template)" 
+								ng-show="showOptions(item)" 
 								ng-click="callOptions(item.template, item)" 
 								class="btn btn-warning btn-mini">
 									Set
 							</button>
 							<button 
 								ng-switch-default 
-								ng-show="showOptions(item.template)" 
+								ng-show="showOptions(item)" 
 								ng-click="callOptions(item.template, item)" 
 								class="btn btn-info btn-mini">
 									Edit
 							</button>
 						</td>
-						<td ng-switch="showOptions(item.template)">
+						<td ng-switch="showOptions(item)">
 							<span ng-switch-when="false">{{item.cost.pretty}}</span>
 							<span ng-switch-default>{{item.cost.calc | currency}}</span>
 							<a href ng-click="myCart.rem($index)" role="button" class="close">&times;</a>
@@ -65,7 +65,7 @@
 				</a>
 			</div>
 
-			<!-- <pre>{{printList | json}}</pre> -->
+			<pre>{{options | json}}</pre>
 
 		</div>
 	</div>
