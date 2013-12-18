@@ -55,17 +55,17 @@
 			</table>
 
 			<div class="form-actions" style="text-align:center">
-				<a ng-click="palOut()" class="btn btn-primary btn-lg" role="button">
+				<a ng-click="saveCart('online')" class="btn btn-primary btn-lg" role="button">
 					Checkout via PayPal 
 					<span class="badge">{{total | currency}}</span>
 				</a>
-				<a ng-click="checkOut()" class="btn btn-lg" role="button">
+				<a ng-click="saveCart('check')" class="btn btn-lg" role="button">
 					Checkout via Check 
 					<span class="badge">{{total | currency}}</span>
 				</a>
 			</div>
 
-			<pre>{{options | json}}</pre>
+			<!-- <pre>{{options | json}}</pre> -->
 
 		</div>
 	</div>

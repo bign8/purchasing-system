@@ -100,7 +100,7 @@ controller('ShowItemCtrl', ['$scope', 'myPage', 'itemDetail', function ($scope, 
 	$scope.item = itemDetail.data;
 }]).
 
-controller('CartCtrl', ['$scope', 'myPage', 'myCart', 'security', 'printCart', '$modal', function ($scope, myPage, myCart, security, printCart, $modal) {
+controller('CartCtrl', ['$scope', 'myPage', 'myCart', 'security', 'printCart', '$modal', 'interface', '$location', function ($scope, myPage, myCart, security, printCart, $modal, interface, $location) {
 	myPage.setTitle("Shopping Cart");
 
 	$scope.myCart = myCart;
@@ -161,12 +161,45 @@ controller('CartCtrl', ['$scope', 'myPage', 'myCart', 'security', 'printCart', '
 		});
 	};
 
-	$scope.palOut = function() {
-		console.log('send to paypal');
+	$scope.saveCart = function(medium) {
+		// verify options are set
+		var fail = false;
+		angular.forEach($scope.printList, function(ele) {
+			if ( $scope.showOptions(ele) && !$scope.options.hasOwnProperty(ele.itemID) ) {	
+				fail = true;
+			}
+		});
+		if (fail) return alert('You need to assign options for each item in your cart.\nPlease try again.');
+
+		// Pre-process data
+		var obj = {}; // list:$scope.printList, opt:$scope.options
+		angular.forEach($scope.options, function(ele) {
+			if (ele.hasOwnProperty('attendees')) { // convert attendee array of obj to attendee array of id's
+				var temp = [];
+				angular.forEach(ele.attendees, function(att) {
+					temp.push(att.contactID);
+				});
+				ele.attendees = temp;
+			}
+		});
+		angular.forEach($scope.printList, function(ele) { // converting into itemID -> options style array
+			obj[ele.itemID] = $scope.options[ele.itemID] || {};
+		});
+
+		interface.call('saveCart', {items:obj, medium:medium}).then(function(res) {
+			var returnPath = '/purchases/' + res.data;
+			// TODO: empty cart
+			if (medium == 'online') {
+				payPalPass(returnPath); // call paypal data preparation
+			} else {
+				$location.path(returnPath); // go to checkout page
+			}
+		});
 	};
-	$scope.checkOut = function() {
-		console.log('send to check');
-	};
+
+	function payPalPass(retPath) {
+		console.log('passing to paypall');
+	}
 }]).
 
 // CartOptionCtrl that loads questions (from db) and sub controller based on template type
@@ -190,7 +223,7 @@ controller('CartOptionCtrl', ['$scope', '$modalInstance', '$modal', 'options', '
 			}
 		});
 		modalInstance.result.then(function(res) {
-			$scope.opt[option.fieldID] = '+'; // Added Attendee (allow hidden field to pass)
+			$scope.opt['+' + option.name] = 'Assigned'; // Added Attendee (allow hidden field to pass)
 			$scope.opt.attendees = res;
 		});
 	};
@@ -326,8 +359,8 @@ controller('ContactModalCtrl', ['$scope', '$modalInstance', 'contact', 'firmAddr
 	$scope.cancel = function () { $modalInstance.dismiss('cancel'); };
 }]).
 
-controller('CheckoutCtrl', ['$scope', 'myPage', function ($scope, myPage) {
-	myPage.setTitle("Checkout");
+controller('ReciptCtrl', ['$scope', 'myPage', function ($scope, myPage) {
+	myPage.setTitle("Recipt");
 }]).
 
 controller('HeadCtrl', ['$scope', 'myPage', 'breadcrumbs', 'myCart', 'security', function ($scope, myPage, breadcrumbs, myCart, security) {

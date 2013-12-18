@@ -16,14 +16,14 @@
 					<span ng-repeat="person in opt.attendees">
 						{{person.legalName}}<span ng-hide="$last">, </span>
 					</span>
-					<input type="hidden" id="test" ng-model="opt[option.fieldID]" required>
+					<input type="hidden" id="test" ng-model="opt['+' + option.name]" required>
 				</div>
 			</div>
 
 			<div ng-show="option.type=='text'">
 				<label class="control-label" for="legalName">{{option.name}}</label>
 				<div class="controls">
-					<input type="text" id="legalName" ng-model="opt[option.fieldID]" placeholder="{{option.name}}" required>
+					<input type="text" id="legalName" ng-model="opt['+' + option.name]" placeholder="{{option.name}}" required>
 				</div>
 			</div>
 
