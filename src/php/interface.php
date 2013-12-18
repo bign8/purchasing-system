@@ -295,6 +295,41 @@ class formsManager extends NgClass {
 		}
 		return json_encode($retData);
 	}
+
+	// Worker(app/checkout): save cart
+	public function saveCart() {
+		$user = $this->requiresAuth();
+		$data = $this->getPostData();
+
+		// Insert order
+		$orderSTH = $this->db->prepare("INSERT INTO `order` (contactID, medium) VALUES (?,?);");
+		if (!$orderSTH->execute( $user['contactID'], $data->medium )) {
+			header('HTTP/ 409 Conflict');
+			return print_r($orderSTH->errorInfo(), true);
+		}
+		$orderID = $this->db->lastInsertId();
+
+		// Store purchases and options
+		$purchaseSTH = $this->db->prepare("INSERT INTO `purchase` (itemID, orderID, firmID, data) VALUES (?,?,?,?);");
+		$attendeeSTH = $this->db->prepare("INSERT INTO `attendee` (itemID, contactID) VALUES (?,?);");
+		foreach ($data->items as $key => $value) { // iterate over items
+			if (isset($value->attendees)) { // Store attendees here (if possible)
+				foreach ($value->attendees as $contactID) {
+					if (!$attendeeSTH->execute($key, $contactID)) {
+						header('HTTP/ 409 Conflict');
+						return print_r($orderSTH->errorInfo(), true);
+					}
+				}
+				unset($value->attendees);
+			}
+			if (!$purchaseSTH->execute($key, $orderID, $user['firmID'], json_encode($value))) { // store purchase here
+				header('HTTP/ 409 Conflict');
+				return print_r($orderSTH->errorInfo(), true);
+			}
+		}
+
+		return $orderID;
+	}
 }
 
 /*
@@ -326,11 +361,15 @@ switch ($_REQUEST['action']) {
 	case 'addContact': echo $obj->addContact(); break;
 	case 'editContact': echo $obj->editContact(); break;
 	case 'getItemOptions': echo $obj->getItemOptions(); break;
+	case 'saveCart': echo $obj->saveCart(); break;
 
 	// Test case statements
 	case 'testAuth': echo $obj->testAuth(); break;
 	case 'testAdmin': echo $obj->testAdmin(); break;
-	case 'demo': echo '<pre>'; print_r($_REQUEST); break;
+	case 'demo': 
+		echo '<pre>'; 
+		print_r($_REQUEST); 
+		break;
 	default: 
 		header('HTTP/ 409 Conflict');
 		die('Your Kung-Fu is not strong.');

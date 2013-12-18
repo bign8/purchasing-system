@@ -54,9 +54,9 @@ config(['$routeProvider', 'securityAuthorizationProvider', function( $routeProvi
 				user: securityAuthorizationProvider.requireAuthenticatedUser
 			}
 		}).
-		when('/cart/checkout', { // generated checkout form (ask all the questions here)
-			templateUrl: 'partials/checkout-questions.tpl.html',
-			controller: 'CheckoutCtrl',
+		when('/purchases/:orderID', { // shows a recipt of items purchased for a specific order
+			templateUrl: 'partials/recipt-print.tpl.html',
+			controller: 'ReciptCtrl',
 			resolve: {
 				user: securityAuthorizationProvider.requireAuthenticatedUser
 			}
