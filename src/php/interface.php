@@ -192,6 +192,7 @@ class formsManager extends NgClass {
 	public function addUser() {
 		$data = $this->getPostData();
 
+		// check to see if user is already in system (email)
 		$checkSTH = $this->db->prepare("SELECT * FROM `contact` WHERE email=?;");
 		if (!$checkSTH->execute($data->email)) {
 			header('HTTP/ 409 Conflict');
@@ -202,8 +203,7 @@ class formsManager extends NgClass {
 			return 'dup';
 		}
 
-		// TODO: check to see if user is already in system (email)
-
+		// Add firm
 		$firmSTH = $this->db->prepare("INSERT INTO `firm` (addressID, name, website) VALUES (?,?,?);");
 		if (!$firmSTH->execute( $data->firm->addr->addrID, $data->firm->name, $data->firm->website )) {
 			header('HTTP/ 409 Conflict');
@@ -211,6 +211,7 @@ class formsManager extends NgClass {
 		}
 		$firmID = $this->db->lastInsertId();
 
+		// Add Contact
 		$contSTH = $this->db->prepare("INSERT INTO `contact` (firmID, addressID, legalName, preName, title, email, phone, pass) VALUES (?,?,?,?,?,?,?,ENCRYPT(?,?));");
 		if (!$contSTH->execute( $firmID, $data->addr->addrID, $data->legalName, $data->preName, $data->title, $data->email, $data->phone, $data->password, config::encryptSTR )) {
 			header('HTTP/ 409 Conflict');
@@ -220,6 +221,54 @@ class formsManager extends NgClass {
 		session_start();
 		$_SESSION['user'] = $this->getUser( $data );
 		return $this->db->lastInsertId();
+	}
+
+	// Worker(app/checkout): return firms address
+	public function getFirmAddr() {
+		$user = $this->requiresAuth();
+
+		$STH = $this->db->prepare("SELECT a.* FROM `firm` f JOIN `address` a ON f.addressID=a.addressID WHERE f.firmID=?;");
+		$STH->execute( $user['firmID'] );
+
+		return json_encode( $STH->fetch(PDO::FETCH_ASSOC) );
+	}
+
+	// Worker(app/checkout): return firms employees
+	public function getFirmEmploy() {
+		$user = $this->requiresAuth();
+
+		$STH = $this->db->prepare("SELECT * FROM `contact` WHERE `firmID`=?;");
+		$STH->execute( $user['firmID'] );
+
+		return json_encode( $STH->fetchAll(PDO::FETCH_ASSOC) );
+	}
+
+	// Worker(app/checkout): add contact to system
+	public function addContact() {
+		$user = $this->requiresAuth();
+		$data = $this->getPostData();
+
+		$contSTH = $this->db->prepare("INSERT INTO `contact` (firmID, addressID, legalName, preName, title, email, phone) VALUES (?,?,?,?,?,?,?);");
+		if (!$contSTH->execute( $user['firmID'], $data->addr->addressID, $data->legalName, $data->preName, $data->title, $data->email, $data->phone )) {
+			header('HTTP/ 409 Conflict');
+			return print_r($STH->errorInfo(), true);
+		}
+
+		return $this->db->lastInsertId();
+	}
+
+	// Worker(app/checkout): add contact to system
+	public function editContact() {
+		$user = $this->requiresAuth();
+		$data = $this->getPostData();
+
+		$contSTH = $this->db->prepare("UPDATE `contact` SET addressID=?, legalName=?, preName=?, title=?, email=?, phone=? WHERE contactID=?;");
+		if (!$contSTH->execute( $data->addr->addressID, $data->legalName, $data->preName, $data->title, $data->email, $data->phone, $data->contactID )) {
+			header('HTTP/ 409 Conflict');
+			return print_r($STH->errorInfo(), true);
+		}
+
+		return $data->contactID;
 	}
 }
 
@@ -245,6 +294,12 @@ switch ($_REQUEST['action']) {
 	case 'addAddress': echo $obj->addAddress(); break;
 	case 'editAddress': echo $obj->editAddress(); break;
 	case 'addUser': echo $obj->addUser(); break;
+
+	// checkout functions
+	case 'getFirmAddr': echo $obj->getFirmAddr(); break;
+	case 'getFirmEmploy': echo $obj->getFirmEmploy(); break;
+	case 'addContact': echo $obj->addContact(); break;
+	case 'editContact': echo $obj->editContact(); break;
 
 	// Test case statements
 	case 'testAuth': echo $obj->testAuth(); break;
