@@ -152,7 +152,7 @@ controller('CartCtrl', ['$scope', 'myPage', 'myCart', 'security', 'printCart', '
 				item: function() { return item; },
 				opt: function() {
 					if ( $scope.options.hasOwnProperty(item.itemID) ) {
-						return $scope.options[item.itemID];
+						return angular.copy($scope.options[item.itemID]); // insurance (breaks tie incase of cancel)
 					} else {
 						return undefined;
 					}
@@ -173,13 +173,11 @@ controller('CartCtrl', ['$scope', 'myPage', 'myCart', 'security', 'printCart', '
 	};
 }]).
 
-controller('CartOptionsconferenceCtrl', ['$scope', '$modalInstance', 'item', 'opt', function($scope, $modalInstance, item, opt) {
+// CartOptionCtrl that loads questions (from db) and sub controller based on template type
+
+controller('CartOptionsconferenceCtrl', ['$scope', '$modalInstance', 'item', 'opt', '$modal', function($scope, $modalInstance, item, opt, $modal) {
 	$scope.item = item;
-	$scope.opt = opt || {attendees: [
-		{name:'Alfred', phone:'111 222 3333'},
-		{name:'Betty', phone:'111 222 3333'},
-		{name:'Charles', phone:'111 222 3333'}
-	]};
+	$scope.opt = opt || {attendees: []};
 	$scope.total = 0;
 
 	var updatePrice = function() {
@@ -194,19 +192,112 @@ controller('CartOptionsconferenceCtrl', ['$scope', '$modalInstance', 'item', 'op
 			}
 			$scope.total += $scope.opt.attendees[i].price;
 		}
+		if ($scope.total === 0) { // cannot have a 0 priced thing (for consistency)
+			$scope.total = parseFloat(item.cost.settings.initial);
+		}
 	};
 	updatePrice();
 
 	$scope.ok = function () {
 		$modalInstance.close($scope.opt);
 	};
-	$scope.rem = function(index) {
+	$scope.rem = function(index, $event) {
+		$event.preventDefault();
 		$scope.opt.attendees.splice(index,1);
 		updatePrice();
 	};
 	$scope.add = function () {
-		$scope.opt.attendees.push({name:'new guy', phone:'111 222 3333'});
-		updatePrice();
+		$scope.edit();
+	};
+	$scope.edit = function (contact) {
+		var modalInstance = $modal.open({
+			templateUrl: 'partials/modal-contact.tpl.html',
+			controller: 'ContactModalCtrl',
+			resolve: {
+				contact: function() {
+					return angular.copy( contact );
+				},
+				firmAddr: function(interface) {
+					return interface.call('getFirmAddr');
+				},
+				firmEmploy: function(interface) {
+					return interface.call('getFirmEmploy');
+				}
+			}
+		});
+
+		modalInstance.result.then(function (modContact) {
+			var index = $scope.opt.attendees.indexOf(contact);
+			if (index === -1) {
+				$scope.opt.attendees.push(modContact); // {name:'new guy', phone:'111 222 3333'}
+			} else {
+				$scope.opt.attendees[index] = modContact;
+			}
+			updatePrice();
+		});
+	};
+	$scope.cancel = function () { $modalInstance.dismiss('cancel'); };
+}]).
+
+controller('ContactModalCtrl', ['$scope', '$modalInstance', 'contact', 'firmAddr', 'firmEmploy', 'interface', '$modal', function ($scope, $modalInstance, contact, firmAddr, firmEmploy, interface, $modal) {
+	var oldUserAddr = {addrID:null, addr2:null}; // null address handler
+	$scope.contact = contact || {addr:oldUserAddr}; // null contact handler
+	$scope.firmEmploy = firmEmploy.data;
+
+	// for managing same changes
+	$scope.sameAddr = true;
+	$scope.$watch('sameAddr', function(value) {
+		if (value) {
+			oldUserAddr = $scope.contact.addr;
+			$scope.contact.addr = firmAddr.data;
+		} else {
+			$scope.contact.addr = oldUserAddr;
+		}
+	});
+
+	$scope.addNew = (contact!==undefined);
+	$scope.canChange = (contact===null);
+	$scope.toggle = function () {
+		$scope.addNew = !$scope.addNew;
+	};
+	$scope.choose = function (user) {
+		$modalInstance.close(user);
+	};
+	$scope.ok = function ( invalid ) {
+		if (invalid) {
+			return alert('Form is not valid\nPlease try again.');
+		}
+		if ($scope.contact.addr.addrID === null) {
+			return alert('Please assign an address');
+		}
+
+		// change add or edit based on existence of contactID
+		var query = ($scope.contact.contactID === undefined) ? 'add' : 'edit';
+		interface.call(query + 'Contact', $scope.contact).then(function(res) {
+			$scope.contact.contactID = res.data;
+			$modalInstance.close( $scope.contact );
+		}, function (err) {
+			alert('There was an unknown error adding this user\nPlease try again or contact Upstream Academy for help.');
+			console.log(err);
+		});
+	};
+
+	// handle set address clicks
+	$scope.setAddr = function () {
+		// open modal here with address form
+		// modal insterts into db and returns full object
+		
+		var modalInstance = $modal.open({
+			templateUrl: 'partials/modal-address.tpl.html',
+			controller: 'ModalAddressCtrl',
+			resolve: {
+				address: function() { return angular.copy( $scope.contact.addr ); }
+			}
+		});
+
+		modalInstance.result.then(function(address) {
+			$scope.contact.addr = address;
+		});
 	};
 	$scope.cancel = function () { $modalInstance.dismiss('cancel'); };
 }]).
@@ -247,8 +338,8 @@ controller('RegisterFormCtrl', ['$scope', 'myPage', '$modal', 'interface', 'secu
 	// initialize empty user
 	$scope.user = {
 		preName: '',
-		firm: {addr: {addrID: null, addr2: null}},
-		addr: {addrID: null, addr2: null}
+		firm: {addr: null},// {addrID: null, addr2: null}
+		addr: null // {addrID: null, addr2: null}
 	};
 
 	// handle registration clicks
@@ -320,7 +411,7 @@ controller('RegisterFormCtrl', ['$scope', 'myPage', '$modal', 'interface', 'secu
 }]).
 
 controller('ModalAddressCtrl', ['$scope', '$modalInstance', 'address', 'interface', function($scope, $modalInstance, address, interface){
-	$scope.address = address;
+	$scope.address = address || {addrID:null, addr2: null};
 	$scope.ok = function() {
 		// use interface to add/edit address in db
 		var fun = ($scope.address.addrID === null) ? 'add' : 'edit' ;

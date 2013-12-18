@@ -1,5 +1,5 @@
 <div class="modal-header">
-	<h3>Add Conference Attendees</h3>
+	<h3>Add/Edit Conference Attendees</h3>
 </div>
 <div class="modal-body">
 
@@ -12,22 +12,15 @@
 			</tr>
 		</thead>
 		<tbody>
-			<tr ng-repeat="attendee in opt.attendees">
-				<td>{{attendee.name}}</td>
+			<tr ng-repeat="attendee in opt.attendees" ng-click="edit(attendee)">
+				<td>{{attendee.legalName}}</td>
 				<td>{{attendee.phone}}</td>
 				<td>
 					{{attendee.price | currency}} 
-					<a href ng-click="rem($index)" role="button" class="close">&times;</a>
+					<a href ng-click="rem($index, $event)" role="button" class="close">&times;</a>
 				</td>
 			</tr>
 		</tbody>
-		<!-- <tfoot>
-			<tr>
-				<th></th>
-				<th></th>
-				<th>{{total | currency}}</th>
-			</tr>
-		</tfoot> -->
 	</table>
 
 	<!-- <pre>{{item | json}}</pre> -->
