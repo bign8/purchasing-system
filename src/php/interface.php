@@ -125,7 +125,8 @@ class formsManager extends NgClass {
 
 	// Helper(app): return specific item detail by id
 	private function getItemByID( $itemID ) {
-		$itemSTH = $this->db->prepare("SELECT i.*, t.template FROM (SELECT * FROM `item` WHERE itemID = ?) i JOIN product p ON p.productID=i.productID JOIN template t ON t.templateID = p.templateID;");
+		// $itemSTH = $this->db->prepare("SELECT i.*, t.template FROM (SELECT * FROM `item` WHERE itemID = ?) i JOIN product p ON p.productID=i.productID JOIN template t ON t.templateID = p.templateID;");
+		$itemSTH = $this->db->prepare("SELECT i.*, t.template, COUNT(f.tiePFID) as `options` FROM (SELECT * FROM `item` WHERE itemID = ?) i JOIN product p ON p.productID=i.productID JOIN template t ON t.templateID = p.templateID LEFT JOIN `tie_product_field` f ON f.productID = i.productID GROUP BY i.itemID, i.productID, i.name, i.description, i.settings, i.img, i.blurb, t.template;");
 		// $itemSTH = $this->db->prepare("SELECT * FROM `item` WHERE itemID = ?;");
 		$itemSTH->execute( $itemID );
 		$row = $itemSTH->fetch(PDO::FETCH_ASSOC);
@@ -240,7 +241,13 @@ class formsManager extends NgClass {
 		$STH = $this->db->prepare("SELECT * FROM `contact` WHERE `firmID`=?;");
 		$STH->execute( $user['firmID'] );
 
-		return json_encode( $STH->fetchAll(PDO::FETCH_ASSOC) );
+		// Clear sensitive data
+		$retData = $STH->fetchAll(PDO::FETCH_ASSOC);
+		foreach ($retData as &$item) {
+			unset( $item['pass'], $item['resetHash'], $item['resetExpires'], $item['isAdmin'], $item['lastLogin'] );
+		}
+		return json_encode($retData);
+		// return json_encode( $STH->fetchAll(PDO::FETCH_ASSOC) );
 	}
 
 	// Worker(app/checkout): add contact to system
@@ -248,8 +255,8 @@ class formsManager extends NgClass {
 		$user = $this->requiresAuth();
 		$data = $this->getPostData();
 
-		$contSTH = $this->db->prepare("INSERT INTO `contact` (firmID, addressID, legalName, preName, title, email, phone) VALUES (?,?,?,?,?,?,?);");
-		if (!$contSTH->execute( $user['firmID'], $data->addr->addressID, $data->legalName, $data->preName, $data->title, $data->email, $data->phone )) {
+		$STH = $this->db->prepare("INSERT INTO `contact` (firmID, addressID, legalName, preName, title, email, phone) VALUES (?,?,?,?,?,?,?);");
+		if (!$STH->execute( $user['firmID'], $data->addr->addressID, $data->legalName, $data->preName, $data->title, $data->email, $data->phone )) {
 			header('HTTP/ 409 Conflict');
 			return print_r($STH->errorInfo(), true);
 		}
@@ -262,13 +269,31 @@ class formsManager extends NgClass {
 		$user = $this->requiresAuth();
 		$data = $this->getPostData();
 
-		$contSTH = $this->db->prepare("UPDATE `contact` SET addressID=?, legalName=?, preName=?, title=?, email=?, phone=? WHERE contactID=?;");
-		if (!$contSTH->execute( $data->addr->addressID, $data->legalName, $data->preName, $data->title, $data->email, $data->phone, $data->contactID )) {
+		$STH = $this->db->prepare("UPDATE `contact` SET addressID=?, legalName=?, preName=?, title=?, email=?, phone=? WHERE contactID=?;");
+		if (!$STH->execute( $data->addr->addressID, $data->legalName, $data->preName, $data->title, $data->email, $data->phone, $data->contactID )) {
 			header('HTTP/ 409 Conflict');
 			return print_r($STH->errorInfo(), true);
 		}
 
 		return $data->contactID;
+	}
+
+	// Worker(app/checkout): return question's options
+	public function getItemOptions() {
+		$data = $this->getPostData();
+
+		$STH = $this->db->prepare("SELECT f.* FROM `tie_product_field` t JOIN `field` f ON f.fieldID = t.fieldID WHERE productID=? ORDER BY `order`;");
+		if (!$STH->execute( $data->productID )) {
+			header('HTTP/ 409 Conflict');
+			return print_r($STH->errorInfo(), true);
+		}
+
+		// Decode those settings!
+		$retData = $STH->fetchAll(PDO::FETCH_ASSOC);
+		foreach ($retData as &$item) {
+			$item['settings'] = json_decode($item['settings']);
+		}
+		return json_encode($retData);
 	}
 }
 
@@ -300,10 +325,13 @@ switch ($_REQUEST['action']) {
 	case 'getFirmEmploy': echo $obj->getFirmEmploy(); break;
 	case 'addContact': echo $obj->addContact(); break;
 	case 'editContact': echo $obj->editContact(); break;
+	case 'getItemOptions': echo $obj->getItemOptions(); break;
 
 	// Test case statements
 	case 'testAuth': echo $obj->testAuth(); break;
 	case 'testAdmin': echo $obj->testAdmin(); break;
 	case 'demo': echo '<pre>'; print_r($_REQUEST); break;
-	default: die('Your Kung-Fu is not strong.');
+	default: 
+		header('HTTP/ 409 Conflict');
+		die('Your Kung-Fu is not strong.');
 }
