@@ -193,6 +193,17 @@ factory('printCart', ['interface', 'myCart', '$rootScope', '$filter', function (
 		},
 		setOpt: function(opt) {
 			options = opt;
+		},
+		checkout: function() {
+			localStorage.setItem('azUArecipt', JSON.stringify(printList)); // store off cart
+			localStorage.setItem('azUAreciptTotal', JSON.stringify(total));
+			myCart.clear();
+		},
+		getRecipt: function() {
+			return {
+				total: JSON.parse(localStorage.getItem('azUAreciptTotal')),
+				list: JSON.parse(localStorage.getItem('azUArecipt'))
+			};
 		}
 	};
 }]).

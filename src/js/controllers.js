@@ -168,19 +168,26 @@ controller('CartCtrl', ['$scope', 'myPage', 'myCart', 'security', 'printCart', '
 		});
 
 		interface.call('saveCart', {items:obj, medium:medium}).then(function(res) {
+			var total = printCart.total();
+			printCart.checkout(); // clear cart + archive for callback
+
 			var returnPath = '/cart/recipt';
-			// TODO: empty cart
+
 			if (medium == 'online') {
-				payPalPass(returnPath); // call paypal data preparation
+				var loc = "https://payflowlink.paypal.com?";
+				loc += "LOGIN=UpstreamAcademy&";
+				loc += "PARTNER=PayPal&";
+				loc += "TYPE=S&";
+				loc += "SHOWCONFIRM=FALSE&";
+				loc += "AMOUNT=" + total + "&";
+				loc += "DESCRIPTION=Upstream Academy Purchase&";
+				loc += "MODE=TEST&";
+				document.location = loc;
 			} else {
 				$location.path(returnPath); // go to checkout page
 			}
 		});
 	};
-
-	function payPalPass(retPath) {
-		console.log('passing to paypall');
-	}
 }]).
 
 // CartOptionCtrl that loads questions (from db) and sub controller based on template type
@@ -341,11 +348,11 @@ controller('ContactModalCtrl', ['$scope', '$modalInstance', 'contact', 'firmAddr
 }]).
 
 controller('ReciptCtrl', ['$scope', 'myPage', 'printCart', '$location', function ($scope, myPage, printCart, $location) {
-	$scope.printList = printCart.list();
-	if ($scope.printList == []) $location.path('/cart'); // force re-direct
-	myPage.setTitle("Recipt");
+	if (printCart.getRecipt().list === null) $location.path('/cart'); // force re-direct
+	myPage.setTitle("Checkout Recipt");
 
-	
+	$scope.recipt = printCart.getRecipt();
+
 }]).
 
 controller('HeadCtrl', ['$scope', 'myPage', 'breadcrumbs', 'myCart', 'security', function ($scope, myPage, breadcrumbs, myCart, security) {
