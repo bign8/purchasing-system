@@ -1,10 +1,9 @@
 ToDo: 
 - Implement Form constraints for checkout
-- PayPal checkout
 - Check checkout
-- Store data on checkout
-- Previous purchases
-- Prevent repeat purchases
+- Previous purchases (for downloads, need to do conference and groups)
+- Prevent repeat purchases (links removed from site, removed from cart on 'get' for offsite, warning for stragglers #overkill)
+- Cart: instead of settinng, attendee to assigned, set it to a string of names, something readable (for use in list-purchase)
 
 
 Notes:
