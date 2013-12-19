@@ -116,9 +116,11 @@ factory('myCart', ['$rootScope', function($rootScope) {
 	};
 }]).
 
-factory('printCart', ['interface', 'myCart', function (interface, myCart) {
+factory('printCart', ['interface', 'myCart', '$rootScope', '$filter', function (interface, myCart, $rootScope, $filter) {
 	var fullCart = [];
 	var options = {};
+	var total = 0;
+	var printList = []; // cost computed fullCart
 
 	// Nice observer pattern! http://stackoverflow.com/a/17558885
 	myCart.registerObserver(load_me);
@@ -131,29 +133,60 @@ factory('printCart', ['interface', 'myCart', function (interface, myCart) {
 
 				// remove myCart elements that don't correspond to fullCart elements
 				for (var i=0; i < response.data.length; i++) {
+					var dieCount = 0; // in case bad error
+					if (response.data[i].itemID==-1) continue; // fix invoices
 					while (response.data[i].itemID != localCart[i]) { // thanks for being sequential!
 						myCart.rem(i);
 						localCart = myCart.get();
+						if (++dieCount > 100) break; // infinete loops are bad
 					}
 				}
+				watchHandle(fullCart.concat(['x'])); // force watcher
 			});
 			return promise;
 	}
+
+	var watchHandle = function(newValue) {
+		total = 0; // reset total
+		printList = angular.copy(newValue); // assign new list
+		printList.pop(); // remove the concatenated options
+
+		// Compute different costs on cart changes
+		printList.forEach(function(ele) {
+			ele.cost.calc = 0;
+			switch (ele.template) {
+				case 'conference':
+					ele.cost.calc = parseFloat(ele.cost.settings.initial); // initial cost always in effect
+					if (options.hasOwnProperty(ele.itemID)) { // apply pricing based on the number of attendees
+						var multiply = options[ele.itemID].attendees.length - parseFloat(ele.cost.settings.after); // how many more
+						if (multiply > 0) ele.cost.calc += parseFloat(ele.cost.settings.later) * multiply; // for additional attendees
+					}
+					break;
+				case 'download':
+					ele.cost.calc = parseFloat(ele.cost.settings.cost); // straight assignment (no options)
+					break;
+				case 'custom':
+					ele.cost = { calc: ele.cost, pretty: $filter('currency')(ele.cost) }; // invoices
+					break;
+				default:
+					ele.cost = {calc:0, pretty:'$0.00'};
+			}
+			total += ele.cost.calc; // compute total
+		});
+	};
+	$rootScope.$watch(function() {
+		return fullCart.concat([options]); // watch for list and option changes
+	}, watchHandle, true);
 
 	return {
 		load: function() {
 			return load_me();
 		},
 		list: function() {
-			return fullCart;
+			return printList; //fullCart;
 		},
 		total: function() {
-			// var tot = 0;
-			// fullCart.forEach(function(ele){
-			// 	tot += parseFloat(ele.cost);
-			// });
-			// return tot;
-			return undefined;
+			return total;
 		},
 		getOpt: function() {
 			return options;
