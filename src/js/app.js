@@ -54,7 +54,7 @@ config(['$routeProvider', 'securityAuthorizationProvider', function( $routeProvi
 				user: securityAuthorizationProvider.requireAuthenticatedUser
 			}
 		}).
-		when('/purchases/:orderID', { // shows a recipt of items purchased for a specific order
+		when('/cart/recipt', { // shows a recipt of items purchased for a specific order
 			templateUrl: 'partials/recipt-print.tpl.html',
 			controller: 'ReciptCtrl',
 			resolve: {

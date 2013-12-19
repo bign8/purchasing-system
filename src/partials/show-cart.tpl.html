@@ -18,7 +18,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr ng-repeat="item in printList">
+					<tr ng-repeat="item in printList"> <!-- printList -->
 						<td><a href="#/products/{{item.productID}}/{{item.itemID}}">{{item.name}}</a></td>
 						<td>{{item.description}}</td>
 						<td ng-switch="options.hasOwnProperty(item.itemID)">
@@ -49,7 +49,7 @@
 						<th></th>
 						<th></th>
 						<th>Total:</th>
-						<th><span>{{total | currency}}</span></th>
+						<th><span>{{printCart.total() | currency}}</span></th>
 					</tr>
 				</tfoot>
 			</table>
@@ -57,15 +57,15 @@
 			<div class="form-actions" style="text-align:center">
 				<a ng-click="saveCart('online')" class="btn btn-primary btn-lg" role="button">
 					Checkout via PayPal 
-					<span class="badge">{{total | currency}}</span>
+					<span class="badge">{{printCart.total() | currency}}</span>
 				</a>
 				<a ng-click="saveCart('check')" class="btn btn-lg" role="button">
 					Checkout via Check 
-					<span class="badge">{{total | currency}}</span>
+					<span class="badge">{{printCart.total() | currency}}</span>
 				</a>
 			</div>
 
-			<!-- <pre>{{options | json}}</pre> -->
+			<pre>{{printList | json}}</pre>
 
 		</div>
 	</div>

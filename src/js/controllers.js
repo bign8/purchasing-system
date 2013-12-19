@@ -104,38 +104,19 @@ controller('CartCtrl', ['$scope', 'myPage', 'myCart', 'security', 'printCart', '
 	myPage.setTitle("Shopping Cart");
 
 	$scope.myCart = myCart;
+	$scope.printCart = printCart;
 	$scope.printList = [];
-	$scope.total = 0;
 	$scope.options = printCart.getOpt(); // load options cashe
 
-	// calculate totals on the fly and specifically for different templates
-	var watchHandle = function(newValue) {
-		printCart.setOpt($scope.options); // update options store
-		$scope.total = 0; // reset total
-		$scope.printList = angular.copy(newValue); // assign new list
-		$scope.printList.pop(); // remove the concatenated options
+	$scope.$watch('options', function(newOptions) { // assign and store options
+		printCart.setOpt($scope.options);
+	}, true);
 
-		// Compute different costs on cart changes
-		$scope.printList.forEach(function(ele) {
-			ele.cost.calc = 0;
-			switch (ele.template) {
-				case 'conference':
-					ele.cost.calc = parseFloat(ele.cost.settings.initial); // initial cost always in effect
-					if ($scope.options.hasOwnProperty(ele.itemID)) { // apply pricing based on the number of attendees
-						var multiply = $scope.options[ele.itemID].attendees.length - parseFloat(ele.cost.settings.after); // how many more
-						if (multiply > 0) ele.cost.calc += parseFloat(ele.cost.settings.later) * multiply; // for additional attendees
-					}
-					break;
-				case 'download':
-					ele.cost.calc = parseFloat(ele.cost.settings.cost); // straight assignment (no options)
-					break;
-			}
-			$scope.total += ele.cost.calc; // compute total
-		});
-	};
-	$scope.$watch(function() {
-		return printCart.list().concat([$scope.options]); // watch for list and option changes
-	}, watchHandle, true);
+	$scope.$watch(function() { // watch and retrieve printCart.list
+		return printCart.list();
+	}, function(newValue) {
+		$scope.printList = newValue;
+	}, true);
 
 	$scope.showOptions = function(item) { // should we show the options button
 		return item.options > 0;
@@ -157,7 +138,7 @@ controller('CartCtrl', ['$scope', 'myPage', 'myCart', 'security', 'printCart', '
 		});
 		modalInstance.result.then(function( res ){
 			$scope.options[item.itemID] = res;
-			watchHandle(printCart.list().concat(['x'])); // force update
+			// watchHandle(printCart.list().concat(['x'])); // force update
 		});
 	};
 
@@ -187,7 +168,7 @@ controller('CartCtrl', ['$scope', 'myPage', 'myCart', 'security', 'printCart', '
 		});
 
 		interface.call('saveCart', {items:obj, medium:medium}).then(function(res) {
-			var returnPath = '/purchases/' + res.data;
+			var returnPath = '/cart/recipt';
 			// TODO: empty cart
 			if (medium == 'online') {
 				payPalPass(returnPath); // call paypal data preparation
@@ -359,8 +340,12 @@ controller('ContactModalCtrl', ['$scope', '$modalInstance', 'contact', 'firmAddr
 	$scope.cancel = function () { $modalInstance.dismiss('cancel'); };
 }]).
 
-controller('ReciptCtrl', ['$scope', 'myPage', function ($scope, myPage) {
+controller('ReciptCtrl', ['$scope', 'myPage', 'printCart', '$location', function ($scope, myPage, printCart, $location) {
+	$scope.printList = printCart.list();
+	if ($scope.printList == []) $location.path('/cart'); // force re-direct
 	myPage.setTitle("Recipt");
+
+	
 }]).
 
 controller('HeadCtrl', ['$scope', 'myPage', 'breadcrumbs', 'myCart', 'security', function ($scope, myPage, breadcrumbs, myCart, security) {
@@ -384,6 +369,8 @@ controller('CustPayFormCtrl', ['$scope', 'myPage', 'myCart', function ($scope, m
 		productID: -1,
 		name: 'Custom Payment',
 		settings: null,
+		template: 'custom',
+		options: 0,
 		img: null,
 		blurb: 'This is a custom field'
 	};
