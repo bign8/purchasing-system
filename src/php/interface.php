@@ -143,15 +143,19 @@ class formsManager extends NgClass {
 		$user = $this->requiresAuth(); // upon cart completion
 		$data = $this->getPostData();
 
+		$STH = $this->db->prepare("SELECT purchaseID FROM `purchase` WHERE firmID=? and itemID=?;");
+
 		// Iterate through ID's
 		$retData = array();
 		foreach ($data->ids as $itemID) {
-			// $itemSTH->execute( $itemID );
-			// $row = $itemSTH->fetch(PDO::FETCH_ASSOC);
-			// $row['cost'] = $this->getProductCost( $row['productID'] );
 			if (is_string($itemID)) {
 				$item = $this->getItemByID( $itemID );
 				if ($item != null) {
+
+					// warn if item has already been purchased
+					$STH->execute( $user['firmID'], $itemID );
+					$item['warn'] = ($STH->rowCount() > 0);
+
 					array_push($retData, $item);
 				}
 			} else {
@@ -330,6 +334,35 @@ class formsManager extends NgClass {
 
 		return $orderID;	
 	}
+
+	// Worker(app/purchases): return purchases
+	public function getPurchases() {
+		$user = $this->requiresAuth();
+
+		$STH = $this->db->prepare("SELECT i.*, p.data, t.template, o.stamp FROM (SELECT * FROM `purchase` WHERE firmID=?) p LEFT JOIN item i ON p.itemID=i.itemID LEFT JOIN `product` pr ON i.productID=pr.productID LEFT JOIN `template` t ON pr.templateID=t.templateID LEFT JOIN `order` o ON p.orderID=o.orderID ORDER BY i.productID, i.name;");
+		$STH->execute( $user['firmID'] );
+
+		$retData = $STH->fetchAll( PDO::FETCH_ASSOC );
+		foreach ($retData as &$item) {
+			$item['settings'] = json_decode($item['settings']);
+			$item['data'] = json_decode($item['data']);
+		}
+		return json_encode($retData);
+	}
+
+	// Worker(app/purchases/all): return purchases (not needing auth)
+	public function getSoftPurchases() {
+		$retData = array();
+
+		$user = $this->getCurrentUser();
+		if (!is_null($user)) {
+			$STH = $this->db->prepare("SELECT itemID FROM `purchase` WHERE firmID=?;");
+			$STH->execute( $user['firmID'] );
+			$retData = $STH->fetchAll( PDO::FETCH_COLUMN );
+		}
+
+		return json_encode($retData);
+	}
 }
 
 /*
@@ -362,6 +395,10 @@ switch ($_REQUEST['action']) {
 	case 'editContact': echo $obj->editContact(); break;
 	case 'getItemOptions': echo $obj->getItemOptions(); break;
 	case 'saveCart': echo $obj->saveCart(); break;
+
+	// previous purchase functions
+	case 'getPurchases': echo $obj->getPurchases(); break;
+	case 'getSoftPurchases': echo $obj->getSoftPurchases(); break;
 
 	// Test case statements
 	case 'testAuth': echo $obj->testAuth(); break;

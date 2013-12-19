@@ -41,7 +41,7 @@
 							<p>{{item.description}}</p>
 							<div>
 								<a ng-href="#/products/{{item.productID}}/{{item.itemID}}" class="btn btn-default" role="button">Details</a>
-								<a ng-click="myCart.add(item)" ng-hide="myCart.contains(item)" class="btn btn-primary pull-right" role="button">Add to Cart</a>
+								<a ng-click="myCart.add(item)" ng-hide="myCart.contains(item.itemID)" class="btn btn-primary pull-right" role="button">Add to Cart</a>
 							</div>
 						</div>
 					</div>
@@ -69,7 +69,7 @@
 						<td><a href="#/products/{{item.productID}}/{{item.itemID}}">{{item.name}}</a></td>
 						<td>{{item.description}}</td>
 						<td>{{item.cost.pretty}}</td>
-						<td><a ng-click="myCart.add(item)" ng-hide="myCart.contains(item)">Add to Cart</a></td>
+						<td><a ng-click="myCart.add(item)" ng-hide="myCart.contains(item.itemID)">Add to Cart</a></td>
 					</tr>
 				</tbody>
 			</table>

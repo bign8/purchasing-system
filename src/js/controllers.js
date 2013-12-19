@@ -362,8 +362,12 @@ controller('HeadCtrl', ['$scope', 'myPage', 'breadcrumbs', 'myCart', 'security',
 	$scope.security = security;
 }]).
 
-controller('LististPurchasesCtrl', ['$scope', 'myPage', function ($scope, myPage){
-	myPage.setTitle("Previously purchased items");
+controller('ListPurchasesCtrl', ['$scope', 'myPage', 'items', function ($scope, myPage, items){
+	myPage.setTitle("Previous Purchases");
+	$scope.items = items.data;
+	angular.forEach($scope.items, function(ele) {
+		if (ele.stamp) ele.stamp = new Date( ele.stamp );
+	});
 }]).
 
 controller('CustPayFormCtrl', ['$scope', 'myPage', 'myCart', function ($scope, myPage, myCart){

@@ -55,8 +55,8 @@ factory('breadcrumbs', ['$rootScope', '$location', function ($rootScope, $locati
 	};
 }]).
 
-factory('myCart', ['$rootScope', function($rootScope) {
-	var cart = JSON.parse(localStorage.azUAcart || '[]');
+factory('myCart', ['$rootScope', 'interface', function($rootScope, interface) {
+	var cart = JSON.parse(localStorage.azUAcart || '[]'), past = [];
 	var observerCallbacks = []; // Observer Pattern
 
 	var update = function() {
@@ -64,6 +64,7 @@ factory('myCart', ['$rootScope', function($rootScope) {
 		angular.forEach(observerCallbacks, function(callback) { // Notify observers
 			callback();
 		});
+		update_purchases();
 	};
 
 	// Attach storage change event
@@ -81,6 +82,11 @@ factory('myCart', ['$rootScope', function($rootScope) {
 		update();
 	}
 
+	function update_purchases() {
+		interface.call('getSoftPurchases').then(function(res) {
+			past = res.data;
+		});
+	}
 
 	return {
 		len: function() {
@@ -98,15 +104,26 @@ factory('myCart', ['$rootScope', function($rootScope) {
 			cart.splice(index, 1);
 			update();
 		},
-		contains: function(item) {
-			return cart.indexOf(item.itemID) !== -1;
+		contains: function(itemID) {
+			// check if already in cart or if inprevious purchases
+			return cart.indexOf(itemID) !== -1 || past.indexOf(itemID) !== -1;
 		},
 		get: function() {
+
+			// remove past items from cart before returning cart
+			angular.forEach(past, function(ele) {
+				var index = cart.indexOf(ele);
+				if (index !== -1) cart.splice(index, 1);
+			});
+
 			return cart;
 		},
 		clear: function() {
 			cart = [];
 			update();
+		},
+		getPurchases: function() {
+			update_purchases();
 		},
 
 		// Observer pattern
@@ -141,6 +158,7 @@ factory('printCart', ['interface', 'myCart', '$rootScope', '$filter', function (
 						if (++dieCount > 100) break; // infinete loops are bad
 					}
 				}
+
 				watchHandle(fullCart.concat(['x'])); // force watcher
 			});
 			return promise;

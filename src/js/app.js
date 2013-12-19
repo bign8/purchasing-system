@@ -70,9 +70,12 @@ config(['$routeProvider', 'securityAuthorizationProvider', function( $routeProvi
 		when('/purchases', {
 			// TODO: show list of past purchases and allow modification/re-download
 			templateUrl: 'partials/list-purchases.tpl.html',
-			controller: 'LististPurchasesCtrl',
+			controller: 'ListPurchasesCtrl',
 			resolve: {
-				user: securityAuthorizationProvider.requireAuthenticatedUser
+				user: securityAuthorizationProvider.requireAuthenticatedUser,
+				items: function(interface) {
+					return interface.call('getPurchases');
+				}
 			}
 		}).
 		when('/payment', {
@@ -88,8 +91,10 @@ config(['$routeProvider', 'securityAuthorizationProvider', function( $routeProvi
 		otherwise({ redirectTo: '/' });
 }])
 
-.run(['security', function(security) {
+.run(['security', 'myCart', function(security, myCart) {
   // Get the current user when the application starts
   // (in case they are still logged in from a previous session)
   security.requestCurrentUser();
+
+  myCart.getPurchases();
 }]);
