@@ -20,8 +20,9 @@ factory('myPage', function( ){
 	};
 }).
 
-factory('breadcrumbs', ['$rootScope', '$location', function ($rootScope, $location) {
+factory('breadcrumbs', ['$rootScope', '$location', 'interface', function ($rootScope, $location, interface) {
 	var breadcrumbs = [];
+	var crumbCashe = {};
 
 	$rootScope.$on('$routeChangeSuccess', function(event, current) {
 		var pathElements = $location.path().split('/'), result = [], i;
@@ -29,13 +30,37 @@ factory('breadcrumbs', ['$rootScope', '$location', function ($rootScope, $locati
 			return '/' + (pathElements.slice(0, index + 1)).join('/');
 		};
 
+		// pretty crumb cash and calling function
+		function prettyCrumb(obj) {
+			if (crumbCashe.hasOwnProperty(obj.path)) { // in in cashe
+				obj.name = crumbCashe[obj.path];
+			} else { // otherwise
+				interface.call('prettyCrumb', obj).then(function(res) {
+					crumbCashe[obj.path] = res.data; // assign cashe
+					breadcrumbs[obj.index].name = res.data; // assign value out
+				});
+			}
+			return ucfirst(obj.name);
+		}
+
+		// Pretty path elements (thanks http://phpjs.org/functions/ucfirst/)
+		function ucfirst (str) {
+			str += '';
+			var f = str.charAt(0).toUpperCase();
+			return f + str.substr(1);
+		}
+
 		if (pathElements[1] !== '') { // remove empty navigation to home
 			pathElements.shift();
+
 			for (i=0; i<pathElements.length; i++) {
-				result.push({
-					name: pathElements[i],
-					path: '#' + breadcrumbPath(i)
-				});
+				var obj = {
+					name: ucfirst(pathElements[i]),
+					path: '#' + breadcrumbPath(i),
+					index: i, // used for prettyCrumb
+				};
+				if (!isNaN(parseInt(obj.name))) obj.name = prettyCrumb(obj); // make that ugly (numeric) crumb pretty
+				result.push(obj);
 			}
 		}
 

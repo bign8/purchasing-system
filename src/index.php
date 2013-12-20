@@ -61,13 +61,13 @@
 						<!-- .nav, .navbar-search, .navbar-form, etc -->
 
 						<ul class="nav">
-							<li ng-class="{active: breadcrumbs.onPage('products')}"><a href="#/products">Products</a></li>
-							<li ng-class="{active: breadcrumbs.onPage('cart')}"><a href="#/cart">Shopping Cart</a></li>
+							<li ng-class="{active: breadcrumbs.onPage('Products')}"><a href="#/products">Products</a></li>
+							<li ng-class="{active: breadcrumbs.onPage('Cart')}"><a href="#/cart">Shopping Cart</a></li>
 							<!-- <li ng-class="{active: breadcrumbs.onPage('purchases')}" ng-show="security.isAuthenticated()"><a href="#/purchases">Past Products</a></li> -->
 						</ul>
 
 						<ul class="nav pull-right">
-							<li><a href="#/payment">Make A Payment</a></li>
+							<li ng-class="{active: breadcrumbs.onPage('Payment')}"><a href="#/payment">Make A Payment</a></li>
 							<li><login-toolbar class="visible-desktop"></login-toolbar></li>
 						</ul>
 
@@ -76,7 +76,7 @@
 			</div>
 
 			<ul class="breadcrumb">
-				<li><a  href="#/">home</a></li>
+				<li><a  href="#/">Home</a></li>
 				<li ng-repeat="breadcrumb in breadcrumbs.getAll()">
 					<span class="divider">/</span>  
 					<ng-switch on="$last">

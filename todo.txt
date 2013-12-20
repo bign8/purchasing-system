@@ -2,7 +2,7 @@ ToDo:
 - Implement Form constraints for checkout
 - Previous purchases (for downloads + conference, need to do groups)
 - periodically make calls back to server to check for additions to php cart
-- Breadcrumbs pretty titles
+- and visible field to items
 
 
 Notes:
