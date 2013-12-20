@@ -116,6 +116,26 @@ class formsManager extends NgClass {
 		return json_encode($retData);
 	}
 
+	// Worker(app/breadcrumb): return full name for breadcrumb
+	public function prettyCrumb() {
+		$data = $this->getPostData();
+
+		$ret = ucfirst($data->name);
+
+		// Pretty print product area
+		if ( preg_match('/#\/products\/.*/', $data->path) && $data->index > 0 && $data->index < 3 ) {
+			if ( $data->index == 1 ) {
+				$STH = $this->db->prepare("SELECT `name` FROM `product` WHERE `productID`=?;");
+			} else { // has to be 2
+				$STH = $this->db->prepare("SELECT `name` FROM `item` WHERE `itemID`=?;");
+			}
+			$STH->execute( $data->name );
+			$ret = $STH->fetchColumn();
+		}
+
+		return $ret;
+	}
+
 	// Worker(app): return specific item detail
 	public function getItem() {
 		$data = $this->getPostData();
@@ -382,6 +402,7 @@ switch ($_REQUEST['action']) {
 	case 'getItems': echo $obj->getItems(); break;
 	case 'getCart': echo $obj->getCart(); break;
 	case 'getItem': echo $obj->getItem(); break;
+	case 'prettyCrumb': echo $obj->prettyCrumb(); break;
 
 	// user registration functions
 	case 'addAddress': echo $obj->addAddress(); break;
