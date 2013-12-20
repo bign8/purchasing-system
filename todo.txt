@@ -2,9 +2,13 @@ ToDo:
 - Implement Form constraints for checkout
 - Previous purchases (for downloads + conference, need to do groups)
 - periodically make calls back to server to check for additions to php cart
-- and visible field to items
 
 
 Notes:
 - Add conference type product -> Force insert into tie_product_field
 
+
+Questions:
+- Can we get a test domain up and running (store.upstreamacademy.com)
+- how old of a browser do we need to support
+	- iff not old -> try this for array unique (php cart merge within index.php) http://stackoverflow.com/a/11247231
