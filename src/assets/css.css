@@ -1,0 +1,18 @@
+/* for consistent block sizing on /products and /products/[0-9]+ */
+.thumbnail .caption {
+	height: 260px;
+	overflow: hidden;
+	position: relative;
+}
+.thumbnail .caption .btn {
+	position: absolute;
+	bottom: 7px;
+}
+.thumbnail .caption .btn.pull-right {
+	right: 7px;
+}
+
+/* For printing recipt page, needs re-working */
+@media print {
+	.header, .btn { display: none;}
+}
