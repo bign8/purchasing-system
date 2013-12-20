@@ -215,15 +215,17 @@ factory('printCart', ['interface', 'myCart', '$rootScope', '$filter', function (
 		setOpt: function(opt) {
 			options = opt;
 		},
-		checkout: function() {
+		checkout: function(medium) {
 			localStorage.setItem('azUArecipt', JSON.stringify(printList)); // store off cart
 			localStorage.setItem('azUAreciptTotal', JSON.stringify(total));
+			localStorage.setItem('azUAreciptType', medium);
 			myCart.clear();
 		},
 		getRecipt: function() {
 			return {
 				total: JSON.parse(localStorage.getItem('azUAreciptTotal')),
-				list: JSON.parse(localStorage.getItem('azUArecipt'))
+				list: JSON.parse(localStorage.getItem('azUArecipt')),
+				medium: localStorage.getItem('azUAreciptType')
 			};
 		}
 	};

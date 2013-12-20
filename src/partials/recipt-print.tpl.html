@@ -1,5 +1,17 @@
+<div class="row" ng-show="recipt.medium == 'check'">
+	<div class="offset1 span10">
+		<p>Please make checks payable to <strong>Upstream Academy</strong> and send them to the following address.</p>
+		<address>
+			<strong>Upstream Academy</strong><br>
+			P.O. Box 1147<br>
+			Helena, MT 59624
+		</address>
+	</div>
+</div>
+
 <div class="row">
 	<div class="offset0 span12">
+		<a class="btn" href="#/purchases">View Purchases</a>
 		<a class="btn pull-right" href="javascript:window.print()">Print</a>
 
 		<table class="table table-striped table-hover">
@@ -29,7 +41,7 @@
 			</tfoot>
 		</table>
 
-
+		<!-- <pre>{{recipt | json}}</pre> -->
 
 	</div>
 </div>
