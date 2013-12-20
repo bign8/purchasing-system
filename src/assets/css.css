@@ -12,6 +12,11 @@
 	right: 7px;
 }
 
+/* don't wrap on specific th fields */
+th.nowrap, td.nowrap {
+	white-space: nowrap;
+}
+
 /* For printing recipt page, needs re-working */
 @media print {
 	.header, .btn { display: none;}
