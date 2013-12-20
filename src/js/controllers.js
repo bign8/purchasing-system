@@ -164,7 +164,11 @@ controller('CartCtrl', ['$scope', 'myPage', 'myCart', 'security', 'printCart', '
 			}
 		});
 		angular.forEach($scope.printList, function(ele) { // converting into itemID -> options style array
-			obj[ele.itemID] = $scope.options[ele.itemID] || {};
+			// obj[ele.itemID] = $scope.options[ele.itemID] || ele.settings || {};
+			obj[ele.itemID] = { // Proposed change, send options and element
+				opt: $scope.options[ele.itemID] || {},
+				ele: ele
+			};
 		});
 
 		interface.call('saveCart', {items:obj, medium:medium}).then(function(res) {

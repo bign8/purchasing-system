@@ -336,17 +336,24 @@ class formsManager extends NgClass {
 		// Store purchases and options
 		$purchaseSTH = $this->db->prepare("INSERT INTO `purchase` (itemID, orderID, firmID, data) VALUES (?,?,?,?);");
 		$attendeeSTH = $this->db->prepare("INSERT INTO `attendee` (itemID, contactID) VALUES (?,?);");
+		$memberSTH = $this->db->prepare("INSERT INTO `member` (firmID, groupID) VALUES (?,?);");
 		foreach ($data->items as $key => $value) { // iterate over items
-			if (isset($value->attendees)) { // Store attendees here (if possible)
-				foreach ($value->attendees as $contactID) {
+			if (isset($value->opt->attendees)) { // Store attendees here (if possible)
+				foreach ($value->opt->attendees as $contactID) {
 					if (!$attendeeSTH->execute($key, $contactID)) {
 						header('HTTP/ 409 Conflict');
 						return print_r($orderSTH->errorInfo(), true);
 					}
 				}
-				unset($value->attendees);
+				unset($value->opt->attendees);
 			}
-			if (!$purchaseSTH->execute($key, $orderID, $user['firmID'], json_encode($value))) { // store purchase here
+			if (isset($value->ele->settings->groupID)) {
+				if (!$memberSTH->execute($user['firmID'], $value->ele->settings->groupID)) {
+					header('HTTP/ 409 Conflict');
+					return print_r($orderSTH->errorInfo(), true);
+				}
+			}
+			if (!$purchaseSTH->execute($key, $orderID, $user['firmID'], json_encode($value->opt))) { // store purchase here
 				header('HTTP/ 409 Conflict');
 				return print_r($orderSTH->errorInfo(), true);
 			}
