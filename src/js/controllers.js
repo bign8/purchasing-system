@@ -211,7 +211,9 @@ controller('CartOptionCtrl', ['$scope', '$modalInstance', '$modal', 'options', '
 			}
 		});
 		modalInstance.result.then(function(res) {
-			$scope.opt['+' + option.name] = 'Assigned'; // Added Attendee (allow hidden field to pass)
+			var out = '';
+			angular.forEach(res, function(ele) { out += ', ' + ele.legalName; });
+			$scope.opt['+' + option.name] = out.substr(2); // Added Attendee (allow hidden field to pass)
 			$scope.opt.attendees = res;
 		});
 	};
