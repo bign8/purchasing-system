@@ -55,17 +55,9 @@ factory('breadcrumbs', ['$rootScope', '$location', function ($rootScope, $locati
 	};
 }]).
 
-factory('myCart', ['$rootScope', 'interface', function($rootScope, interface) {
+factory('myCart', ['$rootScope', 'interface', 'security', function($rootScope, interface, security) {
 	var cart = JSON.parse(localStorage.azUAcart || '[]'), past = [];
 	var observerCallbacks = []; // Observer Pattern
-
-	var update = function() {
-		localStorage.setItem('azUAcart', JSON.stringify(cart));
-		angular.forEach(observerCallbacks, function(callback) { // Notify observers
-			callback();
-		});
-		update_purchases();
-	};
 
 	// Attach storage change event
 	if (window.addEventListener) { // See: http://diveintohtml5.info/storage.html
@@ -74,17 +66,38 @@ factory('myCart', ['$rootScope', 'interface', function($rootScope, interface) {
 		window.attachEvent('onstorage', handle_storage);
 	}
 
+	// Update purchases on current user change
+	$rootScope.$watch(function() {
+		return security.currentUser;
+	}, update_purchases, true);
+
 	// Update cart and notify world of changes
 	function handle_storage(e) { // allow multi-tab updates
 		if (!e) { e = window.event; }
 		cart = JSON.parse(localStorage.getItem('azUAcart') || '[]');
-		$rootScope.$digest();
 		update();
+		$rootScope.$digest();
 	}
 
+	// Update local storage container
+	function update() {
+		localStorage.setItem('azUAcart', JSON.stringify(cart));
+		angular.forEach(observerCallbacks, function(callback) { // Notify observers
+			callback();
+		});
+	}
+
+	// retrieve purchases from server
 	function update_purchases() {
-		interface.call('getSoftPurchases').then(function(res) {
+		interface.call('getSoftPurchases').then(function (res) {
 			past = res.data;
+			
+			// remove past items from cart before returning cart
+			angular.forEach(past, function(ele) {
+				var index = cart.indexOf(ele);
+				if (index !== -1) cart.splice(index, 1);
+			});
+			update();
 		});
 	}
 
@@ -109,21 +122,11 @@ factory('myCart', ['$rootScope', 'interface', function($rootScope, interface) {
 			return cart.indexOf(itemID) !== -1 || past.indexOf(itemID) !== -1;
 		},
 		get: function() {
-
-			// remove past items from cart before returning cart
-			angular.forEach(past, function(ele) {
-				var index = cart.indexOf(ele);
-				if (index !== -1) cart.splice(index, 1);
-			});
-
 			return cart;
 		},
 		clear: function() {
 			cart = [];
 			update();
-		},
-		getPurchases: function() {
-			update_purchases();
 		},
 
 		// Observer pattern
