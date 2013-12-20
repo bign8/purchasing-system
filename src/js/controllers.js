@@ -169,7 +169,7 @@ controller('CartCtrl', ['$scope', 'myPage', 'myCart', 'security', 'printCart', '
 
 		interface.call('saveCart', {items:obj, medium:medium}).then(function(res) {
 			var total = printCart.total();
-			printCart.checkout(); // clear cart + archive for callback
+			printCart.checkout(medium); // clear cart + archive for callback
 
 			var returnPath = '/cart/recipt';
 
