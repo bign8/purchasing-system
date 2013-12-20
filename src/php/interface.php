@@ -54,7 +54,7 @@ class formsManager extends NgClass {
 
 	// Worker(app): returns product list
 	public function getProducts() {
-		$STH = $this->db->query("SELECT * FROM `product` WHERE visible = 'yes';");
+		$STH = $this->db->query("SELECT * FROM `product` WHERE visible='yes';");
 		return json_encode($STH->fetchAll(PDO::FETCH_ASSOC));
 	}
 
@@ -103,7 +103,7 @@ class formsManager extends NgClass {
 		$cost = $this->getProductCost( $data->prodID );
 
 		// Get All the items
-		$itemSTH = $this->db->prepare("SELECT * FROM `item` WHERE productID = ?;");
+		$itemSTH = $this->db->prepare("SELECT * FROM `item` WHERE productID = ? AND visible='yes';");
 		$itemSTH->execute( $data->prodID );
 
 		// Properly pre-format return data
