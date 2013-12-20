@@ -1,10 +1,7 @@
 ToDo: 
 - Implement Form constraints for checkout
 - Check checkout
-- Previous purchases (for downloads, need to do conference and groups)
-- Prevent repeat purchases (links removed from site, removed from cart on 'get' for offsite, warning for stragglers #overkill)
-	-- be sure to re-load previous purchases list on re-login/logout
-- Cart: instead of settinng, attendee to assigned, set it to a string of names, something readable (for use in list-purchase)
+- Previous purchases (for downloads + conference, need to do groups)
 - periodically make calls back to server to check for additions to php cart
 - Breadcrumbs pretty titles
 
