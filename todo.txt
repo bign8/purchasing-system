@@ -6,6 +6,7 @@ ToDo:
 	-- be sure to re-load previous purchases list on re-login/logout
 - Cart: instead of settinng, attendee to assigned, set it to a string of names, something readable (for use in list-purchase)
 - periodically make calls back to server to check for additions to php cart
+- Breadcrumbs pretty titles
 
 
 Notes:

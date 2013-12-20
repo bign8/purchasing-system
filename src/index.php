@@ -20,11 +20,7 @@
 
 	<!-- for app -->
 	<script src="<%= grunt.config.get('pkg.name') %>.js"></script>
-	<style>
-		@media print {
-			.header, .btn { display: none;}
-		}
-	</style>
+	<link rel="stylesheet" type="text/css" href="css.css">
 	<script>
 		Array.prototype.unique = function() { // thanks: http://stackoverflow.com/a/1584377
 		    var a = this.concat();
