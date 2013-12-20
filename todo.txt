@@ -2,7 +2,8 @@ ToDo:
 - Implement Form constraints for checkout
 - Previous purchases (for downloads + conference, need to do groups)
 - periodically make calls back to server to check for additions to php cart
-
+- pull pending group pricing when a group membership is in the cart
+- pull pricing based on group membership
 
 Notes:
 - Add conference type product -> Force insert into tie_product_field
