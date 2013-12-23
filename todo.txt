@@ -3,7 +3,6 @@ ToDo:
 - Previous purchases -> modify attendees to a conference
 - periodically make calls back to server to check for additions to php cart
 - pull pending group pricing when a group membership is in the cart
-- pull pricing based on group membership
 - implement discount codes
 - allow modification of attendees, priced accordingly
 - send email on checkout (indicate payment type, send misc fields)
