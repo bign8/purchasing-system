@@ -470,13 +470,18 @@ class formsManager extends NgClass {
 		}
 
 		// TODO: test if valid for current cart
+		$questionMarks = trim(str_repeat("?,", sizeof($data->ids)),",");
+		$finalSTH = $this->db->prepare("SELECT * FROM `discount` WHERE ((productID IN (SELECT DISTINCT productID FROM `item` WHERE itemID IN ($questionMarks)) AND itemID IS NULL) OR (productID IS NULL AND itemID IN ($questionMarks)) OR (productID IS NULL AND itemID IS NULL) ) AND discountID = ?;");
+		if (!$finalSTH->execute( array_merge( $data->ids, $data->ids, array($codeID) ) ) || $finalSTH->rowCount() == 0) {
+			return json_encode(array('pre' => 'Unrelated!', 'msg'=>'Not associated with any items in your cart.', 'type'=>'error'));
+		}
 
 		// successfull callback
 		return json_encode(array(
 			'pre'=> 'Success!',
 			'msg'=>'Added discount to current order!',
 			'type'=>'success',
-			'obj'=>$validTimeSTH->fetch(PDO::FETCH_ASSOC)
+			'obj'=>$finalSTH->fetch(PDO::FETCH_ASSOC)
 		));
 	}
 }
