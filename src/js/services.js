@@ -243,7 +243,7 @@ factory('printCart', ['interface', 'myCart', '$rootScope', '$filter', '$timeout'
 	var discount_total = function() {
 		var total = 0;
 		angular.forEach(discounts, function(item) {
-			total += item.amount;
+			total += parseFloat(item.amount);
 		});
 		return total;
 	};
@@ -279,6 +279,22 @@ factory('printCart', ['interface', 'myCart', '$rootScope', '$filter', '$timeout'
 				list: JSON.parse(localStorage.getItem('azUArecipt')),
 				medium: localStorage.getItem('azUAreciptType')
 			};
+		},
+		rem: function(index) {
+			obj = fullCart[index];
+			myCart.rem(index);
+
+			// look through discounts for same product id's
+			var otherProducts = false;
+			angular.forEach(fullCart, function(item) {
+				if (obj.itemID != item.itemID && obj.productID == item.productID) otherProducts = true;
+			});
+
+			// remove discounts that apply directly to the last item removed (and not to others)
+			angular.forEach(discounts, function(item, idx) {
+				if (item.itemID == obj.itemID) discounts.splice(idx, 1);
+				if (!otherProducts && item.productID == obj.productID) discounts.splice(idx, 1);
+			});
 		},
 
 		// discount public funcitons
