@@ -2,7 +2,6 @@ ToDo:
 - Implement Form constraints for checkout
 - Previous purchases -> modify attendees to a conference, priced accordingly
 - periodically make calls back to server to check for additions to php cart
-- remove discount codes with relevant cart removals
 - send email on checkout (indicate payment type, send misc fields)
 - photo upload field (doesn't store, just emails)
 - build administration section

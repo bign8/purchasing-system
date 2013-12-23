@@ -39,7 +39,7 @@
 						<td ng-switch="showOptions(item)">
 							<span ng-switch-when="false">{{item.cost.pretty}}</span>
 							<span ng-switch-default>{{item.cost.calc | currency}}</span>
-							<a href ng-click="myCart.rem($index)" role="button" class="close">&times;</a>
+							<a href ng-click="printCart.rem($index)" role="button" class="close">&times;</a>
 						</td>
 					</tr>
 				</tbody>
