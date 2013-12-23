@@ -1,15 +1,35 @@
 ToDo: 
 - Implement Form constraints for checkout
-- Previous purchases (for downloads + conference, need to do groups)
+- Previous purchases -> modify attendees to a conference
 - periodically make calls back to server to check for additions to php cart
 - pull pending group pricing when a group membership is in the cart
 - pull pricing based on group membership
+- implement discount codes
+- allow modification of attendees, priced accordingly
+- send email on checkout (indicate payment type, send misc fields)
+- photo upload field (doesn't store, just emails)
+- build administration section
+	- Products
+	- Items
+	- Downloads
+	- Groups
+	- Discounts
+	- Firms (merge)
+	- Memberships
+	- Purchases
+	- ...
 
 Notes:
 - Add conference type product -> Force insert into tie_product_field
-
 
 Questions:
 - Can we get a test domain up and running (store.upstreamacademy.com)
 - how old of a browser do we need to support
 	- iff not old -> try this for array unique (php cart merge within index.php) http://stackoverflow.com/a/11247231
+- add a new paypal service to "us" account, just use mine, wait until we go to production and convert past paypal service
+
+Future releases
+- download proxy? to ensure files have been purchased? (php script)
+- assign status to orders (processing, confirmed, etc)
+- use key based paypal checkout
+- handle invoices

@@ -49,8 +49,8 @@ controller('ListProdCtrl', ['$scope', 'myPage', 'prodList', function ($scope, my
 
 }]).
 
-controller('ListItemCtrl', ['$scope', 'myPage', '$routeParams', 'itemList', 'myCart', function ($scope, myPage, $routeParams, itemList, myCart) {
-	myPage.setTitle("Products", $routeParams.prodID);
+controller('ListItemCtrl', ['$scope', 'myPage', 'itemList', 'myCart', function ($scope, myPage, itemList, myCart) {
+	myPage.setTitle("Products");
 
 	// Set global passed variables
 	$scope.myCart = myCart;

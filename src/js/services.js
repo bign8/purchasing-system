@@ -146,6 +146,9 @@ factory('myCart', ['$rootScope', 'interface', 'security', function($rootScope, i
 			// check if already in cart or if inprevious purchases
 			return cart.indexOf(itemID) !== -1 || past.indexOf(itemID) !== -1;
 		},
+		purchased: function(itemID) {
+			return past.indexOf(itemID) !== -1;
+		},
 		get: function() {
 			return cart;
 		},
