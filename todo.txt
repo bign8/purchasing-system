@@ -1,10 +1,11 @@
 ToDo: 
 - Implement Form constraints for checkout
-- Previous purchases -> modify attendees to a conference, priced accordingly
-- periodically make calls back to server to check for additions to php cart
 - send email on checkout (indicate payment type, send misc fields)
 - photo upload field (doesn't store, just emails)
-- build administration section
+
+In a holding pattern:
+- periodically make calls back to server to check for additions to php cart (wait for test domain)
+- build administration section (see if user end is accepted)
 	- Products
 	- Items
 	- Downloads
@@ -22,9 +23,10 @@ Questions:
 - Can we get a test domain up and running (store.upstreamacademy.com)
 - how old of a browser do we need to support
 	- iff not old -> try this for array unique (php cart merge within index.php) http://stackoverflow.com/a/11247231
-- add a new paypal service to "us" account, just use mine, wait until we go to production and convert past paypal service
+- add a new paypal service to "usxxxxxx" account, just use mine, wait until we go to production and convert past paypal service
 
 Future releases
+- Previous purchases -> modify attendees to a conference, priced accordingly
 - download proxy? to ensure files have been purchased? (php script)
 - assign status to orders (processing, confirmed, etc)
 - use key based paypal checkout

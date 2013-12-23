@@ -19,7 +19,7 @@
 							<a ng-href="/files/{{item.settings.file}}" class="btn btn-info btn-mini" target="_Blank">Download</a>
 						</span>
 						<span ng-switch-when="conference">
-							<button class="btn btn-mini" title="{{item.data['+Attendees']}}">Attendees</button>
+							<button class="btn btn-mini" title="{{item.data['+Attendees']}}" ng-click="showAttendees(item)">Attendees</button>
 						</span>
 						<span ng-switch-default>n/a</span>
 					</td>
