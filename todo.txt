@@ -2,6 +2,8 @@ ToDo:
 - Implement Form constraints for checkout
 - send email on checkout (indicate payment type, send misc fields)
 - photo upload field (doesn't store, just emails)
+- GET SAMPLE DATA!
+- Don't allow adding of same attendee, filter selection list
 
 In a holding pattern:
 - periodically make calls back to server to check for additions to php cart (wait for test domain)
