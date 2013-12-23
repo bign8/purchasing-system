@@ -164,11 +164,13 @@ factory('myCart', ['$rootScope', 'interface', 'security', function($rootScope, i
 	};
 }]).
 
-factory('printCart', ['interface', 'myCart', '$rootScope', '$filter', function (interface, myCart, $rootScope, $filter) {
+factory('printCart', ['interface', 'myCart', '$rootScope', '$filter', '$timeout', function (interface, myCart, $rootScope, $filter, $timeout) {
 	var fullCart = [];
 	var options = {};
 	var total = 0;
 	var printList = []; // cost computed fullCart
+	var discounts = [];
+	var discountMsg = false;
 
 	// Nice observer pattern! http://stackoverflow.com/a/17558885
 	myCart.registerObserver(load_me);
@@ -227,6 +229,25 @@ factory('printCart', ['interface', 'myCart', '$rootScope', '$filter', function (
 		return fullCart.concat([options]); // watch for list and option changes
 	}, watchHandle, true);
 
+	// A reset-able discount messang function (clears timeout on recall)
+	var msgPromise;
+	var setDisMessage = function(msgObj, delay) {
+		discountMsg = msgObj;
+		$timeout.cancel( msgPromise );
+		msgPromise = $timeout(function() {
+			discountMsg = false;
+		}, delay);
+	};
+
+	// On the fly discount summation
+	var discount_total = function() {
+		var total = 0;
+		angular.forEach(discounts, function(item) {
+			total += item.amount;
+		});
+		return total;
+	};
+
 	return {
 		load: function() {
 			return load_me();
@@ -235,6 +256,9 @@ factory('printCart', ['interface', 'myCart', '$rootScope', '$filter', function (
 			return printList; //fullCart;
 		},
 		total: function() {
+			return total - discount_total();
+		},
+		subTotal: function() {
 			return total;
 		},
 		getOpt: function() {
@@ -255,6 +279,42 @@ factory('printCart', ['interface', 'myCart', '$rootScope', '$filter', function (
 				list: JSON.parse(localStorage.getItem('azUArecipt')),
 				medium: localStorage.getItem('azUAreciptType')
 			};
+		},
+
+		// discount public funcitons
+		addDiscount: function(code) {
+			var isDuplicateCode = false;
+			angular.forEach(discounts, function(item) {
+				if (item.code == code) isDuplicateCode = true;
+			});
+
+			if ( isDuplicateCode ) { // is a duplicate code
+				setDisMessage({
+					'pre': 'Duplicate Code!',
+					'msg': 'Are you trying to cheat us?',
+					'type': 'error'
+				}, 5000);
+			} else { // new discount
+				interface.call('getDiscount', {
+					'ids': myCart.get(),
+					'code':code
+				}).then(function(res) {
+					setDisMessage(res.data, 5000); // assign a reset-able message
+					if (res.data.type == 'success') discounts.push( res.data.obj ); // add object on good callback
+				});
+			}
+		},
+		getDiscounts: function() {
+			return discounts;
+		},
+		remDiscount: function(index) {
+			discounts.splice(index, 1);
+		},
+		getDiscountMsg: function() {
+			return discountMsg;
+		},
+		disTotal: function() {
+			return discount_total();
 		}
 	};
 }]).

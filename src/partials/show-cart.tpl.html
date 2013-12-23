@@ -6,7 +6,7 @@
 		</div>
 
 
-		<div class="col-md-offset-1 col-md-10" ng-switch-default>
+		<div ng-switch-default>
 			<table class="table table-striped table-hover">
 				<thead>
 					<tr>
@@ -47,24 +47,91 @@
 					<tr>
 						<th></th>
 						<th></th>
-						<th>Total:</th>
-						<th><span>{{printCart.total() | currency}}</span></th>
+						<th>Sub-Total:</th>
+						<th><span>{{printCart.subTotal() | currency}}</span></th>
 					</tr>
 				</tfoot>
 			</table>
 
-			<div class="form-actions" style="text-align:center">
-				<a ng-click="saveCart('online')" class="btn btn-primary btn-lg" role="button">
-					Checkout via PayPal 
-					<span class="badge">{{printCart.total() | currency}}</span>
-				</a>
-				<a ng-click="saveCart('check')" class="btn btn-lg" role="button">
-					Checkout via Check 
-					<span class="badge">{{printCart.total() | currency}}</span>
-				</a>
+			<div class="row-fluid"> <!-- discount + chekcout area -->
+
+				<div class="span6 well">
+					<h4 style="margin-top:0">Checkout</h4>
+
+					<table class="table">
+						<tbody>
+							<tr>
+								<td><strong class="pull-right">Sub-Total:</strong></td>
+								<td>{{printCart.subTotal() | currency}}</td>
+							</tr>
+							<tr>
+								<td><strong class="pull-right">Discounts:</strong></td>
+								<td>{{printCart.disTotal() | currency}}</td>
+							</tr>
+							<tr>
+								<td><strong class="pull-right">Cart Total:</strong></td>
+								<td>{{printCart.total() | currency}}</td>
+							</tr>
+						</tbody>
+					</table>
+
+					<div class="fluid-row">
+						<button ng-click="saveCart('online')" class="btn btn-primary btn-lg span6" role="button">
+							via PayPal 
+							<span class="badge">{{printCart.total() | currency}}</span>
+						</button>
+						<button ng-click="saveCart('check')" class="btn btn-lg span6" role="button">
+							via Check 
+							<span class="badge">{{printCart.total() | currency}}</span>
+						</button>
+					</div>
+				</div>
+
+				<div class="span6 well">
+					<h4 style="margin-top:0">Discounts</h4>
+
+					<form class="form-search" style="margin:0">
+						<div class="input-append input-block-level" style="padding-right:50px;">
+							<input type="text" id="code" class="search-query input-block-level" ng-model="discountCode" placeholder="Discount Code">
+							<button type="submit" class="btn btn-success" ng-click="printCart.addDiscount(discountCode);discountCode=''">Add</button>
+						</div>
+					</form>
+
+					<div class="alert alert-{{printCart.getDiscountMsg().type}}" ng-show="printCart.getDiscountMsg()" style="margin-top:20px;">
+						<strong>{{printCart.getDiscountMsg().pre}}</strong> {{printCart.getDiscountMsg().msg}}
+					</div>
+
+					<table class="table table-striped table-hover" style="margin:0" ng-show="printCart.getDiscounts().length > 0">
+						<thead>
+							<tr>
+								<th>Descripiton</th>
+								<th>Amount</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr ng-repeat="discount in printCart.getDiscounts()">
+								<td>{{discount.name}}</td>
+								<td>
+									{{discount.amount | currency}}
+									<a href ng-click="printCart.remDiscount($index)" role="button" class="close">&times;</a>
+								</td>
+							</tr>
+						</tbody>
+						<tfoot>
+							<tr>
+								<th><span class="pull-right">Discount Total:</span></th>
+								<th>{{printCart.disTotal() | currency}}</th>
+							</tr>
+						</tfoot>
+					</table>
+				</div>
 			</div>
 
-			<pre>{{printList | json}}</pre>
+			<!-- <div class="form-actions" style="text-align:center">
+				
+			</div> -->
+
+			<!-- <pre>{{printList | json}}</pre> -->
 
 		</div>
 	</div>
