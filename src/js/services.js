@@ -293,13 +293,13 @@ factory('printCart', ['interface', 'myCart', '$rootScope', '$filter', '$timeout'
 					'pre': 'Duplicate Code!',
 					'msg': 'Are you trying to cheat us?',
 					'type': 'error'
-				}, 5000);
+				}, 10000);
 			} else { // new discount
 				interface.call('getDiscount', {
 					'ids': myCart.get(),
 					'code':code
 				}).then(function(res) {
-					setDisMessage(res.data, 5000); // assign a reset-able message
+					setDisMessage(res.data, 10000); // assign a reset-able message
 					if (res.data.type == 'success') discounts.push( res.data.obj ); // add object on good callback
 				});
 			}
