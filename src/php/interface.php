@@ -81,10 +81,11 @@ class formsManager extends NgClass {
 			$groupSTH->execute( $user['firmID'] );
 			$groups = $groupSTH->fetchAll( PDO::FETCH_COLUMN );
 		}
+		if (isset($this->groupCashe)) $groups = array_merge($groups, $this->groupCashe); // add groups that are in cart
 		
 		// pull prices that match productID and group criteria
 		$questionMarks = trim(str_repeat("?,", sizeof($groups)),","); // build string of questionmarks based on sizeof($groups)
-		$costSTH = $this->db->prepare("SELECT `name`, `pretty`, `settings` FROM `price` p JOIN `option` o ON o.optionID = p.optionID WHERE productID=? AND (groupID IN (". $questionMarks .") OR groupID IS NULL);");
+		$costSTH = $this->db->prepare("SELECT `name`, `pretty`, `settings` FROM `price` p JOIN `option` o ON o.optionID = p.optionID WHERE productID=? AND (groupID IN ($questionMarks) OR groupID IS NULL);");
 		array_unshift( $groups, $productID ); // put productID at the beginninng of the array
 		$costSTH->execute( $groups );
 		$costRows = $costSTH->fetchAll(PDO::FETCH_ASSOC);
@@ -207,7 +208,24 @@ class formsManager extends NgClass {
 
 		$STH = $this->db->prepare("SELECT purchaseID FROM `purchase` WHERE firmID=? and itemID=?;");
 
-		// Iterate through ID's
+		// remove all non-strings to allow invoices, but still grab purchase id's
+		$cleanIDs = array();
+		foreach($data->ids as $itemID) if (is_string($itemID)) array_push($cleanIDs, $itemID);
+
+		// Grab pending group purchases
+		$queryMarks = trim( str_repeat( "?,", sizeof( $cleanIDs ) ), "," );
+		$pendingGroupsSTH = $this->db->prepare("SELECT i.settings FROM (SELECT * FROM `item` WHERE itemID IN ($queryMarks)) i LEFT JOIN `product` p ON i.productID=p.productID LEFT JOIN `template` t ON p.templateID=t.templateID WHERE template='group';");
+		$pendingGroupsSTH->execute( $cleanIDs );
+
+		// parse out their groupID's
+		$arrGroupID = array();
+		while ( $row = $pendingGroupsSTH->fetch( PDO::FETCH_ASSOC ) ) {
+			$rowData = (array) json_decode($row['settings']);
+			array_push( $arrGroupID, $rowData['groupID'] );
+		}
+		$this->groupCashe = $arrGroupID; // store for later use in getItemByID() -> getProductCost()
+
+		// Iterate through ID's and grab items or pass objects through
 		$retData = array();
 		foreach ($data->ids as $itemID) {
 			if (is_string($itemID)) {
