@@ -72,12 +72,54 @@ class formsManager extends NgClass {
 
 	// Helper(app): return cost for a productID
 	private function getProductCost( $productID ) {
-		$user = $this->getCurrentUser(); // TODO: use this to adjust price as it is set
+		$user = $this->getCurrentUser();
 
-		$costSTH = $this->db->prepare("SELECT settings, pretty FROM `price` p JOIN `option` o ON o.optionID = p.optionID WHERE productID = ?;");
-		$costSTH->execute( $productID );
-		$costRow = $costSTH->fetch(PDO::FETCH_ASSOC);
-		$subs = (array)json_decode($costRow['settings']);
+		// pull groups based on firmID if user is assigned
+		$groups = array();
+		if ($user != null) {
+			$groupSTH = $this->db->prepare("SELECT groupID FROM `member` WHERE firmID=?;");
+			$groupSTH->execute( $user['firmID'] );
+			$groups = $groupSTH->fetchAll( PDO::FETCH_COLUMN );
+		}
+		
+		// pull prices that match productID and group criteria
+		$questionMarks = trim(str_repeat("?,", sizeof($groups)),","); // build string of questionmarks based on sizeof($groups)
+		$costSTH = $this->db->prepare("SELECT `name`, `pretty`, `settings` FROM `price` p JOIN `option` o ON o.optionID = p.optionID WHERE productID=? AND (groupID IN (". $questionMarks .") OR groupID IS NULL);");
+		array_unshift( $groups, $productID ); // put productID at the beginninng of the array
+		$costSTH->execute( $groups );
+		$costRows = $costSTH->fetchAll(PDO::FETCH_ASSOC);
+
+		// find least price
+		$leastRow = null;
+		$leastCost = null;
+		foreach ($costRows as $row) {
+			$cost = (array)json_decode($row['settings']); // parse settings out to compare
+
+			if ($leastRow == null) { // if no previous leasts, the first is the least
+				$leastCost = $cost;
+				$leastRow = $row;
+			} else { // conditionally check based off of specified parameters
+				switch ($row['name']) {
+					case 'Static Cost':
+						if ($leastCost['cost'] > $cost['cost']) {
+							$leastCost = $cost;
+							$leastRow = $row;
+						}
+						break;
+					
+					case 'Delayed attendee cost':
+						if ($leastCost['initial'] > $cost['initial']) {
+							$leastCost = $cost;
+							$leastRow = $row;
+						}
+						break;
+				}
+			}
+			
+		}
+		
+		// parse json for interpolating and pretty printing
+		$subs = (array)json_decode($leastRow['settings']);
 		$pretty = $subs;
 
 		// convert specific values to currency (excluding the values mentioned in the case statements)
@@ -90,7 +132,7 @@ class formsManager extends NgClass {
 		}
 
 		return array(
-			'pretty' => $this->interpolate($costRow['pretty'], $pretty),
+			'pretty' => $this->interpolate($leastRow['pretty'], $pretty),
 			'settings' => $subs
 		);
 	}
