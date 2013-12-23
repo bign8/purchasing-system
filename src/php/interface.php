@@ -103,7 +103,7 @@ class formsManager extends NgClass {
 		$cost = $this->getProductCost( $data->prodID );
 
 		// Get All the items
-		$itemSTH = $this->db->prepare("SELECT * FROM `item` WHERE productID = ? AND visible='yes';");
+		$itemSTH = $this->db->prepare("SELECT i.*, template FROM (SELECT * FROM `item` WHERE productID=? AND visible='yes') i LEFT JOIN `product` p ON p.productID=i.productID LEFT JOIN `template` t ON p.templateID=t.templateID;");
 		$itemSTH->execute( $data->prodID );
 
 		// Properly pre-format return data
