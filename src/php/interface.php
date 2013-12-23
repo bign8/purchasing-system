@@ -450,6 +450,35 @@ class formsManager extends NgClass {
 
 		return json_encode($retData);
 	}
+
+	// Worker(app/cart/discount): return discount object
+	public function getDiscount() {
+		$user = $this->requiresAuth();
+		$data = $this->getPostData();
+
+		// Check if any code matches the inputed code
+		$anyCodeSTH = $this->db->prepare("SELECT discountID FROM `discount` WHERE `code`=?;");
+		if (!$anyCodeSTH->execute( $data->code ) || $anyCodeSTH->rowCount() == 0) {
+			return json_encode(array('pre'=> 'Error!','msg'=>'Invalid discount code.', 'type'=>'error'));
+		}
+		$codeID = $anyCodeSTH->fetchColumn();
+
+		// Check if code is still valid
+		$validTimeSTH = $this->db->prepare("SELECT * FROM `discount` WHERE `activate`<NOW() AND (`expire`>NOW() OR `expire` IS NULL) AND discountID=?;");
+		if (!$validTimeSTH->execute( $codeID ) || $validTimeSTH->rowCount() == 0) {
+			return json_encode(array('pre' => 'Sorry!', 'msg'=>'This code has expired!', 'type'=>'error'));
+		}
+
+		// TODO: test if valid for current cart
+
+		// successfull callback
+		return json_encode(array(
+			'pre'=> 'Success!',
+			'msg'=>'Added discount to current order!',
+			'type'=>'success',
+			'obj'=>$validTimeSTH->fetch(PDO::FETCH_ASSOC)
+		));
+	}
 }
 
 /*
@@ -483,6 +512,7 @@ switch ($_REQUEST['action']) {
 	case 'editContact': echo $obj->editContact(); break;
 	case 'getItemOptions': echo $obj->getItemOptions(); break;
 	case 'saveCart': echo $obj->saveCart(); break;
+	case 'getDiscount': echo $obj->getDiscount(); break;
 
 	// previous purchase functions
 	case 'getPurchases': echo $obj->getPurchases(); break;
