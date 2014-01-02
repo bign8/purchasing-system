@@ -419,7 +419,70 @@ class formsManager extends NgClass {
 			}
 		}
 
+		// $this->emailCart($orderID);
+
 		return $orderID;	
+	}
+
+	// Helper(app/cart/checkout/email): email cart data
+	public function emailCart($orderID) {
+		// grab order info
+		$orderSTH = $this->db->prepare("SELECT * FROM `order` WHERE `orderID`=? LIMIT 1;");
+		$orderSTH->execute( $orderID );
+		$order = $orderSTH->fetch(PDO::FETCH_ASSOC);
+		// print_r($order);
+
+		// grab contact info
+		$contactSTH = $this->db->prepare("SELECT c.firmID, c.legalName, c.preName, c.title, c.email, c.phone, a.* FROM `contact` c LEFT JOIN `address` a ON c.addressID=a.addressID WHERE `contactID`=? LIMIT 1;");
+		$contactSTH->execute( $order['contactID'] );
+		$contact = $contactSTH->fetch(PDO::FETCH_ASSOC);
+		// print_r($contact);
+
+		// grab contacts firm info
+		$firmSTH = $this->db->prepare("SELECT f.name, f.website, a.* FROM `firm` f LEFT JOIN `address` a on f.addressID=a.addressID WHERE firmID=? LIMIT 1;");
+		$firmSTH->execute( $contact['firmID'] );
+		$firm = $firmSTH->fetch(PDO::FETCH_ASSOC);
+		// print_r($firm);
+
+		// grab order
+		$itemsSTH = $this->db->prepare("SELECT p.data, i.* FROM `purchase` p LEFT JOIN `item` i ON p.itemID=i.itemID WHERE orderID=?;");
+		$itemsSTH->execute( $orderID );
+		$items = $itemsSTH->fetchAll(PDO::FETCH_ASSOC);
+		// print_r($items);
+		echo '</pre>';
+
+		// pretty print data for email
+		$html  = "Order#: $orderID<br />\r\n";
+		$html .= "Status / medium: {$order['status']} / {$order['medium']}<br />\r\n";
+		$html .= "Time: {$order['stamp']}<br />\r\n";
+		$html .= "<hr/>";
+		
+		$html .= "<a href=\"mailto:{$contact['email']}\" >{$contact['title']} {$contact['legalName']} ({$contact['preName']})</a><br />\r\n";
+		$html .= "{$contact['addr1']}<br />\r\n";
+		$html .= "{$contact['addr2']}<br />\r\n";
+		$html .= "{$contact['city']} {$contact['state']}, {$contact['zip']}<br />\r\n";
+		$html .= "Phone: <a href=\"tel:{$contact['phone']}\">{$contact['phone']}</a><br />\r\n";
+		$html .= "<hr/>";
+		$html .= "<a href=\"{$firm['website']}\">{$firm['name']}</a><br />\r\n";
+		$html .= "{$firm['addr1']}<br />\r\n";
+		$html .= "{$firm['addr2']}<br />\r\n";
+		$html .= "{$firm['city']} {$firm['state']}, {$firm['zip']}<br />\r\n";
+		$html .= "<hr/>Items:<br /><ul>\r\n";
+
+		foreach ($items as $item) {
+			$html .= "<li>{$item['name']}<ul>";
+			$data = json_decode($item['data']);
+			foreach ($data as $key => $value) {
+				$html .= "<li>" . substr($key, 1) . ': ' . $value . "</li>";
+			}
+			$html .= "</ul></li>";
+		}
+
+		$html .= "</ul>\r\n";
+
+		echo $html;
+		// echo mail('nwoods@azworld.com', 'Test Email', 'Da test <b>HTML</b> email.') ? 'true' : 'false';
+		// echo mail('big.nate.w@gmail.com', 'Test Email', 'Da test <b>HTML</b> email.') ? 'true' : 'false';
 	}
 
 	// Worker(app/purchases): return purchases
@@ -528,7 +591,8 @@ switch ($_REQUEST['action']) {
 	case 'testAdmin': echo $obj->testAdmin(); break;
 	case 'demo': 
 		echo '<pre>'; 
-		print_r($_REQUEST); 
+		$obj->emailCart(12);
+		// print_r($_REQUEST); 
 		break;
 	default: 
 		header('HTTP/ 409 Conflict');
