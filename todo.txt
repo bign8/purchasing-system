@@ -3,6 +3,7 @@ ToDo:
 - Implement Form constraints for checkout
 - photo upload field (doesn't store, just emails)
 - send email on checkout (indicate payment type, send misc fields)
+- apply time based settings to events
 
 In a holding pattern:
 - build administration section (see if user end is accepted)

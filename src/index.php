@@ -23,9 +23,9 @@
 	<script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js"></script>
 
 	<!-- app -->
-	<script src="<%= grunt.config.get('pkg.name') %>-tpl.js"></script>
-	<script src="<%= grunt.config.get('pkg.name') %>.js"></script>
-	<link rel="stylesheet" type="text/css" href="css.css">
+	<script src="//<?php echo $_SERVER['SERVER_NAME']; ?>/<%= grunt.config.get('pkg.name') %>-tpl.js"></script>
+	<script src="//<?php echo $_SERVER['SERVER_NAME']; ?>/<%= grunt.config.get('pkg.name') %>.js"></script>
+	<link rel="stylesheet" type="text/css" href="//<?php echo $_SERVER['SERVER_NAME']; ?>/css.css">
 	<script>
 		var phpCart = <?php session_start();echo json_encode($_SESSION['cart']); $_SESSION['cart']=array(/*empty php cart*/); ?>; // grab cart from php session
 		var activeCart = JSON.parse(localStorage.getItem('azUAcart') || '[]'); // grab localStorage cart
