@@ -273,6 +273,9 @@ controller('CartOptionsconferenceCtrl', ['$scope', '$modalInstance', 'item', 'op
 				},
 				firmEmploy: function(interface) {
 					return interface.call('getFirmEmploy');
+				},
+				opt: function() {
+					return angular.copy( $scope.opt );
 				}
 			}
 		});
@@ -288,12 +291,23 @@ controller('CartOptionsconferenceCtrl', ['$scope', '$modalInstance', 'item', 'op
 		});
 	};
 	$scope.cancel = function () { $modalInstance.dismiss('cancel'); };
+
+	if (!$scope.opt.length) $scope.add(); // open add dialog on empty attendee list
 }]).
 
-controller('ContactModalCtrl', ['$scope', '$modalInstance', 'contact', 'firmAddr', 'firmEmploy', 'interface', '$modal', function ($scope, $modalInstance, contact, firmAddr, firmEmploy, interface, $modal) {
+controller('ContactModalCtrl', ['$scope', '$modalInstance', 'contact', 'firmAddr', 'firmEmploy', 'interface', '$modal', 'opt', function ($scope, $modalInstance, contact, firmAddr, firmEmploy, interface, $modal, opt) {
 	var oldUserAddr = {addrID:null, addr2:null}; // null address handler
 	$scope.contact = contact || {addr:oldUserAddr}; // null contact handler
 	$scope.firmEmploy = firmEmploy.data;
+
+	// filter list on `opt` (remove already added people)
+	$scope.filterAlreadyAdded = function (item) { // http://stackoverflow.com/a/14844516
+		var found = false;
+		angular.forEach(opt, function (obj){
+			if (!found && obj.contactID == item.contactID ) found = true;
+		});
+		return !found;
+	};
 
 	// for managing same changes
 	$scope.sameAddr = true;
