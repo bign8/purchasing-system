@@ -4,40 +4,33 @@
 	<meta charset="utf-8">
 	<title><%= grunt.config.get('pkg.name') %></title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link type="text/plain" rel="author" href="http://<?php echo $_SERVER['SERVER_NAME']; ?>/humans.txt" />
+	<link type="text/plain" rel="author" href="//<?php echo $_SERVER['SERVER_NAME']; ?>/humans.txt" />
 
-	<!-- for Bootstrap -->
+	<!-- Bootstrap -->
 	<script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
 	<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet" />
 	<script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/js/bootstrap.min.js"></script>
 
-	<!-- for Angular -->
+	<!-- Angular -->
 	<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.3/angular.min.js"></script>
 	<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.3/angular-route.js"></script>
 
-	<!-- for Angular ui -->
+	<!-- Angular UI -->
 	<script src="//angular-ui.github.io/bootstrap/ui-bootstrap-0.6.0.js"></script>
 	<script src="//angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.6.0.js"></script>
 
-	<!-- for app -->
+	<!-- UnderscoreJS -->
+	<script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js"></script>
+
+	<!-- app -->
 	<script src="<%= grunt.config.get('pkg.name') %>-tpl.js"></script>
 	<script src="<%= grunt.config.get('pkg.name') %>.js"></script>
 	<link rel="stylesheet" type="text/css" href="css.css">
 	<script>
-		Array.prototype.unique = function() { // thanks: http://stackoverflow.com/a/1584377
-		    var a = this.concat();
-		    for(var i=0; i<a.length; ++i)
-		    	for(var j=i+1; j<a.length; ++j)
-		    		if(a[i] === a[j])
-		    			a.splice(j--, 1);
-		    return a;
-		};
-
 		var phpCart = <?php session_start();echo json_encode($_SESSION['cart']); $_SESSION['cart']=array(/*empty php cart*/); ?>; // grab cart from php session
 		var activeCart = JSON.parse(localStorage.getItem('azUAcart') || '[]'); // grab localStorage cart
-		var newCart = phpCart.concat( activeCart ).unique(); // join the two
+		var newCart = _.union(phpCart, activeCart); // join the two
 		localStorage.setItem('azUAcart', JSON.stringify(newCart)); // re-assign to localStorage
-
 	</script>
 </head>
 <body>
