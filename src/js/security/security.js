@@ -27,7 +27,7 @@ factory('security', ['$http', '$q', '$location', 'securityRetryQueue', '$modal',
 
 		// // rewrite tu use modal
 		loginModal = $modal.open({
-			templateUrl: 'security/login/form.tpl.html',
+			templateUrl: 'js/security/login/form.tpl.html',
 			controller: 'LoginFormController',
 			backdrop: 'static'
 		});

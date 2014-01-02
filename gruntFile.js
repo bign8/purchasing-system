@@ -89,19 +89,19 @@ module.exports = function(grunt) {
 				expand: true,
 				cwd: 'src/assets/'
 			},
-			partials: {
-				flatten: true,
-				expand: true,
-				cwd: 'src/partials/',
-				dest: '<%= activeDir %>/partials/',
-				src: '*.tpl.html'
-			},
-			js_partials: {
-				expand: true,
-				cwd: 'src/js/',
-				src: ['**/*.tpl.html'],
-				dest: '<%= activeDir %>/'
-			}
+			// partials: {
+			// 	flatten: true,
+			// 	expand: true,
+			// 	cwd: 'src/partials/',
+			// 	dest: '<%= activeDir %>/partials/',
+			// 	src: '*.tpl.html'
+			// },
+			// js_partials: {
+			// 	expand: true,
+			// 	cwd: 'src/js/',
+			// 	src: ['**/*.tpl.html'],
+			// 	dest: '<%= activeDir %>/'
+			// }
 		},
 
 		connect: {
@@ -142,7 +142,7 @@ module.exports = function(grunt) {
 				dest: '/',
 				exclusions: ['build/**/*.png']
 			}
-		}
+		},
 
 		// php: { // install php to make this work
 		// 	test: {
@@ -151,6 +151,13 @@ module.exports = function(grunt) {
 		// 		port: 5000
 		// 	}
 		// }
+
+		html2js: {
+			main: {
+				src: 'src/**/*.tpl.html',
+				dest: '<%= activeDir %>/<%= pkg.name %>-tpl.js'
+			}
+		}
 	});
 
 	grunt.registerTask('setPath', function( arg1 ) {
@@ -168,13 +175,14 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-connect');
 	grunt.loadNpmTasks('grunt-open');
 	grunt.loadNpmTasks('grunt-ftp-deploy');
+	grunt.loadNpmTasks('grunt-html2js');
 	// grunt.loadNpmTasks('grunt-php');
 
 	// Define task(s)
 	grunt.registerTask('default', ['build', 'connect', 'open', 'watch:local']);
 	grunt.registerTask('remote', ['build-remote', 'watch:remote']);
 
-	grunt.registerTask('build', ['setPath:build', 'jshint', 'clean', 'concat', 'copy', 'ftp-deploy:phpOnly']);
+	grunt.registerTask('build', ['setPath:build', 'jshint', 'clean', 'concat', 'copy', 'html2js', 'ftp-deploy:phpOnly']);
 	grunt.registerTask('build-remote', ['build', 'ftp-deploy:theApp']);
 
 	grunt.registerTask('release', ['setPath:release', 'jshint', 'clean', 'uglify', 'concat:index', 'copy']);

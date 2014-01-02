@@ -6,7 +6,8 @@ angular.module('myApp', [
 	'myApp.filters',
 	'security',
 	'myApp.services',
-	'myApp.directives'
+	'myApp.directives',
+	'templates-main' // for html2js
 ]).
 
 config(['$routeProvider', 'securityAuthorizationProvider', function( $routeProvider, securityAuthorizationProvider ){

@@ -4,6 +4,7 @@
 	<meta charset="utf-8">
 	<title><%= grunt.config.get('pkg.name') %></title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link type="text/plain" rel="author" href="http://<?php echo $_SERVER['SERVER_NAME']; ?>/humans.txt" />
 
 	<!-- for Bootstrap -->
 	<script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
@@ -19,6 +20,7 @@
 	<script src="//angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.6.0.js"></script>
 
 	<!-- for app -->
+	<script src="<%= grunt.config.get('pkg.name') %>-tpl.js"></script>
 	<script src="<%= grunt.config.get('pkg.name') %>.js"></script>
 	<link rel="stylesheet" type="text/css" href="css.css">
 	<script>
