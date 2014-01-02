@@ -1,0 +1,16 @@
+/* TEAM */
+	Developer: Nathan Woods
+	Twitter: @bignatewoods
+	Site: http://nathanjwoods.com/
+	From: Columbia Falls, Montana, USA
+
+/* THANKS */
+	Company: Anderson ZurMuehlen
+	Site: http://www.azworld.com/
+
+/* SITE */
+	Last update: 01/02/2014
+	Language: English
+	Doctype: HTML5
+	Components: Bootstrap, AngularJS, Bootstrap-UI
+	IDE: Sublime Text, Grunt

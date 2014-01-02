@@ -1,35 +1,36 @@
 {
-	"author": "Nathan Woods",
-	"name": "UA-purchasing-system",
-	"homepage": "https://github.com/bign8-AZ/UA-purchasing-system",
-	"version": "0.0.0",
-	"repository": {
-		"type": "git",
-		"url": "git@github.com:bign8-AZ/UA-purchasing-system.git"
-	},
-	"bugs": {
-		"url": "https://github.com/bign8-AZ/UA-purchasing-system/issues"
-	},
-	"licenses": [
-		{
-			"type": "MIT",
-			"url": "https://raw.github.com/angular-app/angular-app/master/LICENSE"
-		}
-	],
-	"engines": {
-		"node": ">= 0.10.21"
-	},
-	"dependencies": {},
-	"devDependencies": {
-		"grunt": "~0.4.1",
-		"grunt-contrib-clean": "~0.5.0",
-		"grunt-contrib-copy": "~0.4.1",
-		"grunt-contrib-jshint": "~0.7.1",
-		"grunt-contrib-concat": "~0.3.0",
-		"grunt-contrib-uglify": "~0.2.6",
-		"grunt-contrib-watch": "~0.5.3",
-		"grunt-contrib-connect": "~0.5.0",
-		"grunt-ftp-deploy": "~0.0.10",
-		"grunt-open": "~0.2.2"
-	}
+  "author": "Nathan Woods",
+  "name": "UA-purchasing-system",
+  "homepage": "https://github.com/bign8-AZ/UA-purchasing-system",
+  "version": "0.0.0",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:bign8-AZ/UA-purchasing-system.git"
+  },
+  "bugs": {
+    "url": "https://github.com/bign8-AZ/UA-purchasing-system/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://raw.github.com/angular-app/angular-app/master/LICENSE"
+    }
+  ],
+  "engines": {
+    "node": ">= 0.10.21"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-contrib-clean": "~0.5.0",
+    "grunt-contrib-copy": "~0.4.1",
+    "grunt-contrib-jshint": "~0.7.1",
+    "grunt-contrib-concat": "~0.3.0",
+    "grunt-contrib-uglify": "~0.2.6",
+    "grunt-contrib-watch": "~0.5.3",
+    "grunt-contrib-connect": "~0.5.0",
+    "grunt-ftp-deploy": "~0.0.10",
+    "grunt-open": "~0.2.2",
+    "grunt-html2js": "~0.2.3"
+  }
 }
