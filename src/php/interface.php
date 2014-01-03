@@ -430,50 +430,65 @@ class formsManager extends NgClass {
 		$orderSTH = $this->db->prepare("SELECT * FROM `order` WHERE `orderID`=? LIMIT 1;");
 		$orderSTH->execute( $orderID );
 		$order = $orderSTH->fetch(PDO::FETCH_ASSOC);
-		// print_r($order);
 
 		// grab contact info
 		$contactSTH = $this->db->prepare("SELECT c.firmID, c.legalName, c.preName, c.title, c.email, c.phone, a.* FROM `contact` c LEFT JOIN `address` a ON c.addressID=a.addressID WHERE `contactID`=? LIMIT 1;");
 		$contactSTH->execute( $order['contactID'] );
 		$contact = $contactSTH->fetch(PDO::FETCH_ASSOC);
-		// print_r($contact);
 
 		// grab contacts firm info
 		$firmSTH = $this->db->prepare("SELECT f.name, f.website, a.* FROM `firm` f LEFT JOIN `address` a on f.addressID=a.addressID WHERE firmID=? LIMIT 1;");
 		$firmSTH->execute( $contact['firmID'] );
 		$firm = $firmSTH->fetch(PDO::FETCH_ASSOC);
-		// print_r($firm);
 
 		// grab order
 		$itemsSTH = $this->db->prepare("SELECT p.data, i.* FROM `purchase` p LEFT JOIN `item` i ON p.itemID=i.itemID WHERE orderID=?;");
 		$itemsSTH->execute( $orderID );
 		$items = $itemsSTH->fetchAll(PDO::FETCH_ASSOC);
-		// print_r($items);
-		echo '</pre>';
+
+		// setup attendees grab
+		$attendeeSTH = $this->db->prepare("SELECT c.legalName, c.preName, c.title, c.email, c.phone, d.* FROM (SELECT contactID FROM `attendee` a WHERE itemID=?) a LEFT JOIN `contact` c ON a.contactID=c.contactID LEFT JOIN `address` d ON c.addressID=d.addressID;");
+
+		// Pretty print addresses
+		function address($data) {
+			$str  = "{$data['addr1']}<br />\r\n";
+			if ($data['addr2']!='') 
+				$str .= "{$data['addr2']}<br />\r\n";
+			$str .= "{$data['city']} {$data['state']}, {$data['zip']}<br />\r\n";
+			return $str;
+		}
 
 		// pretty print data for email
-		$html  = "Order#: $orderID<br />\r\n";
-		$html .= "Status / medium: {$order['status']} / {$order['medium']}<br />\r\n";
-		$html .= "Time: {$order['stamp']}<br />\r\n";
-		$html .= "<hr/>";
-		
+		$html  = "<b>Order#:</b> $orderID<br />\r\n";
+		$html .= "<b>Status / medium:</b> {$order['status']} / {$order['medium']}<br />\r\n";
+		$html .= "<b>Time:</b> {$order['stamp']}<br />\r\n";
+		$html .= "<hr/><b>Purchase Contact:</b><br />\r\n";
 		$html .= "<a href=\"mailto:{$contact['email']}\" >{$contact['title']} {$contact['legalName']} ({$contact['preName']})</a><br />\r\n";
-		$html .= "{$contact['addr1']}<br />\r\n";
-		$html .= "{$contact['addr2']}<br />\r\n";
-		$html .= "{$contact['city']} {$contact['state']}, {$contact['zip']}<br />\r\n";
+		$html .= address($contact);
 		$html .= "Phone: <a href=\"tel:{$contact['phone']}\">{$contact['phone']}</a><br />\r\n";
-		$html .= "<hr/>";
+		$html .= "<hr/><b>Purchase Firm:</b><br />\r\n";
 		$html .= "<a href=\"{$firm['website']}\">{$firm['name']}</a><br />\r\n";
-		$html .= "{$firm['addr1']}<br />\r\n";
-		$html .= "{$firm['addr2']}<br />\r\n";
-		$html .= "{$firm['city']} {$firm['state']}, {$firm['zip']}<br />\r\n";
+		$html .= address($firm);
 		$html .= "<hr/>Items:<br /><ul>\r\n";
 
 		foreach ($items as $item) {
-			$html .= "<li>{$item['name']}<ul>";
+			$html .= "<li><a href=\"http://uastore.wha.la/#/products/{$item['productID']}/{$item['itemID']}\">{$item['name']}</a><ul>";
 			$data = json_decode($item['data']);
 			foreach ($data as $key => $value) {
-				$html .= "<li>" . substr($key, 1) . ': ' . $value . "</li>";
+				if ($key == "+Attendees") { // pretty print attendees
+					$html .= "<li><b>Attendee(s):</b><ul>";
+					$attendeeSTH->execute( $item['itemID'] );
+					while ($row = $attendeeSTH->fetch( PDO::FETCH_ASSOC )) {
+						$html .= "<li>";
+						$html .= "<a href=\"mailto:{$row['email']}\" >{$row['title']} {$row['legalName']} ({$row['preName']})</a><br />\r\n";
+						$html .= address($row);
+						$html .= "Phone: <a href=\"tel:{$row['phone']}\">{$row['phone']}</a><br />\r\n";
+						$html .= "</li>";
+					}
+					$html .= "</ul></li>";
+				} else {
+					$html .= "<li><b>" . substr($key, 1) . ':</b> ' . $value . "</li>";
+				}
 			}
 			$html .= "</ul></li>";
 		}
@@ -590,7 +605,7 @@ switch ($_REQUEST['action']) {
 	case 'testAuth': echo $obj->testAuth(); break;
 	case 'testAdmin': echo $obj->testAdmin(); break;
 	case 'demo': 
-		echo '<pre>'; 
+		// echo '<pre>'; 
 		$obj->emailCart(12);
 		// print_r($_REQUEST); 
 		break;
