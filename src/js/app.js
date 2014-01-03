@@ -12,37 +12,50 @@ angular.module('myApp', [
 
 config(['$routeProvider', 'securityAuthorizationProvider', function( $routeProvider, securityAuthorizationProvider ){
 	$routeProvider.
+
+		// Working Pages
+
+		// In-progress Pages
+
 		when('/', { // Home - statically generated (static tpl with links)
 			templateUrl: 'partials/index.tpl.html',
-			controller: 'IndexCtrl'
-		}).
-		when('/products', { // List Products - render list of offered products
-			templateUrl: 'partials/list-products.tpl.html',
-			controller: 'ListProdCtrl',
+			controller: 'IndexCtrl',
 			resolve: {
-				prodList: function(interface, $route) {
-					return interface.call('getProducts', $route.current.params);
+				fullCart: function(interface) {
+					return interface.cart('getCart');
 				}
 			}
 		}).
-		when('/products/:prodID', { // List Items - render list of items offered within product
-			templateUrl: 'partials/list-items.tpl.html',
-			controller: 'ListItemCtrl',
-			resolve: {
-				itemList: function(interface, $route) {
-					return interface.call('getItems', $route.current.params);
-				}
-			}
-		}).
-		when('/products/:prodID/:itemID', { // Show Item details - include add to cart button
-			templateUrl: 'partials/show-item.tpl.html',
-			controller: 'ShowItemCtrl',
-			resolve: {
-				itemDetail: function(interface, $route) {
-					return interface.call('getItem', $route.current.params);
-				}
-			}
-		}).
+
+		// Staged pages
+
+		// when('/products', { // List Products - render list of offered products
+		// 	templateUrl: 'partials/list-products.tpl.html',
+		// 	controller: 'ListProdCtrl',
+		// 	resolve: {
+		// 		prodList: function(interface, $route) {
+		// 			return interface.call('getProducts', $route.current.params);
+		// 		}
+		// 	}
+		// }).
+		// when('/products/:prodID', { // List Items - render list of items offered within product
+		// 	templateUrl: 'partials/list-items.tpl.html',
+		// 	controller: 'ListItemCtrl',
+		// 	resolve: {
+		// 		itemList: function(interface, $route) {
+		// 			return interface.call('getItems', $route.current.params);
+		// 		}
+		// 	}
+		// }).
+		// when('/products/:prodID/:itemID', { // Show Item details - include add to cart button
+		// 	templateUrl: 'partials/show-item.tpl.html',
+		// 	controller: 'ShowItemCtrl',
+		// 	resolve: {
+		// 		itemDetail: function(interface, $route) {
+		// 			return interface.call('getItem', $route.current.params);
+		// 		}
+		// 	}
+		// }).
 
 		// CART
 		when('/cart', { // list items in cart
@@ -55,7 +68,7 @@ config(['$routeProvider', 'securityAuthorizationProvider', function( $routeProvi
 				user: securityAuthorizationProvider.requireAuthenticatedUser
 			}
 		}).
-		when('/cart/recipt', { // shows a recipt of items purchased for a specific order
+		when('/recipt', { // shows a recipt of items purchased for a specific order
 			templateUrl: 'partials/recipt-print.tpl.html',
 			controller: 'ReciptCtrl',
 			resolve: {

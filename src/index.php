@@ -20,18 +20,18 @@
 	<script src="//angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.6.0.js"></script>
 
 	<!-- UnderscoreJS -->
-	<script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js"></script>
+	<!-- // <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js"></script> -->
 
 	<!-- app -->
 	<script src="//<?php echo $_SERVER['SERVER_NAME']; ?>/<%= grunt.config.get('pkg.name') %>-tpl.js"></script>
 	<script src="//<?php echo $_SERVER['SERVER_NAME']; ?>/<%= grunt.config.get('pkg.name') %>.js"></script>
 	<link rel="stylesheet" type="text/css" href="//<?php echo $_SERVER['SERVER_NAME']; ?>/css.css">
-	<script>
-		var phpCart = <?php session_start();echo json_encode($_SESSION['cart']); $_SESSION['cart']=array(/*empty php cart*/); ?>; // grab cart from php session
+	<!--<script>
+		var phpCart = <?php session_start();echo json_encode($_SESSION['cart']);/* $_SESSION['cart']=array(/*empty php cart/);*/ ?>; // grab cart from php session
 		var activeCart = JSON.parse(localStorage.getItem('azUAcart') || '[]'); // grab localStorage cart
 		var newCart = _.union(phpCart, activeCart); // join the two
 		localStorage.setItem('azUAcart', JSON.stringify(newCart)); // re-assign to localStorage
-	</script>
+	</script>-->
 </head>
 <body>
 	<div ng-app="myApp" class="container">
@@ -56,9 +56,9 @@
 						<!-- .nav, .navbar-search, .navbar-form, etc -->
 
 						<ul class="nav">
-							<li ng-class="{active: breadcrumbs.onPage('Products')}"><a href="#/products">Products</a></li>
+							<!-- <li ng-class="{active: breadcrumbs.onPage('Products')}"><a href="#/products">Products</a></li> -->
 							<li ng-class="{active: breadcrumbs.onPage('Cart')}"><a href="#/cart">Shopping Cart</a></li>
-							<!-- <li ng-class="{active: breadcrumbs.onPage('purchases')}" ng-show="security.isAuthenticated()"><a href="#/purchases">Past Products</a></li> -->
+							<li ng-class="{active: breadcrumbs.onPage('purchases')}" ng-show="security.isAuthenticated()"><a href="#/purchases">Past Products</a></li>
 						</ul>
 
 						<ul class="nav pull-right">

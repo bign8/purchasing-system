@@ -5,100 +5,101 @@ angular.module('myApp.controllers', [
 	'ui.bootstrap'
 ]).
 
-controller('IndexCtrl', ['$scope', 'myPage', function ($scope, myPage) {
+controller('IndexCtrl', ['$scope', 'myPage', 'fullCart', function ($scope, myPage, fullCart) {
 	myPage.setTitle("Upstream Academy", "Guiding accounting firms to high performance");
+	$scope.fullCart = fullCart.data;
 }]).
 
-controller('ListProdCtrl', ['$scope', 'myPage', 'prodList', function ($scope, myPage, prodList) {
-	myPage.setTitle("Our Products", "Some quote about products");
+// controller('ListProdCtrl', ['$scope', 'myPage', 'prodList', function ($scope, myPage, prodList) {
+// 	myPage.setTitle("Our Products", "Some quote about products");
 
-	// Set global passed variables
-	prodList.data.forEach(function(ele) {
-		// console.log(ele);
-		if (ele.img === null) {
-			ele.img = 'http://lorempixel.com/360/250/business';
-		}
-	});
-	$scope.products = prodList.data;
+// 	// Set global passed variables
+// 	prodList.data.forEach(function(ele) {
+// 		// console.log(ele);
+// 		if (ele.img === null) {
+// 			ele.img = 'http://lorempixel.com/360/250/business';
+// 		}
+// 	});
+// 	$scope.products = prodList.data;
 
-	// toggling list view style
-	$scope.showAsList = false;
+// 	// toggling list view style
+// 	$scope.showAsList = false;
 
-	// list sort
-	$scope.sortField = undefined;
-	$scope.reverse = false;
-	$scope.sort = function (fieldName) {
-		if ($scope.sortField === fieldName) {
-			$scope.reverse = !$scope.reverse;
-		} else {
-			$scope.sortField = fieldName;
-			$scope.reverse = false;
-		}
-	};
-	$scope.sortIcon = function (fieldName) {
-		if ($scope.sortField === fieldName) {
-			return $scope.reverse ? 'icon-chevron-down' : 'icon-chevron-up' ;
-		} else {
-			return '';
-		}
-	};
+// 	// list sort
+// 	$scope.sortField = undefined;
+// 	$scope.reverse = false;
+// 	$scope.sort = function (fieldName) {
+// 		if ($scope.sortField === fieldName) {
+// 			$scope.reverse = !$scope.reverse;
+// 		} else {
+// 			$scope.sortField = fieldName;
+// 			$scope.reverse = false;
+// 		}
+// 	};
+// 	$scope.sortIcon = function (fieldName) {
+// 		if ($scope.sortField === fieldName) {
+// 			return $scope.reverse ? 'icon-chevron-down' : 'icon-chevron-up' ;
+// 		} else {
+// 			return '';
+// 		}
+// 	};
 
-	// pagination
-	$scope.pageNo = 1;
-	$scope.pageSize = 12;
+// 	// pagination
+// 	$scope.pageNo = 1;
+// 	$scope.pageSize = 12;
 
-}]).
+// }]).
 
-controller('ListItemCtrl', ['$scope', 'myPage', 'itemList', 'myCart', function ($scope, myPage, itemList, myCart) {
-	myPage.setTitle("Products");
+// controller('ListItemCtrl', ['$scope', 'myPage', 'itemList', 'myCart', function ($scope, myPage, itemList, myCart) {
+// 	myPage.setTitle("Products");
 
-	// Set global passed variables
-	$scope.myCart = myCart;
-	itemList.data.forEach(function(ele) {
-		if (ele.img === null) {
-			ele.img = 'http://lorempixel.com/360/250/business';
-		}
-	});
-	$scope.items = itemList.data;
+// 	// Set global passed variables
+// 	$scope.myCart = myCart;
+// 	itemList.data.forEach(function(ele) {
+// 		if (ele.img === null) {
+// 			ele.img = 'http://lorempixel.com/360/250/business';
+// 		}
+// 	});
+// 	$scope.items = itemList.data;
 
-	// toggling list view style
-	$scope.showAsList = false;
+// 	// toggling list view style
+// 	$scope.showAsList = false;
 
-	// list sort
-	$scope.sortField = undefined;
-	$scope.reverse = false;
+// 	// list sort
+// 	$scope.sortField = undefined;
+// 	$scope.reverse = false;
 
-	$scope.sort = function (fieldName) {
-		if ($scope.sortField === fieldName) {
-			$scope.reverse = !$scope.reverse;
-		} else {
-			$scope.sortField = fieldName;
-			$scope.reverse = false;
-		}
-	};
+// 	$scope.sort = function (fieldName) {
+// 		if ($scope.sortField === fieldName) {
+// 			$scope.reverse = !$scope.reverse;
+// 		} else {
+// 			$scope.sortField = fieldName;
+// 			$scope.reverse = false;
+// 		}
+// 	};
 
-	$scope.sortIcon = function (fieldName) {
-		if ($scope.sortField === fieldName) {
-			return $scope.reverse ? 'icon-chevron-down' : 'icon-chevron-up' ;
-		} else {
-			return '';
-		}
-	};
+// 	$scope.sortIcon = function (fieldName) {
+// 		if ($scope.sortField === fieldName) {
+// 			return $scope.reverse ? 'icon-chevron-down' : 'icon-chevron-up' ;
+// 		} else {
+// 			return '';
+// 		}
+// 	};
 
-	// pagination
-	$scope.pageNo = 1;
-	$scope.pageSize = 12;
-}]).
+// 	// pagination
+// 	$scope.pageNo = 1;
+// 	$scope.pageSize = 12;
+// }]).
 
-controller('ShowItemCtrl', ['$scope', 'myPage', 'itemDetail', function ($scope, myPage, itemDetail) {
-	myPage.setTitle(itemDetail.data.name);
+// controller('ShowItemCtrl', ['$scope', 'myPage', 'itemDetail', function ($scope, myPage, itemDetail) {
+// 	myPage.setTitle(itemDetail.data.name);
 
-	if (itemDetail.data.img === null) {
-		itemDetail.data.img = 'http://lorempixel.com/360/250/business';
-	}
+// 	if (itemDetail.data.img === null) {
+// 		itemDetail.data.img = 'http://lorempixel.com/360/250/business';
+// 	}
 
-	$scope.item = itemDetail.data;
-}]).
+// 	$scope.item = itemDetail.data;
+// }]).
 
 controller('CartCtrl', ['$scope', 'myPage', 'myCart', 'security', 'printCart', '$modal', 'interface', '$location', function ($scope, myPage, myCart, security, printCart, $modal, interface, $location) {
 	myPage.setTitle("Shopping Cart");
