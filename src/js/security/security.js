@@ -77,7 +77,7 @@ factory('security', ['$http', '$q', '$location', 'securityRetryQueue', '$modal',
 		// Attempt to authenticate a user by the given email and password
 		login: function(email, password) {
 			// var request = $http.post('interface.php', {email: email, password: password}, {params:{action:'login'}});
-			var request = interface.call('login', {email: email, password: password});
+			var request = interface.user('login', {email: email, password: password});
 			return request.then(function(response) {
 				service.currentUser = response.data.user;
 				if ( service.isAuthenticated() ) {
@@ -96,7 +96,7 @@ factory('security', ['$http', '$q', '$location', 'securityRetryQueue', '$modal',
 		// Logout the current user and redirect
 		logout: function(redirectTo) {
 			// $http.post('interface.php', {}, {params:{action:'logout'}}).then(function() {
-			interface.call('logout', {}).then(function() {
+			interface.user('logout', {}).then(function() {
 				service.currentUser = null;
 				redirect(redirectTo);
 			});
@@ -114,7 +114,7 @@ factory('security', ['$http', '$q', '$location', 'securityRetryQueue', '$modal',
 				return $q.when(service.currentUser);
 			} else {
 				// return $http.get('interface.php', {params: {action:'currentUser'}}).then(function(response) {
-				return interface.call('currentUser', {}).then(function(response) {
+				return interface.user('currentUser', {}).then(function(response) {
 					service.currentUser = response.data.user;
 					return service.currentUser;
 				});

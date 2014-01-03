@@ -30,18 +30,18 @@ factory('breadcrumbs', ['$rootScope', '$location', 'interface', function ($rootS
 			return '/' + (pathElements.slice(0, index + 1)).join('/');
 		};
 
-		// pretty crumb cash and calling function
-		function prettyCrumb(obj) {
-			if (crumbCashe.hasOwnProperty(obj.path)) { // in in cashe
-				obj.name = crumbCashe[obj.path];
-			} else { // otherwise
-				interface.call('prettyCrumb', obj).then(function(res) {
-					crumbCashe[obj.path] = res.data; // assign cashe
-					breadcrumbs[obj.index].name = res.data; // assign value out
-				});
-			}
-			return ucfirst(obj.name);
-		}
+		// // pretty crumb cash and calling function
+		// function prettyCrumb(obj) {
+		// 	if (crumbCashe.hasOwnProperty(obj.path)) { // in in cashe
+		// 		obj.name = crumbCashe[obj.path];
+		// 	} else { // otherwise
+		// 		interface.call('prettyCrumb', obj).then(function(res) {
+		// 			crumbCashe[obj.path] = res.data; // assign cashe
+		// 			breadcrumbs[obj.index].name = res.data; // assign value out
+		// 		});
+		// 	}
+		// 	return ucfirst(obj.name);
+		// }
 
 		// Pretty path elements (thanks http://phpjs.org/functions/ucfirst/)
 		function ucfirst (str) {
@@ -59,7 +59,7 @@ factory('breadcrumbs', ['$rootScope', '$location', 'interface', function ($rootS
 					path: '#' + breadcrumbPath(i),
 					index: i, // used for prettyCrumb
 				};
-				if (!isNaN(parseInt(obj.name))) obj.name = prettyCrumb(obj); // make that ugly (numeric) crumb pretty
+				// if (!isNaN(parseInt(obj.name))) obj.name = prettyCrumb(obj); // make that ugly (numeric) crumb pretty
 				result.push(obj);
 			}
 		}
@@ -91,10 +91,10 @@ factory('myCart', ['$rootScope', 'interface', 'security', function($rootScope, i
 		window.attachEvent('onstorage', handle_storage);
 	}
 
-	// Update purchases on current user change
-	$rootScope.$watch(function() {
-		return security.currentUser;
-	}, update_purchases, true);
+	// // Update purchases on current user change
+	// $rootScope.$watch(function() {
+	// 	return security.currentUser;
+	// }, update_purchases, true);
 
 	// Update cart and notify world of changes
 	function handle_storage(e) { // allow multi-tab updates
@@ -112,19 +112,19 @@ factory('myCart', ['$rootScope', 'interface', 'security', function($rootScope, i
 		});
 	}
 
-	// retrieve purchases from server
-	function update_purchases() {
-		interface.call('getSoftPurchases').then(function (res) {
-			past = res.data;
+	// // retrieve purchases from server
+	// function update_purchases() {
+	// 	interface.call('interface', 'getSoftPurchases').then(function (res) {
+	// 		past = res.data;
 			
-			// remove past items from cart before returning cart
-			angular.forEach(past, function(ele) {
-				var index = cart.indexOf(ele);
-				if (index !== -1) cart.splice(index, 1);
-			});
-			update();
-		});
-	}
+	// 		// remove past items from cart before returning cart
+	// 		angular.forEach(past, function(ele) {
+	// 			var index = cart.indexOf(ele);
+	// 			if (index !== -1) cart.splice(index, 1);
+	// 		});
+	// 		update();
+	// 	});
+	// }
 
 	return {
 		len: function() {
@@ -181,18 +181,18 @@ factory('printCart', ['interface', 'myCart', '$rootScope', '$filter', '$timeout'
 			promise.then(function(response) {
 				fullCart = response.data;
 
-				// remove myCart elements that don't correspond to fullCart elements
-				for (var i=0; i < response.data.length; i++) {
-					var dieCount = 0; // in case bad error
-					if (response.data[i].itemID==-1) continue; // fix invoices
-					while (response.data[i].itemID != localCart[i]) { // thanks for being sequential!
-						myCart.rem(i);
-						localCart = myCart.get();
-						if (++dieCount > 100) break; // infinete loops are bad
-					}
-				}
+				// // remove myCart elements that don't correspond to fullCart elements
+				// for (var i=0; i < response.data.length; i++) {
+				// 	var dieCount = 0; // in case bad error
+				// 	if (response.data[i].itemID==-1) continue; // fix invoices
+				// 	while (response.data[i].itemID != localCart[i]) { // thanks for being sequential!
+				// 		myCart.rem(i);
+				// 		localCart = myCart.get();
+				// 		if (++dieCount > 100) break; // infinete loops are bad
+				// 	}
+				// }
 
-				watchHandle(fullCart.concat(['x'])); // force watcher
+				// watchHandle(fullCart.concat(['x'])); // force watcher
 			});
 			return promise;
 	}
@@ -338,8 +338,15 @@ factory('printCart', ['interface', 'myCart', '$rootScope', '$filter', '$timeout'
 factory('interface', ['$http', function ($http) {
 
 	return {
-		call: function(myAction, data) {
-			return $http.post('http://uastore.wha.la/interface.php', data, {params:{action: myAction}});
+		// call: function(myClass, myAction, myData) {
+		// 	return $http.post('http://uastore.wha.la/interface.php', myData, {params:{a: myAction, c: myClass}});
+		// },
+
+		user: function(myAction, myData) {
+			return $http.post('http://uastore.wha.la/interface.php', myData, {params:{a: myAction, c: 'user'}});
+		},
+		cart: function(myAction, myData) {
+			return $http.post('http://uastore.wha.la/interface.php', myData, {params:{a: myAction, c: 'cart'}});
 		}
 	};
 }]);
