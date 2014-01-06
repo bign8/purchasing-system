@@ -17,12 +17,12 @@
 		</tr>
 	</thead>
 	<tbody>
-		<tr ng-repeat="item in fullCart" ng-class="{true:'error', false:''}[item.warn]"> <!-- printList -->
+		<tr ng-repeat="item in theCart.get()" ng-class="{true:'error', false:''}[item.warn]"> <!-- printList -->
 			<td><a href="#/products/{{item.productID}}/{{item.itemID}}">{{item.name}}</a></td>
 			<td>{{item.description}}</td>
 			<td ng-switch="showOptions(item)">
 				<span ng-switch-when="false">{{item.cost.pretty}}</span>
-				<span ng-switch-default>{{item.cost.calc | currency}}</span>
+				<span ng-switch-default>{{item.cost.pretty}}</span>
 				<a href ng-click="printCart.rem($index)" role="button" class="close">&times;</a>
 			</td>
 		</tr>
@@ -36,4 +36,4 @@
 	</tfoot>
 </table>
 
-<pre>{{fullCart | json}}</pre>
+<pre>{{theCart.get() | json}}</pre>

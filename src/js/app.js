@@ -21,8 +21,8 @@ config(['$routeProvider', 'securityAuthorizationProvider', function( $routeProvi
 			templateUrl: 'partials/index.tpl.html',
 			controller: 'IndexCtrl',
 			resolve: {
-				fullCart: function(interface) {
-					return interface.cart('getCart');
+				fullCart: function(theCart) {
+					return theCart.load();
 				}
 			}
 		}).
@@ -57,52 +57,52 @@ config(['$routeProvider', 'securityAuthorizationProvider', function( $routeProvi
 		// 	}
 		// }).
 
-		// CART
+		// // CART
 		when('/cart', { // list items in cart
 			templateUrl: 'partials/show-cart.tpl.html',
 			controller: 'CartCtrl',
 			resolve: {
-				fullCart: function(printCart) {
-					return printCart.load();
+				fullCart: function(theCart) {
+					return theCart.load();
 				},
 				user: securityAuthorizationProvider.requireAuthenticatedUser
 			}
 		}).
-		when('/recipt', { // shows a recipt of items purchased for a specific order
-			templateUrl: 'partials/recipt-print.tpl.html',
-			controller: 'ReciptCtrl',
-			resolve: {
-				user: securityAuthorizationProvider.requireAuthenticatedUser
-			}
-		}).
+		// when('/recipt', { // shows a recipt of items purchased for a specific order
+		// 	templateUrl: 'partials/recipt-print.tpl.html',
+		// 	controller: 'ReciptCtrl',
+		// 	resolve: {
+		// 		user: securityAuthorizationProvider.requireAuthenticatedUser
+		// 	}
+		// }).
 
-		// USER STUFF
-		when('/register', {
-			templateUrl: 'partials/register-form.tpl.html',
-			controller: 'RegisterFormCtrl'
-		}).
-		when('/purchases', {
-			templateUrl: 'partials/list-purchases.tpl.html',
-			controller: 'ListPurchasesCtrl',
-			resolve: {
-				user: securityAuthorizationProvider.requireAuthenticatedUser,
-				items: function(interface) {
-					return interface.call('getPurchases');
-				}
-			}
-		}).
-		when('/payment', {
-			templateUrl: 'partials/custom-payment-form.tpl.html',
-			controller: 'CustPayFormCtrl'
-		}).
+		// // USER STUFF
+		// when('/register', {
+		// 	templateUrl: 'partials/register-form.tpl.html',
+		// 	controller: 'RegisterFormCtrl'
+		// }).
+		// when('/purchases', {
+		// 	templateUrl: 'partials/list-purchases.tpl.html',
+		// 	controller: 'ListPurchasesCtrl',
+		// 	resolve: {
+		// 		user: securityAuthorizationProvider.requireAuthenticatedUser,
+		// 		items: function(interface) {
+		// 			return interface.call('getPurchases');
+		// 		}
+		// 	}
+		// }).
+		// when('/payment', {
+		// 	templateUrl: 'partials/custom-payment-form.tpl.html',
+		// 	controller: 'CustPayFormCtrl'
+		// }).
 
 
-		// TODO: build administration section
-		when('/admin', {
-			resolve: {
-				user: securityAuthorizationProvider.requireAdminUser
-			}
-		}).
+		// // TODO: build administration section
+		// when('/admin', {
+		// 	resolve: {
+		// 		user: securityAuthorizationProvider.requireAdminUser
+		// 	}
+		// }).
 		otherwise({ redirectTo: '/' });
 }])
 

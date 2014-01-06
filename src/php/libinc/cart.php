@@ -15,8 +15,8 @@ class Cart extends NG {
 	}
 
 	// Worker(app): return cart with current prices
-	public function getCart() {
-		$user = $this->getCurrentUser(); // gets user if available
+	public function get() {
+		$user = $this->usr->getCurrentUser(); // gets user if available
 
 		$checkSTH = $this->db->prepare("SELECT purchaseID FROM `purchase` WHERE firmID=? and itemID=?;");
 
@@ -56,7 +56,7 @@ class Cart extends NG {
 
 		}
 
-		return json_encode($retData);
+		return $retData;
 	}
 
 	
@@ -76,7 +76,7 @@ class Cart extends NG {
 
 	// Helper(app): return cost for a productID
 	private function getProductCost( $productID ) {
-		$user = $this->getCurrentUser();
+		$user = $this->usr->getCurrentUser();
 
 		// pull groups based on firmID if user is assigned
 		$groups = array();
@@ -132,7 +132,7 @@ class Cart extends NG {
 		foreach ($pretty as $key => $value) {
 			switch ($key) {
 				case 'after': continue; break;
-				default: $pretty[$key] = money_format('%n', $value); break;
+				default: $pretty[$key] = '$' . money_format('%n', $value); break;
 			}
 		}
 
@@ -140,34 +140,6 @@ class Cart extends NG {
 			'pretty' => $this->interpolate($leastRow['pretty'], $pretty),
 			'settings' => $subs
 		);
-	}
-
-	// Worker(app/checkout): add contact to system
-	public function addContact() {
-		$user = $this->requiresAuth();
-		$data = $this->getPostData();
-
-		$STH = $this->db->prepare("INSERT INTO `contact` (firmID, addressID, legalName, preName, title, email, phone) VALUES (?,?,?,?,?,?,?);");
-		if (!$STH->execute( $user['firmID'], $data->addr->addressID, $data->legalName, $data->preName, $data->title, $data->email, $data->phone )) {
-			header('HTTP/ 409 Conflict');
-			return print_r($STH->errorInfo(), true);
-		}
-
-		return $this->db->lastInsertId();
-	}
-
-	// Worker(app/checkout): add contact to system
-	public function editContact() {
-		$user = $this->requiresAuth();
-		$data = $this->getPostData();
-
-		$STH = $this->db->prepare("UPDATE `contact` SET addressID=?, legalName=?, preName=?, title=?, email=?, phone=? WHERE contactID=?;");
-		if (!$STH->execute( $data->addr->addressID, $data->legalName, $data->preName, $data->title, $data->email, $data->phone, $data->contactID )) {
-			header('HTTP/ 409 Conflict');
-			return print_r($STH->errorInfo(), true);
-		}
-
-		return $data->contactID;
 	}
 
 	// Worker(app/checkout): return question's options
@@ -398,7 +370,7 @@ class Cart extends NG {
 	// 	return json_encode($retData);
 	// }
 
-	
+
 	// // Worker(app): return specific item detail
 	// public function getItem() {
 	// 	$data = $this->getPostData();

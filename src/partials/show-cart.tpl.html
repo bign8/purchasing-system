@@ -17,7 +17,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr ng-repeat="item in printList" ng-class="{true:'error', false:''}[item.warn]"> <!-- printList -->
+					<tr ng-repeat="item in theCart.get()" ng-class="{true:'error', false:''}[item.warn]"> <!-- printList -->
 						<td><a href="#/products/{{item.productID}}/{{item.itemID}}">{{item.name}}</a></td>
 						<td>{{item.description}}</td>
 						<td ng-switch="options.hasOwnProperty(item.itemID)">

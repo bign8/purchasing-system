@@ -124,22 +124,27 @@ module.exports = function(grunt) {
 		'ftp-deploy': {
 			phpOnly: {
 				auth: {
-					host: 'uastore.wha.la',
-					// host: 'nate.youdontcare.com',
+					// host: 'uastore.wha.la',
+					host: 'ftp.modwest.com',
 					port: 21,
-					authKey: 'uastore'
+					// authKey: 'uastore'
+					authKey: 'modwest'
 				},
 				src: 'src/php',
-				dest: '/'
+				// dest: '/'
+				dest: '/htdocs/payment/'
 			},
 			theApp: {
 				auth: {
-					host: 'uastore.wha.la',
+					// host: 'uastore.wha.la',
+					host: 'ftp.modwest.com',
 					port: 21,
-					authKey: 'uastore'
+					// authKey: 'uastore'
+					authKey: 'modwest'
 				},
 				src: 'build/',
-				dest: '/',
+				// dest: '/',
+				dest: '/htdocs/payment/',
 				exclusions: ['build/**/*.png']
 			}
 		},

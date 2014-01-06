@@ -77,7 +77,7 @@ class User extends NG {
 
 	// Worker(security): returns current user or null
 	public function currentUser() {
-		return json_encode(array( 'user' => $_SESSION['user'] ) );
+		return array( 'user' => $_SESSION['user'] );
 	}
 
 	// Worker(security): grabs authentication from child class
@@ -98,8 +98,36 @@ class User extends NG {
 		// session_destroy();
 	}
 
-	
-	
+
+
+	// Worker(app/checkout): add contact to system
+	public function addContact() {
+		$user = $this->requiresAuth();
+		$data = $this->getPostData();
+
+		$STH = $this->db->prepare("INSERT INTO `contact` (firmID, addressID, legalName, preName, title, email, phone) VALUES (?,?,?,?,?,?,?);");
+		if (!$STH->execute( $user['firmID'], $data->addr->addressID, $data->legalName, $data->preName, $data->title, $data->email, $data->phone )) {
+			header('HTTP/ 409 Conflict');
+			return print_r($STH->errorInfo(), true);
+		}
+
+		return $this->db->lastInsertId();
+	}
+
+	// Worker(app/checkout): add contact to system
+	public function editContact() {
+		$user = $this->requiresAuth();
+		$data = $this->getPostData();
+
+		$STH = $this->db->prepare("UPDATE `contact` SET addressID=?, legalName=?, preName=?, title=?, email=?, phone=? WHERE contactID=?;");
+		if (!$STH->execute( $data->addr->addressID, $data->legalName, $data->preName, $data->title, $data->email, $data->phone, $data->contactID )) {
+			header('HTTP/ 409 Conflict');
+			return print_r($STH->errorInfo(), true);
+		}
+
+		return $data->contactID;
+	}
+
 	// Worker(app/user): add an address to the database
 	public function addAddress() {
 		$data = $this->getPostData();

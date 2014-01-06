@@ -1,10 +1,10 @@
 <?php
 
 // Handle cross site stuff (for development)
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type');
-if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') { exit(0); }
+// header('Access-Control-Allow-Origin: *');
+// header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
+// header('Access-Control-Allow-Headers: Content-Type');
+// if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') exit(0);
 
 require_once('./libinc/main_include.php');
 
@@ -22,41 +22,41 @@ $data = array(); // return json data array
 if ( $_REQUEST['c'] == 'cart' ) {
 	$obj = new Cart();
 	switch ($_REQUEST['a']) {
-		case 'getCart': $data = $obj->getCart(); break;
-		case 'getDiscount': $data = $obj->getDiscount(); break;
-		case 'getItem': $data = $obj->getItem(); break;
-		case 'getItemOptions': $data = $obj->getItemOptions(); break;
-		case 'getItems': $data = $obj->getItems(); break;
-		case 'getProducts': $data = $obj->getProducts(); break;
-		case 'getPurchases': $data = $obj->getPurchases(); break;
-		case 'getSoftPurchases': $data = $obj->getSoftPurchases(); break;
-		case 'prettyCrumb': $data = $obj->prettyCrumb(); break;
-		case 'saveCart': $data = $obj->saveCart(); break;
+		case 'get': $data = $obj->get(); break;
+		// case 'getDiscount': $data = $obj->getDiscount(); break;
+		// case 'getItem': $data = $obj->getItem(); break;
+		// case 'getItemOptions': $data = $obj->getItemOptions(); break;
+		// case 'getItems': $data = $obj->getItems(); break;
+		// case 'getProducts': $data = $obj->getProducts(); break;
+		// case 'getPurchases': $data = $obj->getPurchases(); break;
+		// case 'getSoftPurchases': $data = $obj->getSoftPurchases(); break;
+		// case 'prettyCrumb': $data = $obj->prettyCrumb(); break;
+		// case 'saveCart': $data = $obj->saveCart(); break;
 		default: $pass = false;
 	}
 } elseif ( $_REQUEST['c'] == 'user' ) {
 	$obj = new User();
 	switch ($_REQUEST['a']) {
-		case 'addAddress': $data = $obj->addAddress(); break;
-		case 'addContact': $data = $obj->addContact(); break;
-		case 'addUser': $data = $obj->addUser(); break;
+		// case 'addAddress': $data = $obj->addAddress(); break;
+		// case 'addContact': $data = $obj->addContact(); break;
+		// case 'addUser': $data = $obj->addUser(); break;
 		case 'currentUser': $data = $obj->currentUser(); break;
-		case 'editAddress': $data = $obj->editAddress(); break;
-		case 'editContact': $data = $obj->editContact(); break;
-		case 'getCart': $data = $obj->getCart(); break;
-		case 'getFirmAddr': $data = $obj->getFirmAddr(); break;
-		case 'getFirmEmploy': $data = $obj->getFirmEmploy(); break;
+		// case 'editAddress': $data = $obj->editAddress(); break;
+		// case 'editContact': $data = $obj->editContact(); break;
+		// case 'getCart': $data = $obj->getCart(); break;
+		// case 'getFirmAddr': $data = $obj->getFirmAddr(); break;
+		// case 'getFirmEmploy': $data = $obj->getFirmEmploy(); break;
 		case 'login': $data = $obj->login(); break;
 		case 'logout': $data = $obj->logout(); break;
 		default: $pass = false;
 	}
 } elseif ( $_REQUEST['c'] == 'test' ) {
 	switch ($_REQUEST['a']) {
-		case 'testAuth': $data = $obj->testAuth(); break;
-		case 'testAdmin': $data = $obj->testAdmin(); break;
+		// case 'testAuth': $data = $obj->testAuth(); break;
+		// case 'testAdmin': $data = $obj->testAdmin(); break;
 		case 'demo': 
 			// echo '<pre>'; 
-			$obj->emailCart(12);
+			$obj->emailCart(12); // trhow an error
 			// print_r($_REQUEST); 
 			break;
 		default: $pass = false;
