@@ -41,7 +41,7 @@ module.exports = function(grunt) {
 					process: true
 				}, 
 				files: {
-					'<%= activeDir %>/index.php': ['src/index.php']
+					'<%= activeDir %>/index.html': ['src/index.html']
 				}
 			},
 			// vendor: {
@@ -73,11 +73,11 @@ module.exports = function(grunt) {
 				// spawn: false
 			},
 			local: {
-				files: ['src/**/*.js', 'src/index.php', 'src/**/*.tpl.html', 'src/php/**/*', 'src/assets/css.css'],
+				files: ['src/**/*.js', 'src/index.html', 'src/**/*.tpl.html', 'src/php/**/*', 'src/assets/css.css'],
 				tasks: ['build']
 			},
 			remote: {
-				files: ['src/**/*.js', 'src/index.php', 'src/**/*.tpl.html', 'src/php/**/*', 'src/assets/css.css'],
+				files: ['src/**/*.js', 'src/index.html', 'src/**/*.tpl.html', 'src/php/**/*', 'src/assets/css.css'],
 				tasks: ['build-remote']
 			}
 		},

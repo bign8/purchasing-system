@@ -142,6 +142,15 @@ class Cart extends NG {
 		);
 	}
 
+	// Worker: remove element from cart
+	public function rem() {
+		$data = $this->getPostData();
+		$_SESSION['cart'] = array_diff($_SESSION['cart'], array($data->itemID) ); // http://stackoverflow.com/a/9268826
+	}
+
+	// UNTESTED FUNCTIONS
+
+
 	// Worker(app/checkout): return question's options
 	public function getItemOptions() {
 		$data = $this->getPostData();

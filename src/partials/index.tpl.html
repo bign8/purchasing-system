@@ -1,9 +1,8 @@
 <div class="row">
-	<div class="offset2 span8">
+	<div class="span12">
 		<div class="well">
 			<h1>Welcome!</h1>
-			<p>Please feel free to navigate around and see if anything is of interest to you</p>
-			<p><a href="#/products" class="btn btn-primary btn-large" role="button">Start Shopping</a></p>
+			<p>Please sign in to check out</p>
 		</div>
 	</div>
 </div>
@@ -23,7 +22,7 @@
 			<td ng-switch="showOptions(item)">
 				<span ng-switch-when="false">{{item.cost.pretty}}</span>
 				<span ng-switch-default>{{item.cost.pretty}}</span>
-				<a href ng-click="printCart.rem($index)" role="button" class="close">&times;</a>
+				<a href ng-click="theCart.rem(item)" role="button" class="close">&times;</a>
 			</td>
 		</tr>
 	</tbody>

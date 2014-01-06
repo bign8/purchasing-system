@@ -378,10 +378,10 @@ controller('CartCtrl', ['$scope', 'myPage', 'security', '$modal', 'interface', '
 
 // }]).
 
-controller('HeadCtrl', ['$scope', 'myPage', 'breadcrumbs', /*'myCart', */'security', function ($scope, myPage, breadcrumbs, security) {
+controller('HeadCtrl', ['$scope', 'myPage', 'breadcrumbs', 'theCart', 'security', function ($scope, myPage, breadcrumbs, theCart, security) {
 	$scope.myPage = myPage;
 	$scope.breadcrumbs = breadcrumbs;
-	// $scope.myCart = myCart;
+	$scope.theCart = theCart;
 	$scope.security = security;
 }]).
 
