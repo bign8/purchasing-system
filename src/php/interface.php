@@ -23,6 +23,7 @@ if ( $_REQUEST['c'] == 'cart' ) {
 	$obj = new Cart();
 	switch ($_REQUEST['a']) {
 		case 'get': $data = $obj->get(); break;
+		case 'rem': $data = $obj->rem(); break;
 		// case 'getDiscount': $data = $obj->getDiscount(); break;
 		// case 'getItem': $data = $obj->getItem(); break;
 		// case 'getItemOptions': $data = $obj->getItemOptions(); break;

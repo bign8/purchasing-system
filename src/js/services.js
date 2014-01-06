@@ -149,9 +149,9 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function($rootS
 			}
 			return promise;
 		},
-		// len: function() {
-		// 	return cart.length || '';
-		// },
+		len: function() {
+			return cart.length || '';
+		},
 		// add: function(item) {
 		// 	cart.push(item.itemID);
 		// 	update();
@@ -160,10 +160,13 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function($rootS
 		// 	cart.push(item);
 		// 	update();
 		// },
-		// rem: function(index) {
-		// 	cart.splice(index, 1);
-		// 	update();
-		// },
+		rem: function(item) {
+			dirty = true; // incase page change
+			var promise = interface.cart('rem', item);
+			promise.then(function(res) {
+				reload();
+			});
+		},
 		// contains: function(itemID) {
 		// 	// check if already in cart or if inprevious purchases
 		// 	return cart.indexOf(itemID) !== -1 || past.indexOf(itemID) !== -1;
