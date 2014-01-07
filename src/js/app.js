@@ -15,8 +15,14 @@ config(['$routeProvider', 'securityAuthorizationProvider', function( $routeProvi
 
 		// Working Pages
 
-		// In-progress Pages
+		when('/payment', {
+			templateUrl: 'partials/custom-payment-form.tpl.html',
+			controller: 'CustPayFormCtrl'
+		}).
 
+		// In-progress Pages
+		
+		// total computation needs fixing (requires register/:itemID page)
 		when('/', { // Home - statically generated (static tpl with links)
 			templateUrl: 'partials/index.tpl.html',
 			controller: 'IndexCtrl',
@@ -25,6 +31,21 @@ config(['$routeProvider', 'securityAuthorizationProvider', function( $routeProvi
 					return theCart.load();
 				}
 			}
+		}).
+
+		// when('/register/:itemID', {
+		// 	templateUrl: 'partials/register-conf.tpl.html',
+		// 	controller: 'RegisterConFormCtrl',
+		// 	resolve: {
+		// 		questions: function(interface, $route) {
+		// 			return interface.cart('con', $route.current.params);
+		// 		}
+		// 	}
+		// }).
+
+		when('/register', {
+			templateUrl: 'partials/register-form.tpl.html',
+			controller: 'RegisterFormCtrl'
 		}).
 
 		// Staged pages
@@ -77,10 +98,8 @@ config(['$routeProvider', 'securityAuthorizationProvider', function( $routeProvi
 		// }).
 
 		// // USER STUFF
-		// when('/register', {
-		// 	templateUrl: 'partials/register-form.tpl.html',
-		// 	controller: 'RegisterFormCtrl'
-		// }).
+		
+
 		// when('/purchases', {
 		// 	templateUrl: 'partials/list-purchases.tpl.html',
 		// 	controller: 'ListPurchasesCtrl',
@@ -91,10 +110,6 @@ config(['$routeProvider', 'securityAuthorizationProvider', function( $routeProvi
 		// 		}
 		// 	}
 		// }).
-		when('/payment', {
-			templateUrl: 'partials/custom-payment-form.tpl.html',
-			controller: 'CustPayFormCtrl'
-		}).
 
 
 		// // TODO: build administration section

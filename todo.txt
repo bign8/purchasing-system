@@ -1,18 +1,19 @@
 ToDo: 
--Push cart to php, no localstorage cart
-	-remove duplicates on server instead of on browser
--Clean services (breadcrumbs and carts) to get rid of useless code
--Perform db optimization
--Account for all special cases
-	-hardcopy vs softcopy price
-	-classes and their recurring wierdness
-	-
--migrate logic to a rest type structure
--re-design based on proposed user interaction tree
--store referrer for redirects back to site
+- Push cart to php, no localstorage cart
+- Clean services (breadcrumbs and carts) to get rid of useless code
+- Perform db optimization
+- Account for all special cases
+	- hardcopy vs softcopy price
+	- classes and their recurring wierdness
+	- ...
+- migrate logic to a rest type structure
+- re-design based on proposed user interaction tree
+- store referrer for redirects back to site
 
--refresh cart on login/logout
+- register user / select firm from list of firms
+- register user / select address for a list of firm addresses
 
+- wierd errors in cost function, needs work
 
 - GET SAMPLE DATA!
 - Implement Form constraints for checkout
@@ -38,8 +39,7 @@ Notes:
 Questions:
 - how old of a browser do we need to support
 	- iff not old -> try this for array unique (php cart merge within index.php) http://stackoverflow.com/a/11247231
-- Can we get a test domain up and running (store.upstreamacademy.com)
-- add a new paypal service to "usxxxxxx" account, just use mine, wait until we go to production and convert past paypal service
+- remove duplicates on server or notify user of duplicates?
 
 Future releases
 - handle invoices
@@ -49,3 +49,9 @@ Future releases
 - Previous purchases -> modify attendees to a conference, priced accordingly
 - periodically make calls back to server to check for additions to php cart (wait for test domain)
 - instead of so many dialogs for attendees, just list all employees with checkboxes (only a dialog for new employee)
+
+Used partials:
+- index.tpl.html
+- custom-payment-form.tpl.html
+- register-form.tpl.html
+- modal-address.tpl.html

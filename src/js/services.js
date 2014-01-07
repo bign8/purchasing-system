@@ -93,10 +93,10 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function($rootS
 // 		window.attachEvent('onstorage', handle_storage);
 // 	}
 
-// 	// // Update purchases on current user change
-// 	// $rootScope.$watch(function() {
-// 	// 	return security.currentUser;
-// 	// }, update_purchases, true);
+	// Update cart/purchases on current user change
+	$rootScope.$watch(function() {
+		return security.currentUser;
+	}, reload, true);
 
 // 	// Update cart and notify world of changes
 // 	function handle_storage(e) { // allow multi-tab updates
