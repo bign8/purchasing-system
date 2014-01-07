@@ -22,7 +22,12 @@ config(['$routeProvider', 'securityAuthorizationProvider', function( $routeProvi
 
 		when('/register', {
 			templateUrl: 'partials/register-form.tpl.html',
-			controller: 'RegisterFormCtrl'
+			controller: 'RegisterFormCtrl',
+			resolve: {
+				firms: function(interface) {
+					return interface.user('listFirms');
+				}
+			}
 		}).
 
 		// total computation needs fixing (requires register/:itemID page)
