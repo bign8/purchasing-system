@@ -24,6 +24,8 @@ if ( $_REQUEST['c'] == 'cart' ) {
 	switch ($_REQUEST['a']) {
 		case 'get': $data = $obj->get(); break;
 		case 'rem': $data = $obj->rem(); break;
+		case 'add': $data = $obj->add(); break;
+		case 'clr': $data = $obj->clr(); break;
 		// case 'getDiscount': $data = $obj->getDiscount(); break;
 		// case 'getItem': $data = $obj->getItem(); break;
 		// case 'getItemOptions': $data = $obj->getItemOptions(); break;
@@ -57,7 +59,14 @@ if ( $_REQUEST['c'] == 'cart' ) {
 		// case 'testAdmin': $data = $obj->testAdmin(); break;
 		case 'demo': 
 			// echo '<pre>'; 
-			$obj->emailCart(12); // trhow an error
+			// $obj->emailCart(12); // trhow an error
+			new Cart();
+			$class = $_SESSION['cart'][4];
+			echo gettype($class);
+			$obj = get_object_vars($class);
+			echo gettype($obj);
+			print_r($class);
+			print_r($obj);
 			// print_r($_REQUEST); 
 			break;
 		default: $pass = false;

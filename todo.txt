@@ -11,6 +11,8 @@ ToDo:
 -re-design based on proposed user interaction tree
 -store referrer for redirects back to site
 
+-refresh cart on login/logout
+
 
 - GET SAMPLE DATA!
 - Implement Form constraints for checkout

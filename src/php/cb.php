@@ -8,10 +8,10 @@ header('Access-Control-Allow-Credentials: true');
 // Initialize session
 session_start();
 
-// change to past session if exists
-if (isset($_REQUEST['sessionID'])) {
-	session_id( $_REQUEST['sessionID']  );
-}
+// // change to past session if exists
+// if (isset($_REQUEST['sessionID'])) {
+// 	session_id( $_REQUEST['sessionID']  );
+// }
 
 // create sesson array
 if (!isset($_SESSION['cart'])) {

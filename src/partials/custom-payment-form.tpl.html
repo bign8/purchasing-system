@@ -2,12 +2,22 @@
 	<form name="customForm" class="form-horizontal span8 offset2">
 		<fieldset>
 			<legend>Custom Payment Form</legend>
+
+			<div class="alert alert-error" ng-show="error">
+				<strong>Error!</strong> A payment with this name and value is already in your cart.
+			</div>
+
+			<div class="alert alert-success" ng-show="success">
+				<strong>Thanks!</strong> This custom payment has been added to your cart.
+			</div>
+
 			<div class="control-group">
 				<label class="control-label" for="desc">Invoice # / Description</label>
 				<div class="controls">
 					<input class="input-block-level" type="text" id="desc" ng-model="item.description" placeholder="Invoice # / Description" required>
 				</div>
 			</div>
+
 			<div class="control-group">
 				<label class="control-label" for="cost">Amount (US Dollars)</label>
 				<div class="controls">
@@ -18,12 +28,14 @@
 					</div>
 				</div>
 			</div>
+
 			<div class="control-grou">
 				<div class="controls">
-					<button type="submit" class="btn btn-primary" ng-click="myCart.addObj(item)" ng-disabled="customForm.$invalid">Add Payment to Cart</button>
+					<button type="submit" class="btn btn-primary" ng-click="add()" ng-disabled="customForm.$invalid">Add Payment to Cart</button>
 					<button type="reset" class="btn">Clear</button>
 				</div>
 			</div>
+
 		</fieldset>
 	</form>
 </div>
