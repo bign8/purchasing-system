@@ -145,7 +145,7 @@ module.exports = function(grunt) {
 				src: 'build/',
 				// dest: '/',
 				dest: '/htdocs/payment/',
-				exclusions: ['build/**/*.png']
+				exclusions: ['build/**/*.png', 'build/**/*.txt', 'build/**/*.ico']
 			}
 		},
 
