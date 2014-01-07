@@ -91,10 +91,10 @@ config(['$routeProvider', 'securityAuthorizationProvider', function( $routeProvi
 		// 		}
 		// 	}
 		// }).
-		// when('/payment', {
-		// 	templateUrl: 'partials/custom-payment-form.tpl.html',
-		// 	controller: 'CustPayFormCtrl'
-		// }).
+		when('/payment', {
+			templateUrl: 'partials/custom-payment-form.tpl.html',
+			controller: 'CustPayFormCtrl'
+		}).
 
 
 		// // TODO: build administration section
@@ -106,8 +106,11 @@ config(['$routeProvider', 'securityAuthorizationProvider', function( $routeProvi
 		otherwise({ redirectTo: '/' });
 }])
 
-.run(['security', function(security) {
+.run(['security', 'theCart', function(security, theCart) {
   // Get the current user when the application starts
   // (in case they are still logged in from a previous session)
   security.requestCurrentUser();
+
+  // prefetch cart if necessary
+  theCart.load();
 }]);

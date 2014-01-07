@@ -409,22 +409,40 @@ controller('HeadCtrl', ['$scope', 'myPage', 'breadcrumbs', 'theCart', 'security'
 // 	$scope.cancel = function () { $modalInstance.dismiss('cancel'); };
 // }]).
 
-// controller('CustPayFormCtrl', ['$scope', 'myPage', 'myCart', function ($scope, myPage, myCart){
-// 	myPage.setTitle("Custom Payment Form");
+controller('CustPayFormCtrl', ['$scope', 'myPage', 'theCart', '$location', '$timeout', function ($scope, myPage, theCart, $location, $timeout){
+	myPage.setTitle("Custom Payment Form");
 
-// 	$scope.myCart = myCart;
+	$scope.success = $scope.error = false;
+	var timer = 0;
 
-// 	$scope.item = {
-// 		itemID: -1,
-// 		productID: -1,
-// 		name: 'Custom Payment',
-// 		settings: null,
-// 		template: 'custom',
-// 		options: 0,
-// 		img: null,
-// 		blurb: 'This is a custom field'
-// 	};
-// }]).
+	var orig = {
+		itemID: -1,
+		productID: -1,
+		name: 'Custom Payment',
+		template: 'custom',
+		img: null
+	};
+	$scope.item = angular.copy(orig);
+
+	$scope.add = function() {
+		var promise = theCart.add( $scope.item );
+		promise.then(function (res) {
+			if (res.data == 'false') {
+				$scope.error = true;
+				$scope.success = false;
+			} else {
+				$scope.success = true;
+				$scope.error = false;
+				$scope.item = angular.copy(orig);
+			}
+			
+			$timeout.cancel(timer);
+			timer = $timeout(function() {
+				$scope.success = $scope.error = false;
+			}, 5000);
+		});
+	};
+}]).
 
 // controller('RegisterFormCtrl', ['$scope', 'myPage', '$modal', 'interface', 'security', function ($scope, myPage, $modal, interface, security){
 // 	myPage.setTitle("Registration Form");

@@ -1,7 +1,5 @@
 <?php
 
-// require_once('main_include.php');
-
 class Cart extends NG {
 
 	private $usr;
@@ -39,6 +37,7 @@ class Cart extends NG {
 
 		// Iterate through ID's and grab items or pass objects through
 		$retData = array();
+		setlocale(LC_MONETARY, 'en_US');
 		foreach ($_SESSION['cart'] as $itemID) {
 			if (is_string($itemID)) {
 				$item = $this->getItemByID( $itemID );
@@ -50,7 +49,14 @@ class Cart extends NG {
 
 					array_push($retData, $item);
 				}
-			} else {
+			} else { // format cost for carts
+				$cost = $itemID['cost'];
+				$itemID['cost'] = array(
+					'pretty' => '$' . money_format('%n', $cost),
+					'settings' => array(
+						"cost" => $cost
+					)
+				);
 				array_push($retData, $itemID);
 			}
 
@@ -59,9 +65,7 @@ class Cart extends NG {
 		return $retData;
 	}
 
-	
-
-	// Helper(app): return specific item detail by id
+	// Helper(get): return specific item detail by id
 	private function getItemByID( $itemID ) {
 		$itemSTH = $this->db->prepare("SELECT i.*, t.template FROM (SELECT * FROM `item` WHERE itemID = ?) i JOIN product p ON p.productID=i.productID JOIN template t ON t.templateID = p.templateID;");
 		// $itemSTH = $this->db->prepare("SELECT i.*, t.template, COUNT(f.tiePFID) as `options` FROM (SELECT * FROM `item` WHERE itemID = ?) i JOIN product p ON p.productID=i.productID JOIN template t ON t.templateID = p.templateID LEFT JOIN `tie_product_field` f ON f.productID = i.productID GROUP BY i.itemID, i.productID, i.name, i.description, i.settings, i.img, i.blurb, t.template;");
@@ -69,12 +73,13 @@ class Cart extends NG {
 		$itemSTH->execute( $itemID );
 		$row = $itemSTH->fetch(PDO::FETCH_ASSOC);
 		if (!isset($row['productID'])) return null; // if can't find product
-		$row['settings'] = json_decode($row['settings']);
+		// $row['settings'] = json_decode($row['settings']);
+		unset($row['settings']);
 		$row['cost'] = $this->getProductCost( $row['productID'] );
 		return $row;
 	}
 
-	// Helper(app): return cost for a productID
+	// Helper(get): return cost for a productID
 	private function getProductCost( $productID ) {
 		$user = $this->usr->getCurrentUser();
 
@@ -145,7 +150,37 @@ class Cart extends NG {
 	// Worker: remove element from cart
 	public function rem() {
 		$data = $this->getPostData();
-		$_SESSION['cart'] = array_diff($_SESSION['cart'], array($data->itemID) ); // http://stackoverflow.com/a/9268826
+
+		if ($data->itemID == -1) { // wierd thing to make custom payments work
+			$data->cost = $data->cost->settings->cost; // clean cost
+
+			$_SESSION['cart'] = array_udiff($_SESSION['cart'], array( get_object_vars($data) ), function($a, $b) {
+				$tempA = json_encode($a);
+				$tempB = json_encode($b);
+				if ($tempA == $tempB) { return 0; } elseif ($tempA < $tempB) { return -1; } else { return 1; }
+			});
+
+		} else {
+			$_SESSION['cart'] = array_diff($_SESSION['cart'], array($data->itemID) ); // http://stackoverflow.com/a/9268826
+		}
+		return $data; // debug
+	}
+
+	// Worker: add invoice to cart
+	public function add() {
+		$data = get_object_vars( $this->getPostData() );
+		$pass = false;
+
+		if (false===array_search($data, $_SESSION['cart'])) {
+			array_push($_SESSION['cart'], $data);
+			$pass = ture;
+		}
+		return $pass; // debug
+	}
+
+	// Worker: clear cart
+	public function clr() {
+		$_SESSION['cart'] = array();
 	}
 
 	// UNTESTED FUNCTIONS

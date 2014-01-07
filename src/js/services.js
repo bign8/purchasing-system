@@ -128,6 +128,15 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function($rootS
 // 	// 	});
 // 	// }
 
+	function dbCall(fn, item) {
+		dirty = true;
+		var promise = interface.cart(fn, item);
+		promise.then(function(res) {
+			reload();
+		});
+		return promise;
+	}
+
 	function reload() {
 		var promise = interface.cart('get');
 		promise.then(function(response) {
@@ -152,20 +161,11 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function($rootS
 		len: function() {
 			return cart.length || '';
 		},
-		// add: function(item) {
-		// 	cart.push(item.itemID);
-		// 	update();
-		// },
-		// addObj: function(item) {
-		// 	cart.push(item);
-		// 	update();
-		// },
+		add: function(item) {
+			return dbCall('add', item);
+		},
 		rem: function(item) {
-			dirty = true; // incase page change
-			var promise = interface.cart('rem', item);
-			promise.then(function(res) {
-				reload();
-			});
+			return dbCall('rem', item);
 		},
 		// contains: function(itemID) {
 		// 	// check if already in cart or if inprevious purchases
