@@ -13,8 +13,6 @@ ToDo:
 - register user / select firm from list of firms
 - register user / select address for a list of firm addresses
 
-- wierd errors in cost function, needs work
-
 - GET SAMPLE DATA!
 - Implement Form constraints for checkout
 - photo upload field (doesn't store, just emails)

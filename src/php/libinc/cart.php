@@ -90,7 +90,7 @@ class Cart extends NG {
 			$groupSTH->execute( $user['firmID'] );
 			$groups = $groupSTH->fetchAll( PDO::FETCH_COLUMN );
 		}
-		if (isset($this->groupCashe)) $groups = array_merge($groups, $this->groupCashe); // add groups that are in cart
+		if (isset($this->groupCashe)) $groups = array_merge($groups, $this->groupCashe, array(0)); // add groups that are in cart
 		
 		// pull prices that match productID and group criteria
 		$questionMarks = trim(str_repeat("?,", sizeof($groups)),","); // build string of questionmarks based on sizeof($groups)
