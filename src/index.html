@@ -63,7 +63,7 @@
 				</div>
 			</div>
 
-			<ul class="breadcrumb">
+			<ul class="breadcrumb" ng-hide="breadcrumbs.getAll().length < 1">
 				<li><a  href="#/">Home</a></li>
 				<li ng-repeat="breadcrumb in breadcrumbs.getAll()">
 					<span class="divider">/</span>  

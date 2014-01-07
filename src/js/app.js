@@ -20,8 +20,11 @@ config(['$routeProvider', 'securityAuthorizationProvider', function( $routeProvi
 			controller: 'CustPayFormCtrl'
 		}).
 
-		// In-progress Pages
-		
+		when('/register', {
+			templateUrl: 'partials/register-form.tpl.html',
+			controller: 'RegisterFormCtrl'
+		}).
+
 		// total computation needs fixing (requires register/:itemID page)
 		when('/', { // Home - statically generated (static tpl with links)
 			templateUrl: 'partials/index.tpl.html',
@@ -33,6 +36,8 @@ config(['$routeProvider', 'securityAuthorizationProvider', function( $routeProvi
 			}
 		}).
 
+		// In-progress Pages
+
 		// when('/register/:itemID', {
 		// 	templateUrl: 'partials/register-conf.tpl.html',
 		// 	controller: 'RegisterConFormCtrl',
@@ -42,11 +47,6 @@ config(['$routeProvider', 'securityAuthorizationProvider', function( $routeProvi
 		// 		}
 		// 	}
 		// }).
-
-		when('/register', {
-			templateUrl: 'partials/register-form.tpl.html',
-			controller: 'RegisterFormCtrl'
-		}).
 
 		// Staged pages
 
