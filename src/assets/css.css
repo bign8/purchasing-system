@@ -29,3 +29,31 @@ th.nowrap, td.nowrap {
 .css-form input.ng-valid.ng-dirty {
 	background-color: #78FA89;
 }
+
+/* alert styles */
+.alert a {
+	color: #f09800;
+}
+.alert a:hover, .alert a:focus {
+	color: #7f6943;
+}
+
+/* well features */
+.well {
+	position: relative;
+}
+.well .well-overlay {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	background-color: rgba(138, 138, 138, 0.25);
+	z-index: 5;
+	border-radius: inherit;
+}
+
+/* helpers */
+.ctr {
+	text-align: center;
+}

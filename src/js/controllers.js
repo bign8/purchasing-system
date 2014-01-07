@@ -445,14 +445,17 @@ controller('CustPayFormCtrl', ['$scope', 'myPage', 'theCart', '$location', '$tim
 	};
 }]).
 
-controller('RegisterFormCtrl', ['$scope', 'myPage', '$modal', 'interface', 'security', function ($scope, myPage, $modal, interface, security){
+controller('RegisterFormCtrl', ['$scope', 'myPage', '$modal', 'interface', 'security', 'firms', function ($scope, myPage, $modal, interface, security, firms){
 	myPage.setTitle("Registration Form");
+
+	// find firm vs. register
+	$scope.firms = firms.data;
+	$scope.clearFirm = function () { $scope.user.firm = undefined; };
+
 
 	// initialize empty user
 	$scope.user = {
-		preName: '',
-		firm: {addr: null},// {addrID: null, addr2: null}
-		addr: null // {addrID: null, addr2: null}
+		preName: ''
 	};
 
 	// handle registration clicks
@@ -463,10 +466,10 @@ controller('RegisterFormCtrl', ['$scope', 'myPage', '$modal', 'interface', 'secu
 		if ($scope.passVerify !== $scope.user.password) {
 			return alert('Passwords do not match\nPlease try again.');
 		}
-		if ($scope.user.firm.addr.addrID === null) {
+		if ($scope.user.firm.addr.addrID === undefined) {
 			return alert('Please assign a firm address');
 		}
-		if ($scope.user.addr.addrID === null) {
+		if ($scope.user.addr.addrID === undefined) {
 			return alert('Please assign a user address');
 		}
 		interface.user('addUser', $scope.user).then(function() {

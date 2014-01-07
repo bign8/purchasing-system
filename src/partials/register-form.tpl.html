@@ -1,43 +1,72 @@
+<script type="text/ng-template" id="customTemplate.html">
+	<a>
+		<span bind-html-unsafe="match.label | typeaheadHighlight:query"></span> 
+		(<span>{{ match.model.website | replace:{'http://':'','https://':''} }}</span>)
+	</a>
+</script>
+
 <form class="form-horizontal" name="registration">
 	<div class="row">
 		<fieldset class="span6">
 			<legend>Firm Information</legend>
 
-			<div class="control-group">
-				<label class="control-label" for="firmName">Firm Name</label>
+			<p class="ctr"><strong>Find</strong> your firm</p>
+
+			<div class="control-group well">
+				<div class="well-overlay" ng-hide=" user.firm.toString() === user.firm || (user.firm.firmID !== undefined || user.firm === undefined) "></div>
+
+				<label class="control-label" for="firmFind">Type your Firm Name</label>
 				<div class="controls">
-					<input type="text" id="firmName" ng-model="user.firm.name" placeholder="Firm Name" required>
-					<!-- <span class="help-inline">(xxx-xxx-xxxx)</span> -->
+					<input type="text" id="firmFind" ng-model="user.firm" typeahead="firm as firm.name for firm in firms | filter:{name:$viewValue} | limitTo:8" placeholder="Firm Search" typeahead-template-url="customTemplate.html">
+					<button type="button" class="close" ng-click="clearFirm()" ng-hide="user.firm === undefined">&times;</button>
 				</div>
 			</div>
 
-			<div class="control-group">
-				<label class="control-label" for="firmWeb">Firm Website</label>
-				<div class="controls">
-					<input type="url" id="firmWeb" ng-model="user.firm.website" placeholder="Firm Website" required>
-					<span class="help-inline">http://www.UpstreamAcademy.com/</span>
-				</div>
-			</div>
+			<p class="ctr">Or <strong>Register</strong> a new one</p>
 
-			<div class="control-group">
-				<label class="control-label" for="firmName">Firm Address</label>
-				<div class="controls">
-					<div class="input-append" ng-switch="user.firm.addr.addrID">
+			<div class="well" style="padding: 20px 0 1px;">
 
-						<div ng-switch-when="null">
-							<span class="input-medium uneditable-input">Click 'set' to assign</span>
-							<button type="button" class="btn btn-info" ng-click="setAddr('firm')">Set</button>
-						</div>
+				<div class="well-overlay" ng-hide="user.firm.firmID === undefined"></div>
 
-						<div ng-switch-default>
-							<span class="input-medium uneditable-input">{{user.firm.addr.addrName}}</span>
-							<button type="button" class="btn btn-warning" ng-click="setAddr('firm')">Edit</button>
-						</div>
-
+				<div class="control-group">
+					<label class="control-label" for="firmName">Firm Name</label>
+					<div class="controls">
+						<input type="text" id="firmName" ng-model="user.firm.name" placeholder="Firm Name" required>
+						<!-- <span class="help-inline">(xxx-xxx-xxxx)</span> -->
+						<button type="button" class="close" ng-click="clearFirm()" style="margin-right: 19px;" ng-hide="user.firm === undefined">&times;</button>
 					</div>
 				</div>
+
+				<div class="control-group">
+					<label class="control-label" for="firmWeb">Firm Website</label>
+					<div class="controls">
+						<input type="url" id="firmWeb" ng-model="user.firm.website" placeholder="Firm Website" required>
+						<span class="help-inline">http://www.UpstreamAcademy.com/</span>
+					</div>
+				</div>
+
+				<div class="control-group">
+					<label class="control-label" for="firmName">Firm Address</label>
+					<div class="controls">
+						<div class="input-append" ng-switch="user.firm.addr.addrID">
+
+							<div ng-switch-when="undefined">
+								<span class="input-medium uneditable-input">Click 'set' to assign</span>
+								<button type="button" class="btn btn-info" ng-click="setAddr('firm')">Set</button>
+							</div>
+
+							<div ng-switch-default>
+								<span class="input-medium uneditable-input">{{user.firm.addr.addrName}}</span>
+								<button type="button" class="btn btn-warning" ng-click="setAddr('firm')">Edit</button>
+							</div>
+
+						</div>
+					</div>
+				</div>
+
 			</div>
 
+			<!-- <pre>Model: {{user.firm | json}}</pre> -->
 		</fieldset>
 
 		<fieldset class="span6">
@@ -86,7 +115,7 @@
 				<div class="controls">
 					<div class="input-append" ng-switch="user.addr.addrID">
 
-						<div ng-switch-when="null">
+						<div ng-switch-when="undefined">
 							<span class="input-medium uneditable-input">Click 'set' to assign</span>
 							<button type="button" class="btn btn-info" ng-click="setAddr('addr')" ng-disabled="same">Set</button>
 						</div>

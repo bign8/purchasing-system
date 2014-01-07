@@ -41,6 +41,7 @@ if ( $_REQUEST['c'] == 'cart' ) {
 	$obj = new User();
 	switch ($_REQUEST['a']) {
 		case 'addAddress': $data = $obj->addAddress(); break;
+		case 'listFirms': $data = $obj->listFirms(); break;
 		// case 'addContact': $data = $obj->addContact(); break;
 		case 'addUser': $data = $obj->addUser(); break;
 		case 'currentUser': $data = $obj->currentUser(); break;

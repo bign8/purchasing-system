@@ -99,6 +99,28 @@ class User extends NG {
 	}
 
 
+	// New/tested functions
+
+	public function listFirms() {
+		$STH = $this->db->query("SELECT f.firmID, f.name, f.website, a.* FROM `firm` f JOIN `address` a ON f.addressID=a.addressID;");
+		$ret = $STH->fetchAll( PDO::FETCH_ASSOC );
+		foreach ($ret as &$value) {
+			$value['addr'] = array(
+				'addrID' => $value['addressID'],
+				'addrName' => $value['addrName'],
+				'addr1' => $value['addr1'],
+				'addr2' => $value['addr2'],
+				'city' => $value['city'],
+				'state' => $value['state'],
+				'zip' => $value['zip'],
+			);
+			unset($value['addressID'], $value['addrName'], $value['addr1'], $value['addr2'], $value['city'], $value['state'], $value['zip']);
+		}
+
+		return $ret;
+	}
+
+	// Un-tested functions
 
 	// Worker(app/checkout): add contact to system
 	public function addContact() {
