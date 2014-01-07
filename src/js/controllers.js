@@ -5,8 +5,9 @@ angular.module('myApp.controllers', [
 	'ui.bootstrap'
 ]).
 
-controller('IndexCtrl', ['$scope', 'myPage', 'theCart', function ($scope, myPage, theCart) {
+controller('IndexCtrl', ['$scope', 'myPage', 'theCart', 'security', function ($scope, myPage, theCart, security) {
 	myPage.setTitle("Upstream Academy", "Guiding accounting firms to high performance");
+	if (security.currentUser !== null) security.redirect('/cart');
 	$scope.theCart = theCart;
 }]).
 
@@ -435,7 +436,7 @@ controller('CustPayFormCtrl', ['$scope', 'myPage', 'theCart', '$location', '$tim
 				$scope.error = false;
 				$scope.item = angular.copy(orig);
 			}
-			
+
 			$timeout.cancel(timer);
 			timer = $timeout(function() {
 				$scope.success = $scope.error = false;
@@ -444,91 +445,92 @@ controller('CustPayFormCtrl', ['$scope', 'myPage', 'theCart', '$location', '$tim
 	};
 }]).
 
-// controller('RegisterFormCtrl', ['$scope', 'myPage', '$modal', 'interface', 'security', function ($scope, myPage, $modal, interface, security){
-// 	myPage.setTitle("Registration Form");
+controller('RegisterFormCtrl', ['$scope', 'myPage', '$modal', 'interface', 'security', function ($scope, myPage, $modal, interface, security){
+	myPage.setTitle("Registration Form");
 
-// 	// initialize empty user
-// 	$scope.user = {
-// 		preName: '',
-// 		firm: {addr: null},// {addrID: null, addr2: null}
-// 		addr: null // {addrID: null, addr2: null}
-// 	};
+	// initialize empty user
+	$scope.user = {
+		preName: '',
+		firm: {addr: null},// {addrID: null, addr2: null}
+		addr: null // {addrID: null, addr2: null}
+	};
 
-// 	// handle registration clicks
-// 	$scope.register = function( invalid ) {
-// 		if (invalid) {
-// 			return alert('Form is not valid\nPlease try again.');
-// 		}
-// 		if ($scope.passVerify !== $scope.user.password) {
-// 			return alert('Passwords do not match\nPlease try again.');
-// 		}
-// 		if ($scope.user.firm.addr.addrID === null) {
-// 			return alert('Please assign a firm address');
-// 		}
-// 		if ($scope.user.addr.addrID === null) {
-// 			return alert('Please assign a user address');
-// 		}
-// 		interface.call('addUser', $scope.user).then(function() {
-// 			alert('Your account has successfully been created');
-// 			security.requestCurrentUser();
-// 			security.redirect('/cart');
-// 		}, function (err) {
-// 			if (err.data == 'dup') {
-// 				alert('This email already has an account\nPlease click the login button and attempt a password reset.');
-// 			} else {
-// 				alert('There was an unknown error creating your account\nPlease try again or contact Upstream Academy for help.');
-// 			}
-// 			console.log(err);
-// 		});
-// 	};
+	// handle registration clicks
+	$scope.register = function( invalid ) {
+		if (invalid) {
+			return alert('Form is not valid\nPlease try again.');
+		}
+		if ($scope.passVerify !== $scope.user.password) {
+			return alert('Passwords do not match\nPlease try again.');
+		}
+		if ($scope.user.firm.addr.addrID === null) {
+			return alert('Please assign a firm address');
+		}
+		if ($scope.user.addr.addrID === null) {
+			return alert('Please assign a user address');
+		}
+		interface.user('addUser', $scope.user).then(function() {
+			alert('Your account has successfully been created');
+			security.requestCurrentUser();
+			security.redirect('/cart');
+		}, function (err) {
+			if (err.data == '"dup"') {
+				alert('This email already has an account\nPlease click the login button and attempt a password reset.');
+			} else {
+				alert('There was an unknown error creating your account\nPlease try again or contact Upstream Academy for help.');
+			}
+			console.log(err);
+		});
+	};
 
-// 	// For same address handling
-// 	$scope.same = false;
-// 	var firstLoad = true, oldUserAddr = null;
-// 	$scope.$watch('same', function(value) {
-// 		if (firstLoad) {
-// 			firstLoad = false;
-// 			return;
-// 		}
-// 		if (value) {
-// 			oldUserAddr = $scope.user.addr;
-// 			$scope.user.addr = $scope.user.firm.addr;
-// 		} else {
-// 			$scope.user.addr = oldUserAddr;
-// 		}
-// 	});
+	// For same address handling
+	$scope.same = false;
+	var firstLoad = true, oldUserAddr = null;
+	$scope.$watch('same', function(value) {
+		if (firstLoad) {
+			firstLoad = false;
+			return;
+		}
+		if (value) {
+			oldUserAddr = $scope.user.addr;
+			$scope.user.addr = $scope.user.firm.addr;
+		} else {
+			$scope.user.addr = oldUserAddr;
+		}
+	});
 
-// 	// handle set address clicks
-// 	$scope.setAddr = function (slug) {
-// 		// open modal here with address form
-// 		// modal insterts into db and returns full object
-// 		var myAddress = (slug == 'firm') ? $scope.user.firm.addr : $scope.user.addr ;
+	// handle set address clicks
+	$scope.setAddr = function (slug) {
+		// open modal here with address form
+		// modal insterts into db and returns full object
+		var myAddress = (slug == 'firm') ? $scope.user.firm.addr : $scope.user.addr ;
 		
-// 		var modalInstance = $modal.open({
-// 			templateUrl: 'partials/modal-address.tpl.html',
-// 			controller: 'ModalAddressCtrl',
-// 			resolve: {
-// 				address: function() { return angular.copy( myAddress ); }
-// 			}
-// 		});
+		var modalInstance = $modal.open({
+			templateUrl: 'partials/modal-address.tpl.html',
+			controller: 'ModalAddressCtrl',
+			resolve: {
+				address: function() { return angular.copy( myAddress ); }
+			}
+		});
 
-// 		modalInstance.result.then(function(address) {
-// 			if (slug == 'firm') {
-// 				$scope.user.firm.addr = address;
-// 			} else {
-// 				$scope.user.addr = address;
-// 			}
-// 		});
-// 	};
-// }]).
+		modalInstance.result.then(function(address) {
+			if (slug == 'firm') {
+				$scope.user.firm.addr = address;
+				if ($scope.same) $scope.user.addr = address;
+			} else {
+				$scope.user.addr = address;
+			}
+		});
+	};
+}]).
 
 controller('ModalAddressCtrl', ['$scope', '$modalInstance', 'address', 'interface', function($scope, $modalInstance, address, interface){
 	$scope.address = address || {addrID:null, addr2: null};
 	$scope.ok = function() {
 		// use interface to add/edit address in db
 		var fun = ($scope.address.addrID === null) ? 'add' : 'edit' ;
-		interface.call(fun + 'Address', $scope.address).then(function (res) {
-			$scope.address.addrID = res.data;
+		interface.user(fun + 'Address', $scope.address).then(function (res) {
+			$scope.address.addrID = JSON.parse(res.data);
 			$modalInstance.close($scope.address);
 		}, function (err) {
 			console.log(err);

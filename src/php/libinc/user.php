@@ -162,7 +162,7 @@ class User extends NG {
 		$checkSTH = $this->db->prepare("SELECT * FROM `contact` WHERE email=?;");
 		if (!$checkSTH->execute($data->email)) {
 			header('HTTP/ 409 Conflict');
-			return print_r($STH->errorInfo(), true);
+			return print_r($checkSTH->errorInfo(), true);
 		}
 		if ($checkSTH->rowCount() > 0) {
 			header('HTTP/ 409 Conflict');
@@ -173,7 +173,7 @@ class User extends NG {
 		$firmSTH = $this->db->prepare("INSERT INTO `firm` (addressID, name, website) VALUES (?,?,?);");
 		if (!$firmSTH->execute( $data->firm->addr->addrID, $data->firm->name, $data->firm->website )) {
 			header('HTTP/ 409 Conflict');
-			return print_r($STH->errorInfo(), true);
+			return print_r($firmSTH->errorInfo(), true);
 		}
 		$firmID = $this->db->lastInsertId();
 
@@ -181,7 +181,7 @@ class User extends NG {
 		$contSTH = $this->db->prepare("INSERT INTO `contact` (firmID, addressID, legalName, preName, title, email, phone, pass) VALUES (?,?,?,?,?,?,?,ENCRYPT(?,?));");
 		if (!$contSTH->execute( $firmID, $data->addr->addrID, $data->legalName, $data->preName, $data->title, $data->email, $data->phone, $data->password, config::encryptSTR )) {
 			header('HTTP/ 409 Conflict');
-			return print_r($STH->errorInfo(), true);
+			return print_r($contSTH->errorInfo(), true);
 		}
 
 		session_start();
