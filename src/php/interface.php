@@ -27,7 +27,7 @@ if ( $_REQUEST['c'] == 'cart' ) {
 		case 'add': $data = $obj->add(); break; // add invoice to cart
 		case 'clr': $data = $obj->clr(); break; // clear cart
 
-		case 'con': $data = $obj->con(); break; // get conference form data
+		case 'getOptions': $data = $obj->getOptions(); break; // get conference form data
 
 		// case 'getDiscount': $data = $obj->getDiscount(); break;
 		// case 'getItem': $data = $obj->getItem(); break;
@@ -45,14 +45,14 @@ if ( $_REQUEST['c'] == 'cart' ) {
 	switch ($_REQUEST['a']) {
 		case 'addAddress': $data = $obj->addAddress(); break;
 		case 'listFirms': $data = $obj->listFirms(); break;
-		// case 'addContact': $data = $obj->addContact(); break;
 		case 'addUser': $data = $obj->addUser(); break;
 		case 'currentUser': $data = $obj->currentUser(); break;
 		case 'editAddress': $data = $obj->editAddress(); break;
+		case 'getFirmEmploy': $data = $obj->getFirmEmploy(); break;
+		case 'getFirmAddr': $data = $obj->getFirmAddr(); break;
+		// case 'addContact': $data = $obj->addContact(); break;
 		// case 'editContact': $data = $obj->editContact(); break;
 		// case 'getCart': $data = $obj->getCart(); break;
-		// case 'getFirmAddr': $data = $obj->getFirmAddr(); break;
-		// case 'getFirmEmploy': $data = $obj->getFirmEmploy(); break;
 		case 'login': $data = $obj->login(); break;
 		case 'logout': $data = $obj->logout(); break;
 		default: $pass = false;

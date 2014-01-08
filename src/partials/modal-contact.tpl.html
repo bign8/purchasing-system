@@ -78,19 +78,17 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr ng-repeat="employ in firmEmploy | filter:filterAlreadyAdded">
+				<tr ng-repeat="employ in firmEmploy">
 					<td>{{employ.legalName}}</td>
 					<td>
 						{{employ.phone}}
-						<button class="btn btn-primary pull-right" ng-click="choose(employ)">Choose</button>
+						<button class="btn btn-primary btn-mini pull-right" ng-click="choose(employ)">Choose</button>
 					</td>
 				</tr>
 			</tbody>
 		</table>
 	</div>
-
-	<!-- <pre>{{contact | json}}</pre> -->
-	<!-- <pre>{{firmEmploy | json}}</pre> -->
+	
 </div>
 <div class="modal-footer">
 	<button class="btn btn-success pull-left" ng-click="toggle()" ng-show="addNew&&canChange">Select Employee</button>

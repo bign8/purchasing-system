@@ -39,8 +39,7 @@ class NG {
 		// Pretty print product area
 		if ( preg_match('/\/register\/.*/', $data->path) && $data->index == 1 ) {
 			$STH = $this->db->prepare("SELECT `name` FROM `item` WHERE `itemID`=?;");
-			$STH->execute( $data->name );
-			$ret = $STH->fetchColumn();
+			if ($STH->execute( $data->name )) $ret = $STH->fetchColumn();
 		}
 
 		return $ret;

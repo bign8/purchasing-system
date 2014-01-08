@@ -11,14 +11,119 @@ controller('IndexCtrl', ['$scope', 'myPage', 'theCart', 'security', function ($s
 	$scope.theCart = theCart;
 }]).
 
-controller('RegisterConFormCtrl', ['$scope', 'myPage', 'interface', 'conference', function ($scope, myPage, interface, conference) {
+controller('RegisterConFormCtrl', ['$scope', 'myPage', 'interface', 'conference', '$modal', function ($scope, myPage, interface, conference, $modal) {
 	$scope.con = conference.data;
+	// employees = employees.data; // store for later
+
 	var title = ($scope.con.item.template == 'conference') ? "Register" : "Options" ;
 	myPage.setTitle(title, "for " + $scope.con.item.name);
 
 	$scope.noFields = ($scope.con.fields.length === 0); // ensure item has quesitions
+	if ($scope.noFields) return; // no need to do any further processing if there are no options
 	
+	$scope.attID = (function() {
+		angular.forEach($scope.con.fields, function(value, key) { if (value.name == 'Attendees') found = value.fieldID; });
+		return found;
+	})();
 
+	// Attendee list controls
+	$scope.total = 0;
+	$scope.computeCost = function(index) {
+		var cost = 0, s = $scope.con.item.cost.settings;
+		if ( index === 0 ) {
+			cost = parseFloat( s.initial );
+			$scope.total = 0;
+		} else if ( index >= parseInt( s.after ) ) {
+			cost = parseFloat( s.later );
+		}
+		$scope.total += cost;
+		return cost;
+	};
+	$scope.clr = function() { 
+		$scope.con.options[ $scope.attID ] = []; 
+		$scope.total = 0; 
+	};
+	$scope.rem = function(index, $event) {
+		$event.preventDefault();
+		var o = $scope.con.options[ $scope.attID ];
+		o.splice(index,1);
+		if (!o.length) $scope.total = 0;
+	};
+	$scope.add = function() { $scope.edit(); };
+	$scope.edit = function(contact) {
+		var o = $scope.con.options[ $scope.attID ],
+		modalInstance = $modal.open({
+			templateUrl: 'partials/modal-contact.tpl.html',
+			controller: 'ContactModalCtrl',
+			resolve: {
+				contact: function() { return angular.copy( contact ); },
+				firmAddr: function(interface) { return interface.user('getFirmAddr'); },
+				firmEmploy: function(interface) { return interface.user('getFirmEmploy'); },
+				opt: function() { return angular.copy( o ); }
+			}
+		});
+		modalInstance.result.then(function (modContact) {
+			if (!o) o = $scope.con.options[ $scope.attID ] = []; // in case the settings object is empty
+			var index = o.indexOf( contact );
+			if (index === -1) {
+				o.push( modContact );
+			} else {
+				o[index] = modContact;
+			}
+		});
+	};
+}]).
+
+controller('ContactModalCtrl', ['$scope', '$modalInstance', 'contact', 'firmAddr', 'firmEmploy', 'interface', '$modal', 'opt', '$filter', function ($scope, $modalInstance, contact, firmAddr, firmEmploy, interface, $modal, opt, $filter) {
+	var oldUserAddr = {addrID:null, addr2:null}; // null address handler
+	$scope.contact = contact || {addr:oldUserAddr}; // null contact handler
+
+	// filter list on `opt` (remove already added people)
+	$scope.firmEmploy = $filter('filter')(firmEmploy.data, function(item) { // filter here not on template
+		var found = false; // http://stackoverflow.com/a/14844516
+		angular.forEach(opt, function (obj){ if (!found && obj.contactID == item.contactID ) found = true; });
+		return !found;
+	});
+
+	// view changing variables
+	$scope.addNew = (contact !== undefined) || $scope.firmEmploy.length === 0;
+	$scope.canChange = ($scope.contact.contactID === undefined) && $scope.firmEmploy.length !== 0;
+
+	// for managing same changes
+	$scope.sameAddr = true;
+	$scope.$watch('sameAddr', function(value) {
+		if (value) {
+			oldUserAddr = $scope.contact.addr;
+			$scope.contact.addr = firmAddr.data;
+		} else {
+			$scope.contact.addr = oldUserAddr;
+		}
+	});
+
+	$scope.toggle = function () { $scope.addNew = !$scope.addNew; }; // changes view
+	$scope.choose = function (user) { $modalInstance.close(user); }; // chooses a specific user
+	$scope.cancel = function () { $modalInstance.dismiss('cancel'); }; // closes the dialog
+	$scope.ok = function ( invalid ) {
+		if (invalid) return alert('Form is not valid\nPlease try again.');
+		if ($scope.contact.addr.addrID === null) return alert('Please assign an address');
+
+		var query = ($scope.contact.contactID === undefined) ? 'add' : 'edit'; // change add or edit based on existence of contactID
+		interface.call(query + 'Contact', $scope.contact).then(function(res) {
+			$scope.contact.contactID = JSON.parse(res.data);
+			$modalInstance.close( $scope.contact );
+		}, function (err) {
+			alert('There was an unknown error adding this user\nPlease try again or contact Upstream Academy for help.');
+			console.log(err);
+		});
+	};
+	$scope.setAddr = function () { // open modal here with address form
+		var modalInstance = $modal.open({ // modal insterts into db and returns full object
+			templateUrl: 'partials/modal-address.tpl.html',
+			controller: 'ModalAddressCtrl',
+			resolve: { address: function() { return angular.copy( $scope.contact.addr ); } }
+		});
+		modalInstance.result.then(function(address) { $scope.contact.addr = address; });
+	};
 }]).
 
 // controller('ListProdCtrl', ['$scope', 'myPage', 'prodList', function ($scope, myPage, prodList) {
@@ -307,78 +412,6 @@ controller('CartCtrl', ['$scope', 'myPage', 'security', '$modal', 'interface', '
 // 	$scope.cancel = function () { $modalInstance.dismiss('cancel'); };
 
 // 	if (!$scope.opt.length) $scope.add(); // open add dialog on empty attendee list
-// }]).
-
-// controller('ContactModalCtrl', ['$scope', '$modalInstance', 'contact', 'firmAddr', 'firmEmploy', 'interface', '$modal', 'opt', function ($scope, $modalInstance, contact, firmAddr, firmEmploy, interface, $modal, opt) {
-// 	var oldUserAddr = {addrID:null, addr2:null}; // null address handler
-// 	$scope.contact = contact || {addr:oldUserAddr}; // null contact handler
-// 	$scope.firmEmploy = firmEmploy.data;
-
-// 	// filter list on `opt` (remove already added people)
-// 	$scope.filterAlreadyAdded = function (item) { // http://stackoverflow.com/a/14844516
-// 		var found = false;
-// 		angular.forEach(opt, function (obj){
-// 			if (!found && obj.contactID == item.contactID ) found = true;
-// 		});
-// 		return !found;
-// 	};
-
-// 	// for managing same changes
-// 	$scope.sameAddr = true;
-// 	$scope.$watch('sameAddr', function(value) {
-// 		if (value) {
-// 			oldUserAddr = $scope.contact.addr;
-// 			$scope.contact.addr = firmAddr.data;
-// 		} else {
-// 			$scope.contact.addr = oldUserAddr;
-// 		}
-// 	});
-
-// 	$scope.addNew = (contact!==undefined);
-// 	$scope.canChange = (contact===null);
-// 	$scope.toggle = function () {
-// 		$scope.addNew = !$scope.addNew;
-// 	};
-// 	$scope.choose = function (user) {
-// 		$modalInstance.close(user);
-// 	};
-// 	$scope.ok = function ( invalid ) {
-// 		if (invalid) {
-// 			return alert('Form is not valid\nPlease try again.');
-// 		}
-// 		if ($scope.contact.addr.addrID === null) {
-// 			return alert('Please assign an address');
-// 		}
-
-// 		// change add or edit based on existence of contactID
-// 		var query = ($scope.contact.contactID === undefined) ? 'add' : 'edit';
-// 		interface.call(query + 'Contact', $scope.contact).then(function(res) {
-// 			$scope.contact.contactID = res.data;
-// 			$modalInstance.close( $scope.contact );
-// 		}, function (err) {
-// 			alert('There was an unknown error adding this user\nPlease try again or contact Upstream Academy for help.');
-// 			console.log(err);
-// 		});
-// 	};
-
-// 	// handle set address clicks
-// 	$scope.setAddr = function () {
-// 		// open modal here with address form
-// 		// modal insterts into db and returns full object
-		
-// 		var modalInstance = $modal.open({
-// 			templateUrl: 'partials/modal-address.tpl.html',
-// 			controller: 'ModalAddressCtrl',
-// 			resolve: {
-// 				address: function() { return angular.copy( $scope.contact.addr ); }
-// 			}
-// 		});
-
-// 		modalInstance.result.then(function(address) {
-// 			$scope.contact.addr = address;
-// 		});
-// 	};
-// 	$scope.cancel = function () { $modalInstance.dismiss('cancel'); };
 // }]).
 
 // controller('ReciptCtrl', ['$scope', 'myPage', 'printCart', '$location', function ($scope, myPage, printCart, $location) {
