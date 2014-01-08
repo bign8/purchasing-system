@@ -50,8 +50,8 @@ if ( $_REQUEST['c'] == 'cart' ) {
 		case 'editAddress': $data = $obj->editAddress(); break;
 		case 'getFirmEmploy': $data = $obj->getFirmEmploy(); break;
 		case 'getFirmAddr': $data = $obj->getFirmAddr(); break;
-		// case 'addContact': $data = $obj->addContact(); break;
-		// case 'editContact': $data = $obj->editContact(); break;
+		case 'addContact': $data = $obj->addContact(); break;
+		case 'editContact': $data = $obj->editContact(); break;
 		// case 'getCart': $data = $obj->getCart(); break;
 		case 'login': $data = $obj->login(); break;
 		case 'logout': $data = $obj->logout(); break;

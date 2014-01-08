@@ -1,5 +1,4 @@
 ToDo: 
-- Push cart to php, no localstorage cart
 - Clean services (breadcrumbs and carts) to get rid of useless code
 - Perform db optimization
 - Account for all special cases
@@ -54,6 +53,8 @@ Used partials:
 - custom-payment-form.tpl.html
 - register-form.tpl.html
 - modal-address.tpl.html
+- modal-contact.tpl.html
+- register-conf.tpl.html
 
 Not used partials:
-- modal-options.tpl.html
+- modal-options.tpl.html (replaced by register-conf.tpl.html)

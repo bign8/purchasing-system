@@ -105,7 +105,7 @@ class User extends NG {
 		$ret = $STH->fetchAll( PDO::FETCH_ASSOC );
 		foreach ($ret as &$value) {
 			$value['addr'] = array(
-				'addrID' => $value['addressID'],
+				'addrID' => $value['addressID'], // TODO: why does this change?
 				'addrName' => $value['addrName'],
 				'addr1' => $value['addr1'],
 				'addr2' => $value['addr2'],
@@ -127,7 +127,20 @@ class User extends NG {
 			header('HTTP/ 409 Conflict');
 			return $this->db->errorInfo();
 		}
-		return $STH->fetchAll(PDO::FETCH_ASSOC);
+		$ret = $STH->fetchAll( PDO::FETCH_ASSOC );
+		foreach ($ret as &$value) {
+			$value['addr'] = array(
+				'addressID' => $value['addressID'],
+				'addrName' => $value['addrName'],
+				'addr1' => $value['addr1'],
+				'addr2' => $value['addr2'],
+				'city' => $value['city'],
+				'state' => $value['state'],
+				'zip' => $value['zip'],
+			);
+			unset($value['addressID'], $value['addrName'], $value['addr1'], $value['addr2'], $value['city'], $value['state'], $value['zip']);
+		}
+		return $ret;
 	}
 
 	// Worker(app/checkout): return firms address
@@ -144,7 +157,7 @@ class User extends NG {
 
 	// Worker(app/checkout): add contact to system
 	public function addContact() {
-		$this->requiresAuth();
+		$user = $this->requiresAuth();
 		$data = $this->getPostData();
 
 		$STH = $this->db->prepare("INSERT INTO `contact` (firmID, addressID, legalName, preName, title, email, phone) VALUES (?,?,?,?,?,?,?);");
