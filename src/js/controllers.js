@@ -72,6 +72,10 @@ controller('RegisterConFormCtrl', ['$scope', 'myPage', 'interface', 'conference'
 			}
 		});
 	};
+
+	$scope.save = function() {
+		console.log('SAVING');
+	};
 }]).
 
 controller('ContactModalCtrl', ['$scope', '$modalInstance', 'contact', 'firmAddr', 'firmEmploy', 'interface', '$modal', 'opt', '$filter', function ($scope, $modalInstance, contact, firmAddr, firmEmploy, interface, $modal, opt, $filter) {
@@ -108,7 +112,7 @@ controller('ContactModalCtrl', ['$scope', '$modalInstance', 'contact', 'firmAddr
 		if ($scope.contact.addr.addrID === null) return alert('Please assign an address');
 
 		var query = ($scope.contact.contactID === undefined) ? 'add' : 'edit'; // change add or edit based on existence of contactID
-		interface.call(query + 'Contact', $scope.contact).then(function(res) {
+		interface.user(query + 'Contact', $scope.contact).then(function(res) {
 			$scope.contact.contactID = JSON.parse(res.data);
 			$modalInstance.close( $scope.contact );
 		}, function (err) {

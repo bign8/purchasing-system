@@ -60,13 +60,13 @@
 							{{person.phone}}
 						</td>
 						<td>
-							{{person.addrName}}<br/>
-							{{person.addr1}}<br/>
-							<span ng-show="person.addr2">{{person.addr2}}<br/></span>
-							{{person.city}} {{person.state}}, {{person.zip}}
+							{{person.addr.addrName}}<br/>
+							{{person.addr.addr1}}<br/>
+							<span ng-show="person.addr2">{{person.addr.addr2}}<br/></span>
+							{{person.addr.city}} {{person.addr.state}}, {{person.addr.zip}}
 						</td>
 						<td>
-							<span style="float:right">{{computeCost($index) | currency}}<br/><br/></span><!-- computeCost({{$index}}) -->
+							<span style="float:right">{{computeCost($index) | currency}}<br/><br/></span>
 							<button style="clear:both" type="button" class="close" ng-click="rem($index,$event)">&times;</button>
 						</td>
 					</tr>
@@ -84,8 +84,14 @@
 			<button type="button" class="btn btn-danger pull-right" ng-click="clr()">Clear</button>
 
 		</div>
+		
 	</div>
 
+</div>
+
+<div class="form-actions" ng-hide="noFields">
+	<button type="submit" class="btn btn-primary" ng-click="save()">Save</button>
+	<a href="/" class="btn">Cancel</a>
 </div>
 
 <pre>{{con | json}}</pre>
