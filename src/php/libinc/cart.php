@@ -69,7 +69,7 @@ class Cart extends NG {
 		$itemSTH = $this->db->prepare("SELECT i.*, t.template FROM (SELECT * FROM `item` WHERE itemID = ?) i JOIN product p ON p.productID=i.productID JOIN template t ON t.templateID = p.templateID;");
 		// $itemSTH = $this->db->prepare("SELECT i.*, t.template, COUNT(f.tiePFID) as `options` FROM (SELECT * FROM `item` WHERE itemID = ?) i JOIN product p ON p.productID=i.productID JOIN template t ON t.templateID = p.templateID LEFT JOIN `tie_product_field` f ON f.productID = i.productID GROUP BY i.itemID, i.productID, i.name, i.description, i.settings, i.img, i.blurb, t.template;");
 		// $itemSTH = $this->db->prepare("SELECT * FROM `item` WHERE itemID = ?;");
-		$itemSTH->execute( $itemID );
+		if (!$itemSTH->execute( $itemID )) return -1;
 		$row = $itemSTH->fetch(PDO::FETCH_ASSOC);
 		if (!isset($row['productID'])) return null; // if can't find product
 		// $row['settings'] = json_decode($row['settings']);
@@ -187,11 +187,14 @@ class Cart extends NG {
 	public function con() {
 		$data = $this->getPostData();
 
-		$item = $this->getItemByID( $data->itemID );
-		$options = $this->getProductQuestions( $item['productID'] );
+		$item = $this->getItemByID( $data->itemID ); // get item + cost information
+		$options = $this->getProductFields( $item['productID'] ); // get fields for a product
+		if ($options == -1) {
+			header('HTTP/ 409 Conflict');
+			return $this->db->errorInfo();
+		}
 
-		$item = is_null( $item ) ? array( 'name'=>'Not Found' ) : $item ;
-
+		$item = is_null( $item ) ? array( 'name'=>'Not Found' ) : $item ; // account for empty case
 		return array(
 			'item' => $item,
 			'fields' => $options
@@ -199,15 +202,12 @@ class Cart extends NG {
 
 	}
 	// Helper: return question's options
-	private function getProductQuestions( $productID ) {
+	private function getProductFields( $productID ) {
 		$STH = $this->db->prepare("SELECT f.* FROM `tie_product_field` t JOIN `field` f ON f.fieldID = t.fieldID WHERE productID=? ORDER BY `order`;");
-		if (!$STH->execute( $productID )) return -1;
+		if (!$STH->execute( $productID )) return -1; // on error
 
-		// Decode those settings!
-		$retData = $STH->fetchAll(PDO::FETCH_ASSOC);
-		foreach ($retData as &$item) {
-			$item['settings'] = json_decode($item['settings']);
-		}
+		$retData = $STH->fetchAll(PDO::FETCH_ASSOC);// Decode those settings!
+		foreach ($retData as &$item) $item['settings'] = json_decode($item['settings']);
 		return $retData;
 	}
 

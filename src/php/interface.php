@@ -67,6 +67,12 @@ if ( $_REQUEST['c'] == 'cart' ) {
 			break;
 		default: $pass = false;
 	}
+} elseif ( $_REQUEST['c'] == 'app') {
+	$obj = new NG();
+	switch ($_REQUEST['a']) {
+		case 'prettyCrumb': $data = $obj->prettyCrumb(); break;
+		default: $pass = false;
+	}
 } else {
 	$pass = false;
 }
