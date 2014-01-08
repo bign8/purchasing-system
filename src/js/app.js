@@ -51,8 +51,9 @@ config(['$routeProvider', 'securityAuthorizationProvider', '$locationProvider', 
 			controller: 'RegisterConFormCtrl',
 			resolve: {
 				conference: function(interface, $route) {
-					return interface.cart('con', $route.current.params);
-				}
+					return interface.cart('getOptions', $route.current.params);
+				},
+				user: securityAuthorizationProvider.requireAuthenticatedUser
 			}
 		}).
 

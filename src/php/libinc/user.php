@@ -1,7 +1,5 @@
 <?php
 
-// require_once('main_include.php');
-
 class User extends NG {
 
 	// Constructor: Initialize session and db connections
@@ -101,6 +99,7 @@ class User extends NG {
 
 	// New/tested functions
 
+	// Worker: list all firms in db
 	public function listFirms() {
 		$STH = $this->db->query("SELECT f.firmID, f.name, f.website, a.* FROM `firm` f JOIN `address` a ON f.addressID=a.addressID;");
 		$ret = $STH->fetchAll( PDO::FETCH_ASSOC );
@@ -116,39 +115,61 @@ class User extends NG {
 			);
 			unset($value['addressID'], $value['addrName'], $value['addr1'], $value['addr2'], $value['city'], $value['state'], $value['zip']);
 		}
-
 		return $ret;
 	}
 
-	// Un-tested functions
+	// Worker(app/checkout): return firms employees
+	public function getFirmEmploy() {
+		$user = $this->requiresAuth();
+
+		$STH = $this->db->prepare("SELECT c.contactID, c.firmID, c.legalName, c.preName, c.title, c.email, c.phone, a.* FROM (SELECT * FROM `contact` WHERE `firmID`=?) c LEFT JOIN `address` a ON c.addressID=a.addressID;");
+		if (!$STH->execute( $user['firmID'] )) {
+			header('HTTP/ 409 Conflict');
+			return $this->db->errorInfo();
+		}
+		return $STH->fetchAll(PDO::FETCH_ASSOC);
+	}
+
+	// Worker(app/checkout): return firms address
+	public function getFirmAddr() {
+		$user = $this->requiresAuth();
+
+		$STH = $this->db->prepare("SELECT a.* FROM `firm` f JOIN `address` a ON f.addressID=a.addressID WHERE f.firmID=?;");
+		if (!$STH->execute( $user['firmID'] )) {
+			header('HTTP/ 409 Conflict');
+			return $this->db->errorInfo();
+		}
+		return $STH->fetch(PDO::FETCH_ASSOC);
+	}
 
 	// Worker(app/checkout): add contact to system
 	public function addContact() {
-		$user = $this->requiresAuth();
+		$this->requiresAuth();
 		$data = $this->getPostData();
 
 		$STH = $this->db->prepare("INSERT INTO `contact` (firmID, addressID, legalName, preName, title, email, phone) VALUES (?,?,?,?,?,?,?);");
 		if (!$STH->execute( $user['firmID'], $data->addr->addressID, $data->legalName, $data->preName, $data->title, $data->email, $data->phone )) {
 			header('HTTP/ 409 Conflict');
-			return print_r($STH->errorInfo(), true);
+			return $this->db->errorInfo();
 		}
-
 		return $this->db->lastInsertId();
 	}
 
 	// Worker(app/checkout): add contact to system
 	public function editContact() {
-		$user = $this->requiresAuth();
+		$this->requiresAuth();
 		$data = $this->getPostData();
 
 		$STH = $this->db->prepare("UPDATE `contact` SET addressID=?, legalName=?, preName=?, title=?, email=?, phone=? WHERE contactID=?;");
 		if (!$STH->execute( $data->addr->addressID, $data->legalName, $data->preName, $data->title, $data->email, $data->phone, $data->contactID )) {
 			header('HTTP/ 409 Conflict');
-			return print_r($STH->errorInfo(), true);
+			return $this->db->errorInfo();
 		}
-
 		return $data->contactID;
 	}
+
+
+	// Un-tested functions
 
 	// Worker(app/user): add an address to the database
 	public function addAddress() {
@@ -209,32 +230,6 @@ class User extends NG {
 		session_start();
 		$_SESSION['user'] = $this->getUser( $data );
 		return $this->db->lastInsertId();
-	}
-
-	// Worker(app/checkout): return firms address
-	public function getFirmAddr() {
-		$user = $this->requiresAuth();
-
-		$STH = $this->db->prepare("SELECT a.* FROM `firm` f JOIN `address` a ON f.addressID=a.addressID WHERE f.firmID=?;");
-		$STH->execute( $user['firmID'] );
-
-		return json_encode( $STH->fetch(PDO::FETCH_ASSOC) );
-	}
-
-	// Worker(app/checkout): return firms employees
-	public function getFirmEmploy() {
-		$user = $this->requiresAuth();
-
-		$STH = $this->db->prepare("SELECT * FROM `contact` WHERE `firmID`=?;");
-		$STH->execute( $user['firmID'] );
-
-		// Clear sensitive data
-		$retData = $STH->fetchAll(PDO::FETCH_ASSOC);
-		foreach ($retData as &$item) {
-			unset( $item['pass'], $item['resetHash'], $item['resetExpires'], $item['isAdmin'], $item['lastLogin'] );
-		}
-		return json_encode($retData);
-		// return json_encode( $STH->fetchAll(PDO::FETCH_ASSOC) );
 	}
 
 }

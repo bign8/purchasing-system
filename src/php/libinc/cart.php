@@ -8,9 +8,12 @@ class Cart extends NG {
 	function __construct() {
 		parent::__construct();
 
-		if ( !isset($_SESSION['cart']) ) $_SESSION['cart'] = array(); // assign empty user if applicable
+		if ( !isset($_SESSION['cart']) ) $_SESSION['cart'] = array(); // assign empty cart if applicable
+		if ( !isset($_SESSION['cart.options']) ) $_SESSION['cart.options'] = array(); // assign empty cart.options if applicable
 		$this->usr = new User();
 	}
+
+	// CART ACTIONS
 
 	// Worker(app): return cart with current prices
 	public function get() {
@@ -64,8 +67,7 @@ class Cart extends NG {
 
 		return $retData;
 	}
-	// Helper(get): return specific item detail by id
-	private function getItemByID( $itemID ) {
+	private function getItemByID( $itemID ) { // Helper(get): return specific item detail by id
 		$itemSTH = $this->db->prepare("SELECT i.*, t.template FROM (SELECT * FROM `item` WHERE itemID = ?) i JOIN product p ON p.productID=i.productID JOIN template t ON t.templateID = p.templateID;");
 		// $itemSTH = $this->db->prepare("SELECT i.*, t.template, COUNT(f.tiePFID) as `options` FROM (SELECT * FROM `item` WHERE itemID = ?) i JOIN product p ON p.productID=i.productID JOIN template t ON t.templateID = p.templateID LEFT JOIN `tie_product_field` f ON f.productID = i.productID GROUP BY i.itemID, i.productID, i.name, i.description, i.settings, i.img, i.blurb, t.template;");
 		// $itemSTH = $this->db->prepare("SELECT * FROM `item` WHERE itemID = ?;");
@@ -77,8 +79,7 @@ class Cart extends NG {
 		$row['cost'] = $this->getProductCost( $row['productID'] );
 		return $row;
 	}
-	// Helper(get): return cost for a productID
-	private function getProductCost( $productID ) {
+	private function getProductCost( $productID ) { // Helper(get): return cost for a productID
 		$user = $this->usr->getCurrentUser();
 
 		// pull groups based on firmID if user is assigned
@@ -180,35 +181,42 @@ class Cart extends NG {
 	// Worker: clear cart
 	public function clr() {
 		$_SESSION['cart'] = array();
+		$_SESSION['cart.options'] = array();
 	}
 
+	// CART.OPTIONS ACTIONS
 
 	// Worker: return conference options
-	public function con() {
+	public function getOptions() {
 		$data = $this->getPostData();
 
 		$item = $this->getItemByID( $data->itemID ); // get item + cost information
-		$options = $this->getProductFields( $item['productID'] ); // get fields for a product
-		if ($options == -1) {
+		$fields = $this->getProductFields( $item['productID'] ); // get fields for a product
+		if ($fields == -1) {
 			header('HTTP/ 409 Conflict');
 			return $this->db->errorInfo();
 		}
 
 		$item = is_null( $item ) ? array( 'name'=>'Not Found' ) : $item ; // account for empty case
+		$options = isset($_SESSION['cart.options'][$data->itemID]) ? $_SESSION['cart.options'][$data->itemID] : new stdClass(/*empty obj*/) ;
 		return array(
 			'item' => $item,
-			'fields' => $options
+			'fields' => $fields,
+			'options' => $options
 		);
-
 	}
-	// Helper: return question's options
-	private function getProductFields( $productID ) {
+	private function getProductFields( $productID ) { // Helper: return question's options
 		$STH = $this->db->prepare("SELECT f.* FROM `tie_product_field` t JOIN `field` f ON f.fieldID = t.fieldID WHERE productID=? ORDER BY `order`;");
 		if (!$STH->execute( $productID )) return -1; // on error
 
-		$retData = $STH->fetchAll(PDO::FETCH_ASSOC);// Decode those settings!
-		foreach ($retData as &$item) $item['settings'] = json_decode($item['settings']);
+		$retData = $STH->fetchAll(PDO::FETCH_ASSOC);
+		foreach ($retData as &$item) { $item['settings'] = json_decode($item['settings']); } // Decode those settings!
 		return $retData;
+	}
+
+	// Worker: save cart options
+	public function saveOptions() {
+		// blah blah blah
 	}
 
 	// UNTESTED FUNCTIONS

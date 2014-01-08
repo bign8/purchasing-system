@@ -69,7 +69,7 @@
 					<span class="divider">/</span>  
 					<ng-switch on="$last">
 						<span ng-switch-when="true">{{breadcrumb.name}}</span>
-						<span ng-switch-default><a href="{{breadcrumb.path}}">{{breadcrumb.name}}</a></span>
+						<span ng-switch-default><a ng-href="{{breadcrumb.path}}">{{breadcrumb.name}}</a></span>
 					</ng-switch>
 				</li>
 			</ul>
