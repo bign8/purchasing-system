@@ -53,3 +53,6 @@ Used partials:
 - custom-payment-form.tpl.html
 - register-form.tpl.html
 - modal-address.tpl.html
+
+Not used partials:
+- modal-options.tpl.html

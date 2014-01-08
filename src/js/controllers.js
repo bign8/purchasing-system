@@ -11,6 +11,16 @@ controller('IndexCtrl', ['$scope', 'myPage', 'theCart', 'security', function ($s
 	$scope.theCart = theCart;
 }]).
 
+controller('RegisterConFormCtrl', ['$scope', 'myPage', 'interface', 'conference', function ($scope, myPage, interface, conference) {
+	$scope.con = conference.data;
+	var title = ($scope.con.item.template == 'conference') ? "Register" : "Options" ;
+	myPage.setTitle(title, "for " + $scope.con.item.name);
+
+	$scope.noFields = ($scope.con.fields.length === 0); // ensure item has quesitions
+	
+
+}]).
+
 // controller('ListProdCtrl', ['$scope', 'myPage', 'prodList', function ($scope, myPage, prodList) {
 // 	myPage.setTitle("Our Products", "Some quote about products");
 
