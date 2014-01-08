@@ -105,8 +105,15 @@ controller('ContactModalCtrl', ['$scope', '$modalInstance', 'contact', 'firmAddr
 	});
 
 	$scope.toggle = function () { $scope.addNew = !$scope.addNew; }; // changes view
-	$scope.choose = function (user) { $modalInstance.close(user); }; // chooses a specific user
 	$scope.cancel = function () { $modalInstance.dismiss('cancel'); }; // closes the dialog
+	$scope.edit = function (user) {
+		$scope.contact = user;
+		$scope.addNew = true;
+	};
+	$scope.choose = function (user, $event) { // chooses a specific user
+		$event.preventDefault();
+		$modalInstance.close(user);
+	};
 	$scope.ok = function ( invalid ) {
 		if (invalid) return alert('Form is not valid\nPlease try again.');
 		if ($scope.contact.addr.addrID === null) return alert('Please assign an address');
