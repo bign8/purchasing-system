@@ -64,7 +64,6 @@ class Cart extends NG {
 
 		return $retData;
 	}
-
 	// Helper(get): return specific item detail by id
 	private function getItemByID( $itemID ) {
 		$itemSTH = $this->db->prepare("SELECT i.*, t.template FROM (SELECT * FROM `item` WHERE itemID = ?) i JOIN product p ON p.productID=i.productID JOIN template t ON t.templateID = p.templateID;");
@@ -78,7 +77,6 @@ class Cart extends NG {
 		$row['cost'] = $this->getProductCost( $row['productID'] );
 		return $row;
 	}
-
 	// Helper(get): return cost for a productID
 	private function getProductCost( $productID ) {
 		$user = $this->usr->getCurrentUser();
@@ -90,7 +88,8 @@ class Cart extends NG {
 			$groupSTH->execute( $user['firmID'] );
 			$groups = $groupSTH->fetchAll( PDO::FETCH_COLUMN );
 		}
-		if (isset($this->groupCashe)) $groups = array_merge($groups, $this->groupCashe, array(0)); // add groups that are in cart
+		$groups = array_merge($groups, array(0)); // ensure not empty
+		if (isset($this->groupCashe)) $groups = array_merge($groups, $this->groupCashe); // add groups that are in cart
 		
 		// pull prices that match productID and group criteria
 		$questionMarks = trim(str_repeat("?,", sizeof($groups)),","); // build string of questionmarks based on sizeof($groups)
@@ -183,26 +182,36 @@ class Cart extends NG {
 		$_SESSION['cart'] = array();
 	}
 
-	// UNTESTED FUNCTIONS
 
-
-	// Worker(app/checkout): return question's options
-	public function getItemOptions() {
+	// Worker: return conference options
+	public function con() {
 		$data = $this->getPostData();
 
+		$item = $this->getItemByID( $data->itemID );
+		$options = $this->getProductQuestions( $item['productID'] );
+
+		$item = is_null( $item ) ? array( 'name'=>'Not Found' ) : $item ;
+
+		return array(
+			'item' => $item,
+			'fields' => $options
+		);
+
+	}
+	// Helper: return question's options
+	private function getProductQuestions( $productID ) {
 		$STH = $this->db->prepare("SELECT f.* FROM `tie_product_field` t JOIN `field` f ON f.fieldID = t.fieldID WHERE productID=? ORDER BY `order`;");
-		if (!$STH->execute( $data->productID )) {
-			header('HTTP/ 409 Conflict');
-			return print_r($STH->errorInfo(), true);
-		}
+		if (!$STH->execute( $productID )) return -1;
 
 		// Decode those settings!
 		$retData = $STH->fetchAll(PDO::FETCH_ASSOC);
 		foreach ($retData as &$item) {
 			$item['settings'] = json_decode($item['settings']);
 		}
-		return json_encode($retData);
+		return $retData;
 	}
+
+	// UNTESTED FUNCTIONS
 
 	// Worker(app/checkout): save cart
 	public function saveCart() {

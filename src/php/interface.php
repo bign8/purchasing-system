@@ -22,10 +22,13 @@ $data = array(); // return json data array
 if ( $_REQUEST['c'] == 'cart' ) {
 	$obj = new Cart();
 	switch ($_REQUEST['a']) {
-		case 'get': $data = $obj->get(); break;
-		case 'rem': $data = $obj->rem(); break;
-		case 'add': $data = $obj->add(); break;
-		case 'clr': $data = $obj->clr(); break;
+		case 'get': $data = $obj->get(); break; // get entire cart
+		case 'rem': $data = $obj->rem(); break; // remove item from cart
+		case 'add': $data = $obj->add(); break; // add invoice to cart
+		case 'clr': $data = $obj->clr(); break; // clear cart
+
+		case 'con': $data = $obj->con(); break; // get conference form data
+
 		// case 'getDiscount': $data = $obj->getDiscount(); break;
 		// case 'getItem': $data = $obj->getItem(); break;
 		// case 'getItemOptions': $data = $obj->getItemOptions(); break;

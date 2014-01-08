@@ -1,0 +1,40 @@
+<div class="row" ng-switch="noFields">
+
+	<div class="offset2 span8 well" ng-switch-when="true">
+		<h2>{{con.item.name}} has no options.</h2>
+		<p>Please <a href="http://upstreamacademy.com/">continue shopping</a> or <a href="#/">checkout</a>.</p>
+	</div>
+
+	<div class="offset0 span12" ng-switch-when="false">
+
+		<form class="form-horizontal css-form" name="optionsForm">
+			<div class="control-group" ng-repeat="field in con.fields">
+
+				<div ng-show="field.type=='attendees'">
+					<label class="control-label" for="legalName">{{field.name}}</label>
+					<div class="controls">
+						<button type="button" class="btn btn-success" ng-click="attendees(field)">
+							Assign 
+							<span class="badge">{{opt.attendees.length}}</span>
+						</button>
+						<span ng-repeat="person in opt.attendees">
+							{{person.legalName}}<span ng-hide="$last">, </span>
+						</span>
+						<input type="hidden" id="test" ng-model="opt['+' + field.name]" required>
+					</div>
+				</div>
+
+				<div ng-show="field.type=='text'">
+					<label class="control-label" for="legalName">{{field.name}}</label>
+					<div class="controls">
+						<input type="text" id="legalName" ng-model="opt['+' + field.name]" placeholder="{{field.name}}" required>
+					</div>
+				</div>
+
+			</div>
+		</form>
+
+
+		<pre>{{con | json}}</pre>
+	</div>
+</div>

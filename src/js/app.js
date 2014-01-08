@@ -10,7 +10,9 @@ angular.module('myApp', [
 	'templates-main' // for html2js
 ]).
 
-config(['$routeProvider', 'securityAuthorizationProvider', function( $routeProvider, securityAuthorizationProvider ){
+config(['$routeProvider', 'securityAuthorizationProvider', '$locationProvider', function( $routeProvider, securityAuthorizationProvider, $locationProvider ){
+	$locationProvider.html5Mode(true);//.hashPrefix('!');
+
 	$routeProvider.
 
 		// Working Pages
@@ -20,6 +22,7 @@ config(['$routeProvider', 'securityAuthorizationProvider', function( $routeProvi
 			controller: 'CustPayFormCtrl'
 		}).
 
+		// pull firm addresses? wierd error if website typed before name
 		when('/register', {
 			templateUrl: 'partials/register-form.tpl.html',
 			controller: 'RegisterFormCtrl',
@@ -43,15 +46,15 @@ config(['$routeProvider', 'securityAuthorizationProvider', function( $routeProvi
 
 		// In-progress Pages
 
-		// when('/register/:itemID', {
-		// 	templateUrl: 'partials/register-conf.tpl.html',
-		// 	controller: 'RegisterConFormCtrl',
-		// 	resolve: {
-		// 		questions: function(interface, $route) {
-		// 			return interface.cart('con', $route.current.params);
-		// 		}
-		// 	}
-		// }).
+		when('/register/:itemID', {
+			templateUrl: 'partials/register-conf.tpl.html',
+			controller: 'RegisterConFormCtrl',
+			resolve: {
+				conference: function(interface, $route) {
+					return interface.cart('con', $route.current.params);
+				}
+			}
+		}).
 
 		// Staged pages
 
