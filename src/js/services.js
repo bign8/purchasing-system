@@ -56,7 +56,7 @@ factory('breadcrumbs', ['$rootScope', '$location', 'interface', function ($rootS
 			for (i=0; i<pathElements.length; i++) {
 				var obj = {
 					name: ucfirst(pathElements[i]),
-					path: '#' + breadcrumbPath(i),
+					path: breadcrumbPath(i),
 					index: i, // used for prettyCrumb
 				};
 				// if (!isNaN(parseInt(obj.name))) obj.name = prettyCrumb(obj); // make that ugly (numeric) crumb pretty
