@@ -70,19 +70,27 @@
 	</form>
 
 	<div ng-hide="addNew">
+		<p>Choose a contact to add to this conferenct or click "Add Employee" below to create a new contact. <span class="muted">Click a row to modify user information</span></p>
 		<table class="table table-striped table-hover">
 			<thead>
 				<tr>
-					<th>Name</th>
-					<th>Phone</th>
+					<th>Personal Info</th>
+					<th>Address</th>
 				</tr>
 			</thead>
 			<tbody>
-				<tr ng-repeat="employ in firmEmploy">
-					<td>{{employ.legalName}}</td>
+				<tr ng-repeat="person in firmEmploy" ng-click="edit(person)">
 					<td>
-						{{employ.phone}}
-						<button class="btn btn-primary btn-mini pull-right" ng-click="choose(employ)">Choose</button>
+						{{person.title}} {{person.legalName}}<br/>
+						<a ng-href="mailto:{{person.email}}">{{person.email}}</a><br/>
+						{{person.phone}}
+					</td>
+					<td>
+						{{person.addr.addrName}}<br/>
+						{{person.addr.addr1}}<br/>
+						<span ng-show="person.addr2">{{person.addr.addr2}}<br/></span>
+						{{person.addr.city}} {{person.addr.state}}, {{person.addr.zip}}
+						<button class="btn btn-primary btn-mini pull-right" ng-click="choose(person, $event)">choose</button>
 					</td>
 				</tr>
 			</tbody>
