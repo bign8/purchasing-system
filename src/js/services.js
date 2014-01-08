@@ -30,18 +30,19 @@ factory('breadcrumbs', ['$rootScope', '$location', 'interface', function ($rootS
 			return '/' + (pathElements.slice(0, index + 1)).join('/');
 		};
 
-		// // pretty crumb cash and calling function
-		// function prettyCrumb(obj) {
-		// 	if (crumbCashe.hasOwnProperty(obj.path)) { // in in cashe
-		// 		obj.name = crumbCashe[obj.path];
-		// 	} else { // otherwise
-		// 		interface.call('prettyCrumb', obj).then(function(res) {
-		// 			crumbCashe[obj.path] = res.data; // assign cashe
-		// 			breadcrumbs[obj.index].name = res.data; // assign value out
-		// 		});
-		// 	}
-		// 	return ucfirst(obj.name);
-		// }
+		// pretty crumb cash and calling function
+		function prettyCrumb(obj) {
+			if (crumbCashe.hasOwnProperty(obj.path)) { // in in cashe
+				obj.name = crumbCashe[obj.path];
+			} else { // otherwise
+				interface.app('prettyCrumb', obj).then(function (res) {
+					var label = JSON.parse(res.data);
+					crumbCashe[obj.path] = label; // assign cashe
+					breadcrumbs[obj.index].name = label; // assign value out
+				});
+			}
+			return ucfirst(obj.name);
+		}
 
 		// Pretty path elements (thanks http://phpjs.org/functions/ucfirst/)
 		function ucfirst (str) {
@@ -59,7 +60,7 @@ factory('breadcrumbs', ['$rootScope', '$location', 'interface', function ($rootS
 					path: breadcrumbPath(i),
 					index: i, // used for prettyCrumb
 				};
-				// if (!isNaN(parseInt(obj.name))) obj.name = prettyCrumb(obj); // make that ugly (numeric) crumb pretty
+				if (!isNaN(parseInt(obj.name))) obj.name = prettyCrumb(obj); // make that ugly (numeric) crumb pretty
 				result.push(obj);
 			}
 		}
@@ -372,6 +373,9 @@ factory('interface', ['$http', function ($http) {
 		},
 		cart: function(myAction, myData) {
 			return $http.post('/interface.php', myData, {params:{a: myAction, c: 'cart'}});
+		},
+		app: function(myAction, myData) {
+			return $http.post('/interface.php', myData, {params:{a: myAction, c: 'app'}});
 		}
 	};
 }]);

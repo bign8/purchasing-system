@@ -30,23 +30,19 @@ class NG {
 		return strtr($message, $replace); // interpolate replacement values into the message
 	}
 
-	// // Worker(app/breadcrumb): return full name for breadcrumb
-	// public function prettyCrumb() {
-	// 	$data = $this->getPostData();
+	// Worker(app/breadcrumb): return full name for breadcrumb
+	public function prettyCrumb() {
+		$data = $this->getPostData();
 
-	// 	$ret = ucfirst($data->name);
+		$ret = ucfirst($data->name);
 
-	// 	// Pretty print product area
-	// 	if ( preg_match('/#\/products\/.*/', $data->path) && $data->index > 0 && $data->index < 3 ) {
-	// 		if ( $data->index == 1 ) {
-	// 			$STH = $this->db->prepare("SELECT `name` FROM `product` WHERE `productID`=?;");
-	// 		} else { // has to be 2
-	// 			$STH = $this->db->prepare("SELECT `name` FROM `item` WHERE `itemID`=?;");
-	// 		}
-	// 		$STH->execute( $data->name );
-	// 		$ret = $STH->fetchColumn();
-	// 	}
+		// Pretty print product area
+		if ( preg_match('/\/register\/.*/', $data->path) && $data->index == 1 ) {
+			$STH = $this->db->prepare("SELECT `name` FROM `item` WHERE `itemID`=?;");
+			$STH->execute( $data->name );
+			$ret = $STH->fetchColumn();
+		}
 
-	// 	return $ret;
-	// }
+		return $ret;
+	}
 }
