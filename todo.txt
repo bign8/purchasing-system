@@ -9,6 +9,7 @@ ToDo:
 - migrate logic to a rest type structure
 - re-design based on proposed user interaction tree
 - store referrer for redirects back to site
+- notify of empty cart on home page
 
 - register user / select firm from list of firms
 - register user / select address for a list of firm addresses
