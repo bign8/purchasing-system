@@ -2,23 +2,23 @@ angular.module('myApp.services', [
 
 ]).
 
-factory('myPage', function( ){
-	var pageTitle = "Upstream Academy Shop";
+factory('myPage', ['$rootScope', function( $rootScope ){
+	$rootScope.pageTitle = "Upstream Academy Shop"; // for actual title - https://coderwall.com/p/vcfo4q
 	var subTitle = "";
 
 	return {
 		setTitle: function( newTitle, newSubTitle ){
-			pageTitle = newTitle;
+			$rootScope.pageTitle = newTitle;
 			subTitle = newSubTitle;
 		},
 		getTitle: function() {
-			return pageTitle;
+			return $rootScope.pageTitle;
 		},
 		getSubTitle: function() {
 			return subTitle;
 		}
 	};
-}).
+}]).
 
 factory('breadcrumbs', ['$rootScope', '$location', 'interface', function ($rootScope, $location, interface) {
 	var breadcrumbs = [];
