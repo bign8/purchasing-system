@@ -16,12 +16,15 @@ $data = array(); // return json data array
 if ( $_REQUEST['c'] == 'cart' ) {
 	$obj = new Cart();
 	switch ($_REQUEST['a']) {
+		// Cart Functions
 		case 'get': $data = $obj->get(); break; // get entire cart
 		case 'rem': $data = $obj->rem(); break; // remove item from cart
 		case 'add': $data = $obj->add(); break; // add invoice to cart
 		case 'clr': $data = $obj->clr(); break; // clear cart
 
+		// Cart.Options Functions
 		case 'getOptions': $data = $obj->getOptions(); break; // get conference form data
+		case 'setOptions': $data = $obj->setOptions(); break; // get conference form data
 
 		// case 'saveCart': $data = $obj->saveCart(); break;
 		// case 'getPurchases': $data = $obj->getPurchases(); break;

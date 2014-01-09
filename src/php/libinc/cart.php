@@ -154,7 +154,7 @@ class Cart extends NG {
 		if ($data->itemID == -1) { // wierd thing to make custom payments work
 			$data->cost = $data->cost->settings->cost; // clean cost
 
-			$_SESSION['cart'] = array_udiff($_SESSION['cart'], array( get_object_vars($data) ), function($a, $b) {
+			$_SESSION['cart'] = array_udiff($_SESSION['cart'], array( $this->object_to_array($data) ), function($a, $b) {
 				$tempA = json_encode($a);
 				$tempB = json_encode($b);
 				if ($tempA == $tempB) { return 0; } elseif ($tempA < $tempB) { return -1; } else { return 1; }
@@ -168,7 +168,7 @@ class Cart extends NG {
 
 	// Worker: add invoice to cart
 	public function add() {
-		$data = get_object_vars( $this->getPostData() );
+		$data = $this->object_to_array( $this->getPostData() );
 		$pass = false;
 
 		if (false===array_search($data, $_SESSION['cart'])) {
@@ -206,7 +206,7 @@ class Cart extends NG {
 		);
 	}
 	private function getProductFields( $productID ) { // Helper: return question's options
-		$STH = $this->db->prepare("SELECT f.* FROM `tie_product_field` t JOIN `field` f ON f.fieldID = t.fieldID WHERE productID=? ORDER BY `order`;");
+		$STH = $this->db->prepare("SELECT f.*, t.required FROM `tie_product_field` t JOIN `field` f ON f.fieldID = t.fieldID WHERE productID=? ORDER BY `order`;");
 		if (!$STH->execute( $productID )) return -1; // on error
 
 		$retData = $STH->fetchAll(PDO::FETCH_ASSOC);
@@ -214,9 +214,10 @@ class Cart extends NG {
 		return $retData;
 	}
 
-	// Worker: save cart options
-	public function saveOptions() {
-		// blah blah blah
+	// Worker: set cart options
+	public function setOptions() {
+		$data = $this->getPostData();
+		$_SESSION['cart.options'][ $data->item->itemID ] = $this->object_to_array( $data->options );
 	}
 
 	// UNTESTED FUNCTIONS

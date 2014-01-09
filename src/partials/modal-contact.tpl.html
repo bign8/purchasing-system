@@ -81,14 +81,15 @@
 			<tbody>
 				<tr ng-repeat="person in firmEmploy" ng-click="edit(person)">
 					<td>
-						{{person.title}} {{person.legalName}}<br/>
+						<span ng-show="person.title">{{person.title}}<br/></span>
+						{{person.legalName}}<br/>
 						<a ng-href="mailto:{{person.email}}">{{person.email}}</a><br/>
 						{{person.phone}}
 					</td>
 					<td>
 						{{person.addr.addrName}}<br/>
 						{{person.addr.addr1}}<br/>
-						<span ng-show="person.addr2">{{person.addr.addr2}}<br/></span>
+						<span ng-show="person.addr.addr2">{{person.addr.addr2}}<br/></span>
 						{{person.addr.city}} {{person.addr.state}}, {{person.addr.zip}}
 						<button class="btn btn-primary btn-mini pull-right" ng-click="choose(person, $event)">choose</button>
 					</td>
