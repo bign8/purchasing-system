@@ -16,7 +16,7 @@ module.exports = function(grunt) {
 			},
 			release: {
 				files: {
-					'<%= activeDir %>/<%= pkg.name %>.js': ['src/**/*.js']
+					'<%= activeDir %>/js.js': ['src/**/*.js']
 				},
 			},
 			// vendor: {
@@ -33,7 +33,7 @@ module.exports = function(grunt) {
 					banner: "<%= banner %>"
 				},
 				files: {
-					'<%= activeDir %>/<%= pkg.name %>.js': ['src/**/*.js']
+					'<%= activeDir %>/js.js': ['src/**/*.js']
 				}
 			},
 			index: {
@@ -160,7 +160,7 @@ module.exports = function(grunt) {
 		html2js: {
 			main: {
 				src: 'src/**/*.tpl.html',
-				dest: '<%= activeDir %>/<%= pkg.name %>-tpl.js'
+				dest: '<%= activeDir %>/js-tpl.js'
 			}
 		}
 	});

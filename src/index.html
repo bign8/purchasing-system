@@ -2,9 +2,10 @@
 <html lang="en" ng-app="myApp">
 <head>
 	<meta charset="utf-8">
-	<title ng-bind="'<%= grunt.config.get('pkg.name') %> &mdash; ' + $root.pageTitle"><%= grunt.config.get('pkg.name') %></title>
+	<title ng-bind="'UA Payment &mdash; ' + $root.pageTitle">UA Payment</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link type="text/plain" rel="author" href="/humans.txt" />
+	<link href="/favicon.ico" rel="icon" type="image/x-icon" />
 
 	<!-- Bootstrap -->
 	<script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
@@ -23,17 +24,17 @@
 	<!-- // <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js"></script> -->
 
 	<!-- app -->
-	<script src="/<%= grunt.config.get('pkg.name') %>-tpl.js"></script>
-	<script src="/<%= grunt.config.get('pkg.name') %>.js"></script>
-	<link rel="stylesheet" type="text/css" href="/css.css">
+	<script src="/js-tpl.js"></script>
+	<script src="/js.js"></script>
+	<link rel="stylesheet" href="/css.css">
 </head>
 <body>
 	<div class="container">
 		<div class="header" ng-controller="HeadCtrl">
-			<div class="pull-right"><a href="/cart">Cart <span class="badge">{{theCart.len()}}</span></a></div>
+			<div class="pull-right"><a href="/cart">Cart <span class="badge" ng-bind="theCart.len()"></span></a></div>
 
 			<div class="page-header">
-				<h1>{{myPage.getTitle()}} <small>{{myPage.getSubTitle()}}</small></h1>
+				<h1 ng-bind-html="myPage.getHTML()">UA Payment</h1>
 			</div>
 
 			<div class="navbar" role="navigation">
@@ -68,8 +69,8 @@
 				<li ng-repeat="breadcrumb in breadcrumbs.getAll()">
 					<span class="divider">/</span>  
 					<ng-switch on="$last">
-						<span ng-switch-when="true">{{breadcrumb.name}}</span>
-						<span ng-switch-default><a ng-href="{{breadcrumb.path}}">{{breadcrumb.name}}</a></span>
+						<span ng-switch-when="true" ng-bind="breadcrumb.name"></span>
+						<span ng-switch-default><a ng-href="{{breadcrumb.path}}" ng-bind="breadcrumb.name"></a></span>
 					</ng-switch>
 				</li>
 			</ul>
