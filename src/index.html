@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" ng-app="myApp">
 <head>
 	<meta charset="utf-8">
-	<title><%= grunt.config.get('pkg.name') %></title>
+	<title ng-bind="'<%= grunt.config.get('pkg.name') %> &mdash; ' + $root.pageTitle"><%= grunt.config.get('pkg.name') %></title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link type="text/plain" rel="author" href="//<?php echo $_SERVER['SERVER_NAME']; ?>/humans.txt" />
+	<link type="text/plain" rel="author" href="/humans.txt" />
 
 	<!-- Bootstrap -->
 	<script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
@@ -28,7 +28,7 @@
 	<link rel="stylesheet" type="text/css" href="/css.css">
 </head>
 <body>
-	<div ng-app="myApp" class="container">
+	<div class="container">
 		<div class="header" ng-controller="HeadCtrl">
 			<div class="pull-right"><a href="/cart">Cart <span class="badge">{{theCart.len()}}</span></a></div>
 
