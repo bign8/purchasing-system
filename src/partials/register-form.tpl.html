@@ -48,7 +48,7 @@
 				<div class="control-group">
 					<label class="control-label" for="firmName">Firm Address</label>
 					<div class="controls">
-						<div class="input-append" ng-switch="user.firm.addr.addrID">
+						<div class="input-append" ng-switch="user.firm.addr.addressID">
 
 							<div ng-switch-when="undefined">
 								<span class="input-medium uneditable-input">Click 'set' to assign</span>
@@ -113,7 +113,7 @@
 			<div class="control-group">
 				<label class="control-label">Address</label>
 				<div class="controls">
-					<div class="input-append" ng-switch="user.addr.addrID">
+					<div class="input-append" ng-switch="user.addr.addressID">
 
 						<div ng-switch-when="undefined">
 							<span class="input-medium uneditable-input">Click 'set' to assign</span>
@@ -154,4 +154,4 @@
 
 </form>
 
-<pre class="">{{user | json}}</pre>
+<!-- <pre>{{user | json}}</pre> -->

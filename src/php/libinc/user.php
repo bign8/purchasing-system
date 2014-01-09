@@ -68,14 +68,9 @@ class User extends NG {
 		return $_SESSION['user'];
 	}
 
-	// Helper(security) grabs user if available
-	public function getCurrentUser() {
-		return $_SESSION['user'];
-	}
-
 	// Worker(security): returns current user or null
 	public function currentUser() {
-		return array( 'user' => $_SESSION['user'] );
+		return $_SESSION['user'];
 	}
 
 	// Worker(security): grabs authentication from child class
@@ -86,36 +81,32 @@ class User extends NG {
 		if (isset($user)) {
 			$_SESSION['user'] = $user;
 		}
-
 		return $this->currentUser();
 	}
 
 	// Worker(security): destroys a particular session
 	public function logout() {
 		$_SESSION['user'] = NULL;
-		// session_destroy();
 	}
-
-
-	// New/tested functions
 
 	// Worker: list all firms in db
 	public function listFirms() {
 		$STH = $this->db->query("SELECT f.firmID, f.name, f.website, a.* FROM `firm` f JOIN `address` a ON f.addressID=a.addressID;");
 		$ret = $STH->fetchAll( PDO::FETCH_ASSOC );
-		foreach ($ret as &$value) {
-			$value['addr'] = array(
-				'addressID' => $value['addressID'],
-				'addrName' => $value['addrName'],
-				'addr1' => $value['addr1'],
-				'addr2' => $value['addr2'],
-				'city' => $value['city'],
-				'state' => $value['state'],
-				'zip' => $value['zip'],
-			);
-			unset($value['addressID'], $value['addrName'], $value['addr1'], $value['addr2'], $value['city'], $value['state'], $value['zip']);
-		}
+		foreach ($ret as &$value) $this->cleanAddress( $value );
 		return $ret;
+	}
+	private function cleanAddress( &$value ) { // Helper (listFirms + fetFirmEmploy): formats address for app
+		$value['addr'] = array(
+			'addressID' => $value['addressID'],
+			'addrName' => $value['addrName'],
+			'addr1' => $value['addr1'],
+			'addr2' => $value['addr2'],
+			'city' => $value['city'],
+			'state' => $value['state'],
+			'zip' => $value['zip'],
+		);
+		unset($value['addressID'], $value['addrName'], $value['addr1'], $value['addr2'], $value['city'], $value['state'], $value['zip']);
 	}
 
 	// Worker: get data for choosing new attendee
@@ -137,18 +128,7 @@ class User extends NG {
 		$STH = $this->db->prepare("SELECT c.contactID, c.firmID, c.legalName, c.preName, c.title, c.email, c.phone, a.* FROM (SELECT * FROM `contact` WHERE `firmID`=?) c LEFT JOIN `address` a ON c.addressID=a.addressID;");
 		if (!$STH->execute( $firmID )) return -1;
 		$ret = $STH->fetchAll( PDO::FETCH_ASSOC );
-		foreach ($ret as &$value) {
-			$value['addr'] = array(
-				'addressID' => $value['addressID'],
-				'addrName' => $value['addrName'],
-				'addr1' => $value['addr1'],
-				'addr2' => $value['addr2'],
-				'city' => $value['city'],
-				'state' => $value['state'],
-				'zip' => $value['zip'],
-			);
-			unset($value['addressID'], $value['addrName'], $value['addr1'], $value['addr2'], $value['city'], $value['state'], $value['zip']);
-		}
+		foreach ($ret as &$value) $this->cleanAddress( $value );
 		return $ret;
 	}
 	private function getFirmAddr( $firmID ) { // Helper: return firms address
@@ -183,9 +163,7 @@ class User extends NG {
 		return $data->contactID;
 	}
 
-	// Un-tested functions
-
-	// Worker(register + attendee): add an address to the database (att check)
+	// Worker(register + attendee): add an address to the database
 	public function addAddress() {
 		$data = $this->getPostData();
 
@@ -197,7 +175,7 @@ class User extends NG {
 		return $this->db->lastInsertId();
 	}
 
-	// Worker(register + attendee): add an address to the database (att check)
+	// Worker(register + attendee): add an address to the database
 	public function editAddress() {
 		$data = $this->getPostData();
 
@@ -217,7 +195,7 @@ class User extends NG {
 		$checkSTH = $this->db->prepare("SELECT * FROM `contact` WHERE email=?;");
 		if (!$checkSTH->execute($data->email)) {
 			header('HTTP/ 409 Conflict');
-			return print_r($checkSTH->errorInfo(), true);
+			return $this->db->errorInfo();
 		}
 		if ($checkSTH->rowCount() > 0) {
 			header('HTTP/ 409 Conflict');
@@ -226,20 +204,18 @@ class User extends NG {
 
 		// Add firm
 		$firmSTH = $this->db->prepare("INSERT INTO `firm` (addressID, name, website) VALUES (?,?,?);");
-		if (!$firmSTH->execute( $data->firm->addr->addrID, $data->firm->name, $data->firm->website )) {
+		if (!$firmSTH->execute( $data->firm->addr->addressID, $data->firm->name, $data->firm->website )) {
 			header('HTTP/ 409 Conflict');
-			return print_r($firmSTH->errorInfo(), true);
+			return $this->db->errorInfo();
 		}
 		$firmID = $this->db->lastInsertId();
 
 		// Add Contact
 		$contSTH = $this->db->prepare("INSERT INTO `contact` (firmID, addressID, legalName, preName, title, email, phone, pass) VALUES (?,?,?,?,?,?,?,ENCRYPT(?,?));");
-		if (!$contSTH->execute( $firmID, $data->addr->addrID, $data->legalName, $data->preName, $data->title, $data->email, $data->phone, $data->password, config::encryptSTR )) {
+		if (!$contSTH->execute( $firmID, $data->addr->addressID, $data->legalName, $data->preName, $data->title, $data->email, $data->phone, $data->password, config::encryptSTR )) {
 			header('HTTP/ 409 Conflict');
-			return print_r($contSTH->errorInfo(), true);
+			return $this->db->errorInfo();
 		}
-
-		session_start();
 		$_SESSION['user'] = $this->getUser( $data );
 		return $this->db->lastInsertId();
 	}

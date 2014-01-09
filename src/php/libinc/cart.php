@@ -17,7 +17,7 @@ class Cart extends NG {
 
 	// Worker(app): return cart with current prices
 	public function get() {
-		$user = $this->usr->getCurrentUser(); // gets user if available
+		$user = $this->usr->currentUser(); // gets user if available
 
 		$checkSTH = $this->db->prepare("SELECT purchaseID FROM `purchase` WHERE firmID=? and itemID=?;");
 
@@ -80,7 +80,7 @@ class Cart extends NG {
 		return $row;
 	}
 	private function getProductCost( $productID ) { // Helper(get): return cost for a productID
-		$user = $this->usr->getCurrentUser();
+		$user = $this->usr->currentUser();
 
 		// pull groups based on firmID if user is assigned
 		$groups = array();
@@ -175,7 +175,7 @@ class Cart extends NG {
 			array_push($_SESSION['cart'], $data);
 			$pass = ture;
 		}
-		return $pass; // debug
+		return $pass;
 	}
 
 	// Worker: clear cart
@@ -356,20 +356,6 @@ class Cart extends NG {
 		return json_encode($retData);
 	}
 
-	// Worker(app/purchases/all): return purchases (not needing auth)
-	public function getSoftPurchases() {
-		$retData = array();
-
-		$user = $this->getCurrentUser();
-		if (!is_null($user)) {
-			$STH = $this->db->prepare("SELECT itemID FROM `purchase` WHERE firmID=?;");
-			$STH->execute( $user['firmID'] );
-			$retData = $STH->fetchAll( PDO::FETCH_COLUMN );
-		}
-
-		return json_encode($retData);
-	}
-
 	// Worker(app/cart/discount): return discount object
 	public function getDiscount() {
 		$user = $this->requiresAuth();
@@ -403,40 +389,4 @@ class Cart extends NG {
 			'obj'=>$finalSTH->fetch(PDO::FETCH_ASSOC)
 		));
 	}
-
-	// // Worker(app): returns product list
-	// public function getProducts() {
-	// 	$STH = $this->db->query("SELECT * FROM `product` WHERE visible='yes';");
-	// 	return json_encode($STH->fetchAll(PDO::FETCH_ASSOC));
-	// }
-
-	// // Worker(app): returns item list
-	// public function getItems() {
-	// 	$data = $this->getPostData();
-
-	// 	// Get cost for all the items
-	// 	$cost = $this->getProductCost( $data->prodID );
-
-	// 	// Get All the items
-	// 	$itemSTH = $this->db->prepare("SELECT i.*, template FROM (SELECT * FROM `item` WHERE productID=? AND visible='yes') i LEFT JOIN `product` p ON p.productID=i.productID LEFT JOIN `template` t ON p.templateID=t.templateID;");
-	// 	$itemSTH->execute( $data->prodID );
-
-	// 	// Properly pre-format return data
-	// 	$retData = $itemSTH->fetchAll(PDO::FETCH_ASSOC);
-	// 	foreach ($retData as &$item) {
-	// 		$item['settings'] = json_decode($item['settings']);
-	// 		$item['cost'] = $cost;
-	// 	}
-
-	// 	return json_encode($retData);
-	// }
-
-
-	// // Worker(app): return specific item detail
-	// public function getItem() {
-	// 	$data = $this->getPostData();
-	// 	// die(print_r($data, true));
-	// 	return json_encode($this->getItemByID($data->itemID));
-	// }
-
 }
