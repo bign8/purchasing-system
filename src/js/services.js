@@ -125,23 +125,23 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function($rootS
 // 	// 	});
 // 	// }
 
-	function dbCall(fn, item) {
+	var dbCall = function(fn, item) {
 		dirty = true;
 		var promise = interface.cart(fn, item);
 		promise.then(function(res) {
 			reload();
 		});
 		return promise;
-	}
+	};
 
-	function reload() {
+	var reload = function() {
 		var promise = interface.cart('get');
 		promise.then(function(response) {
 			cart = response;
 			dirty = false;
 		});
 		return promise;
-	}
+	};
 
 	return {
 		load: function() {

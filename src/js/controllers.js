@@ -77,6 +77,8 @@ controller('RegisterConFormCtrl', ['$scope', 'myPage', 'interface', 'conference'
 
 	$scope.save = function() {
 		console.log('SAVING');
+		// Perform required checks
+		interface.cart('setOptions', $scope.con);
 	};
 }]).
 

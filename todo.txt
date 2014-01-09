@@ -9,8 +9,9 @@ ToDo:
 - re-design based on proposed user interaction tree
 - store referrer for redirects back to site
 - notify of empty cart on home page
+- pretty crumb use localStorage
+- improve form constraints for register/xx
 
-- register user / select firm from list of firms
 - register user / select address for a list of firm addresses
 
 - GET SAMPLE DATA!
@@ -45,8 +46,7 @@ Future releases
 - assign status to orders (processing, confirmed, etc)
 - download proxy? to ensure files have been purchased? (php script)
 - Previous purchases -> modify attendees to a conference, priced accordingly
-- periodically make calls back to server to check for additions to php cart (wait for test domain)
-- instead of so many dialogs for attendees, just list all employees with checkboxes (only a dialog for new employee)
+- periodically make calls back to server to check for additions to php cart
 
 Used partials:
 - index.tpl.html

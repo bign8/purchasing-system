@@ -5,93 +5,97 @@
 		<p>Please <a href="http://upstreamacademy.com/">continue shopping</a> or <a href="#/">checkout</a>.</p>
 	</div>
 
-	<div class="offset0 span12 row-fluid" ng-switch-default>
+	<div ng-switch-default>
 
-		<form class="form-horizontal css-form span6 well" name="optionsForm">
-			<h3>Questions</h3>
-			<p>Please fill in as much of the following information as possible</p>
-			<div class="control-group" ng-repeat="field in con.fields | filter:{name:'!Attendees'}" ng-switch="field.type">
+		<div class="span6">
+			<form class="form-horizontal css-form well" name="optionsForm" id="optionsForm">
+				<h3>Questions</h3>
+				<p>Please fill in as much of the following information as possible</p>
+				<div class="control-group" ng-repeat="field in con.fields | filter:{name:'!Attendees'}" ng-switch="field.type">
 
-				<!-- <div ng-show="field.type=='attendees'">
-					<label class="control-label" for="legalName">{{field.name}}</label>
-					<div class="controls">
-						<button type="button" class="btn btn-success" ng-click="attendees(field)">
-							Assign 
-							<span class="badge">{{opt.attendees.length}}</span>
-						</button>
-						<span ng-repeat="person in opt.attendees">
-							{{person.legalName}}<span ng-hide="$last">, </span>
-						</span>
-						<input type="hidden" id="test" ng-model="con.options[field.fieldID]" required>
+					<!-- <div ng-show="field.type=='attendees'">
+						<label class="control-label" for="legalName">{{field.name}}</label>
+						<div class="controls">
+							<button type="button" class="btn btn-success" ng-click="attendees(field)">
+								Assign 
+								<span class="badge">{{opt.attendees.length}}</span>
+							</button>
+							<span ng-repeat="person in opt.attendees">
+								{{person.legalName}}<span ng-hide="$last">, </span>
+							</span>
+							<input type="hidden" id="test" ng-model="con.options[field.fieldID]" required>
+						</div>
+					</div> -->
+
+					<div ng-switch-when="text">
+						<label class="control-label" for="legalName">{{field.name}}</label>
+						<div class="controls">
+							<input type="text" id="legalName" ng-model="con.options[field.fieldID]" placeholder="{{field.name}}" ng-required="field.required">
+						</div>
 					</div>
-				</div> -->
 
-				<div ng-switch-when="text">
-					<label class="control-label" for="legalName">{{field.name}}</label>
-					<div class="controls">
-						<input type="text" id="legalName" ng-model="con.options[field.fieldID]" placeholder="{{field.name}}" required>
+					<div ng-switch-default>
+						<h4>Unknown question type ({{field.type}})</h4>
 					</div>
+
 				</div>
+			</form><!-- .well -->
+		</div><!-- .span6 -->
 
-				<div ng-switch-default>
-					<h4>Unknown question type ({{field.type}})</h4>
-				</div>
+		<div class="span6" ng-show="attID">
+			<div class="well">
+				<h3>Event Attendees</h3>
+				<p>Choose and modify the attendees to this event here</p>
 
-			</div>
-		</form>
+				<table class="table" ng-show="con.options[attID].length">
+					<caption class="muted">Click a row to modify user information</caption>
+					<thead>
+						<tr>
+							<th>Personal Info</th>
+							<th>Address</th>
+							<th><abbr title="{{con.item.cost.pretty}}">Cost</abbr></th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat="person in con.options[attID]" ng-click="edit(person)">
+							<td>
+								<span ng-show="person.title">{{person.title}}<br/></span>
+								{{person.legalName}}<br/>
+								<a ng-href="mailto:{{person.email}}">{{person.email}}</a><br/>
+								{{person.phone}}
+							</td>
+							<td>
+								{{person.addr.addrName}}<br/>
+								{{person.addr.addr1}}<br/>
+								<span ng-show="person.addr.addr2">{{person.addr.addr2}}<br/></span>
+								{{person.addr.city}} {{person.addr.state}}, {{person.addr.zip}}
+							</td>
+							<td>
+								<span style="float:right">{{computeCost($index) | currency}}<br/><br/></span>
+								<button style="clear:both" type="button" class="close" ng-click="rem($index,$event)">&times;</button>
+							</td>
+						</tr>
+					</tbody>
+					<tfoot>
+						<tr>
+							<th></th>
+							<th><abbr title="{{con.item.cost.pretty}}" class="pull-right">Total:</abbr></th>
+							<th>{{total | currency}}</th>
+						</tr>
+					</tfoot>
+				</table>
 
-		<div class="span6 well" ng-show="attID">
-			<h3>Event Attendees</h3>
-			<p>Choose and modify the attendees to this event here</p>
-
-			<table class="table" ng-show="con.options[attID].length">
-				<caption class="muted">Click a row to modify user information</caption>
-				<thead>
-					<tr>
-						<th>Personal Info</th>
-						<th>Address</th>
-						<th><abbr title="{{con.item.cost.pretty}}">Cost</abbr></th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr ng-repeat="person in con.options[attID]" ng-click="edit(person)">
-						<td>
-							{{person.title}} {{person.legalName}}<br/>
-							<a ng-href="mailto:{{person.email}}">{{person.email}}</a><br/>
-							{{person.phone}}
-						</td>
-						<td>
-							{{person.addr.addrName}}<br/>
-							{{person.addr.addr1}}<br/>
-							<span ng-show="person.addr2">{{person.addr.addr2}}<br/></span>
-							{{person.addr.city}} {{person.addr.state}}, {{person.addr.zip}}
-						</td>
-						<td>
-							<span style="float:right">{{computeCost($index) | currency}}<br/><br/></span>
-							<button style="clear:both" type="button" class="close" ng-click="rem($index,$event)">&times;</button>
-						</td>
-					</tr>
-				</tbody>
-				<tfoot>
-					<tr>
-						<th></th>
-						<th><abbr title="{{con.item.cost.pretty}}" class="pull-right">Total:</abbr></th>
-						<th>{{total | currency}}</th>
-					</tr>
-				</tfoot>
-			</table>
-
-			<button type="button" class="btn btn-success" ng-click="add()">Add {{con.options[attID].length?'another ':''}}Attendee</button>
-			<button type="button" class="btn btn-danger pull-right" ng-click="clr()" ng-show="con.options[attID].length">Clear</button>
-
-		</div>
+				<button type="button" class="btn btn-success" ng-click="add()">Add {{con.options[attID].length?'another ':''}}Attendee</button>
+				<button type="button" class="btn btn-danger pull-right" ng-click="clr()" ng-show="con.options[attID].length">Clear</button>
+			</div><!-- .well -->
+		</div><!-- .span6 -->
 		
-	</div>
+	</div><!-- ng-switch-default -->
 
 </div>
 
 <div class="form-actions" ng-hide="noFields">
-	<button type="submit" class="btn btn-primary" ng-click="save()">Save</button>
+	<button type="submit" form="optionsForm" class="btn btn-primary" ng-click="save()">Save</button>
 	<a href="/" class="btn">Cancel</a>
 </div>
 

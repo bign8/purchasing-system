@@ -30,6 +30,16 @@ class NG {
 		return strtr($message, $replace); // interpolate replacement values into the message
 	}
 
+	// Helper(cart->setOptions): converts stdObjects to array (see: http://bit.ly/1eJETYC)
+	protected function object_to_array($obj) {
+		$arrObj = is_object($obj) ? get_object_vars($obj) : $obj;
+		foreach ($arrObj as $key => $val) {
+			$val = (is_array($val) || is_object($val)) ? $this->object_to_array($val) : $val;
+			$arr[$key] = $val;
+		}
+		return $arr;
+	}
+
 	// Worker(app/breadcrumb): return full name for breadcrumb
 	public function prettyCrumb() {
 		$data = $this->getPostData();
@@ -38,8 +48,8 @@ class NG {
 
 		// Pretty print product area
 		if ( preg_match('/\/register\/.*/', $data->path) && $data->index == 1 ) {
-			$STH = $this->db->prepare("SELECT `name` FROM `item` WHERE `itemID`=?;");
-			if ($STH->execute( $data->name )) $ret = $STH->fetchColumn();
+			$STH = $this->db->prepare("SELECT `name` FROM `item` WHERE `itemID`=? LIMIT 1;");
+			if ( $STH->execute( $data->name ) && $STH->rowCount() > 0 ) $ret = $STH->fetchColumn();
 		}
 
 		return $ret;

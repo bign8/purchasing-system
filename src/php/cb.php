@@ -32,7 +32,7 @@ if (isset($_REQUEST['itemId'])) {
 } else {
 	// document print (for debug)
 	echo '<pre>';
-	print_r($_SESSION['cart']);
+	print_r($_SESSION);
 }
 
 /*
