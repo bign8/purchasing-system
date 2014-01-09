@@ -1,11 +1,5 @@
 <?php
 
-// Handle cross site stuff (for development)
-// header('Access-Control-Allow-Origin: *');
-// header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
-// header('Access-Control-Allow-Headers: Content-Type');
-// if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') exit(0);
-
 require_once('./libinc/main_include.php');
 
 /*
@@ -43,24 +37,24 @@ if ( $_REQUEST['c'] == 'cart' ) {
 } elseif ( $_REQUEST['c'] == 'user' ) {
 	$obj = new User();
 	switch ($_REQUEST['a']) {
-		case 'addAddress': $data = $obj->addAddress(); break;
-		case 'listFirms': $data = $obj->listFirms(); break;
-		case 'addUser': $data = $obj->addUser(); break;
+		case 'addAddress':  $data = $obj->addAddress();  break;
+		case 'addContact':  $data = $obj->addContact();  break;
+		case 'addUser':     $data = $obj->addUser();     break;
 		case 'currentUser': $data = $obj->currentUser(); break;
 		case 'editAddress': $data = $obj->editAddress(); break;
-		case 'getFirmEmploy': $data = $obj->getFirmEmploy(); break;
-		case 'getFirmAddr': $data = $obj->getFirmAddr(); break;
-		case 'addContact': $data = $obj->addContact(); break;
 		case 'editContact': $data = $obj->editContact(); break;
-		// case 'getCart': $data = $obj->getCart(); break;
-		case 'login': $data = $obj->login(); break;
-		case 'logout': $data = $obj->logout(); break;
+		case 'listFirms':   $data = $obj->listFirms();   break;
+		case 'login':       $data = $obj->login();       break;
+		case 'logout':      $data = $obj->logout();      break;
+		case 'prepAtten':   $data = $obj->prepAtten();   break;
+
+		// DEV
+		case 'testAuth':  $data = $obj->testAuth();  break;
+		case 'testAdmin': $data = $obj->testAdmin(); break;
 		default: $pass = false;
 	}
 } elseif ( $_REQUEST['c'] == 'test' ) {
 	switch ($_REQUEST['a']) {
-		// case 'testAuth': $data = $obj->testAuth(); break;
-		// case 'testAdmin': $data = $obj->testAdmin(); break;
 		case 'demo': 
 			// echo '<pre>'; 
 			// print_r($_REQUEST); 
@@ -79,6 +73,7 @@ if ( $_REQUEST['c'] == 'cart' ) {
 
 // Determine proper return data
 if ( $pass ) {
+	echo ")]}',\n";
 	echo json_encode( $data );
 } else {
 	header( 'HTTP/ 405 Method Not Allowed' );

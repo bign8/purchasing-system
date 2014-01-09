@@ -50,7 +50,7 @@
 		<div class="control-group">
 			<label class="control-label">Address</label>
 			<div class="controls">
-				<div class="input-append" ng-switch="contact.addr.addrID">
+				<div class="input-append" ng-switch="contact.addr.addressID">
 
 					<div ng-switch-when="null">
 						<span class="input-medium uneditable-input">Click 'set' to assign</span>
@@ -59,7 +59,7 @@
 
 					<div ng-switch-default>
 						<span class="input-medium uneditable-input">{{contact.addr.addrName}}</span>
-						<button type="button" class="btn btn-warning" ng-click="setAddr()"  ng-disabled="sameAddr">Edit</button>
+						<button type="button" class="btn btn-warning" ng-click="setAddr()" ng-disabled="sameAddr">Edit</button>
 					</div>
 
 				</div>

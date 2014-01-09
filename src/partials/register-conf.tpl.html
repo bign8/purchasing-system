@@ -81,8 +81,8 @@
 				</tfoot>
 			</table>
 
-			<button type="button" class="btn btn-success" ng-click="add()">Add Attendee</button>
-			<button type="button" class="btn btn-danger pull-right" ng-click="clr()">Clear</button>
+			<button type="button" class="btn btn-success" ng-click="add()">Add {{con.options[attID].length?'another ':''}}Attendee</button>
+			<button type="button" class="btn btn-danger pull-right" ng-click="clr()" ng-show="con.options[attID].length">Clear</button>
 
 		</div>
 		
