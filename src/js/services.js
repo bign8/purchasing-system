@@ -32,8 +32,7 @@ factory('breadcrumbs', ['$rootScope', '$location', 'interface', function ($rootS
 			if (crumbCashe.hasOwnProperty(obj.path)) { // in in cashe
 				obj.name = crumbCashe[obj.path];
 			} else { // otherwise
-				interface.app('prettyCrumb', obj).then(function (res) {
-					var label = JSON.parse(res.data);
+				interface.app('prettyCrumb', obj).then(function (label) {
 					crumbCashe[obj.path] = label; // assign cashe
 					breadcrumbs[obj.index].name = label; // assign value out
 				});
@@ -138,7 +137,7 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function($rootS
 	function reload() {
 		var promise = interface.cart('get');
 		promise.then(function(response) {
-			cart = response.data;
+			cart = response;
 			dirty = false;
 		});
 		return promise;
@@ -358,21 +357,33 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function($rootS
 // 	};
 // }]).
 
-factory('interface', ['$http', function ($http) {
+factory('interface', ['$http', '$q', function ($http, $q) {
+
+	var formatData = function(data) { // process simple types (null,true,false)
+		try { if (typeof(data)=='string') data = JSON.parse(data); } catch (e) {}
+		return data;
+	};
+
+	var cb = function(myClass, myFn, myData) { // don't have to call res.data to get data!
+		var deferred = $q.defer();
+
+		$http.post('/interface.php', myData, {params:{c:myClass, a:myFn}}).then(function(obj) {
+			deferred.resolve( formatData( obj.data ) );
+		}, function(obj) {
+			deferred.reject( formatData( obj.data ) );
+		});
+		return deferred.promise;
+	};
 
 	return {
-		// call: function(myClass, myAction, myData) {
-		// 	return $http.post('http://uastore.wha.la/interface.php', myData, {params:{a: myAction, c: myClass}});
-		// },
-
 		user: function(myAction, myData) {
-			return $http.post('/interface.php', myData, {params:{a: myAction, c: 'user'}});
+			return cb('user', myAction, myData);
 		},
 		cart: function(myAction, myData) {
-			return $http.post('/interface.php', myData, {params:{a: myAction, c: 'cart'}});
+			return cb('cart', myAction, myData);
 		},
 		app: function(myAction, myData) {
-			return $http.post('/interface.php', myData, {params:{a: myAction, c: 'app'}});
+			return cb('app', myAction, myData);
 		}
 	};
 }]);

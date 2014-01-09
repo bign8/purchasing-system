@@ -23,15 +23,9 @@ if ( $_REQUEST['c'] == 'cart' ) {
 
 		case 'getOptions': $data = $obj->getOptions(); break; // get conference form data
 
-		// case 'getDiscount': $data = $obj->getDiscount(); break;
-		// case 'getItem': $data = $obj->getItem(); break;
-		// case 'getItemOptions': $data = $obj->getItemOptions(); break;
-		// case 'getItems': $data = $obj->getItems(); break;
-		// case 'getProducts': $data = $obj->getProducts(); break;
-		// case 'getPurchases': $data = $obj->getPurchases(); break;
-		// case 'getSoftPurchases': $data = $obj->getSoftPurchases(); break;
-		// case 'prettyCrumb': $data = $obj->prettyCrumb(); break;
 		// case 'saveCart': $data = $obj->saveCart(); break;
+		// case 'getPurchases': $data = $obj->getPurchases(); break;
+		// case 'getDiscount': $data = $obj->getDiscount(); break;
 		default: $pass = false;
 	}
 } elseif ( $_REQUEST['c'] == 'user' ) {
@@ -56,8 +50,7 @@ if ( $_REQUEST['c'] == 'cart' ) {
 } elseif ( $_REQUEST['c'] == 'test' ) {
 	switch ($_REQUEST['a']) {
 		case 'demo': 
-			// echo '<pre>'; 
-			// print_r($_REQUEST); 
+			// Some dev code goes here
 			break;
 		default: $pass = false;
 	}
@@ -73,7 +66,7 @@ if ( $_REQUEST['c'] == 'cart' ) {
 
 // Determine proper return data
 if ( $pass ) {
-	echo ")]}',\n";
+	if ( !is_bool($data) ) echo ")]}',\n";
 	echo json_encode( $data );
 } else {
 	header( 'HTTP/ 405 Method Not Allowed' );

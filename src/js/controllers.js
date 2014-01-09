@@ -7,13 +7,16 @@ angular.module('myApp.controllers', [
 
 controller('IndexCtrl', ['$scope', 'myPage', 'theCart', 'security', function ($scope, myPage, theCart, security) {
 	myPage.setTitle("Upstream Academy", "Guiding accounting firms to high performance");
-	if (security.currentUser !== null) security.redirect('/cart');
+
+	$scope.$watch(function() {return security.currentUser;}, function() {
+		if (security.currentUser !== null) security.redirect('/cart');
+	}, true);
+	
 	$scope.theCart = theCart;
 }]).
 
 controller('RegisterConFormCtrl', ['$scope', 'myPage', 'interface', 'conference', '$modal', function ($scope, myPage, interface, conference, $modal) {
-	$scope.con = conference.data;
-	// employees = employees.data; // store for later
+	$scope.con = conference;
 
 	var title = ($scope.con.item.template == 'conference') ? "Register" : "Options" ;
 	myPage.setTitle(title, "for " + $scope.con.item.name);
@@ -79,11 +82,11 @@ controller('RegisterConFormCtrl', ['$scope', 'myPage', 'interface', 'conference'
 
 controller('ContactModalCtrl', ['$scope', '$modalInstance', 'contact', 'prep', 'interface', '$modal', 'opt', '$filter', function ($scope, $modalInstance, contact, prep, interface, $modal, opt, $filter) {
 	var blankAddr = {addressID:null, addr2:null};
-	var oldUserAddr = ( contact && contact.addr.addressID != prep.data.add.addressID ) ? contact.addr : blankAddr ; // null address handler
+	var oldUserAddr = ( contact && contact.addr.addressID != prep.add.addressID ) ? contact.addr : blankAddr ; // null address handler
 	$scope.contact = contact || {addr:blankAddr}; // null contact handler
 
 	// filter list on `opt` (remove already added people)
-	$scope.firmEmploy = $filter('filter')(prep.data.emp, function(item) { // filter here not on template
+	$scope.firmEmploy = $filter('filter')(prep.emp, function(item) { // filter here not on template
 		var found = false; // http://stackoverflow.com/a/14844516
 		angular.forEach(opt, function (obj){ if (!found && obj.contactID == item.contactID ) found = true; });
 		return !found;
@@ -95,11 +98,11 @@ controller('ContactModalCtrl', ['$scope', '$modalInstance', 'contact', 'prep', '
 
 	// for managing same changes
 	var tmpAddrID = contact ? contact.addr.addressID : -2 ; // wierd case checking
-	$scope.sameAddr = ($scope.contact.addr.addressID == prep.data.add.addressID); // check if same address
+	$scope.sameAddr = ($scope.contact.addr.addressID == prep.add.addressID); // check if same address
 	$scope.$watch('sameAddr', function(value) {
 		if (value) {
-			if (tmpAddrID != prep.data.add.addressID) oldUserAddr = $scope.contact.addr; // ensure not firm
-			$scope.contact.addr = prep.data.add;
+			if (tmpAddrID != prep.add.addressID) oldUserAddr = $scope.contact.addr; // ensure not firm
+			$scope.contact.addr = prep.add;
 		} else {
 			$scope.contact.addr = oldUserAddr;
 		}
@@ -111,7 +114,7 @@ controller('ContactModalCtrl', ['$scope', '$modalInstance', 'contact', 'prep', '
 		$scope.contact = user;
 		$scope.addNew = true;
 		tmpAddrID = user.addr.addressID;
-		$scope.sameAddr = (tmpAddrID == prep.data.add.addressID); // check if same address
+		$scope.sameAddr = (tmpAddrID == prep.add.addressID); // check if same address
 		oldUserAddr = $scope.sameAddr ? blankAddr : user.addr ; // clear or assign last
 	};
 	$scope.choose = function (user, $event) { // chooses a specific user
@@ -124,7 +127,7 @@ controller('ContactModalCtrl', ['$scope', '$modalInstance', 'contact', 'prep', '
 
 		var query = ($scope.contact.contactID === undefined) ? 'add' : 'edit'; // change add or edit based on existence of contactID
 		interface.user(query + 'Contact', $scope.contact).then(function(res) {
-			$scope.contact.contactID = JSON.parse(res.data);
+			$scope.contact.contactID = JSON.parse(res);
 			$modalInstance.close( $scope.contact );
 		}, function (err) {
 			alert('There was an unknown error adding this user\nPlease try again or contact Upstream Academy for help.');
@@ -232,7 +235,7 @@ controller('ContactModalCtrl', ['$scope', '$modalInstance', 'contact', 'prep', '
 // 	$scope.item = itemDetail.data;
 // }]).
 
-controller('CartCtrl', ['$scope', 'myPage', 'security', '$modal', 'interface', '$location', 'theCart', function ($scope, myPage, security, $modal, interface, $location, theCart) {
+controller('CartCtrl', ['$scope', 'myPage', '$modal', 'interface', '$location', 'theCart', function ($scope, myPage, $modal, interface, $location, theCart) {
 	myPage.setTitle("Shopping Cart");
 
 	$scope.theCart = theCart;
@@ -486,13 +489,13 @@ controller('CustPayFormCtrl', ['$scope', 'myPage', 'theCart', '$location', '$tim
 	$scope.add = function() {
 		var promise = theCart.add( $scope.item );
 		promise.then(function (res) {
-			if (res.data == 'false') {
-				$scope.error = true;
-				$scope.success = false;
-			} else {
+			if (res) {
 				$scope.success = true;
 				$scope.error = false;
 				$scope.item = angular.copy(orig);
+			} else {
+				$scope.error = true;
+				$scope.success = false;
 			}
 
 			$timeout.cancel(timer);
@@ -507,13 +510,13 @@ controller('RegisterFormCtrl', ['$scope', 'myPage', '$modal', 'interface', 'secu
 	myPage.setTitle("Registration Form");
 
 	// find firm vs. register
-	$scope.firms = firms.data;
+	$scope.firms = firms;
 	$scope.clearFirm = function () { $scope.user.firm = undefined; };
-
 
 	// initialize empty user
 	$scope.user = {
-		preName: ''
+		preName: '',
+		firm: ''
 	};
 
 	// handle registration clicks
@@ -535,7 +538,7 @@ controller('RegisterFormCtrl', ['$scope', 'myPage', '$modal', 'interface', 'secu
 			security.requestCurrentUser();
 			security.redirect('/cart');
 		}, function (err) {
-			if (err.data == '"dup"') {
+			if (err == '"dup"') {
 				alert('This email already has an account\nPlease click the login button and attempt a password reset.');
 			} else {
 				alert('There was an unknown error creating your account\nPlease try again or contact Upstream Academy for help.');
@@ -564,7 +567,7 @@ controller('RegisterFormCtrl', ['$scope', 'myPage', '$modal', 'interface', 'secu
 	$scope.setAddr = function (slug) {
 		// open modal here with address form
 		// modal insterts into db and returns full object
-		var myAddress = (slug == 'firm') ? $scope.user.firm.addr : $scope.user.addr ;
+		var myAddress = (slug == 'firm') ? ($scope.user.firm || {}).addr : $scope.user.addr ;
 		
 		var modalInstance = $modal.open({
 			templateUrl: 'partials/modal-address.tpl.html',
@@ -576,6 +579,7 @@ controller('RegisterFormCtrl', ['$scope', 'myPage', '$modal', 'interface', 'secu
 
 		modalInstance.result.then(function(address) {
 			if (slug == 'firm') {
+				$scope.user.firm = typeof($scope.user.firm)=='string' ? {name:''} : $scope.user.firm;
 				$scope.user.firm.addr = address;
 				if ($scope.same) $scope.user.addr = address;
 			} else {
@@ -591,7 +595,8 @@ controller('ModalAddressCtrl', ['$scope', '$modalInstance', 'address', 'interfac
 		// use interface to add/edit address in db
 		var fun = ($scope.address.addressID === null) ? 'add' : 'edit' ;
 		interface.user(fun + 'Address', $scope.address).then(function (res) {
-			$scope.address.addressID = JSON.parse(res.data);
+			console.log(res);
+			$scope.address.addressID = JSON.parse(res);
 			$modalInstance.close($scope.address);
 		}, function (err) {
 			console.log(err);
