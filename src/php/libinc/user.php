@@ -105,7 +105,7 @@ class User extends NG {
 		$ret = $STH->fetchAll( PDO::FETCH_ASSOC );
 		foreach ($ret as &$value) {
 			$value['addr'] = array(
-				'addrID' => $value['addressID'], // TODO: why does this change?
+				'addressID' => $value['addressID'],
 				'addrName' => $value['addrName'],
 				'addr1' => $value['addr1'],
 				'addr2' => $value['addr2'],
@@ -118,15 +118,24 @@ class User extends NG {
 		return $ret;
 	}
 
-	// Worker(app/checkout): return firms employees
-	public function getFirmEmploy() {
+	// Worker: get data for choosing new attendee
+	public function prepAtten() {
 		$user = $this->requiresAuth();
+		$emp = $this->getFirmEmploy( $user['firmID'] );
+		$add = $this->getFirmAddr( $user['firmID'] );
 
-		$STH = $this->db->prepare("SELECT c.contactID, c.firmID, c.legalName, c.preName, c.title, c.email, c.phone, a.* FROM (SELECT * FROM `contact` WHERE `firmID`=?) c LEFT JOIN `address` a ON c.addressID=a.addressID;");
-		if (!$STH->execute( $user['firmID'] )) {
+		if ($emp == -1 || $add == -1) {
 			header('HTTP/ 409 Conflict');
 			return $this->db->errorInfo();
 		}
+		return array(
+			'emp' => $emp,
+			'add' => $add
+		);
+	}
+	private function getFirmEmploy( $firmID ) { // Helper: return firms employees
+		$STH = $this->db->prepare("SELECT c.contactID, c.firmID, c.legalName, c.preName, c.title, c.email, c.phone, a.* FROM (SELECT * FROM `contact` WHERE `firmID`=?) c LEFT JOIN `address` a ON c.addressID=a.addressID;");
+		if (!$STH->execute( $firmID )) return -1;
 		$ret = $STH->fetchAll( PDO::FETCH_ASSOC );
 		foreach ($ret as &$value) {
 			$value['addr'] = array(
@@ -142,20 +151,13 @@ class User extends NG {
 		}
 		return $ret;
 	}
-
-	// Worker(app/checkout): return firms address
-	public function getFirmAddr() {
-		$user = $this->requiresAuth();
-
+	private function getFirmAddr( $firmID ) { // Helper: return firms address
 		$STH = $this->db->prepare("SELECT a.* FROM `firm` f JOIN `address` a ON f.addressID=a.addressID WHERE f.firmID=?;");
-		if (!$STH->execute( $user['firmID'] )) {
-			header('HTTP/ 409 Conflict');
-			return $this->db->errorInfo();
-		}
+		if (!$STH->execute( $firmID )) return -1;
 		return $STH->fetch(PDO::FETCH_ASSOC);
 	}
 
-	// Worker(app/checkout): add contact to system
+	// Worker: add contact to system
 	public function addContact() {
 		$user = $this->requiresAuth();
 		$data = $this->getPostData();
@@ -168,7 +170,7 @@ class User extends NG {
 		return $this->db->lastInsertId();
 	}
 
-	// Worker(app/checkout): add contact to system
+	// Worker: add contact to system
 	public function editContact() {
 		$this->requiresAuth();
 		$data = $this->getPostData();
@@ -181,33 +183,30 @@ class User extends NG {
 		return $data->contactID;
 	}
 
-
 	// Un-tested functions
 
-	// Worker(app/user): add an address to the database
+	// Worker(register + attendee): add an address to the database (att check)
 	public function addAddress() {
 		$data = $this->getPostData();
 
 		$STH = $this->db->prepare("INSERT INTO `address` (addrName, addr1, addr2, city, state, zip) VALUES (?,?,?,?,?,?);");
 		if (!$STH->execute( $data->addrName, $data->addr1, $data->addr2, $data->city, $data->state, $data->zip )) {
 			header('HTTP/ 409 Conflict');
-			print_r($STH->errorInfo());
+			return $this->db->errorInfo();
 		}
-
 		return $this->db->lastInsertId();
 	}
 
-	// Worker(app/user): add an address to the database
+	// Worker(register + attendee): add an address to the database (att check)
 	public function editAddress() {
 		$data = $this->getPostData();
 
 		$STH = $this->db->prepare("UPDATE `address` SET addrName=?, addr1=?, addr2=?, city=?, state=?, zip=? WHERE addressID=?;");
-		if (!$STH->execute( $data->addrName, $data->addr1, $data->addr2, $data->city, $data->state, $data->zip, $data->addrID )) {
+		if (!$STH->execute( $data->addrName, $data->addr1, $data->addr2, $data->city, $data->state, $data->zip, $data->addressID )) {
 			header('HTTP/ 409 Conflict');
-			print_r($STH->errorInfo());
+			return $this->db->errorInfo();
 		}
-
-		return $data->addrID;
+		return $data->addressID;
 	}
 
 	// Worker(app/user): register a user to the database

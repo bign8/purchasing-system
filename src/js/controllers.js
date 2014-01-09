@@ -57,8 +57,7 @@ controller('RegisterConFormCtrl', ['$scope', 'myPage', 'interface', 'conference'
 			controller: 'ContactModalCtrl',
 			resolve: {
 				contact: function() { return angular.copy( contact ); },
-				firmAddr: function(interface) { return interface.user('getFirmAddr'); },
-				firmEmploy: function(interface) { return interface.user('getFirmEmploy'); },
+				prep: function(interface) { return interface.user('prepAtten'); },
 				opt: function() { return angular.copy( o ); }
 			}
 		});
@@ -78,27 +77,29 @@ controller('RegisterConFormCtrl', ['$scope', 'myPage', 'interface', 'conference'
 	};
 }]).
 
-controller('ContactModalCtrl', ['$scope', '$modalInstance', 'contact', 'firmAddr', 'firmEmploy', 'interface', '$modal', 'opt', '$filter', function ($scope, $modalInstance, contact, firmAddr, firmEmploy, interface, $modal, opt, $filter) {
-	var oldUserAddr = {addrID:null, addr2:null}; // null address handler
-	$scope.contact = contact || {addr:oldUserAddr}; // null contact handler
+controller('ContactModalCtrl', ['$scope', '$modalInstance', 'contact', 'prep', 'interface', '$modal', 'opt', '$filter', function ($scope, $modalInstance, contact, prep, interface, $modal, opt, $filter) {
+	var blankAddr = {addressID:null, addr2:null};
+	var oldUserAddr = ( contact && contact.addr.addressID != prep.data.add.addressID ) ? contact.addr : blankAddr ; // null address handler
+	$scope.contact = contact || {addr:blankAddr}; // null contact handler
 
 	// filter list on `opt` (remove already added people)
-	$scope.firmEmploy = $filter('filter')(firmEmploy.data, function(item) { // filter here not on template
+	$scope.firmEmploy = $filter('filter')(prep.data.emp, function(item) { // filter here not on template
 		var found = false; // http://stackoverflow.com/a/14844516
 		angular.forEach(opt, function (obj){ if (!found && obj.contactID == item.contactID ) found = true; });
 		return !found;
 	});
 
 	// view changing variables
-	$scope.addNew = (contact !== undefined) || $scope.firmEmploy.length === 0;
+	$scope.addNew = (contact !== undefined) || $scope.firmEmploy.length === 0; // !blank passed contact or no employees left
 	$scope.canChange = ($scope.contact.contactID === undefined) && $scope.firmEmploy.length !== 0;
 
 	// for managing same changes
-	$scope.sameAddr = true;
+	var tmpAddrID = contact ? contact.addr.addressID : -2 ; // wierd case checking
+	$scope.sameAddr = ($scope.contact.addr.addressID == prep.data.add.addressID); // check if same address
 	$scope.$watch('sameAddr', function(value) {
 		if (value) {
-			oldUserAddr = $scope.contact.addr;
-			$scope.contact.addr = firmAddr.data;
+			if (tmpAddrID != prep.data.add.addressID) oldUserAddr = $scope.contact.addr; // ensure not firm
+			$scope.contact.addr = prep.data.add;
 		} else {
 			$scope.contact.addr = oldUserAddr;
 		}
@@ -109,6 +110,9 @@ controller('ContactModalCtrl', ['$scope', '$modalInstance', 'contact', 'firmAddr
 	$scope.edit = function (user) {
 		$scope.contact = user;
 		$scope.addNew = true;
+		tmpAddrID = user.addr.addressID;
+		$scope.sameAddr = (tmpAddrID == prep.data.add.addressID); // check if same address
+		oldUserAddr = $scope.sameAddr ? blankAddr : user.addr ; // clear or assign last
 	};
 	$scope.choose = function (user, $event) { // chooses a specific user
 		$event.preventDefault();
@@ -116,7 +120,7 @@ controller('ContactModalCtrl', ['$scope', '$modalInstance', 'contact', 'firmAddr
 	};
 	$scope.ok = function ( invalid ) {
 		if (invalid) return alert('Form is not valid\nPlease try again.');
-		if ($scope.contact.addr.addrID === null) return alert('Please assign an address');
+		if ($scope.contact.addr.addressID === null) return alert('Please assign an address');
 
 		var query = ($scope.contact.contactID === undefined) ? 'add' : 'edit'; // change add or edit based on existence of contactID
 		interface.user(query + 'Contact', $scope.contact).then(function(res) {
@@ -520,10 +524,10 @@ controller('RegisterFormCtrl', ['$scope', 'myPage', '$modal', 'interface', 'secu
 		if ($scope.passVerify !== $scope.user.password) {
 			return alert('Passwords do not match\nPlease try again.');
 		}
-		if ($scope.user.firm.addr.addrID === undefined) {
+		if ($scope.user.firm.addr.addressID === undefined) {
 			return alert('Please assign a firm address');
 		}
-		if ($scope.user.addr.addrID === undefined) {
+		if ($scope.user.addr.addressID === undefined) {
 			return alert('Please assign a user address');
 		}
 		interface.user('addUser', $scope.user).then(function() {
@@ -582,12 +586,12 @@ controller('RegisterFormCtrl', ['$scope', 'myPage', '$modal', 'interface', 'secu
 }]).
 
 controller('ModalAddressCtrl', ['$scope', '$modalInstance', 'address', 'interface', function($scope, $modalInstance, address, interface){
-	$scope.address = address || {addrID:null, addr2: null};
+	$scope.address = address || {addressID:null, addr2: null};
 	$scope.ok = function() {
 		// use interface to add/edit address in db
-		var fun = ($scope.address.addrID === null) ? 'add' : 'edit' ;
+		var fun = ($scope.address.addressID === null) ? 'add' : 'edit' ;
 		interface.user(fun + 'Address', $scope.address).then(function (res) {
-			$scope.address.addrID = JSON.parse(res.data);
+			$scope.address.addressID = JSON.parse(res.data);
 			$modalInstance.close($scope.address);
 		}, function (err) {
 			console.log(err);
