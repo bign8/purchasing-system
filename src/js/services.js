@@ -2,7 +2,7 @@ angular.module('myApp.services', [
 
 ]).
 
-factory('myPage', ['$rootScope', function( $rootScope ){
+factory('myPage', ['$rootScope', '$sce', function( $rootScope, $sce ){
 	$rootScope.pageTitle = "Upstream Academy Shop"; // for actual title - https://coderwall.com/p/vcfo4q
 	var subTitle = "";
 
@@ -11,11 +11,8 @@ factory('myPage', ['$rootScope', function( $rootScope ){
 			$rootScope.pageTitle = newTitle;
 			subTitle = newSubTitle;
 		},
-		getTitle: function() {
-			return $rootScope.pageTitle;
-		},
-		getSubTitle: function() {
-			return subTitle;
+		getHTML: function() {
+			return $sce.trustAsHtml($rootScope.pageTitle + ' <small>' + subTitle + '</small>');
 		}
 	};
 }]).
