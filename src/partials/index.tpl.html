@@ -7,32 +7,41 @@
 	</div>
 </div>
 
-<table class="table table-striped table-hover">
-	<thead>
-		<tr>
-			<th>Name</th>
-			<th>Description</th>
-			<th>Cost</th>
-		</tr>
-	</thead>
-	<tbody>
-		<tr ng-repeat="item in theCart.get()" ng-class="{true:'error', false:''}[item.warn]"> <!-- printList -->
-			<td><a href="#/products/{{item.productID}}/{{item.itemID}}">{{item.name}}</a></td>
-			<td>{{item.description}}</td>
-			<td ng-switch="showOptions(item)">
-				<span ng-switch-when="false">{{item.cost.pretty}}</span>
-				<span ng-switch-default>{{item.cost.pretty}}</span>
-				<a href ng-click="theCart.rem(item)" role="button" class="close">&times;</a>
-			</td>
-		</tr>
-	</tbody>
-	<!-- <tfoot>
-		<tr>
-			<th></th>
-			<th><span class="pull-right">Sub-Total:</span></th>
-			<th><span>{{printCart.subTotal() | currency}}</span></th>
-		</tr>
-	</tfoot> -->
-</table>
+
+<div class="row" ng-switch="theCart.get().length">
+	<div class="span12" ng-switch-when="0">
+		<div class="alert alert-error">
+			<strong>Empty Cart</strong> Go <a href="http://upstreamacademy.com/">shopping</a> or <a href="/payment">make a payment</a>
+		</div>
+	</div>
+
+	<table class="table table-striped table-hover span12" ng-switch-default>
+		<thead>
+			<tr>
+				<th>Name</th>
+				<th>Description</th>
+				<th>Cost</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr ng-repeat="item in theCart.get()" ng-class="{true:'error', false:''}[item.warn]"> <!-- printList -->
+				<td><a href="#/products/{{item.productID}}/{{item.itemID}}">{{item.name}}</a></td>
+				<td>{{item.description}}</td>
+				<td ng-switch="showOptions(item)">
+					<span ng-switch-when="false">{{item.cost.pretty}}</span>
+					<span ng-switch-default>{{item.cost.pretty}}</span>
+					<a href ng-click="theCart.rem(item)" role="button" class="close">&times;</a>
+				</td>
+			</tr>
+		</tbody>
+		<!-- <tfoot>
+			<tr>
+				<th></th>
+				<th><span class="pull-right">Sub-Total:</span></th>
+				<th><span>{{printCart.subTotal() | currency}}</span></th>
+			</tr>
+		</tfoot> -->
+	</table>
+</div>
 
 <!-- <pre>{{theCart.get() | json}}</pre> -->
