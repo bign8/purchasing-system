@@ -4,7 +4,6 @@ ToDo:
 	- hardcopy vs softcopy price -> before and after purchases
 	- classes and their recurring wierdness
 	- ...
-- Capture 'register' click from dialog to redirect after registration
 - Clean services (breadcrumbs and carts) to get rid of useless code
 - Implement Form constraints for checkout
 - improve form constraints for register/xx
@@ -40,7 +39,7 @@ Notes:
 Questions:
 - how old of a browser do we need to support
 	- iff not old -> try this for array unique (php cart merge within index.php) http://stackoverflow.com/a/11247231
-- remove duplicates on server or notify user of duplicates?
+- remove duplicates on server or notify user of duplicates? (enforce no re purchases, but notify users)
 
 Future releases
 - assign status to orders (processing, confirmed, etc)

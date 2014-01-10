@@ -1,4 +1,4 @@
-<script type="text/ng-template" id="customTemplate.html">
+<script type="text/ng-template" id="registerFirmTypeAheadTPL.html">
 	<a>
 		<span bind-html-unsafe="match.label | typeaheadHighlight:query"></span> 
 		(<span>{{ match.model.website | replace:{'http://':'','https://':''} }}</span>)
@@ -17,7 +17,7 @@
 
 				<label class="control-label" for="firmFind">Type your Firm Name</label>
 				<div class="controls">
-					<input type="text" id="firmFind" ng-model="user.firm" typeahead="firm as firm.name for firm in firms | filter:{name:$viewValue} | limitTo:8" placeholder="Firm Search" typeahead-template-url="customTemplate.html">
+					<input type="text" id="firmFind" ng-model="user.firm" typeahead="firm as firm.name for firm in firms | filter:{name:$viewValue} | limitTo:8" placeholder="Firm Search" typeahead-template-url="registerFirmTypeAheadTPL.html">
 					<button type="button" class="close" ng-click="clearFirm()" ng-hide="user.firm === undefined">&times;</button>
 				</div>
 			</div>

@@ -17,6 +17,7 @@ controller('IndexCtrl', ['$scope', 'myPage', 'theCart', 'security', function ($s
 
 controller('RegisterConFormCtrl', ['$scope', 'myPage', 'interface', 'conference', '$modal', function ($scope, myPage, interface, conference, $modal) {
 	$scope.con = conference;
+	$scope.orig = angular.copy( $scope.con.options );
 
 	var title = ($scope.con.item.template == 'conference') ? "Register" : "Options" ;
 	myPage.setTitle(title, "for " + $scope.con.item.name);
@@ -74,12 +75,27 @@ controller('RegisterConFormCtrl', ['$scope', 'myPage', 'interface', 'conference'
 			}
 		});
 	};
+	$scope.equal = function(x,y) { return angular.equals(x,y);};
+	$scope.reset = function() { $scope.con.options = angular.copy( $scope.orig ); };
 
-	$scope.save = function() {
+	$scope.save = function( invalid ) {
+		console.log(invalid);
+		if (invalid) return alert('Form is not valid\nPlease try again.');
 		if ($scope.attID && $scope.con.options[ $scope.attID ].length === 0) return alert('Please add at least one Attendee to the conference');
-
-		// Perform required checks
-		interface.cart('setOptions', $scope.con);
+		interface.cart('setOptions', $scope.con).then(function() {
+			$modal.open({
+				templateUrl: 'registerConfNextActionTPL.html',
+				controller: function ($scope, $modalInstance, $location) {
+					$scope.cart = function () {
+						$location.path('/cart');
+						$modalInstance.dismiss('cancel');
+					};
+				}
+			});
+		}, function(obj) {
+			console.log(obj);
+			alert('Your save was unsuccessful.\nPlease try again or contact UpstreamAcademy for assistance.');
+		});
 	};
 }]).
 
@@ -550,7 +566,8 @@ controller('RegisterFormCtrl', ['$scope', 'myPage', '$modal', 'interface', 'secu
 		interface.user('addUser', $scope.user).then(function() {
 			alert('Your account has successfully been created');
 			security.requestCurrentUser();
-			security.redirect('/cart');
+			// security.redirect('/cart');
+			window.history.back(); // go to last page!
 		}, function (err) {
 			if (err == 'dup') {
 				alert('This email already has an account\nPlease click the login button and attempt a password reset.');
