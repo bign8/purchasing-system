@@ -40,6 +40,12 @@ class NG {
 		return $arr;
 	}
 
+	// Helper(php): sets header + returns error object (TODO: SEND ERROR LOG EMAIL)
+	protected function conflict($data = null) {
+		header('HTTP/ 409 Conflict');
+		return is_null($data) ? $this->db->errorInfo() : $data;
+	}
+
 	// Worker(app/breadcrumb): return full name for breadcrumb
 	public function prettyCrumb() {
 		$data = $this->getPostData();
