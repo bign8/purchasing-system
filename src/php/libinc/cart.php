@@ -161,6 +161,7 @@ class Cart extends NG {
 			});
 
 		} else {
+			if (isset($_SESSION['cart.options'][$data->itemID])) unset($_SESSION['cart.options'][$data->itemID]);
 			$_SESSION['cart'] = array_diff($_SESSION['cart'], array($data->itemID) ); // http://stackoverflow.com/a/9268826
 		}
 		return $data; // debug
