@@ -15,6 +15,7 @@ ToDo:
 - re-design based on proposed user interaction tree
 - show if event is un-open or not available at current time (manual)
 - store referrer for redirects back to site
+- password show as red for invalid passwd
 
 Emails (todo):
 - Cart checkout details (cost, payment type, misc fields)

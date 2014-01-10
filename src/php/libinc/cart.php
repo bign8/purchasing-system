@@ -192,10 +192,7 @@ class Cart extends NG {
 
 		$item = $this->getItemByID( $data->itemID ); // get item + cost information
 		$fields = $this->getProductFields( $item['productID'] ); // get fields for a product
-		if ($fields == -1) {
-			header('HTTP/ 409 Conflict');
-			return $this->db->errorInfo();
-		}
+		if ($fields == -1) return $this->conflict();
 
 		$item = is_null( $item ) ? array( 'name'=>'Not Found' ) : $item ; // account for empty case
 		$options = isset($_SESSION['cart.options'][$data->itemID]) ? $_SESSION['cart.options'][$data->itemID] : new stdClass(/*empty obj*/) ;
@@ -229,10 +226,7 @@ class Cart extends NG {
 
 		// Insert order
 		$orderSTH = $this->db->prepare("INSERT INTO `order` (contactID, medium) VALUES (?,?);");
-		if (!$orderSTH->execute( $user['contactID'], $data->medium )) {
-			header('HTTP/ 409 Conflict');
-			return print_r($orderSTH->errorInfo(), true);
-		}
+		if (!$orderSTH->execute( $user['contactID'], $data->medium )) return $this->conflict();
 		$orderID = $this->db->lastInsertId();
 
 		// Store purchases and options
@@ -242,23 +236,14 @@ class Cart extends NG {
 		foreach ($data->items as $key => $value) { // iterate over items
 			if (isset($value->opt->attendees)) { // Store attendees here (if possible)
 				foreach ($value->opt->attendees as $contactID) {
-					if (!$attendeeSTH->execute($key, $contactID)) {
-						header('HTTP/ 409 Conflict');
-						return print_r($orderSTH->errorInfo(), true);
-					}
+					if (!$attendeeSTH->execute($key, $contactID)) return $this->conflict();
 				}
 				unset($value->opt->attendees);
 			}
 			if (isset($value->ele->settings->groupID)) {
-				if (!$memberSTH->execute($user['firmID'], $value->ele->settings->groupID)) {
-					header('HTTP/ 409 Conflict');
-					return print_r($orderSTH->errorInfo(), true);
-				}
+				if (!$memberSTH->execute($user['firmID'], $value->ele->settings->groupID)) return $this->conflict();
 			}
-			if (!$purchaseSTH->execute($key, $orderID, $user['firmID'], json_encode($value->opt))) { // store purchase here
-				header('HTTP/ 409 Conflict');
-				return print_r($orderSTH->errorInfo(), true);
-			}
+			if (!$purchaseSTH->execute($key, $orderID, $user['firmID'], json_encode($value->opt))) return $this->conflict(); // store purchase here
 		}
 
 		// $this->emailCart($orderID);

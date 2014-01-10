@@ -13,10 +13,8 @@ class User extends NG {
 	// Worker(security): Implements: returns database user object or null
 	protected function getUser( $data ) {
 		$user = NULL;
-
 		$STH = $this->db->prepare("SELECT * FROM `contact` WHERE `email`=? AND `pass`=ENCRYPT(?,?) LIMIT 1;");
-		$STH->execute( $data->email, $data->password, config::encryptSTR );
-		if ( $STH->rowCount() > 0 ) {
+		if ( $STH->execute( $data->email, $data->password, config::encryptSTR ) && $STH->rowCount() > 0 ) {
 			$user = $STH->fetch( PDO::FETCH_ASSOC );
 			$user['admin'] = $user['isAdmin'] == 'yes';
 			unset( $user['pass'], $user['resetHash'], $user['resetExpires'], $user['isAdmin'] );
@@ -75,12 +73,8 @@ class User extends NG {
 
 	// Worker(security): grabs authentication from child class
 	public function login() {
-		$data = $this->getPostData();
-
-		$user = $this->getUser( $data ); // Abstract function (See documentation)
-		if (isset($user)) {
-			$_SESSION['user'] = $user;
-		}
+		$user = $this->getUser( $this->getPostData() );
+		if (isset($user)) $_SESSION['user'] = $user;
 		return $this->currentUser();
 	}
 
@@ -114,11 +108,7 @@ class User extends NG {
 		$user = $this->requiresAuth();
 		$emp = $this->getFirmEmploy( $user['firmID'] );
 		$add = $this->getFirmAddr( $user['firmID'] );
-
-		if ($emp == -1 || $add == -1) {
-			header('HTTP/ 409 Conflict');
-			return $this->db->errorInfo();
-		}
+		if ($emp == -1 || $add == -1) return $this->conflict();
 		return array(
 			'emp' => $emp,
 			'add' => $add
@@ -140,51 +130,35 @@ class User extends NG {
 	// Worker: add contact to system
 	public function addContact() {
 		$user = $this->requiresAuth();
-		$data = $this->getPostData();
-
+		$d = $this->getPostData();
 		$STH = $this->db->prepare("INSERT INTO `contact` (firmID, addressID, legalName, preName, title, email, phone) VALUES (?,?,?,?,?,?,?);");
-		if (!$STH->execute( $user['firmID'], $data->addr->addressID, $data->legalName, $data->preName, $data->title, $data->email, $data->phone )) {
-			header('HTTP/ 409 Conflict');
-			return $this->db->errorInfo();
-		}
+		if (!$STH->execute( $user['firmID'], $d->addr->addressID, $d->legalName, $d->preName, $d->title, $d->email, $d->phone )) return $this->conflict();
 		return $this->db->lastInsertId();
 	}
 
 	// Worker: add contact to system
 	public function editContact() {
 		$this->requiresAuth();
-		$data = $this->getPostData();
-
+		$d = $this->getPostData();
 		$STH = $this->db->prepare("UPDATE `contact` SET addressID=?, legalName=?, preName=?, title=?, email=?, phone=? WHERE contactID=?;");
-		if (!$STH->execute( $data->addr->addressID, $data->legalName, $data->preName, $data->title, $data->email, $data->phone, $data->contactID )) {
-			header('HTTP/ 409 Conflict');
-			return $this->db->errorInfo();
-		}
-		return $data->contactID;
+		if (!$STH->execute( $d->addr->addressID, $d->legalName, $d->preName, $d->title, $d->email, $d->phone, $d->contactID )) return $this->conflict();
+		return $d->contactID;
 	}
 
 	// Worker(register + attendee): add an address to the database
 	public function addAddress() {
-		$data = $this->getPostData();
-
+		$d = $this->getPostData();
 		$STH = $this->db->prepare("INSERT INTO `address` (addrName, addr1, addr2, city, state, zip) VALUES (?,?,?,?,?,?);");
-		if (!$STH->execute( $data->addrName, $data->addr1, $data->addr2, $data->city, $data->state, $data->zip )) {
-			header('HTTP/ 409 Conflict');
-			return $this->db->errorInfo();
-		}
+		if (!$STH->execute( $d->addrName, $d->addr1, $d->addr2, $d->city, $d->state, $d->zip )) return $this->conflict();
 		return $this->db->lastInsertId();
 	}
 
 	// Worker(register + attendee): add an address to the database
 	public function editAddress() {
-		$data = $this->getPostData();
-
+		$d = $this->getPostData();
 		$STH = $this->db->prepare("UPDATE `address` SET addrName=?, addr1=?, addr2=?, city=?, state=?, zip=? WHERE addressID=?;");
-		if (!$STH->execute( $data->addrName, $data->addr1, $data->addr2, $data->city, $data->state, $data->zip, $data->addressID )) {
-			header('HTTP/ 409 Conflict');
-			return $this->db->errorInfo();
-		}
-		return $data->addressID;
+		if (!$STH->execute( $d->addrName, $d->addr1, $d->addr2, $d->city, $d->state, $d->zip, $d->addressID )) return $this->conflict();
+		return $d->addressID;
 	}
 
 	// Worker(app/user): register a user to the database
