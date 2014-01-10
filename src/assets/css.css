@@ -38,7 +38,7 @@ th.nowrap, td.nowrap {
 	color: #7f6943;
 }
 
-/* well features */
+/* well features (register) */
 .well {
 	position: relative;
 }
@@ -48,12 +48,67 @@ th.nowrap, td.nowrap {
 	bottom: 0;
 	left: 0;
 	right: 0;
-	background-color: rgba(138, 138, 138, 0.25);
+	background-color: rgba(0, 0, 0, 0.6);
 	z-index: 5;
 	border-radius: inherit;
+}
+.well .well-overlay .well-clear-btn.btn-large {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	height: 44px;
+	width: 140px;
+	margin: -22px 0 0 -70px;
 }
 
 /* helpers */
 .ctr {
 	text-align: center;
+}
+
+.loader {
+	position: fixed;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	background-color: rgba(100, 100, 100, 0.8);
+
+	-webkit-transition: all .5s;
+	-moz-transition: all .5s;
+	-ms-transition: all .5s;
+	-o-transition: all .5s;
+	transition: all .5s;
+
+	opacity: 0; 
+	pointer-events: none;
+}
+
+.loader div {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	text-align: center;
+	background-color: white;
+	padding: 10px;
+	margin: -25px 0 0 -55px; /* add 1/2 padding */
+	height: 40px;
+	width: 100px;
+
+	-webkit-border-radius: 20px;
+	-moz-border-radius: 20px;
+	-ms-border-radius: 20px;
+	-o-border-radius: 20px;
+	border-radius: 20px;
+
+	-webkit-box-shadow: #444444 0 0 20px;
+	-moz-box-shadow: #444444 0 0 20px;
+	-ms-box-shadow: #444444 0 0 20px;
+	-o-box-shadow: #444444 0 0 20px;
+	box-shadow: #444444 0 0 20px;
+}
+
+.loader.active {
+	opacity: 1;
+	pointer-events: auto;
 }
