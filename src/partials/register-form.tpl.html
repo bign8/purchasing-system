@@ -132,18 +132,32 @@
 				</div>
 			</div>
 
-			<div class="control-group">
-				<label class="control-label" for="inputPassword">Password</label>
-				<div class="controls">
-					<input type="password" id="inputPassword" ng-model="user.password" placeholder="Password" required>
-				</div>
-			</div>
+			<div class="well">
+				<div ng-hide="req.pass">
+					<p>Unfulfilled Password Requirements:</p>
+					<ul>
+						<li ng-hide="req.num">At least 1 number</li>
+						<li ng-hide="req.spe">At least 1 special character</li>
+						<li ng-hide="req.alp">At least 1 alphabetical character</li>
+						<li ng-hide="req.upa">At least 1 uppercase alphabetical character</li>
+						<li ng-hide="req.len">At least 6 characters long</li>
+					</ul>
+				</div>	
 
-			<div class="control-group">
-				<label class="control-label" for="inputPassword">Re-type Password</label>
-				<div class="controls">
-					<input type="password" id="inputPassword" ng-model="passVerify" placeholder="Password" required>
+				<div class="control-group">
+					<label class="control-label" for="inputPassword">Password</label>
+					<div class="controls">
+						<input type="password" id="inputPassword" ng-model="user.password" placeholder="Password" required>
+					</div>
 				</div>
+
+				<div class="control-group">
+					<label class="control-label" for="inputPassword">Re-type Password</label>
+					<div class="controls">
+						<input type="password" id="inputPassword" ng-model="passVerify" placeholder="Password" required>
+					</div>
+				</div>
+
 			</div>
 
 		</fieldset>
