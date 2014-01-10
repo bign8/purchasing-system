@@ -25,11 +25,11 @@ controller('RegisterConFormCtrl', ['$scope', 'myPage', 'interface', 'conference'
 	if ($scope.noFields) return; // no need to do any further processing if there are no options
 	
 	$scope.attID = (function() {
-		angular.forEach($scope.con.fields, function(value, key) { if (value.name == 'Attendees') found = value.fieldID; });
-		return found;
+		angular.forEach($scope.con.fields, function(value, key) { if (value.name == 'Attendees') attID = value.fieldID; });
+		return attID;
 	})();
 
-	// Attendee list controls
+	// Attendee list controls (these will be disabled if $scope.attID is undefined)
 	$scope.total = 0;
 	$scope.computeCost = function(index) {
 		var cost = 0, s = $scope.con.item.cost.settings;
@@ -76,7 +76,8 @@ controller('RegisterConFormCtrl', ['$scope', 'myPage', 'interface', 'conference'
 	};
 
 	$scope.save = function() {
-		console.log('SAVING');
+		if ($scope.attID && $scope.con.options[ $scope.attID ].length === 0) return alert('Please add at least one Attendee to the conference');
+
 		// Perform required checks
 		interface.cart('setOptions', $scope.con);
 	};
@@ -513,34 +514,35 @@ controller('RegisterFormCtrl', ['$scope', 'myPage', '$modal', 'interface', 'secu
 
 	// find firm vs. register
 	$scope.firms = firms;
-	$scope.clearFirm = function () { $scope.user.firm = undefined; };
+	$scope.clearFirm = function () { 
+		$scope.user.firm = undefined;
+		$scope.user.firmModified = false;
+	};
 
 	// initialize empty user
 	$scope.user = {
 		preName: '',
-		firm: ''
+		firm: '',
+		firmModified: false
+	};
+
+	$scope.modifyFirm = function() {
+		$scope.user.firmModified = true;
 	};
 
 	// handle registration clicks
 	$scope.register = function( invalid ) {
-		if (invalid) {
-			return alert('Form is not valid\nPlease try again.');
-		}
-		if ($scope.passVerify !== $scope.user.password) {
-			return alert('Passwords do not match\nPlease try again.');
-		}
-		if ($scope.user.firm.addr.addressID === undefined) {
-			return alert('Please assign a firm address');
-		}
-		if ($scope.user.addr.addressID === undefined) {
-			return alert('Please assign a user address');
-		}
+		if (invalid) return alert('Form is not valid\nPlease try again.');
+		if ($scope.passVerify !== $scope.user.password) return alert('Passwords do not match\nPlease try again.');
+		if ($scope.user.firm.addr.addressID === undefined) return alert('Please assign a firm address');
+		if ($scope.user.addr.addressID === undefined) return alert('Please assign a user address');
+		
 		interface.user('addUser', $scope.user).then(function() {
 			alert('Your account has successfully been created');
 			security.requestCurrentUser();
 			security.redirect('/cart');
 		}, function (err) {
-			if (err == '"dup"') {
+			if (err == 'dup') {
 				alert('This email already has an account\nPlease click the login button and attempt a password reset.');
 			} else {
 				alert('There was an unknown error creating your account\nPlease try again or contact Upstream Academy for help.');
@@ -567,18 +569,13 @@ controller('RegisterFormCtrl', ['$scope', 'myPage', '$modal', 'interface', 'secu
 
 	// handle set address clicks
 	$scope.setAddr = function (slug) {
-		// open modal here with address form
-		// modal insterts into db and returns full object
 		var myAddress = (slug == 'firm') ? ($scope.user.firm || {}).addr : $scope.user.addr ;
 		
-		var modalInstance = $modal.open({
+		var modalInstance = $modal.open({ // insterts into db and returns full object
 			templateUrl: 'partials/modal-address.tpl.html',
 			controller: 'ModalAddressCtrl',
-			resolve: {
-				address: function() { return angular.copy( myAddress ); }
-			}
+			resolve: { address: function() { return angular.copy( myAddress ); } }
 		});
-
 		modalInstance.result.then(function(address) {
 			if (slug == 'firm') {
 				$scope.user.firm = typeof($scope.user.firm)=='string' ? {name:''} : $scope.user.firm;

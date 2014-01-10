@@ -26,7 +26,9 @@
 
 			<div class="well" style="padding: 20px 0 1px;">
 
-				<div class="well-overlay" ng-hide="user.firm.firmID === undefined"></div>
+				<div class="well-overlay" ng-hide="user.firmModified || user.firm.firmID === undefined">
+					<button type="button" class="btn btn-warning well-clear-btn btn-large" ng-click="modifyFirm()">Modify Firm</button>
+				</div>
 
 				<div class="control-group">
 					<label class="control-label" for="firmName">Firm Name</label>

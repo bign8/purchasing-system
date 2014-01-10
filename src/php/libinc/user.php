@@ -189,35 +189,30 @@ class User extends NG {
 
 	// Worker(app/user): register a user to the database
 	public function addUser() {
-		$data = $this->getPostData();
+		$d = $this->getPostData();
 
 		// check to see if user is already in system (email)
 		$checkSTH = $this->db->prepare("SELECT * FROM `contact` WHERE email=?;");
-		if (!$checkSTH->execute($data->email)) {
-			header('HTTP/ 409 Conflict');
-			return $this->db->errorInfo();
-		}
-		if ($checkSTH->rowCount() > 0) {
-			header('HTTP/ 409 Conflict');
-			return 'dup';
-		}
+		if (!$checkSTH->execute($d->email)) return $this->conflict();
+		if ($checkSTH->rowCount() > 0) return $this->conflict('dup');
 
-		// Add firm
-		$firmSTH = $this->db->prepare("INSERT INTO `firm` (addressID, name, website) VALUES (?,?,?);");
-		if (!$firmSTH->execute( $data->firm->addr->addressID, $data->firm->name, $data->firm->website )) {
-			header('HTTP/ 409 Conflict');
-			return $this->db->errorInfo();
+		// Add/modify firm
+		if ($d->firmModified && isset($d->firm->firmID)) {
+			$firmSTH = $this->db->prepare("UPDATE `firm` SET `addressID`=?, `name`=?,`website`=? WHERE `firmID`=?");
+			if (!$firmSTH->execute($d->firm->addr->addressID, $d->firm->name, $d->firm->website, $d->firm->firmID)) return $this->conflict();
+			// TODO: send email
+			$firmID = $d->firm->firmID;
+		} else {
+			$firmSTH = $this->db->prepare("INSERT INTO `firm` (addressID, name, website) VALUES (?,?,?);");
+			if (!$firmSTH->execute( $d->firm->addr->addressID, $d->firm->name, $d->firm->website )) return $this->conflict();
+			$firmID = $this->db->lastInsertId();
 		}
-		$firmID = $this->db->lastInsertId();
 
 		// Add Contact
 		$contSTH = $this->db->prepare("INSERT INTO `contact` (firmID, addressID, legalName, preName, title, email, phone, pass) VALUES (?,?,?,?,?,?,?,ENCRYPT(?,?));");
-		if (!$contSTH->execute( $firmID, $data->addr->addressID, $data->legalName, $data->preName, $data->title, $data->email, $data->phone, $data->password, config::encryptSTR )) {
-			header('HTTP/ 409 Conflict');
-			return $this->db->errorInfo();
-		}
-		$_SESSION['user'] = $this->getUser( $data );
-		return $this->db->lastInsertId();
+		if (!$contSTH->execute( $firmID, $d->addr->addressID, $d->legalName, $d->preName, $d->title, $d->email, $d->phone, $d->password, config::encryptSTR )) return $this->conflict();
+		$_SESSION['user'] = $this->getUser( $d );
+		return true;
 	}
 
 }

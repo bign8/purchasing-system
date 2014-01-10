@@ -61,11 +61,7 @@ th.nowrap, td.nowrap {
 	margin: -22px 0 0 -70px;
 }
 
-/* helpers */
-.ctr {
-	text-align: center;
-}
-
+/* loader styles */
 .loader {
 	position: fixed;
 	top: 0;
@@ -83,7 +79,6 @@ th.nowrap, td.nowrap {
 	opacity: 0; 
 	pointer-events: none;
 }
-
 .loader div {
 	position: fixed;
 	top: 50%;
@@ -107,8 +102,12 @@ th.nowrap, td.nowrap {
 	-o-box-shadow: #444444 0 0 20px;
 	box-shadow: #444444 0 0 20px;
 }
-
 .loader.active {
 	opacity: 1;
 	pointer-events: auto;
+}
+
+/* helpers */
+.ctr {
+	text-align: center;
 }

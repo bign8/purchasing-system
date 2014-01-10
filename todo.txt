@@ -1,36 +1,34 @@
 ToDo: 
-- Clean services (breadcrumbs and carts) to get rid of useless code
-- Perform db optimization
 - Account for all special cases
-	- hardcopy vs softcopy price
+	- hardcopy vs softcopy price -> before and after purchases
 	- classes and their recurring wierdness
 	- ...
-- migrate logic to a rest type structure
-- re-design based on proposed user interaction tree
-- store referrer for redirects back to site
-- notify of empty cart on home page
-- pretty crumb use localStorage
-- improve form constraints for register/xx
-
-- register user / select address for a list of firm addresses
-- modify firm on register page, possible after select (use a button)
-- possible to add more attendees, not remove attendees
-
-- GET SAMPLE DATA!
+- Clean services (breadcrumbs and carts) to get rid of useless code
 - Implement Form constraints for checkout
+- improve form constraints for register/xx
+- migrate logic to a rest type structure
+- notify of empty cart on home page
+- Perform db optimization
 - photo upload field (doesn't store, just emails)
-- send email on checkout (indicate payment type, send misc fields)
-- apply time based settings to events
+- possible to add more attendees, not remove attendees
+- pretty crumb use localStorage
+- re-design based on proposed user interaction tree
+- show if event is un-open or not available at current time (manual)
+- store referrer for redirects back to site
+
+Emails (todo):
+- Cart checkout details (cost, payment type, misc fields)
+- Register firm modifications
 
 In a holding pattern:
 - build administration section (see if user end is accepted)
-	- Products
-	- Items
-	- Downloads
-	- Groups
 	- Discounts
+	- Downloads
 	- Firms (merge)
+	- Groups
+	- Items
 	- Memberships
+	- Products
 	- Purchases
 	- ...
 
@@ -43,20 +41,21 @@ Questions:
 - remove duplicates on server or notify user of duplicates?
 
 Future releases
-- handle invoices
-- use key based paypal checkout
 - assign status to orders (processing, confirmed, etc)
 - download proxy? to ensure files have been purchased? (php script)
-- Previous purchases -> modify attendees to a conference, priced accordingly
+- handle invoices
 - periodically make calls back to server to check for additions to php cart
+- Previous purchases -> modify attendees to a conference, priced accordingly
+- register user / select address for a list of firm addresses
+- use key based paypal checkout
 
 Used partials:
-- index.tpl.html
 - custom-payment-form.tpl.html
-- register-form.tpl.html
+- index.tpl.html
 - modal-address.tpl.html
 - modal-contact.tpl.html
 - register-conf.tpl.html
+- register-form.tpl.html
 
 Not used partials:
 - modal-options.tpl.html (replaced by register-conf.tpl.html)
