@@ -128,9 +128,9 @@ config(['$routeProvider', 'securityAuthorizationProvider', '$locationProvider', 
 		// 	}
 		// }).
 		otherwise({ redirectTo: '/' });
-}])
+}]).
 
-.run(['security', 'theCart', function(security, theCart) {
+run(['security', 'theCart', function(security, theCart) {
   // Get the current user when the application starts
   // (in case they are still logged in from a previous session)
   security.requestCurrentUser();

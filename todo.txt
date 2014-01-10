@@ -13,6 +13,8 @@ ToDo:
 - improve form constraints for register/xx
 
 - register user / select address for a list of firm addresses
+- modify firm on register page, possible after select (use a button)
+- possible to add more attendees, not remove attendees
 
 - GET SAMPLE DATA!
 - Implement Form constraints for checkout
