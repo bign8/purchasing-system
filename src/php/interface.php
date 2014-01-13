@@ -32,7 +32,8 @@ if ( $_REQUEST['c'] == 'cart' ) {
 		case 'addDiscount': $data = $obj->addDiscount(); break; // add discounts
 		case 'remDiscount': $data = $obj->remDiscount(); break; // rem discounts
 
-		// case 'saveCart': $data = $obj->saveCart(); break;
+		// Generic Functions
+		case 'save': $data = $obj->save(); break;
 		// case 'getPurchases': $data = $obj->getPurchases(); break;
 		// case 'getDiscount': $data = $obj->getDiscount(); break;
 		default: $pass = false;

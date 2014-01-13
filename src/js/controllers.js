@@ -30,6 +30,7 @@ controller('RegisterConFormCtrl', ['$scope', 'myPage', 'interface', 'conference'
 		$scope.con.options.attID = attID;
 		return attID;
 	})();
+	if ($scope.attID) $scope.con.options[attID] = []; // set empty attendee array
 
 	// Attendee list controls (these will be disabled if $scope.attID is undefined)
 	$scope.total = 0;
@@ -82,7 +83,8 @@ controller('RegisterConFormCtrl', ['$scope', 'myPage', 'interface', 'conference'
 	$scope.save = function( invalid ) {
 		console.log(invalid);
 		if (invalid) return alert('Form is not valid\nPlease try again.');
-		if ($scope.attID && $scope.con.options[ $scope.attID ].length === 0) return alert('Please add at least one Attendee to the conference');
+		if ($scope.attID && $scope.con.options[ $scope.attID ].length === 0) 
+			return alert('Please add at least one Attendee to the conference');
 		interface.cart('setOption', $scope.con).then(function() {
 			theCart.setDirty();
 			$modal.open({
@@ -171,8 +173,7 @@ controller('CartCtrl', ['$scope', 'myPage', '$modal', 'interface', '$location', 
 	$scope.discounts = discounts;
 	$scope.discountMsg = false;
 
-	// A reset-able discount messang function (clears timeout on recall)
-	var msgPromise;
+	var msgPromise; // A reset-able discount messang function (clears timeout on recall)
 	var setDisMessage = function(msgObj, delay) {
 		$scope.discountMsg = msgObj;
 		$timeout.cancel( msgPromise );
@@ -181,20 +182,17 @@ controller('CartCtrl', ['$scope', 'myPage', '$modal', 'interface', '$location', 
 		}, delay);
 	};
 
-	// On the fly discount summation
-	$scope.discountTotal = function() {
+	$scope.total = function() { // Cart total calculation
+		return $scope.theCart.total() - $scope.discountTotal();
+	};
+	$scope.discountTotal = function() { // On the fly discount summation
 		var total = 0;
 		angular.forEach($scope.discounts, function (item) {
 			total += parseFloat( item.amount );
 		});
 		return total;
 	};
-
-	$scope.total = function() {
-		return $scope.theCart.total() - $scope.discountTotal();
-	};
-
-	$scope.addDiscount = function(code) {
+	$scope.addDiscount = function(code) { // add discount
 		var isDuplicateCode = false;
 		angular.forEach(discounts, function(item) {
 			if (item.code == code) isDuplicateCode = true;
@@ -208,65 +206,49 @@ controller('CartCtrl', ['$scope', 'myPage', '$modal', 'interface', '$location', 
 			});
 		}
 	};
-
-	$scope.remDiscount = function(discount) {
+	$scope.remDiscount = function(discount) { // remove discount
 		interface.cart('remDiscount', discount).then(function(res) {
 			$scope.discounts = res;
 		});
 	};
+	$scope.saveCart = function(medium) { // save price (everything else is already on server)
+		var fail = false; // verify options are set
+		angular.forEach(theCart.get(), function(item) {
+			if ( item.hasOptions && !item.cost.set ) fail = true;
+		});
+		if (fail) return alert('You need to assign options for each item in your cart.\nPlease try again.');
 
-	// save cart -> price (everything else is already on server)
+		interface.cart('save', {cost:$scope.total(), medium:medium}).then(function() {
+			var returnPath = '/recipt', cart = {
+				list: theCart.get(),
+				disTotal: $scope.discountTotal(),
+				total: $scope.total(),
+				medium: medium
+			};
+			localStorage.setItem('UA-recipt', JSON.stringify( cart )); // store off cart
 
-	// $scope.saveCart = function(medium) {
-	// 	// verify options are set
-	// 	var fail = false;
-	// 	angular.forEach($scope.printList, function(ele) {
-	// 		if ( $scope.showOptions(ele) && !$scope.options.hasOwnProperty(ele.itemID) ) {	
-	// 			fail = true;
-	// 		}
-	// 	});
-	// 	if (fail) return alert('You need to assign options for each item in your cart.\nPlease try again.');
+			if (medium == 'online') { // direct accordingly
+				var loc = "https://payflowlink.paypal.com?";
+				loc += "LOGIN=UpstreamAcademy&";
+				loc += "PARTNER=PayPal&";
+				loc += "TYPE=S&";
+				loc += "SHOWCONFIRM=FALSE&";
+				loc += "AMOUNT=" + cart.total + "&";
+				loc += "DESCRIPTION=Upstream Academy Purchase&";
+				loc += "MODE=TEST&";
+				document.location = loc;
+			} else {
+				$location.path(returnPath); // go to checkout page
+			}
+			theCart.setDirty(); // make sure empty cart gets loaded into the system
+		});
+	};
+}]).
 
-	// 	// Pre-process data
-	// 	var obj = {}; // list:$scope.printList, opt:$scope.options
-	// 	angular.forEach($scope.options, function(ele) {
-	// 		if (ele.hasOwnProperty('attendees')) { // convert attendee array of obj to attendee array of id's
-	// 			var temp = [];
-	// 			angular.forEach(ele.attendees, function(att) {
-	// 				temp.push(att.contactID);
-	// 			});
-	// 			ele.attendees = temp;
-	// 		}
-	// 	});
-	// 	angular.forEach($scope.printList, function(ele) { // converting into itemID -> options style array
-	// 		// obj[ele.itemID] = $scope.options[ele.itemID] || ele.settings || {};
-	// 		obj[ele.itemID] = { // Proposed change, send options and element
-	// 			opt: $scope.options[ele.itemID] || {},
-	// 			ele: ele
-	// 		};
-	// 	});
+controller('ReciptCtrl', ['$scope', 'myPage', function ($scope, myPage) {
+	myPage.setTitle("Recipt", "from last purchase");
 
-	// 	interface.call('saveCart', {items:obj, medium:medium}).then(function(res) {
-	// 		var total = printCart.total();
-	// 		printCart.checkout(medium); // clear cart + archive for callback
-
-	// 		var returnPath = '/cart/recipt';
-
-	// 		if (medium == 'online') {
-	// 			var loc = "https://payflowlink.paypal.com?";
-	// 			loc += "LOGIN=UpstreamAcademy&";
-	// 			loc += "PARTNER=PayPal&";
-	// 			loc += "TYPE=S&";
-	// 			loc += "SHOWCONFIRM=FALSE&";
-	// 			loc += "AMOUNT=" + total + "&";
-	// 			loc += "DESCRIPTION=Upstream Academy Purchase&";
-	// 			loc += "MODE=TEST&";
-	// 			document.location = loc;
-	// 		} else {
-	// 			$location.path(returnPath); // go to checkout page
-	// 		}
-	// 	});
-	// };
+	$scope.recipt = JSON.parse(localStorage.getItem('UA-recipt'));
 }]).
 
 controller('HeadCtrl', ['$scope', 'myPage', 'breadcrumbs', 'theCart', 'security', function ($scope, myPage, breadcrumbs, theCart, security) {

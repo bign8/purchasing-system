@@ -84,20 +84,6 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function($rootS
 	var total = 0;
 	var observerCallbacks = []; // Observer Pattern
 
-	// // Attach storage change event
-	// if (window.addEventListener) { // See: http://diveintohtml5.info/storage.html
-	// 	window.addEventListener('storage', handle_storage, false);
-	// } else {
-	// 	window.attachEvent('onstorage', handle_storage);
-	// }
-	// // Update cart and notify world of changes
-	// function handle_storage(e) { // allow multi-tab updates
-	// 	if (!e) { e = window.event; }
-	// 	cart = JSON.parse(localStorage.getItem('azUAcart') || '[]');
-	// 	update();
-	// 	$rootScope.$digest();
-	// }
-
 	// Update cart/purchases on current user change
 	$rootScope.$watch(function() {
 		return security.currentUser;
@@ -113,7 +99,7 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function($rootS
 					item.cost.value = parseFloat( item.cost.settings.initial ); // initial cost always in effect
 					if ( options.hasOwnProperty(item.itemID) ) { // apply pricing based on the number of attendees
 						var attID = options[ item.itemID ].attID; // grab attendee id
-						var multiply = options[ item.itemID ][ attID ].length - parseFloat( item.cost.settings.after ); // how many more
+						var multiply = (options[ item.itemID ][ attID ] || []).length - parseFloat( item.cost.settings.after ); // how many more
 						if (multiply > 0) item.cost.value += parseFloat( item.cost.settings.later ) * multiply; // for additional attendees
 					}
 					item.hasOptions = true;
@@ -191,10 +177,6 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function($rootS
 		setDirty: function() {
 			dirty = true;
 		},
-		// clear: function() {
-		// 	cart = [];
-		// 	update();
-		// },
 
 		// Observer pattern
 		registerObserver: function(callback) { // Nice observer pattern! http://stackoverflow.com/a/17558885
@@ -203,23 +185,6 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function($rootS
 		}
 	};
 }]).
-
-// factory('printCart', ['interface', 'myCart', '$rootScope', '$filter', '$timeout', function (interface, myCart, $rootScope, $filter, $timeout) {
-// 	return {
-// 		checkout: function(medium) {
-// 			localStorage.setItem('azUArecipt', JSON.stringify(printList)); // store off cart
-// 			localStorage.setItem('azUAreciptTotal', JSON.stringify(total));
-// 			localStorage.setItem('azUAreciptType', medium);
-// 			myCart.clear();
-// 		},
-// 		getRecipt: function() {
-// 			return {
-// 				total: JSON.parse(localStorage.getItem('azUAreciptTotal')),
-// 				list: JSON.parse(localStorage.getItem('azUArecipt')),
-// 				medium: localStorage.getItem('azUAreciptType')
-// 			};
-// 		},
-// }]).
 
 factory('interface', ['$http', '$q', '$rootScope', '$timeout', function ($http, $q, $rootScope, $timeout) {
 

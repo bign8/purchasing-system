@@ -268,12 +268,11 @@ class Cart extends NG {
 		return array('pre'=> 'Success!', 'msg'=>'Added discount to current order!', 'type'=>'success', 'obj'=>$obj );
 	}
 
-
-	// UNTESTED FUNCTIONS
+	// GENERIC CART FUNCTION
 
 	// Worker(app/checkout): save cart
-	public function saveCart() {
-		$user = $this->requiresAuth();
+	public function save() {
+		$user = $this->usr->requiresAuth();
 		$data = $this->getPostData();
 
 		// Insert order
@@ -285,23 +284,30 @@ class Cart extends NG {
 		$purchaseSTH = $this->db->prepare("INSERT INTO `purchase` (itemID, orderID, firmID, data) VALUES (?,?,?,?);");
 		$attendeeSTH = $this->db->prepare("INSERT INTO `attendee` (itemID, contactID) VALUES (?,?);");
 		$memberSTH = $this->db->prepare("INSERT INTO `member` (firmID, groupID) VALUES (?,?);");
-		foreach ($data->items as $key => $value) { // iterate over items
-			if (isset($value->opt->attendees)) { // Store attendees here (if possible)
-				foreach ($value->opt->attendees as $contactID) {
-					if (!$attendeeSTH->execute($key, $contactID)) return $this->conflict();
-				}
-				unset($value->opt->attendees);
-			}
-			if (isset($value->ele->settings->groupID)) {
-				if (!$memberSTH->execute($user['firmID'], $value->ele->settings->groupID)) return $this->conflict();
-			}
-			if (!$purchaseSTH->execute($key, $orderID, $user['firmID'], json_encode($value->opt))) return $this->conflict(); // store purchase here
+		$cart = $this->get(); // removes random id's
+		foreach ($cart as $item) { // iterate over items
+			if ($item['itemID'] == '-1') continue; // don't care about custom payment storage (yet)
+			// if (isset($value->opt->attendees)) { // Store attendees here (if possible)
+			// 	foreach ($value->opt->attendees as $contactID) {
+			// 		if (!$attendeeSTH->execute($key, $contactID)) return $this->conflict();
+			// 	}
+			// 	unset($value->opt->attendees);
+			// }
+			// if (isset($value->ele->settings->groupID)) {
+			// 	if (!$memberSTH->execute($user['firmID'], $value->ele->settings->groupID)) return $this->conflict();
+			// }
+			$option = isset($_SESSION['cart.options'][ $item['itemID'] ]) ? $_SESSION['cart.options'][ $item['itemID'] ] : array();
+			if (!$purchaseSTH->execute($item['itemID'], $orderID, $user['firmID'], json_encode($option))) return $this->conflict(); // store purchase here
 		}
 
-		// $this->emailCart($orderID);
+		// $this->emailCart($orderID, $data->cost);
+		$this->clr();
 
 		return $orderID;	
 	}
+
+
+	// UNTESTED FUNCTIONS
 
 	// Helper(app/cart/checkout/email): email cart data
 	public function emailCart($orderID) {
