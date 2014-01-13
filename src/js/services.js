@@ -357,12 +357,21 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function($rootS
 // 	};
 // }]).
 
-factory('interface', ['$http', '$q', '$rootScope', function ($http, $q, $rootScope) {
+factory('interface', ['$http', '$q', '$rootScope', '$timeout', function ($http, $q, $rootScope, $timeout) {
 
-	var pendingPromisses = 0;
+	var pendingPromisses = 0, activeTimeout = -1;
 	$rootScope.$watch(
 		function() { return pendingPromisses > 0; }, 
-		function(loading) { $rootScope.loading = loading; }
+		function(loading) {
+			$rootScope.loading = loading;
+			$rootScope.loadWarn = false;
+			$timeout.cancel( activeTimeout );
+			if (loading) {
+				activeTimeout = $timeout(function() {
+					$rootScope.loadWarn = true;
+				}, 10000);
+			}
+		}
 	);
 
 	var formatData = function(data) { // process simple types (null,true,false)
