@@ -1,5 +1,4 @@
 ToDo: 
-- "this is taking too long" and delay for loading dialog
 - Account for all special cases
 	- hardcopy vs softcopy price -> before and after purchases
 	- classes and their recurring wierdness

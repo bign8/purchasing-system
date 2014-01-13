@@ -112,6 +112,23 @@ th.nowrap, td.nowrap {
 	opacity: 1;
 	pointer-events: auto;
 }
+.loader p.warn {
+	margin:20px -120px;
+	padding:10px;
+	background-color: white;
+
+	-webkit-border-radius: 20px;
+	-moz-border-radius: 20px;
+	-ms-border-radius: 20px;
+	-o-border-radius: 20px;
+	border-radius: 20px;
+
+	-webkit-box-shadow: #444444 0 0 20px;
+	-moz-box-shadow: #444444 0 0 20px;
+	-ms-box-shadow: #444444 0 0 20px;
+	-o-box-shadow: #444444 0 0 20px;
+	box-shadow: #444444 0 0 20px;
+}
 
 /* helpers */
 .ctr {
