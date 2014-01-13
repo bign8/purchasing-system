@@ -11,7 +11,7 @@
 
 <div class="row">
 	<div class="offset0 span12">
-		<a class="btn" href="#/purchases">View Purchases</a>
+		<a class="btn" href="/purchases">View Purchases</a>
 		<a class="btn pull-right" href="javascript:window.print()">Print</a>
 
 		<table class="table table-striped table-hover">
@@ -26,22 +26,32 @@
 				<tr ng-repeat="item in recipt.list"> <!-- printList -->
 					<td><a href="#/products/{{item.productID}}/{{item.itemID}}">{{item.name}}</a></td>
 					<td>{{item.description}}</td>
-					<td ng-switch="showOptions(item)">
-						<span ng-switch-when="false">{{item.cost.pretty}}</span>
-						<span ng-switch-default>{{item.cost.calc | currency}}</span>
-					</td>
+					<td>{{item.cost.value | currency}}</td>
 				</tr>
 			</tbody>
 			<tfoot>
 				<tr>
 					<th></th>
-					<th><span class="pull-right">Total:</span></th>
-					<th><span>{{recipt.total | currency}}</span></th>
+					<th>
+						<span class="pull-right">
+							<span ng-show="recipt.disTotal">
+								Sub-Total:<br/>
+								Discounts:<br/>
+							</span>
+							Total:
+						</span>
+					</th>
+					<th>
+						<span ng-show="recipt.disTotal">
+							{{ recipt.total + recipt.disTotal | currency }}<br/>
+							{{ recipt.disTotal | currency }}<br/>
+						</span>
+						<span>{{ recipt.total | currency }}</span>
+					</th>
 				</tr>
 			</tfoot>
 		</table>
 
 		<!-- <pre>{{recipt | json}}</pre> -->
-
 	</div>
 </div>

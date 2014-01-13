@@ -101,13 +101,13 @@ config(['$routeProvider', 'securityAuthorizationProvider', '$locationProvider', 
 				user: securityAuthorizationProvider.requireAuthenticatedUser
 			}
 		}).
-		// when('/recipt', { // shows a recipt of items purchased for a specific order
-		// 	templateUrl: 'partials/recipt-print.tpl.html',
-		// 	controller: 'ReciptCtrl',
-		// 	resolve: {
-		// 		user: securityAuthorizationProvider.requireAuthenticatedUser
-		// 	}
-		// }).
+		when('/recipt', { // shows a recipt of items purchased for a specific order
+			templateUrl: 'partials/recipt-print.tpl.html',
+			controller: 'ReciptCtrl',
+			resolve: {
+				user: securityAuthorizationProvider.requireAuthenticatedUser
+			}
+		}).
 
 		// // USER STUFF
 		
