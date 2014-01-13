@@ -4,9 +4,11 @@ ToDo:
 	- classes and their recurring wierdness
 	- ...
 - Clean services (breadcrumbs and carts) to get rid of useless code
+- Checkout / Continue Shopping / Close
 - Implement Form constraints for checkout
 - improve form constraints for register/xx
 - migrate logic to a rest type structure
+- Modify links on both carts to use db links if available, otherwise txt
 - password show as red for invalid passwd
 - Perform db optimization
 - photo upload field (doesn't store, just emails)

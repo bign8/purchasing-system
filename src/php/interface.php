@@ -23,8 +23,9 @@ if ( $_REQUEST['c'] == 'cart' ) {
 		case 'clr': $data = $obj->clr(); break; // clear cart
 
 		// Cart.Options Functions
-		case 'getOptions': $data = $obj->getOptions(); break; // get conference form data
-		case 'setOptions': $data = $obj->setOptions(); break; // get conference form data
+		case 'getOptions': $data = $obj->getOptions(); break; // get all options
+		case 'getOption':  $data = $obj->getOption();  break; // get conference form data
+		case 'setOption':  $data = $obj->setOption();  break; // get conference form data
 
 		// case 'saveCart': $data = $obj->saveCart(); break;
 		// case 'getPurchases': $data = $obj->getPurchases(); break;
