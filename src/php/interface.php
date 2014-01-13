@@ -27,6 +27,11 @@ if ( $_REQUEST['c'] == 'cart' ) {
 		case 'getOption':  $data = $obj->getOption();  break; // get conference form data
 		case 'setOption':  $data = $obj->setOption();  break; // get conference form data
 
+		// Cart.Discount Functions
+		case 'getDiscount': $data = $obj->getDiscount(); break; // get all discounts
+		case 'addDiscount': $data = $obj->addDiscount(); break; // add discounts
+		case 'remDiscount': $data = $obj->remDiscount(); break; // rem discounts
+
 		// case 'saveCart': $data = $obj->saveCart(); break;
 		// case 'getPurchases': $data = $obj->getPurchases(); break;
 		// case 'getDiscount': $data = $obj->getDiscount(); break;
