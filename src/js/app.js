@@ -95,6 +95,9 @@ config(['$routeProvider', 'securityAuthorizationProvider', '$locationProvider', 
 				preLoad: function(theCart) {
 					return theCart.load(); // won't use data, will pre-fetch data
 				},
+				discounts: function(interface) {
+					return interface.cart('getDiscount');
+				},
 				user: securityAuthorizationProvider.requireAuthenticatedUser
 			}
 		}).

@@ -10,6 +10,7 @@ class Cart extends NG {
 
 		if ( !isset($_SESSION['cart']) ) $_SESSION['cart'] = array(); // assign empty cart if applicable
 		if ( !isset($_SESSION['cart.options']) ) $_SESSION['cart.options'] = array(); // assign empty cart.options if applicable
+		if ( !isset($_SESSION['cart.discounts']) ) $_SESSION['cart.discounts'] = array(); // assign empty cart.discounts if applicable
 		$this->usr = new User();
 	}
 
@@ -183,9 +184,11 @@ class Cart extends NG {
 	public function clr() {
 		$_SESSION['cart'] = array();
 		$_SESSION['cart.options'] = array();
+		$_SESSION['cart.discounts'] = array();
 	}
 
 	// CART.OPTIONS ACTIONS
+
 	// Worker: return all options
 	public function getOptions() {
 		return $_SESSION['cart.options'];
@@ -221,6 +224,50 @@ class Cart extends NG {
 		$data = $this->getPostData();
 		$_SESSION['cart.options'][ $data->item->itemID ] = $this->object_to_array( $data->options );
 	}
+
+	// CART.DISCOUNTS ACTIONS
+
+	// Worker: return all disocunts
+	public function getDiscount() {
+		return $_SESSION['cart.discounts'];
+	}
+
+	// Worker: remove single discount
+	public function remDiscount() {
+		$data = $this->getPostData();
+		$_SESSION['cart.discounts'] = array_diff($_SESSION['cart.discounts'], array( $this->object_to_array($data) ));
+		return $_SESSION['cart.discounts'];
+	}
+
+	// Worker(app/cart/discount): return discount object
+	public function addDiscount() {
+		$data = $this->getPostData();
+
+		// Check if any code matches the inputed code
+		$anyCodeSTH = $this->db->prepare("SELECT discountID FROM `discount` WHERE `code`=?;");
+		if (!$anyCodeSTH->execute( $data->code ) || $anyCodeSTH->rowCount() == 0) 
+			return array('pre'=> 'Error!','msg'=>'Invalid discount code.', 'type'=>'error');
+		$codeID = $anyCodeSTH->fetchColumn();
+
+		// Check if code is still valid
+		$validTimeSTH = $this->db->prepare("SELECT * FROM `discount` WHERE `active`='yes' AND discountID=?;");
+		if (!$validTimeSTH->execute( $codeID ) || $validTimeSTH->rowCount() == 0) 
+			return array('pre' => 'Sorry!', 'msg'=>'This code has expired!', 'type'=>'error');
+
+		// test if valid for current cart
+		$ids = array("0");
+		foreach ($_SESSION['cart'] as $item) array_push($ids, $item['itemID']); // grab ids from current cart
+		$questionMarks = trim(str_repeat("?,", sizeof($ids)),",");
+		$finalSTH = $this->db->prepare("SELECT * FROM `discount` WHERE ((productID IN (SELECT DISTINCT productID FROM `item` WHERE itemID IN ($questionMarks)) AND itemID IS NULL) OR (productID IS NULL AND itemID IN ($questionMarks)) OR (productID IS NULL AND itemID IS NULL) ) AND discountID = ?;");
+		if (!$finalSTH->execute( array_merge( $ids, $ids, array($codeID) ) ) || $finalSTH->rowCount() == 0) 
+			return array('pre' => 'Unrelated!', 'msg'=>'Not associated with any items in your cart.', 'type'=>'error');
+
+		$obj = $finalSTH->fetch(PDO::FETCH_ASSOC);
+		array_push($_SESSION['cart.discounts'], $obj);
+		// successfull callback
+		return array('pre'=> 'Success!', 'msg'=>'Added discount to current order!', 'type'=>'success', 'obj'=>$obj );
+	}
+
 
 	// UNTESTED FUNCTIONS
 
@@ -345,39 +392,5 @@ class Cart extends NG {
 			$item['data'] = json_decode($item['data']);
 		}
 		return json_encode($retData);
-	}
-
-	// Worker(app/cart/discount): return discount object
-	public function getDiscount() {
-		$user = $this->requiresAuth();
-		$data = $this->getPostData();
-
-		// Check if any code matches the inputed code
-		$anyCodeSTH = $this->db->prepare("SELECT discountID FROM `discount` WHERE `code`=?;");
-		if (!$anyCodeSTH->execute( $data->code ) || $anyCodeSTH->rowCount() == 0) {
-			return json_encode(array('pre'=> 'Error!','msg'=>'Invalid discount code.', 'type'=>'error'));
-		}
-		$codeID = $anyCodeSTH->fetchColumn();
-
-		// Check if code is still valid
-		$validTimeSTH = $this->db->prepare("SELECT * FROM `discount` WHERE `activate`<NOW() AND (`expire`>NOW() OR `expire` IS NULL) AND discountID=?;");
-		if (!$validTimeSTH->execute( $codeID ) || $validTimeSTH->rowCount() == 0) {
-			return json_encode(array('pre' => 'Sorry!', 'msg'=>'This code has expired!', 'type'=>'error'));
-		}
-
-		// TODO: test if valid for current cart
-		$questionMarks = trim(str_repeat("?,", sizeof($data->ids)),",");
-		$finalSTH = $this->db->prepare("SELECT * FROM `discount` WHERE ((productID IN (SELECT DISTINCT productID FROM `item` WHERE itemID IN ($questionMarks)) AND itemID IS NULL) OR (productID IS NULL AND itemID IN ($questionMarks)) OR (productID IS NULL AND itemID IS NULL) ) AND discountID = ?;");
-		if (!$finalSTH->execute( array_merge( $data->ids, $data->ids, array($codeID) ) ) || $finalSTH->rowCount() == 0) {
-			return json_encode(array('pre' => 'Unrelated!', 'msg'=>'Not associated with any items in your cart.', 'type'=>'error'));
-		}
-
-		// successfull callback
-		return json_encode(array(
-			'pre'=> 'Success!',
-			'msg'=>'Added discount to current order!',
-			'type'=>'success',
-			'obj'=>$finalSTH->fetch(PDO::FETCH_ASSOC)
-		));
 	}
 }
