@@ -15,7 +15,7 @@ controller('IndexCtrl', ['$scope', 'myPage', 'theCart', 'security', function ($s
 	$scope.theCart = theCart;
 }]).
 
-controller('RegisterConFormCtrl', ['$scope', 'myPage', 'interface', 'conference', '$modal', function ($scope, myPage, interface, conference, $modal) {
+controller('RegisterConFormCtrl', ['$scope', 'myPage', 'interface', 'conference', '$modal', 'theCart', function ($scope, myPage, interface, conference, $modal, theCart) {
 	$scope.con = conference;
 	$scope.orig = angular.copy( $scope.con.options );
 
@@ -27,6 +27,7 @@ controller('RegisterConFormCtrl', ['$scope', 'myPage', 'interface', 'conference'
 	
 	$scope.attID = (function() {
 		angular.forEach($scope.con.fields, function(value, key) { if (value.name == 'Attendees') attID = value.fieldID; });
+		$scope.con.options.attID = attID;
 		return attID;
 	})();
 
@@ -82,7 +83,8 @@ controller('RegisterConFormCtrl', ['$scope', 'myPage', 'interface', 'conference'
 		console.log(invalid);
 		if (invalid) return alert('Form is not valid\nPlease try again.');
 		if ($scope.attID && $scope.con.options[ $scope.attID ].length === 0) return alert('Please add at least one Attendee to the conference');
-		interface.cart('setOptions', $scope.con).then(function() {
+		interface.cart('setOption', $scope.con).then(function() {
+			theCart.setDirty();
 			$modal.open({
 				templateUrl: 'registerConfNextActionTPL.html',
 				controller: function ($scope, $modalInstance, $location) {

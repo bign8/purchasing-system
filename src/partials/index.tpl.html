@@ -26,21 +26,26 @@
 		<tbody>
 			<tr ng-repeat="item in theCart.get()" ng-class="{true:'error', false:''}[item.warn]"> <!-- printList -->
 				<td><a href="#/products/{{item.productID}}/{{item.itemID}}">{{item.name}}</a></td>
-				<td>{{item.description}}</td>
-				<td ng-switch="showOptions(item)">
-					<span ng-switch-when="false">{{item.cost.pretty}}</span>
-					<span ng-switch-default>{{item.cost.pretty}}</span>
+				<td>
+					<div ng-switch="item.cost.set" class="pull-right" ng-show="item.hasOptions">
+						<a href="/register/{{item.itemID}}" ng-switch-when="false" class="btn btn-warning btn-mini">Set</a>
+						<a href="/register/{{item.itemID}}" ng-switch-default class="btn btn-info btn-mini">Edit</a>
+					</div>
+					{{item.description}}
+				</td>
+				<td>
+					<span>{{item.cost.value | currency}}</span>
 					<a href ng-click="theCart.rem(item)" role="button" class="close">&times;</a>
 				</td>
 			</tr>
 		</tbody>
-		<!-- <tfoot>
+		<tfoot>
 			<tr>
 				<th></th>
 				<th><span class="pull-right">Sub-Total:</span></th>
-				<th><span>{{printCart.subTotal() | currency}}</span></th>
+				<th><span>{{theCart.total() | currency}}</span></th>
 			</tr>
-		</tfoot> -->
+		</tfoot>
 	</table>
 </div>
 

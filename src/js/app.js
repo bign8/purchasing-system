@@ -51,7 +51,7 @@ config(['$routeProvider', 'securityAuthorizationProvider', '$locationProvider', 
 			controller: 'RegisterConFormCtrl',
 			resolve: {
 				conference: function(interface, $route) {
-					return interface.cart('getOptions', $route.current.params);
+					return interface.cart('getOption', $route.current.params);
 				},
 				user: securityAuthorizationProvider.requireAuthenticatedUser
 			}
@@ -92,8 +92,8 @@ config(['$routeProvider', 'securityAuthorizationProvider', '$locationProvider', 
 			templateUrl: 'partials/show-cart.tpl.html',
 			controller: 'CartCtrl',
 			resolve: {
-				fullCart: function(theCart) {
-					return theCart.load();
+				preLoad: function(theCart) {
+					return theCart.load(); // won't use data, will pre-fetch data
 				},
 				user: securityAuthorizationProvider.requireAuthenticatedUser
 			}

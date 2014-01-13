@@ -12,43 +12,30 @@
 					<tr>
 						<th>Name</th>
 						<th>Description</th>
-						<th>Options</th>
 						<th>Cost</th>
 					</tr>
 				</thead>
 				<tbody>
 					<tr ng-repeat="item in theCart.get()" ng-class="{true:'error', false:''}[item.warn]"> <!-- printList -->
 						<td><a href="#/products/{{item.productID}}/{{item.itemID}}">{{item.name}}</a></td>
-						<td>{{item.description}}</td>
-						<td ng-switch="options.hasOwnProperty(item.itemID)">
-							<button 
-								ng-switch-when="false" 
-								ng-show="showOptions(item)" 
-								ng-click="callOptions(item.template, item)" 
-								class="btn btn-warning btn-mini">
-									Set
-							</button>
-							<button 
-								ng-switch-default 
-								ng-show="showOptions(item)" 
-								ng-click="callOptions(item.template, item)" 
-								class="btn btn-info btn-mini">
-									Edit
-							</button>
+						<td>
+							<div ng-switch="item.cost.set" class="pull-right" ng-show="item.hasOptions">
+								<a href="/register/{{item.itemID}}" ng-switch-when="false" class="btn btn-warning btn-mini">Set</a>
+								<a href="/register/{{item.itemID}}" ng-switch-default class="btn btn-info btn-mini">Edit</a>
+							</div>
+							<span>{{item.description}}</span>
 						</td>
-						<td ng-switch="showOptions(item)">
-							<span ng-switch-when="false">{{item.cost.pretty}}</span>
-							<span ng-switch-default>{{item.cost.calc | currency}}</span>
-							<a href ng-click="printCart.rem($index)" role="button" class="close">&times;</a>
+						<td>
+							<span>{{item.cost.value | currency}}</span>
+							<a href ng-click="theCart.rem(item)" role="button" class="close">&times;</a>
 						</td>
 					</tr>
 				</tbody>
 				<tfoot>
 					<tr>
 						<th></th>
-						<th></th>
-						<th>Sub-Total:</th>
-						<th><span>{{printCart.subTotal() | currency}}</span></th>
+						<th><span class="pull-right">Sub-Total:</span></th>
+						<th><span>{{theCart.total() | currency}}</span></th>
 					</tr>
 				</tfoot>
 			</table>
@@ -62,7 +49,7 @@
 						<tbody>
 							<tr>
 								<td><strong class="pull-right">Sub-Total:</strong></td>
-								<td>{{printCart.subTotal() | currency}}</td>
+								<td>{{theCart.total() | currency}}</td>
 							</tr>
 							<tr>
 								<td><strong class="pull-right">Discounts:</strong></td>
@@ -128,6 +115,7 @@
 			</div>
 			
 			<pre>{{theCart.get() | json}}</pre>
+			<pre>{{theCart.dev() | json}}</pre>
 
 		</div>
 	</div>

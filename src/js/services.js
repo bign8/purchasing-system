@@ -79,51 +79,62 @@ factory('breadcrumbs', ['$rootScope', '$location', 'interface', function ($rootS
 
 factory('theCart', ['$rootScope', 'interface', 'security', '$q', function($rootScope, interface, security, $q) {
 	var cart = [];
+	var options = {};
 	var dirty = true;
-//	var past = [];
-// 	var observerCallbacks = []; // Observer Pattern
+	var total = 0;
+	var observerCallbacks = []; // Observer Pattern
 
-// 	// Attach storage change event
-// 	if (window.addEventListener) { // See: http://diveintohtml5.info/storage.html
-// 		window.addEventListener('storage', handle_storage, false);
-// 	} else {
-// 		window.attachEvent('onstorage', handle_storage);
-// 	}
+	// // Attach storage change event
+	// if (window.addEventListener) { // See: http://diveintohtml5.info/storage.html
+	// 	window.addEventListener('storage', handle_storage, false);
+	// } else {
+	// 	window.attachEvent('onstorage', handle_storage);
+	// }
+	// // Update cart and notify world of changes
+	// function handle_storage(e) { // allow multi-tab updates
+	// 	if (!e) { e = window.event; }
+	// 	cart = JSON.parse(localStorage.getItem('azUAcart') || '[]');
+	// 	update();
+	// 	$rootScope.$digest();
+	// }
 
 	// Update cart/purchases on current user change
 	$rootScope.$watch(function() {
 		return security.currentUser;
 	}, reload, true);
 
-// 	// Update cart and notify world of changes
-// 	function handle_storage(e) { // allow multi-tab updates
-// 		if (!e) { e = window.event; }
-// 		cart = JSON.parse(localStorage.getItem('azUAcart') || '[]');
-// 		update();
-// 		$rootScope.$digest();
-// 	}
+	var processCart = function() {
+		total = 0;
+		angular.forEach(cart, function(item) {
+			item.cost.value = 0;
+			item.hasOptions = false;
+			switch (item.template) {
+				case 'conference':
+					item.cost.value = parseFloat( item.cost.settings.initial ); // initial cost always in effect
+					if ( options.hasOwnProperty(item.itemID) ) { // apply pricing based on the number of attendees
+						var attID = options[ item.itemID ].attID; // grab attendee id
+						var multiply = options[ item.itemID ][ attID ].length - parseFloat( item.cost.settings.after ); // how many more
+						if (multiply > 0) item.cost.value += parseFloat( item.cost.settings.later ) * multiply; // for additional attendees
+					}
+					item.hasOptions = true;
+					break;
+				case 'download':
+					item.cost.value = parseFloat(item.cost.settings.cost); // straight assignment (no options)
+					break;
+				case 'custom':
+					item.cost.value = item.cost.settings.cost;// = { calc: item.cost, pretty: $filter('currency')(item.cost) }; // invoices
+					break;
+				default:
+					item.cost = {value:0, pretty:'$0.00'};
+			}
+			if (item.hasOptions) item.cost.set = options.hasOwnProperty( item.itemID );
+			total += item.cost.value;
+		});
 
-// 	// Update local storage container
-// 	function update() {
-// 		localStorage.setItem('azUAcart', JSON.stringify(cart));
-// 		angular.forEach(observerCallbacks, function(callback) { // Notify observers
-// 			callback();
-// 		});
-// 	}
-
-// 	// // retrieve purchases from server
-// 	// function update_purchases() {
-// 	// 	interface.call('interface', 'getSoftPurchases').then(function (res) {
-// 	// 		past = res.data;
-			
-// 	// 		// remove past items from cart before returning cart
-// 	// 		angular.forEach(past, function(ele) {
-// 	// 			var index = cart.indexOf(ele);
-// 	// 			if (index !== -1) cart.splice(index, 1);
-// 	// 		});
-// 	// 		update();
-// 	// 	});
-// 	// }
+		angular.forEach(observerCallbacks, function(callback) { // Notify observers
+			callback();
+		});
+	};
 
 	var dbCall = function(fn, item) {
 		dirty = true;
@@ -135,12 +146,16 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function($rootS
 	};
 
 	var reload = function() {
-		var promise = interface.cart('get');
-		promise.then(function(response) {
-			cart = response;
-			dirty = false;
+		var cartPromise = interface.cart('get').then(function(res) { // get cart
+			cart = res;
 		});
-		return promise;
+		var optPromise = interface.cart('getOptions').then(function(res) { // get options
+			options = res;
+		});
+		return $q.all([cartPromise, optPromise]).then(function() { // wait for both to respond
+			dirty = false;
+			processCart();
+		});
 	};
 
 	return {
@@ -164,25 +179,28 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function($rootS
 		rem: function(item) {
 			return dbCall('rem', item);
 		},
-		// contains: function(itemID) {
-		// 	// check if already in cart or if inprevious purchases
-		// 	return cart.indexOf(itemID) !== -1 || past.indexOf(itemID) !== -1;
-		// },
-		// purchased: function(itemID) {
-		// 	return past.indexOf(itemID) !== -1;
-		// },
 		get: function() {
 			return cart;
+		},
+		total: function() {
+			return total;
+		},
+		dev: function() { // for development only
+			return options;
+		},
+		setDirty: function() {
+			dirty = true;
 		},
 		// clear: function() {
 		// 	cart = [];
 		// 	update();
 		// },
 
-		// // Observer pattern
-		// registerObserver: function(callback) {
-		// 	observerCallbacks.push(callback);
-		// }
+		// Observer pattern
+		registerObserver: function(callback) {
+			if (observerCallbacks.indexOf(callback) === -1)
+				observerCallbacks.push(callback);
+		}
 	};
 }]).
 

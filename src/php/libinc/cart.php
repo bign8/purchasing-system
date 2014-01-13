@@ -186,9 +186,13 @@ class Cart extends NG {
 	}
 
 	// CART.OPTIONS ACTIONS
+	// Worker: return all options
+	public function getOptions() {
+		return $_SESSION['cart.options'];
+	}
 
 	// Worker: return conference options
-	public function getOptions() {
+	public function getOption() {
 		$data = $this->getPostData();
 
 		$item = $this->getItemByID( $data->itemID ); // get item + cost information
@@ -213,7 +217,7 @@ class Cart extends NG {
 	}
 
 	// Worker: set cart options
-	public function setOptions() {
+	public function setOption() {
 		$data = $this->getPostData();
 		$_SESSION['cart.options'][ $data->item->itemID ] = $this->object_to_array( $data->options );
 	}
