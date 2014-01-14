@@ -4,6 +4,7 @@ ToDo:
 	- classes and their recurring wierdness
 	- ...
 - Checkout / Continue Shopping / Close
+- Give old and discount price based on groups (show and give reason)
 - Implement Form constraints for checkout
 - improve form constraints for register/xx
 - migrate logic to a rest type structure

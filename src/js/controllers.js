@@ -174,6 +174,12 @@ controller('CartCtrl', ['$scope', 'myPage', '$modal', 'interface', '$location', 
 	$scope.discountMsg = false;
 	$scope.submitMsg = false;
 
+	theCart.registerObserver(function() { // update discounts with cart updates
+		interface.cart('getDiscount').then(function(res) {
+			$scope.discounts = res;
+		});
+	});
+
 	var msgPromises = {}; // A reset-able messang function (clears timeout on recall)
 	var setMessage = function(myVar, msgObj, delay) {
 		$scope[myVar] = msgObj;

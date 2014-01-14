@@ -165,6 +165,7 @@ class Cart extends NG {
 			if (isset($_SESSION['cart.options'][$data->itemID])) unset($_SESSION['cart.options'][$data->itemID]);
 			$_SESSION['cart'] = array_diff($_SESSION['cart'], array($data->itemID) ); // http://stackoverflow.com/a/9268826
 		}
+		$this->chkDiscounts();
 		return $data; // debug
 	}
 
@@ -232,10 +233,10 @@ class Cart extends NG {
 		return $_SESSION['cart.discounts'];
 	}
 
-	// Worker: remove single discount
-	public function remDiscount() {
-		$data = $this->getPostData();
-		$_SESSION['cart.discounts'] = array_values( array_udiff($_SESSION['cart.discounts'], array( $this->object_to_array($data) ), function($a, $b){
+	// Worker/Helper (chkDiscounts): remove single discount
+	public function remDiscount($data = null) {
+		$data = (isset($data)) ? $data : $this->object_to_array( $this->getPostData() );
+		$_SESSION['cart.discounts'] = array_values( array_udiff($_SESSION['cart.discounts'], array( $data ), function($a, $b){
 			$tempA = $a['discountID'];
 			$tempB = $b['discountID'];
 			if ($tempA == $tempB) { return 0; } elseif ($tempA < $tempB) { return -1; } else { return 1; }
@@ -243,7 +244,7 @@ class Cart extends NG {
 		return $_SESSION['cart.discounts'];
 	}
 
-	// Worker(app/cart/discount): return discount object
+	// Worker: return discount object
 	public function addDiscount() {
 		$data = $this->getPostData();
 
@@ -275,6 +276,19 @@ class Cart extends NG {
 		array_push($_SESSION['cart.discounts'], $obj);
 		// successfull callback
 		return array('pre'=>'Success!', 'msg'=>'Added discount to current order!', 'type'=>'success', 'obj'=>$obj );
+	}
+
+	// Helper: check discounts agains removed item
+	private function chkDiscounts() {
+		$ids = array("0");
+		foreach ($_SESSION['cart'] as $itemID) array_push($ids, $itemID); // grab ids from current cart
+		$questionMarks = trim(str_repeat("?,", sizeof($ids)),",");
+		$finalSTH = $this->db->prepare("SELECT * FROM `discount` WHERE ((productID IN (SELECT DISTINCT productID FROM `item` WHERE itemID IN ($questionMarks)) AND itemID IS NULL) OR (productID IS NULL AND itemID IN ($questionMarks)) OR (productID IS NULL AND itemID IS NULL) ) AND discountID = ?;");
+		foreach ($_SESSION['cart.discounts'] as $discount) {
+			if (!$finalSTH->execute( array_merge( $ids, $ids, array($discount['discountID']) ) ) || $finalSTH->rowCount() == 0) {
+				$this->remDiscount( $discount );
+			}
+		}
 	}
 
 	// GENERIC CART FUNCTION
