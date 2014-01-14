@@ -63,7 +63,7 @@ controller('RegisterConFormCtrl', ['$scope', 'myPage', 'interface', 'conference'
 			controller: 'ContactModalCtrl',
 			resolve: {
 				contact: function() { return angular.copy( contact ); },
-				prep: function(interface) { return interface.user('prepAtten'); },
+				prep: ['interface', function(interface) { return interface.user('prepAtten'); }],
 				opt: function() { return angular.copy( o ); }
 			}
 		});
