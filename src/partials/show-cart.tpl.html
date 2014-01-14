@@ -61,6 +61,10 @@
 						</tbody>
 					</table>
 
+					<div class="alert alert-{{submitMsg.type}}" ng-show="submitMsg" style="margin-top:20px;">
+						<strong>{{submitMsg.pre}}</strong> {{submitMsg.msg}}
+					</div>
+
 					<div class="fluid-row">
 						<button ng-click="saveCart('online')" class="btn btn-primary btn-lg span6" role="button">
 							via PayPal 
@@ -113,7 +117,7 @@
 				</div>
 			</div>
 			
-			<pre>{{discounts | json}}</pre>
+			<!-- <pre>{{discounts | json}}</pre> -->
 			<pre>{{theCart.get() | json}}</pre>
 
 		</div>
