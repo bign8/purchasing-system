@@ -22,27 +22,27 @@ config(['$routeProvider', 'securityAuthorizationProvider', '$locationProvider', 
 			templateUrl: 'partials/register-form.tpl.html',
 			controller: 'RegisterFormCtrl',
 			resolve: {
-				firms: function(interface) {
+				firms: ['interface', function (interface) {
 					return interface.user('listFirms');
-				}
+				}]
 			}
 		}).
 		when('/', { // Home
 			templateUrl: 'partials/index.tpl.html',
 			controller: 'IndexCtrl',
 			resolve: {
-				fullCart: function(theCart) {
+				fullCart: ['theCart', function (theCart) {
 					return theCart.load();
-				}
+				}]
 			}
 		}).
 		when('/register/:itemID', {
 			templateUrl: 'partials/register-conf.tpl.html',
 			controller: 'RegisterConFormCtrl',
 			resolve: {
-				conference: function(interface, $route) {
+				conference: ['interface', '$route', function(interface, $route) {
 					return interface.cart('getOption', $route.current.params);
-				},
+				}],
 				user: securityAuthorizationProvider.requireAuthenticatedUser
 			}
 		}).
@@ -50,12 +50,12 @@ config(['$routeProvider', 'securityAuthorizationProvider', '$locationProvider', 
 			templateUrl: 'partials/show-cart.tpl.html',
 			controller: 'CartCtrl',
 			resolve: {
-				preLoad: function(theCart) {
+				preLoad: ['theCart', function (theCart) {
 					return theCart.load(); // won't use data, will pre-fetch data
-				},
-				discounts: function(interface) {
+				}],
+				discounts: ['interface', function (interface) {
 					return interface.cart('getDiscount');
-				},
+				}],
 				user: securityAuthorizationProvider.requireAuthenticatedUser
 			}
 		}).
@@ -71,11 +71,20 @@ config(['$routeProvider', 'securityAuthorizationProvider', '$locationProvider', 
 			controller: 'ListPurchasesCtrl',
 			resolve: {
 				user: securityAuthorizationProvider.requireAuthenticatedUser,
-				items: function(interface) {
+				items: ['interface', function(interface) {
 					return interface.cart('getPurchases');
-				}
+				}]
 			}
 		}).
+		// when('/user', {
+		// 	templateUrl: 'partials/user-form.tpl.html',
+		// 	controller: 'UserFormCtrl',
+		// 	resolve: {
+		// 		firms: function(interface) {
+		// 			return interface.user('listFirms');
+		// 		}
+		// 	}
+		// }).
 
 
 		// // TODO: build administration section
