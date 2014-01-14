@@ -155,11 +155,11 @@ class Cart extends NG {
 		if ($data->itemID == -1) { // wierd thing to make custom payments work
 			$data->cost = $data->cost->settings->cost; // clean cost
 
-			$_SESSION['cart'] = array_udiff($_SESSION['cart'], array( $this->object_to_array($data) ), function($a, $b) {
+			$_SESSION['cart'] = array_values( array_udiff($_SESSION['cart'], array( $this->object_to_array($data) ), function($a, $b) {
 				$tempA = json_encode($a);
 				$tempB = json_encode($b);
 				if ($tempA == $tempB) { return 0; } elseif ($tempA < $tempB) { return -1; } else { return 1; }
-			});
+			}) );
 
 		} else {
 			if (isset($_SESSION['cart.options'][$data->itemID])) unset($_SESSION['cart.options'][$data->itemID]);
@@ -235,7 +235,11 @@ class Cart extends NG {
 	// Worker: remove single discount
 	public function remDiscount() {
 		$data = $this->getPostData();
-		$_SESSION['cart.discounts'] = array_diff($_SESSION['cart.discounts'], array( $this->object_to_array($data) ));
+		$_SESSION['cart.discounts'] = array_values( array_udiff($_SESSION['cart.discounts'], array( $this->object_to_array($data) ), function($a, $b){
+			$tempA = $a['discountID'];
+			$tempB = $b['discountID'];
+			if ($tempA == $tempB) { return 0; } elseif ($tempA < $tempB) { return -1; } else { return 1; }
+		}) );
 		return $_SESSION['cart.discounts'];
 	}
 
@@ -246,26 +250,31 @@ class Cart extends NG {
 		// Check if any code matches the inputed code
 		$anyCodeSTH = $this->db->prepare("SELECT discountID FROM `discount` WHERE `code`=?;");
 		if (!$anyCodeSTH->execute( $data->code ) || $anyCodeSTH->rowCount() == 0) 
-			return array('pre'=> 'Error!','msg'=>'Invalid discount code.', 'type'=>'error');
+			return array('pre'=>'Error!','msg'=>'Invalid discount code.', 'type'=>'error');
 		$codeID = $anyCodeSTH->fetchColumn();
 
 		// Check if code is still valid
 		$validTimeSTH = $this->db->prepare("SELECT * FROM `discount` WHERE `active`='yes' AND discountID=?;");
 		if (!$validTimeSTH->execute( $codeID ) || $validTimeSTH->rowCount() == 0) 
-			return array('pre' => 'Sorry!', 'msg'=>'This code has expired!', 'type'=>'error');
+			return array('pre'=>'Sorry!', 'msg'=>'This code has expired!', 'type'=>'error');
+
+		// server duplicate check
+		$found = false;
+		foreach ($_SESSION['cart.discounts'] as $discount) if ($discount['discountID'] == $codeID) $found = true;
+		if ($found) return array('pre'=>'Duplicate Code!', 'msg'=>'Are you trying to cheat us?', 'type'=>'error');
 
 		// test if valid for current cart
 		$ids = array("0");
-		foreach ($_SESSION['cart'] as $item) array_push($ids, $item['itemID']); // grab ids from current cart
+		foreach ($_SESSION['cart'] as $itemID) array_push($ids, $itemID); // grab ids from current cart
 		$questionMarks = trim(str_repeat("?,", sizeof($ids)),",");
 		$finalSTH = $this->db->prepare("SELECT * FROM `discount` WHERE ((productID IN (SELECT DISTINCT productID FROM `item` WHERE itemID IN ($questionMarks)) AND itemID IS NULL) OR (productID IS NULL AND itemID IN ($questionMarks)) OR (productID IS NULL AND itemID IS NULL) ) AND discountID = ?;");
 		if (!$finalSTH->execute( array_merge( $ids, $ids, array($codeID) ) ) || $finalSTH->rowCount() == 0) 
-			return array('pre' => 'Unrelated!', 'msg'=>'Not associated with any items in your cart.', 'type'=>'error');
+			return array('pre'=>'Unrelated!', 'msg'=>'Not associated with any items in your cart.', 'type'=>'error');
 
 		$obj = $finalSTH->fetch(PDO::FETCH_ASSOC);
 		array_push($_SESSION['cart.discounts'], $obj);
 		// successfull callback
-		return array('pre'=> 'Success!', 'msg'=>'Added discount to current order!', 'type'=>'success', 'obj'=>$obj );
+		return array('pre'=>'Success!', 'msg'=>'Added discount to current order!', 'type'=>'success', 'obj'=>$obj );
 	}
 
 	// GENERIC CART FUNCTION

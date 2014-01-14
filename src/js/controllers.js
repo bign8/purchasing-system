@@ -194,7 +194,7 @@ controller('CartCtrl', ['$scope', 'myPage', '$modal', 'interface', '$location', 
 	};
 	$scope.addDiscount = function(code) { // add discount
 		var isDuplicateCode = false;
-		angular.forEach(discounts, function(item) {
+		angular.forEach($scope.discounts, function(item) {
 			if (item.code == code) isDuplicateCode = true;
 		});
 		if ( isDuplicateCode ) { // is a duplicate code
@@ -202,12 +202,12 @@ controller('CartCtrl', ['$scope', 'myPage', '$modal', 'interface', '$location', 
 		} else { // new discount
 			interface.cart('addDiscount', {code:code}).then(function(res) {
 				setDisMessage(res, 10000); // assign a reset-able message
-				if (res.type == 'success') discounts.push( res.obj ); // add object on good callback
+				if (res.type == 'success') $scope.discounts.push( res.obj ); // add object on good callback
 			});
 		}
 	};
-	$scope.remDiscount = function(discount) { // remove discount
-		interface.cart('remDiscount', discount).then(function(res) {
+	$scope.remDiscount = function(myDiscount) { // remove discount
+		interface.cart('remDiscount', myDiscount).then(function(res) {
 			$scope.discounts = res;
 		});
 	};
