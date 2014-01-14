@@ -172,14 +172,15 @@ controller('CartCtrl', ['$scope', 'myPage', '$modal', 'interface', '$location', 
 	$scope.theCart = theCart;
 	$scope.discounts = discounts;
 	$scope.discountMsg = false;
+	$scope.submitMsg = false;
 
-	var msgPromise; // A reset-able discount messang function (clears timeout on recall)
-	var setDisMessage = function(msgObj, delay) {
-		$scope.discountMsg = msgObj;
-		$timeout.cancel( msgPromise );
-		msgPromise = $timeout(function() {
-			$scope.discountMsg = false;
-		}, delay);
+	var msgPromises = {}; // A reset-able discount messang function (clears timeout on recall)
+	var setMessage = function(myVar, msgObj, delay) {
+		$scope[myVar] = msgObj;
+		$timeout.cancel( msgPromises[myVar] );
+		msgPromises[myVar] = $timeout(function() {
+			$scope[myVar] = false;
+		}, delay*1000);
 	};
 
 	$scope.total = function() { // Cart total calculation
@@ -198,10 +199,10 @@ controller('CartCtrl', ['$scope', 'myPage', '$modal', 'interface', '$location', 
 			if (item.code == code) isDuplicateCode = true;
 		});
 		if ( isDuplicateCode ) { // is a duplicate code
-			setDisMessage({'pre': 'Duplicate Code!', 'msg': 'Are you trying to cheat us?', 'type': 'error'}, 10000);
+			setMessage('discountMsg', {'pre': 'Duplicate Code!', 'msg': 'Are you trying to cheat us?', 'type': 'error'}, 10);
 		} else { // new discount
 			interface.cart('addDiscount', {code:code}).then(function(res) {
-				setDisMessage(res, 10000); // assign a reset-able message
+				setMessage('discountMsg', res, 10); // assign a reset-able message
 				if (res.type == 'success') $scope.discounts.push( res.obj ); // add object on good callback
 			});
 		}
@@ -212,12 +213,13 @@ controller('CartCtrl', ['$scope', 'myPage', '$modal', 'interface', '$location', 
 		});
 	};
 	$scope.saveCart = function(medium) { // save price (everything else is already on server)
-		var fail = false; // verify options are set
-		angular.forEach(theCart.get(), function(item) {
-			if ( item.hasOptions && !item.cost.set ) fail = true;
-		});
-		if (fail) return alert('You need to assign options for each item in your cart.\nPlease try again.');
+		var fail = false;
+		angular.forEach(theCart.get(), function(item) { if ( item.hasOptions && !item.cost.set ) fail = true; }); // verify options are set
+		if (fail) return setMessage('submitMsg', {pre:'Options Needed', msg:'Some of the items in your cart require you to fill out a form. Please click the orange "Set" buttons to assign these options.', type:'error'}, 20);
+		angular.forEach(theCart.get(), function(item) { if (item.warn) fail = true; });
+		if (fail) return setMessage('submitMsg', {pre:'Previous Purchase',msg:'An item in your cart has already been purchased (shown in red).  Please remove it before continueing to checkout.',type:'error'}, 20);
 
+		setMessage('submitMsg', {pre:'Checkout Complete',msg:'You will be redirected to either a) PayPal processing to handle your online payment or b) our recipt page with payment instructions',type:'success'}, 20);
 		interface.cart('save', {cost:$scope.total(), medium:medium}).then(function() {
 			var returnPath = '/recipt', cart = {
 				list: theCart.get(),
