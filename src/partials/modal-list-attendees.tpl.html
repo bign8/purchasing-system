@@ -2,7 +2,31 @@
 	<h3>Event Attendee(s)</h3>
 </div>
 <div class="modal-body">
-	<p><strong>Current Attendee(s):</strong> {{item.data['+Attendees']}}</p>
+	<p>Please contanct UpstreamAcademy if you wish to remove/modify event attendees.</p>
+	<table class="table table-striped table-hover">
+		<thead>
+			<tr>
+				<th>Personal Info</th>
+				<th>Address</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr ng-repeat="person in item.data[item.data.attID]">
+				<td>
+					<span ng-show="person.title">{{person.title}}<br/></span>
+					{{person.legalName}}<br/>
+					<a ng-href="mailto:{{person.email}}">{{person.email}}</a><br/>
+					{{person.phone}}
+				</td>
+				<td>
+					{{person.addr.addrName}}<br/>
+					{{person.addr.addr1}}<br/>
+					<span ng-show="person.addr.addr2">{{person.addr.addr2}}<br/></span>
+					{{person.addr.city}} {{person.addr.state}}, {{person.addr.zip}}
+				</td>
+			</tr>
+		</tbody>
+	</table>
 	
 	<!-- <pre>{{item | json}}</pre> -->
 </div>
