@@ -34,8 +34,7 @@ if ( $_REQUEST['c'] == 'cart' ) {
 
 		// Generic Functions
 		case 'save': $data = $obj->save(); break;
-		// case 'getPurchases': $data = $obj->getPurchases(); break;
-		// case 'getDiscount': $data = $obj->getDiscount(); break;
+		case 'getPurchases': $data = $obj->getPurchases(); break;
 		default: $pass = false;
 	}
 } elseif ( $_REQUEST['c'] == 'user' ) {

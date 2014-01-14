@@ -332,6 +332,20 @@ class Cart extends NG {
 		return $orderID;	
 	}
 
+	// Worker(app/purchases): return purchases
+	public function getPurchases() {
+		$user = $this->usr->requiresAuth();
+
+		$STH = $this->db->prepare("SELECT i.*, p.data, t.template, o.stamp FROM (SELECT * FROM `purchase` WHERE firmID=?) p LEFT JOIN item i ON p.itemID=i.itemID LEFT JOIN `product` pr ON i.productID=pr.productID LEFT JOIN `template` t ON pr.templateID=t.templateID LEFT JOIN `order` o ON p.orderID=o.orderID ORDER BY i.productID, i.name;");
+		$STH->execute( $user['firmID'] );
+
+		$retData = $STH->fetchAll( PDO::FETCH_ASSOC );
+		foreach ($retData as &$item) {
+			$item['settings'] = json_decode($item['settings']);
+			$item['data'] = json_decode($item['data']);
+		}
+		return $retData;
+	}
 
 	// UNTESTED FUNCTIONS
 
@@ -409,20 +423,5 @@ class Cart extends NG {
 		echo $html;
 		// echo mail('nwoods@azworld.com', 'Test Email', 'Da test <b>HTML</b> email.') ? 'true' : 'false';
 		// echo mail('big.nate.w@gmail.com', 'Test Email', 'Da test <b>HTML</b> email.') ? 'true' : 'false';
-	}
-
-	// Worker(app/purchases): return purchases
-	public function getPurchases() {
-		$user = $this->requiresAuth();
-
-		$STH = $this->db->prepare("SELECT i.*, p.data, t.template, o.stamp FROM (SELECT * FROM `purchase` WHERE firmID=?) p LEFT JOIN item i ON p.itemID=i.itemID LEFT JOIN `product` pr ON i.productID=pr.productID LEFT JOIN `template` t ON pr.templateID=t.templateID LEFT JOIN `order` o ON p.orderID=o.orderID ORDER BY i.productID, i.name;");
-		$STH->execute( $user['firmID'] );
-
-		$retData = $STH->fetchAll( PDO::FETCH_ASSOC );
-		foreach ($retData as &$item) {
-			$item['settings'] = json_decode($item['settings']);
-			$item['data'] = json_decode($item['data']);
-		}
-		return json_encode($retData);
 	}
 }

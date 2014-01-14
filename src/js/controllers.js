@@ -271,29 +271,29 @@ controller('HeadCtrl', ['$scope', 'myPage', 'breadcrumbs', 'theCart', 'security'
 	$scope.security = security;
 }]).
 
-// controller('ListPurchasesCtrl', ['$scope', 'myPage', 'items', '$modal', function ($scope, myPage, items, $modal){
-// 	myPage.setTitle("Previous Purchases");
-// 	$scope.items = items.data;
-// 	angular.forEach($scope.items, function(ele) {
-// 		if (ele.stamp) ele.stamp = new Date( ele.stamp );
-// 	});
+controller('ListPurchasesCtrl', ['$scope', 'myPage', 'items', '$modal', function ($scope, myPage, items, $modal){
+	myPage.setTitle("Previous Purchases");
+	$scope.items = items;
+	angular.forEach($scope.items, function(ele) {
+		if (ele.stamp) ele.stamp = new Date( ele.stamp );
+	});
 
-// 	$scope.showAttendees = function( item ) {
-// 		$modal.open({
-// 			templateUrl: 'partials/modal-list-attendees.tpl.html',
-// 			controller: 'ModalListAttendeesCtrl',
-// 			resolve: {
-// 				item: function() { return item; }
-// 			}
-// 		});
-// 	};
-// }]).
+	$scope.showAttendees = function( item ) {
+		$modal.open({
+			templateUrl: 'partials/modal-list-attendees.tpl.html',
+			controller: 'ModalListAttendeesCtrl',
+			resolve: {
+				item: function() { return item; }
+			}
+		});
+	};
+}]).
 
-// controller('ModalListAttendeesCtrl', ['$scope', '$modalInstance', 'item', function($scope, $modalInstance, item) {
-// 	$scope.item = item;
-// 	$scope.ok = function () { $modalInstance.close('all good'); };
-// 	$scope.cancel = function () { $modalInstance.dismiss('cancel'); };
-// }]).
+controller('ModalListAttendeesCtrl', ['$scope', '$modalInstance', 'item', function($scope, $modalInstance, item) {
+	$scope.item = item;
+	$scope.ok = function () { $modalInstance.close('all good'); };
+	$scope.cancel = function () { $modalInstance.dismiss('cancel'); };
+}]).
 
 controller('CustPayFormCtrl', ['$scope', 'myPage', 'theCart', '$location', '$timeout', function ($scope, myPage, theCart, $location, $timeout){
 	myPage.setTitle("Custom Payment Form");
