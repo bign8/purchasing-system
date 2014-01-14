@@ -174,7 +174,7 @@ controller('CartCtrl', ['$scope', 'myPage', '$modal', 'interface', '$location', 
 	$scope.discountMsg = false;
 	$scope.submitMsg = false;
 
-	var msgPromises = {}; // A reset-able discount messang function (clears timeout on recall)
+	var msgPromises = {}; // A reset-able messang function (clears timeout on recall)
 	var setMessage = function(myVar, msgObj, delay) {
 		$scope[myVar] = msgObj;
 		$timeout.cancel( msgPromises[myVar] );
@@ -214,9 +214,14 @@ controller('CartCtrl', ['$scope', 'myPage', '$modal', 'interface', '$location', 
 	};
 	$scope.saveCart = function(medium) { // save price (everything else is already on server)
 		var fail = false;
-		angular.forEach(theCart.get(), function(item) { if ( item.hasOptions && !item.cost.set ) fail = true; }); // verify options are set
+		angular.forEach(theCart.get(), function(item) { // verify options are set
+			if ( item.hasOptions && !item.cost.set ) fail = true;
+		});
 		if (fail) return setMessage('submitMsg', {pre:'Options Needed', msg:'Some of the items in your cart require you to fill out a form. Please click the orange "Set" buttons to assign these options.', type:'error'}, 20);
-		angular.forEach(theCart.get(), function(item) { if (item.warn) fail = true; });
+
+		angular.forEach(theCart.get(), function(item) { // verify double purchases
+			if (item.warn) fail = true;
+		});
 		if (fail) return setMessage('submitMsg', {pre:'Previous Purchase',msg:'An item in your cart has already been purchased (shown in red).  Please remove it before continueing to checkout.',type:'error'}, 20);
 
 		setMessage('submitMsg', {pre:'Checkout Complete',msg:'You will be redirected to either a) PayPal processing to handle your online payment or b) our recipt page with payment instructions',type:'success'}, 20);

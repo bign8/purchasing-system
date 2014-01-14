@@ -75,8 +75,8 @@ class Cart extends NG {
 		if (!$itemSTH->execute( $itemID )) return -1;
 		$row = $itemSTH->fetch(PDO::FETCH_ASSOC);
 		if (!isset($row['productID'])) return null; // if can't find product
-		// $row['settings'] = json_decode($row['settings']);
-		unset($row['settings']);
+		$row['settings'] = json_decode($row['settings']);
+		// unset($row['settings']);
 		$row['cost'] = $this->getProductCost( $row['productID'] );
 		return $row;
 	}
@@ -296,16 +296,19 @@ class Cart extends NG {
 		$cart = $this->get(); // removes random id's
 		foreach ($cart as $item) { // iterate over items
 			if ($item['itemID'] == '-1') continue; // don't care about custom payment storage (yet)
-			// if (isset($value->opt->attendees)) { // Store attendees here (if possible)
-			// 	foreach ($value->opt->attendees as $contactID) {
-			// 		if (!$attendeeSTH->execute($key, $contactID)) return $this->conflict();
-			// 	}
-			// 	unset($value->opt->attendees);
-			// }
-			// if (isset($value->ele->settings->groupID)) {
-			// 	if (!$memberSTH->execute($user['firmID'], $value->ele->settings->groupID)) return $this->conflict();
-			// }
-			$option = isset($_SESSION['cart.options'][ $item['itemID'] ]) ? $_SESSION['cart.options'][ $item['itemID'] ] : array();
+			$option = isset($_SESSION['cart.options'][ $item['itemID'] ]) ? $_SESSION['cart.options'][ $item['itemID'] ] : array(); // get item's object
+
+			if (isset($option['attID'])) { // store attendees
+				foreach($option[$option['attID']] as &$contact) {
+					if (!$attendeeSTH->execute($item['itemID'], $contact['contactID'])) return $this->conflict();
+					$contact['attendeeID'] = $this->db->lastInsertId();
+				}
+			}
+
+			if (isset($item['settings']->groupID)) { // store groups
+				if (!$memberSTH->execute($user['firmID'], $item['settings']->groupID)) return $this->conflict();
+				$option['memberID'] = $this->db->lastInsertId();
+			}
 			if (!$purchaseSTH->execute($item['itemID'], $orderID, $user['firmID'], json_encode($option))) return $this->conflict(); // store purchase here
 		}
 
