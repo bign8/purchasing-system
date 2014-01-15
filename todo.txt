@@ -3,12 +3,14 @@ ToDo:
 	- hardcopy vs softcopy price -> before and after purchases
 	- classes and their recurring wierdness
 	- ...
+- allow registration of email w/o login information (process)?
 - Checkout / Continue Shopping / Close
 - Give old and discount price based on groups (show and give reason)
 - Implement Form constraints for checkout
 - improve form constraints for register/xx
 - migrate logic to a rest type structure
 - Modify links on both carts to use db links if available, otherwise txt
+- password reset functionoality
 - password show as red for invalid passwd
 - photo upload field (doesn't store, just emails)
 - possible to add more attendees, not remove attendees

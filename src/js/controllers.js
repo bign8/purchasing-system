@@ -427,7 +427,7 @@ controller('UserFormCtrl', ['$scope', 'myPage', '$modal', 'interface', 'security
 
 	var firstLoad = true, oldUserAddr = {addressID:undefined};
 	$scope.$watch('same', function(value) {
-		if (firstLoad) return firstLoad = false;
+		if (firstLoad) { firstLoad = false; return; }
 		if (value) {
 			oldUserAddr = $scope.user.addr;
 			$scope.user.addr = $scope.user.firm.addr;
@@ -439,13 +439,48 @@ controller('UserFormCtrl', ['$scope', 'myPage', '$modal', 'interface', 'security
 		if ($scope.same) $scope.user.addr = value;
 	});
 
+	// Passowrd Requirements
+	$scope.req = {pass:false,len:false,spe:false,num:false,alp:false};
+	$scope.$watch('user.password', function(value) {
+		value = value || ''; // undefined check
+		$scope.req.alp = !! value.match(/[a-z]/);
+		$scope.req.upa = !! value.match(/[A-Z]/);
+		$scope.req.num = !! value.match(/[0-9]/);
+		$scope.req.len = !! value.match(/.{6,}/);
+		$scope.req.spe = !! value.match(/[^a-zA-Z0-9]/);
+		$scope.req.pass = $scope.req.alp && $scope.req.upa && $scope.req.num && $scope.req.spe && $scope.req.len;
+	});
+
 	$scope.reset = function() {
 		$scope.user = angular.copy( $scope.origUser );
 		$scope.same = $scope.user.addr.addressID == $scope.user.firm.addr.addressID;
 		$scope.enableFirm = false;
+		$scope.passVerify = "";
 	};
 	$scope.reset();
 
+	$scope.store = function( invalid ) {
+		if (invalid) return alert('Form is not valid\nPlease try again.');
+		if ($scope.user.oldPass && !$scope.req.pass) return alert('Choose a password that passes all the parameters\nPlease try again.');
+		if ($scope.user.oldPass && $scope.passVerify !== $scope.user.password) return alert('Passwords do not match\nPlease try again.');
+		if ($scope.user.firm.addr.addressID === undefined) return alert('Please assign a firm address');
+		if ($scope.user.addr.addressID === undefined) return alert('Please assign a user address');
+		
+		interface.user('updateUser', $scope.user).then(function() {
+			alert('Your account has successfully updated');
+			security.requestCurrentUser();
+			window.location.reload();
+		}, function (err) {
+			if (err == 'dup') {
+				alert('This email already has an account\nPlease click the login button and attempt a password reset.');
+			} else if (err == 'badPass') {
+				alert('Your password is incorrect\nPlease try again or attempt to reset you password.');
+			} else {
+				alert('There was an unknown error saving your account\nPlease try again or contact UpstreamAcademy for help.');
+			}
+			console.log(err);
+		});
+	};
 
 	$scope.modifyFirm = function() {
 		$scope.enableFirm = true;

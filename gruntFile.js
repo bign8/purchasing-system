@@ -97,6 +97,7 @@ module.exports = function(grunt) {
 		var hasPhp = false, arr = Object.keys(changedFiles);
 		for (var i = arr.length - 1; i >= 0; i--) if (arr[i].match(/\.php/)) hasPhp = true;
 		grunt.config('ftp-deploy.php.exclusions', hasPhp ? [] : ['**/*.php'] );
+		changedFiles = Object.create(null);
 	}, 200);
 	grunt.event.on('watch', function(action, filepath, target) { // http://bit.ly/1fygfyP
 		changedFiles[filepath] = action;
