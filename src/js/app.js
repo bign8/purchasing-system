@@ -76,15 +76,18 @@ config(['$routeProvider', 'securityAuthorizationProvider', '$locationProvider', 
 				}]
 			}
 		}).
-		// when('/user', {
-		// 	templateUrl: 'partials/user-form.tpl.html',
-		// 	controller: 'UserFormCtrl',
-		// 	resolve: {
-		// 		firms: function(interface) {
-		// 			return interface.user('listFirms');
-		// 		}
-		// 	}
-		// }).
+		when('/user', {
+			templateUrl: 'partials/user-form.tpl.html',
+			controller: 'UserFormCtrl',
+			resolve: {
+				firms: ['interface', function(interface) {
+					return interface.user('listFirms');
+				}],
+				user: ['interface', function(interface) {
+					return interface.user('getFullUser');
+				}]
+			}
+		}).
 
 
 		// // TODO: build administration section
