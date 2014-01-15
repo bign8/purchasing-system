@@ -51,6 +51,7 @@ if ( $_REQUEST['c'] == 'cart' ) {
 		case 'login':       $data = $obj->login();       break;
 		case 'logout':      $data = $obj->logout();      break;
 		case 'prepAtten':   $data = $obj->prepAtten();   break;
+		case 'updateUser':  $data = $obj->updateUser();  break;
 
 		// DEV
 		case 'testAuth':  $data = $obj->testAuth();  break;

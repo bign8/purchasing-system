@@ -76,11 +76,11 @@ th.nowrap, td.nowrap {
 	right: 0;
 	background-color: rgba(100, 100, 100, 0.8);
 
-	-webkit-transition: opacity .5s;
-	-moz-transition: opacity .5s;
-	-ms-transition: opacity .5s;
-	-o-transition: opacity .5s;
-	transition: opacity .5s;
+	-webkit-transition: all .5s;
+	-moz-transition: all .5s;
+	-ms-transition: all .5s;
+	-o-transition: all .5s;
+	transition: all .5s;
 
 	opacity: 0;
 	z-index: -1;
@@ -113,6 +113,12 @@ th.nowrap, td.nowrap {
 	opacity: 1;
 	z-index: 6;
 	pointer-events: auto;
+
+	-webkit-transition: opacity .5s;
+	-moz-transition: opacity .5s;
+	-ms-transition: opacity .5s;
+	-o-transition: opacity .5s;
+	transition: opacity .5s;
 }
 .loader p.warn {
 	margin:20px -120px;
