@@ -62,6 +62,10 @@ if ( $_REQUEST['c'] == 'cart' ) {
 		case 'demo': 
 			// Some dev code goes here
 			break;
+		case 'db':
+			$cmd = 'mysqldump --host=db3.modwest.com -u ' . config::db_user . ' -p' . config::db_pass . ' upstreamacademy_payment -d --skip-opt';
+			die(system($cmd));
+			break;
 		default: $pass = false;
 	}
 } elseif ( $_REQUEST['c'] == 'app') {
