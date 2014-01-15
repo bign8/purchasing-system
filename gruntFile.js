@@ -23,6 +23,7 @@ module.exports = function(grunt) {
 		clean: ['<%= activeDir %>/*'],
 		jshint: {
 			files: ['src/**/*.js'],
+			config: ['package.json', 'gruntfile.js'],
 			options: { // documentation: http://www.jshint.com/docs/
 				globals: {
 					console: true,
@@ -32,13 +33,19 @@ module.exports = function(grunt) {
 			}
 		},
 		watch: {
-			options: {
-				livereload: 1337,
-				interrupt: true,
-				atBegin: true
+			options: { nospawn: true },
+			app: {
+				options: {
+					livereload: 1337,
+					//interrupt: true
+				},
+				files: ['src/**/*.js', 'src/index.html', 'src/**/*.tpl.html', 'src/php/**/*', 'src/assets/css.css'],
+				tasks: ['build']
 			},
-			files: ['src/**/*.js', 'src/index.html', 'src/**/*.tpl.html', 'src/php/**/*', 'src/assets/css.css'],
-			tasks: ['build']
+			config: {
+				files: ['package.json', 'gruntfile.js'],
+				tasks: ['jshint:config', 'exit']
+			}
 		},
 		copy: {
 			main: {
@@ -73,7 +80,7 @@ module.exports = function(grunt) {
 					// removeAttributeQuotes: true,
 					removeComments: true,
 					// removeEmptyAttributes: true,
-					removeRedundantAttributes: true,
+					// removeRedundantAttributes: true,
 					// removeScriptTypeAttributes: true,
 					// removeStyleLinkTypeAttributes: true
 				}
@@ -85,10 +92,25 @@ module.exports = function(grunt) {
 		}
 	});
 
+	var changedFiles = Object.create(null);
+	var onChange = grunt.util._.debounce(function() {
+		var hasPhp = false, arr = Object.keys(changedFiles);
+		for (var i = arr.length - 1; i >= 0; i--) if (arr[i].match(/\.php/)) hasPhp = true;
+		grunt.config('ftp-deploy.php.exclusions', hasPhp ? [] : ['**/*.php'] );
+	}, 200);
+	grunt.event.on('watch', function(action, filepath, target) { // http://bit.ly/1fygfyP
+		changedFiles[filepath] = action;
+		onChange();
+	});
+
 	grunt.registerTask('setPath', function( arg1 ) {
 		grunt.config.set( 'activeDir', arg1 );
 		grunt.config.set( 'uglify.options.beautify', arg1 == 'build'); // set beautification link
 		grunt.log.writeln('Setting build path to: ' + arg1 );
+	});
+
+	grunt.registerTask('exit', 'Just exits.', function() { // http://bit.ly/1aoqnTn
+		process.exit(0);
 	});
 
 	// Load plugins
@@ -105,7 +127,7 @@ module.exports = function(grunt) {
 
 	grunt.registerTask('build', ['setPath:build', 'process']);
 	grunt.registerTask('release', ['setPath:release', 'process']);
-	grunt.registerTask('process', ['jshint', 'clean', 'uglify', 'copy', 'html2js', 'ftp-deploy']);
+	grunt.registerTask('process', ['jshint:files', 'clean', 'uglify', 'copy', 'html2js', 'ftp-deploy']);
 };
 
 // see https://github.com/gruntjs/grunt-contrib-watch#using-the-watch-event
