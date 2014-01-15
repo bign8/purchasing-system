@@ -63,7 +63,7 @@ th.nowrap, td.nowrap {
 	top: 50%;
 	left: 50%;
 	height: 44px;
-	width: 140px;
+	min-width: 140px;
 	margin: -22px 0 0 -70px;
 }
 
@@ -111,7 +111,7 @@ th.nowrap, td.nowrap {
 }
 .loader.active {
 	opacity: 1;
-	z-index: 1;
+	z-index: 6;
 	pointer-events: auto;
 }
 .loader p.warn {

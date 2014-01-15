@@ -90,7 +90,7 @@ class User extends NG {
 		foreach ($ret as &$value) $this->cleanAddress( $value );
 		return $ret;
 	}
-	private function cleanAddress( &$value ) { // Helper (listFirms + fetFirmEmploy): formats address for app
+	private function cleanAddress( &$value ) { // Helper (listFirms+getFirmEmploy+getFullUser): formats address for app
 		$value['addr'] = array(
 			'addressID' => $value['addressID'],
 			'addrName' => $value['addrName'],
@@ -101,6 +101,7 @@ class User extends NG {
 			'zip' => $value['zip'],
 		);
 		unset($value['addressID'], $value['addrName'], $value['addr1'], $value['addr2'], $value['city'], $value['state'], $value['zip']);
+		return $value;
 	}
 
 	// Worker: get data for choosing new attendee
@@ -187,6 +188,23 @@ class User extends NG {
 		if (!$contSTH->execute( $firmID, $d->addr->addressID, $d->legalName, $d->preName, $d->title, $d->email, $d->phone, $d->password, config::encryptSTR )) return $this->conflict();
 		$_SESSION['user'] = $this->getUser( $d );
 		return true;
+	}
+
+	// Worker: returns full user object
+	public function getFullUser() {
+		$user = $this->requiresAuth();
+		$userSTH = $this->db->prepare("SELECT c.contactID, c.firmID, c.legalName, c.preName, c.title, c.email, c.phone, a.* FROM (SELECT * FROM `contact` WHERE `contactID`=?) c LEFT JOIN `address` a ON c.addressID=a.addressID;");
+		if (!$userSTH->execute( $user['contactID'] )) return $this->conflict();
+		$userData = $userSTH->fetch( PDO::FETCH_ASSOC );
+		$this->cleanAddress( $userData );
+		$firmSTH = $this->db->prepare("SELECT c.firmID, c.name, c.website, a.* FROM (SELECT * FROM `firm` WHERE `firmID`=?) c LEFT JOIN `address` a ON c.addressID=a.addressID;");
+		if (!$firmSTH->execute( $userData['firmID'] )) return $this->conflict();
+		$firmData = $firmSTH->fetch( PDO::FETCH_ASSOC );
+
+		$userData['firm'] = $this->cleanAddress( $firmData );
+
+		return $userData;
+
 	}
 
 }

@@ -420,6 +420,68 @@ controller('RegisterFormCtrl', ['$scope', 'myPage', '$modal', 'interface', 'secu
 	};
 }]).
 
+controller('UserFormCtrl', ['$scope', 'myPage', '$modal', 'interface', 'security', 'user', 'firms', function($scope, myPage, $modal, interface, security, user, firms) {
+	myPage.setTitle("Account Settings", "for " + user.legalName);
+	$scope.origUser = angular.copy( user );
+	$scope.firms = firms;
+
+	var firstLoad = true, oldUserAddr = {addressID:undefined};
+	$scope.$watch('same', function(value) {
+		if (firstLoad) return firstLoad = false;
+		if (value) {
+			oldUserAddr = $scope.user.addr;
+			$scope.user.addr = $scope.user.firm.addr;
+		} else {
+			$scope.user.addr = oldUserAddr;
+		}
+	});
+	$scope.$watch('user.firm.addr', function(value) {
+		if ($scope.same) $scope.user.addr = value;
+	});
+
+	$scope.reset = function() {
+		$scope.user = angular.copy( $scope.origUser );
+		$scope.same = $scope.user.addr.addressID == $scope.user.firm.addr.addressID;
+		$scope.enableFirm = false;
+	};
+	$scope.reset();
+
+
+	$scope.modifyFirm = function() {
+		$scope.enableFirm = true;
+		$scope.firmNew = "";
+	};
+	$scope.selectFirm = function() {
+		$scope.user.firm = $scope.firmNew;
+		$scope.enableFirm = false;
+	};
+	$scope.newFirm = function() {
+		$scope.user.firm = {};
+		$scope.enableFirm = false;
+	};
+	$scope.check = function(a, b) { return angular.equals(a, b); };
+
+	// handle set address clicks
+	$scope.setAddr = function (slug) {
+		var myAddress = (slug == 'firm') ? ($scope.user.firm || {}).addr : $scope.user.addr ;
+		
+		var modalInstance = $modal.open({ // insterts into db and returns full object
+			templateUrl: 'partials/modal-address.tpl.html',
+			controller: 'ModalAddressCtrl',
+			resolve: { address: function() { return angular.copy( myAddress ); } }
+		});
+		modalInstance.result.then(function(address) {
+			if (slug == 'firm') {
+				$scope.user.firm = typeof($scope.user.firm)=='string' ? {name:''} : $scope.user.firm;
+				$scope.user.firm.addr = address;
+				if ($scope.same) $scope.user.addr = address;
+			} else {
+				$scope.user.addr = address;
+			}
+		});
+	};
+}]).
+
 controller('ModalAddressCtrl', ['$scope', '$modalInstance', 'address', 'interface', function($scope, $modalInstance, address, interface){
 	$scope.address = address || {addressID:null, addr2: null};
 	$scope.ok = function() {

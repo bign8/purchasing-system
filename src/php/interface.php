@@ -46,6 +46,7 @@ if ( $_REQUEST['c'] == 'cart' ) {
 		case 'currentUser': $data = $obj->currentUser(); break;
 		case 'editAddress': $data = $obj->editAddress(); break;
 		case 'editContact': $data = $obj->editContact(); break;
+		case 'getFullUser': $data = $obj->getFullUser(); break;
 		case 'listFirms':   $data = $obj->listFirms();   break;
 		case 'login':       $data = $obj->login();       break;
 		case 'logout':      $data = $obj->logout();      break;
