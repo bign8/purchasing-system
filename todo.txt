@@ -5,9 +5,9 @@ ToDo:
 	- ...
 - allow registration of email w/o login information (process)?
 - Checkout / Continue Shopping / Close
+- email cart once it has been saved
 - improve form constraints for register/xx
 - password reset functionoality
-- password show as red for invalid passwd
 - photo upload field (doesn't store, just emails)
 - possible to add more attendees, not remove attendees
 - pretty crumb use localStorage
