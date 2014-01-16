@@ -89,34 +89,40 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function($rootS
 		return security.currentUser;
 	}, reload, true);
 
+	var processItem = function(item, attribute) {
+		var setValue = (attribute=='settings') ? 'value' : 'fullValue';
+		item.cost[setValue] = 0;
+		item.hasOptions = false;
+		switch (item.template) {
+			case 'conference':
+				item.cost[setValue] = parseFloat( item.cost[attribute].initial ); // initial cost always in effect
+				if ( options.hasOwnProperty(item.itemID) ) { // apply pricing based on the number of attendees
+					var attID = options[ item.itemID ].attID; // grab attendee id
+					var multiply = (options[ item.itemID ][ attID ] || []).length - parseFloat( item.cost[attribute].after ); // how many more
+					if (multiply > 0) item.cost[setValue] += parseFloat( item.cost[attribute].later ) * multiply; // for additional attendees
+				}
+				item.hasOptions = true;
+				break;
+			case 'download':
+				item.cost[setValue] = parseFloat(item.cost[attribute].cost); // straight assignment (no options)
+				break;
+			case 'custom':
+				item.cost[setValue] = item.cost[attribute].cost;// = { calc: item.cost, pretty: $filter('currency')(item.cost) }; // invoices
+				break;
+			default:
+				item.cost = {};
+				item.cost[setValue] = 0;
+		}
+		if (item.hasOptions) item.cost.set = options.hasOwnProperty( item.itemID );
+	};
+
 	var processCart = function() {
 		total = 0;
 		angular.forEach(cart, function(item) {
-			item.cost.value = 0;
-			item.hasOptions = false;
-			switch (item.template) {
-				case 'conference':
-					item.cost.value = parseFloat( item.cost.settings.initial ); // initial cost always in effect
-					if ( options.hasOwnProperty(item.itemID) ) { // apply pricing based on the number of attendees
-						var attID = options[ item.itemID ].attID; // grab attendee id
-						var multiply = (options[ item.itemID ][ attID ] || []).length - parseFloat( item.cost.settings.after ); // how many more
-						if (multiply > 0) item.cost.value += parseFloat( item.cost.settings.later ) * multiply; // for additional attendees
-					}
-					item.hasOptions = true;
-					break;
-				case 'download':
-					item.cost.value = parseFloat(item.cost.settings.cost); // straight assignment (no options)
-					break;
-				case 'custom':
-					item.cost.value = item.cost.settings.cost;// = { calc: item.cost, pretty: $filter('currency')(item.cost) }; // invoices
-					break;
-				default:
-					item.cost = {value:0, pretty:'$0.00'};
-			}
-			if (item.hasOptions) item.cost.set = options.hasOwnProperty( item.itemID );
+			processItem(item, 'settings');
+			if (item.cost.hasOwnProperty('full')) processItem(item, 'full');
 			total += item.cost.value;
 		});
-
 		angular.forEach(observerCallbacks, function(callback) { // Notify observers
 			callback();
 		});

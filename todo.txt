@@ -37,6 +37,7 @@ In a holding pattern:
 
 Notes:
 - Add conference type product -> Force insert into tie_product_field
+- Add price to new fields
 
 Questions:
 - how old of a browser do we need to support
