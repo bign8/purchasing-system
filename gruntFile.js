@@ -43,6 +43,10 @@ module.exports = function(grunt) {
 				tasks: ['build']
 			},
 			config: {
+				options: {
+					interval: 1000,
+					event: ['changed']
+				},
 				files: ['package.json', 'gruntfile.js'],
 				tasks: ['jshint:config', 'exit']
 			}

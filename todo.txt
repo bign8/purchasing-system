@@ -15,6 +15,7 @@ ToDo:
 - photo upload field (doesn't store, just emails)
 - possible to add more attendees, not remove attendees
 - pretty crumb use localStorage
+- replace all alert statements with dom level alerts
 - show if event is un-open or not available at current time (manual)
 - store referrer for redirects back to site
 
