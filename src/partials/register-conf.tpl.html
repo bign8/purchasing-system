@@ -45,7 +45,7 @@
 			<div class="span6" ng-show="attID">
 				<div class="well">
 					<h3>Event Attendees</h3>
-					<p>Choose and modify the attendees to this event here</p>
+					<p>Choose and modify the attendees to this event here.<br/>Pricing: <span>{{con.item.cost.text}}</span>.</p>
 
 					<table class="table" ng-show="con.options[attID].length">
 						<caption class="muted">Click a row to modify user information</caption>
@@ -53,7 +53,7 @@
 							<tr>
 								<th>Personal Info</th>
 								<th>Address</th>
-								<th><abbr title="{{con.item.cost.pretty}}">Cost</abbr></th>
+								<th><abbr title="{{con.item.cost.text}}">Cost</abbr></th>
 							</tr>
 						</thead>
 						<tbody>
@@ -79,7 +79,7 @@
 						<tfoot>
 							<tr>
 								<th></th>
-								<th><abbr title="{{con.item.cost.pretty}}" class="pull-right">Total:</abbr></th>
+								<th><abbr title="{{con.item.cost.text}}" class="pull-right">Total:</abbr></th>
 								<th>{{total | currency}}</th>
 							</tr>
 						</tfoot>

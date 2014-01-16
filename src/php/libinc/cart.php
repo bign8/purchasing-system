@@ -92,46 +92,33 @@ class Cart extends NG {
 		}
 		$groups = array_merge($groups, array(0)); // ensure not empty
 		if (isset($this->groupCashe)) $groups = array_merge($groups, $this->groupCashe); // add groups that are in cart
+
+		// get origional cost
+		$flatCostSTH = $this->db->prepare("SELECT o.`optionID`, `name`, `pretty`, `settings` FROM `price` p JOIN `option` o ON o.optionID = p.optionID WHERE productID=? AND groupID IS NULL LIMIT 1;");
+		$flatCostSTH->execute( $productID );
+		$fullCostRow = $flatCostSTH->fetch( PDO::FETCH_ASSOC );
+		$leastRow = $fullCostRow;
+		$leastCost = $this->getRowCost( $fullCostRow );
 		
 		// pull prices that match productID and group criteria
 		$questionMarks = trim(str_repeat("?,", sizeof($groups)),","); // build string of questionmarks based on sizeof($groups)
-		$costSTH = $this->db->prepare("SELECT `name`, `pretty`, `settings` FROM `price` p JOIN `option` o ON o.optionID = p.optionID WHERE productID=? AND (groupID IN ($questionMarks) OR groupID IS NULL);");
+		$costSTH = $this->db->prepare("SELECT o.`optionID`, `name`, `pretty`, `settings` FROM `price` p JOIN `option` o ON o.optionID = p.optionID WHERE productID=? AND groupID IN ($questionMarks);");
 		array_unshift( $groups, $productID ); // put productID at the beginninng of the array
 		$costSTH->execute( $groups );
 		$costRows = $costSTH->fetchAll(PDO::FETCH_ASSOC);
 
 		// find least price
-		$leastRow = null;
-		$leastCost = null;
 		foreach ($costRows as $row) {
-			$cost = (array)json_decode($row['settings']); // parse settings out to compare
-
-			if ($leastRow == null) { // if no previous leasts, the first is the least
-				$leastCost = $cost;
+			$myCost = $this->getRowCost( $row );
+			if ($myCost < $leastCost) {
+				$leastCost = $myCost;
 				$leastRow = $row;
-			} else { // conditionally check based off of specified parameters
-				switch ($row['name']) {
-					case 'Static Cost':
-						if ($leastCost['cost'] > $cost['cost']) {
-							$leastCost = $cost;
-							$leastRow = $row;
-						}
-						break;
-					
-					case 'Delayed attendee cost':
-						if ($leastCost['initial'] > $cost['initial']) {
-							$leastCost = $cost;
-							$leastRow = $row;
-						}
-						break;
-				}
 			}
-			
 		}
 		
 		// parse json for interpolating and pretty printing
-		$subs = (array)json_decode($leastRow['settings']);
-		$pretty = $subs;
+		$pretty = (array)json_decode($leastRow['settings']);
+		$ret = array( 'settings' => $pretty );
 
 		// convert specific values to currency (excluding the values mentioned in the case statements)
 		setlocale(LC_MONETARY, 'en_US');
@@ -141,11 +128,18 @@ class Cart extends NG {
 				default: $pretty[$key] = '$' . money_format('%n', $value); break;
 			}
 		}
-
-		return array(
-			'pretty' => $this->interpolate($leastRow['pretty'], $pretty),
-			'settings' => $subs
-		);
+		$ret['text'] = $this->interpolate($leastRow['pretty'], $pretty);
+		if ($leastRow != $fullCostRow) $ret['full'] = (array)json_decode($fullCostRow['settings']);
+		return $ret;
+	}
+	private function getRowCost( $row ) {
+		$cost = (array)json_decode($row['settings']); // parse settings out to compare
+		$myCost = INF;
+		switch ($row['optionID']) {
+			case '1': $myCost = $cost['cost']; break; // Static Cost
+			case '2': $myCost = $cost['initial']; break; // Delayed attendee cost
+		}
+		return $myCost;
 	}
 
 	// Worker: remove element from cart
