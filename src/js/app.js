@@ -3,6 +3,7 @@
 angular.module('myApp', [
 	'ngRoute',
 	'myApp.controllers',
+	'myApp.directives',
 	'myApp.filters',
 	'security',
 	'myApp.services',

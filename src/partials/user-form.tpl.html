@@ -135,25 +135,25 @@
 				<div class="control-group">
 					<label class="control-label" for="inputPassword">Current Password</label>
 					<div class="controls">
-						<input type="password" id="inputPassword" ng-model="user.oldPass" placeholder="Current Password">
+						<input type="password" id="inputPassword" ng-model="user.oldPass" placeholder="Current Password" ua-blank>
 					</div>
 				</div>
 
-				<div ng-hide="req.pass">
+				<div ng-show="settings.inputPassword.$error.passValid">
 					<p>Unfulfilled Password Requirements:</p>
 					<ul>
-						<li ng-hide="req.num">At least 1 number</li>
-						<li ng-hide="req.spe">At least 1 special character</li>
-						<li ng-hide="req.alp">At least 1 alphabetical character</li>
-						<li ng-hide="req.upa">At least 1 uppercase alphabetical character</li>
-						<li ng-hide="req.len">At least 6 characters long</li>
+						<li ng-show="settings.inputPassword.$error.hasNumber">At least 1 number</li>
+						<li ng-show="settings.inputPassword.$error.specialCh">At least 1 special character</li>
+						<li ng-show="settings.inputPassword.$error.lowerAlph">At least 1 alphabetical character</li>
+						<li ng-show="settings.inputPassword.$error.upperAlph">At least 1 uppercase alphabetical character</li>
+						<li ng-show="settings.inputPassword.$error.metLength">At least 6 characters long</li>
 					</ul>
-				</div>	
+				</div>
 
 				<div class="control-group">
 					<label class="control-label" for="inputPassword">New Password</label>
 					<div class="controls">
-						<input type="password" id="inputPassword" ng-model="user.password" placeholder="New Password">
+						<input type="password" id="inputPassword" name="inputPassword" ng-model="user.password" placeholder="New Password" ua-pass-validate>
 					</div>
 				</div>
 
@@ -170,7 +170,7 @@
 	</div>
 
 	<div class="form-actions">
-		<button type="submit" class="btn btn-primary" ng-click="store( settings.$invalid )" ng-disabled="check(origUser, user)">Save Account Settings</button>&nbsp;&nbsp;
+		<button type="submit" class="btn btn-primary" ng-click="store( settings.$invalid )" ng-disabled="check(origUser, user) || settings.$invalid">Save Account Settings</button>&nbsp;&nbsp;
 		<button type="button" class="btn" ng-click="reset()" ng-disabled="check(origUser, user)">Reset Settings</button>
 	</div>	
 

@@ -213,7 +213,7 @@ class User extends NG {
 		if ($checkSTH->rowCount() > 0) return $this->conflict('dup');
 
 		// Update Password
-		if (isset($d->oldPass)) {
+		if (isset($d->oldPass) && $d->oldPass != '') {
 			$chkSTH = $this->db->prepare("SELECT * FROM `contact` WHERE `contactID`=? AND `pass`=ENCRYPT(?,?);");
 			if ( $chkSTH->execute( $user['contactID'], $d->oldPass, config::encryptSTR ) && $chkSTH->rowCount() > 0 ) {
 				$pasSTH = $this->db->prepare("UPDATE `contact` SET `pass`=ENCRYPT(?,?) WHERE `contactID`=?;");

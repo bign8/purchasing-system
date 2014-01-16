@@ -348,22 +348,9 @@ controller('RegisterFormCtrl', ['$scope', 'myPage', '$modal', 'interface', 'secu
 	};
 	$scope.modifyFirm = function() { $scope.user.firmModified = true; };
 
-	// Passowrd Requirements
-	$scope.req = {pass:false,len:false,spe:false,num:false,alp:false};
-	$scope.$watch('user.password', function(value) {
-		value = value || ''; // undefined check
-		$scope.req.alp = !! value.match(/[a-z]/);
-		$scope.req.upa = !! value.match(/[A-Z]/);
-		$scope.req.num = !! value.match(/[0-9]/);
-		$scope.req.len = !! value.match(/.{6,}/);
-		$scope.req.spe = !! value.match(/[^a-zA-Z0-9]/);
-		$scope.req.pass = $scope.req.alp && $scope.req.upa && $scope.req.num && $scope.req.spe && $scope.req.len;
-	});
-
 	// handle registration clicks
 	$scope.register = function( invalid ) {
 		if (invalid) return alert('Form is not valid\nPlease try again.');
-		if (!$scope.req.pass) return alert('Choose a password that passes all the parameters\nPlease try again.');
 		if ($scope.passVerify !== $scope.user.password) return alert('Passwords do not match\nPlease try again.');
 		if ($scope.user.firm.addr.addressID === undefined) return alert('Please assign a firm address');
 		if ($scope.user.addr.addressID === undefined) return alert('Please assign a user address');
@@ -439,18 +426,6 @@ controller('UserFormCtrl', ['$scope', 'myPage', '$modal', 'interface', 'security
 		if ($scope.same) $scope.user.addr = value;
 	});
 
-	// Passowrd Requirements
-	$scope.req = {pass:false,len:false,spe:false,num:false,alp:false};
-	$scope.$watch('user.password', function(value) {
-		value = value || ''; // undefined check
-		$scope.req.alp = !! value.match(/[a-z]/);
-		$scope.req.upa = !! value.match(/[A-Z]/);
-		$scope.req.num = !! value.match(/[0-9]/);
-		$scope.req.len = !! value.match(/.{6,}/);
-		$scope.req.spe = !! value.match(/[^a-zA-Z0-9]/);
-		$scope.req.pass = $scope.req.alp && $scope.req.upa && $scope.req.num && $scope.req.spe && $scope.req.len;
-	});
-
 	$scope.reset = function() {
 		$scope.user = angular.copy( $scope.origUser );
 		$scope.same = $scope.user.addr.addressID == $scope.user.firm.addr.addressID;
@@ -461,7 +436,6 @@ controller('UserFormCtrl', ['$scope', 'myPage', '$modal', 'interface', 'security
 
 	$scope.store = function( invalid ) {
 		if (invalid) return alert('Form is not valid\nPlease try again.');
-		if ($scope.user.oldPass && !$scope.req.pass) return alert('Choose a password that passes all the parameters\nPlease try again.');
 		if ($scope.user.oldPass && $scope.passVerify !== $scope.user.password) return alert('Passwords do not match\nPlease try again.');
 		if ($scope.user.firm.addr.addressID === undefined) return alert('Please assign a firm address');
 		if ($scope.user.addr.addressID === undefined) return alert('Please assign a user address');
