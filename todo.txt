@@ -5,9 +5,7 @@ ToDo:
 	- ...
 - allow registration of email w/o login information (process)?
 - Checkout / Continue Shopping / Close
-- Implement Form constraints for checkout
 - improve form constraints for register/xx
-- Modify links on both carts to use db links if available, otherwise txt
 - password reset functionoality
 - password show as red for invalid passwd
 - photo upload field (doesn't store, just emails)
@@ -44,6 +42,7 @@ Future releases
 - assign status to orders (processing, confirmed, etc)
 - download proxy? to ensure files have been purchased? (php script)
 - handle invoices
+- have `item` settings store raw data instead of json encoded data
 - periodically make calls back to server to check for additions to php cart
 - register user / select address for a list of firm addresses
 - use key based paypal checkout
