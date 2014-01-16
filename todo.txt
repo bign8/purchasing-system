@@ -5,10 +5,8 @@ ToDo:
 	- ...
 - allow registration of email w/o login information (process)?
 - Checkout / Continue Shopping / Close
-- Give old and discount price based on groups (show and give reason)
 - Implement Form constraints for checkout
 - improve form constraints for register/xx
-- migrate logic to a rest type structure
 - Modify links on both carts to use db links if available, otherwise txt
 - password reset functionoality
 - password show as red for invalid passwd
@@ -37,29 +35,15 @@ In a holding pattern:
 
 Notes:
 - Add conference type product -> Force insert into tie_product_field
-- Add price to new fields
+- Add price to new products
 
 Questions:
-- how old of a browser do we need to support
-	- iff not old -> try this for array unique (php cart merge within index.php) http://stackoverflow.com/a/11247231
-- remove duplicates on server or notify user of duplicates? (enforce no re purchases, but notify users)
+- how old of a browser do we need to support (provide un-supported browser warnings)
 
 Future releases
 - assign status to orders (processing, confirmed, etc)
 - download proxy? to ensure files have been purchased? (php script)
 - handle invoices
 - periodically make calls back to server to check for additions to php cart
-- Previous purchases -> modify attendees to a conference, priced accordingly
 - register user / select address for a list of firm addresses
 - use key based paypal checkout
-
-Used partials:
-- custom-payment-form.tpl.html
-- index.tpl.html
-- modal-address.tpl.html
-- modal-contact.tpl.html
-- register-conf.tpl.html
-- register-form.tpl.html
-
-Not used partials:
-- modal-options.tpl.html (replaced by register-conf.tpl.html)
