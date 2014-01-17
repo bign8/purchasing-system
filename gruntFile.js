@@ -44,7 +44,6 @@ module.exports = function(grunt) {
 			},
 			config: {
 				options: {
-					interval: 1000,
 					event: ['changed']
 				},
 				files: ['package.json', 'gruntfile.js'],
@@ -53,25 +52,33 @@ module.exports = function(grunt) {
 		},
 		copy: {
 			main: {
-				dest: '<%= activeDir %>',
-				src: '**',
-				expand: true,
-				cwd: 'src/assets/'
+				files:[
+					{dest: '<%= activeDir %>', src: '**', expand: true, cwd: 'src/assets/'},
+					{dest: '<%= activeDir %>/index.html', src: 'src/index.html'}
+				]
 			},
-			index: {
-				dest: '<%= activeDir %>/index.html',
-				src: 'src/index.html'
+			php: {
+				dest: '<%= activeDir %>',
+				src: ['**/*.php'],
+				cwd: 'src/php',
+				expand: true
+			},
+			vendor: {
+				files: [
+					{dest: '<%= activeDir %>/libinc', src: '*/*.php', expand: true, cwd: 'vendor'}
+				]
 			}
 		},
 		'ftp-deploy': {
 			php: {
-				src: 'src/php',
+				src: '<%= activeDir %>',
+				exclusions: ['!build/**/*.php'], // overrides by onChange
 				auth: "<%= settings.ftpDeploy.auth %>",
 				dest: "<%= settings.ftpDeploy.dest %>"
 			},
 			app: {
 				src: '<%= activeDir %>',
-				exclusions: ['build/**/*.png', 'build/**/*.txt', 'build/**/*.ico'],
+				exclusions: ['build/**/*.{php,png,ico,txt}'],
 				auth: "<%= settings.ftpDeploy.auth %>",
 				dest: "<%= settings.ftpDeploy.dest %>"
 			}
@@ -100,7 +107,7 @@ module.exports = function(grunt) {
 	var onChange = grunt.util._.debounce(function() {
 		var hasPhp = false, arr = Object.keys(changedFiles);
 		for (var i = arr.length - 1; i >= 0; i--) if (arr[i].match(/\.php/)) hasPhp = true;
-		grunt.config('ftp-deploy.php.exclusions', hasPhp ? [] : ['**/*.php'] );
+		grunt.config('ftp-deploy.php.exclusions', hasPhp ? ['build/**/*.{png,ico,txt,css,html,js}'] : ['**'] );
 		changedFiles = Object.create(null);
 	}, 200);
 	grunt.event.on('watch', function(action, filepath, target) { // http://bit.ly/1fygfyP
@@ -111,6 +118,7 @@ module.exports = function(grunt) {
 	grunt.registerTask('setPath', function( arg1 ) {
 		grunt.config.set( 'activeDir', arg1 );
 		grunt.config.set( 'uglify.options.beautify', arg1 == 'build'); // set beautification link
+		if (arg1 == 'build') grunt.config('copy.vendor.files', []); // don't copy vendor on watch builds
 		grunt.log.writeln('Setting build path to: ' + arg1 );
 	});
 
