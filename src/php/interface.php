@@ -62,7 +62,9 @@ if ( $_REQUEST['c'] == 'cart' ) {
 	switch ($_REQUEST['a']) {
 		case 'demo': 
 			// Some dev code goes here
+			$test = new UAMail();
 			break;
+		case 'info': phpinfo(); break;
 		case 'db':
 			$cmd = 'mysqldump --host=db3.modwest.com -u ' . config::db_user . ' -p' . config::db_pass . ' upstreamacademy_payment -d --skip-opt';
 			die(system($cmd));
