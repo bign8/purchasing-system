@@ -41,6 +41,7 @@ Questions:
 Future releases
 - assign status to orders (processing, confirmed, etc)
 - download proxy? to ensure files have been purchased? (php script)
+- find a better deployment than 'ftp-deploy'
 - handle invoices
 - have `item` settings store raw data instead of json encoded data
 - periodically make calls back to server to check for additions to php cart
