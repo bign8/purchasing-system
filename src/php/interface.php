@@ -62,7 +62,6 @@ if ( $_REQUEST['c'] == 'cart' ) {
 	switch ($_REQUEST['a']) {
 		case 'demo': 
 			// Some dev code goes here
-			$test = new UAMail();
 			break;
 		case 'info': phpinfo(); break;
 		case 'db':

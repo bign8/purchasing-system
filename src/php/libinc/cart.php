@@ -293,13 +293,13 @@ class Cart extends NG {
 		$data = $this->getPostData();
 
 		// Insert order
-		$orderSTH = $this->db->prepare("INSERT INTO `order` (contactID, medium) VALUES (?,?);");
-		if (!$orderSTH->execute( $user['contactID'], $data->medium )) return $this->conflict();
+		$orderSTH = $this->db->prepare("INSERT INTO `order` (contactID, medium, amount) VALUES (?,?,?);");
+		if (!$orderSTH->execute( $user['contactID'], $data->medium, $data->cost )) return $this->conflict();
 		$orderID = $this->db->lastInsertId();
 
 		// Store purchases and options
 		$purchaseSTH = $this->db->prepare("INSERT INTO `purchase` (itemID, orderID, firmID, data) VALUES (?,?,?,?);");
-		$attendeeSTH = $this->db->prepare("INSERT INTO `attendee` (itemID, contactID) VALUES (?,?);");
+		$attendeeSTH = $this->db->prepare("INSERT INTO `attendee` (itemID, contactID, orderID) VALUES (?,?,?);");
 		$memberSTH = $this->db->prepare("INSERT INTO `member` (firmID, groupID) VALUES (?,?);");
 		$cart = $this->get(); // removes random id's
 		foreach ($cart as $item) { // iterate over items
@@ -308,7 +308,7 @@ class Cart extends NG {
 
 			if (isset($option['attID'])) { // store attendees
 				foreach($option[$option['attID']] as &$contact) {
-					if (!$attendeeSTH->execute($item['itemID'], $contact['contactID'])) return $this->conflict();
+					if (!$attendeeSTH->execute($item['itemID'], $contact['contactID'], $orderID)) return $this->conflict();
 					$contact['attendeeID'] = $this->db->lastInsertId();
 				}
 			}
@@ -320,7 +320,7 @@ class Cart extends NG {
 			if (!$purchaseSTH->execute($item['itemID'], $orderID, $user['firmID'], json_encode($option))) return $this->conflict(); // store purchase here
 		}
 
-		// $this->emailCart($orderID, $data->cost);
+		$this->emailCart($orderID);
 		$this->clr();
 
 		return $orderID;	
@@ -367,6 +367,7 @@ class Cart extends NG {
 
 		// setup attendees grab
 		$attendeeSTH = $this->db->prepare("SELECT c.legalName, c.preName, c.title, c.email, c.phone, d.* FROM (SELECT contactID FROM `attendee` a WHERE itemID=?) a LEFT JOIN `contact` c ON a.contactID=c.contactID LEFT JOIN `address` d ON c.addressID=d.addressID;");
+		$fieldSTH = $this->db->prepare("SELECT * FROM `field` WHERE fieldID=? LIMIT 1;");
 
 		// Pretty print addresses
 		function address($data) {
@@ -377,10 +378,14 @@ class Cart extends NG {
 			return $str;
 		}
 
+		setlocale(LC_MONETARY, 'en_US');
+		$order['amount'] = '$' . money_format('%n', $order['amount']);
+
 		// pretty print data for email
 		$html  = "<b>Order#:</b> $orderID<br />\r\n";
 		$html .= "<b>Status / medium:</b> {$order['status']} / {$order['medium']}<br />\r\n";
 		$html .= "<b>Time:</b> {$order['stamp']}<br />\r\n";
+		$html .= "<b>Total:</b> {$order['amount']}<br />\r\n";
 		$html .= "<hr/><b>Purchase Contact:</b><br />\r\n";
 		$html .= "<a href=\"mailto:{$contact['email']}\" >{$contact['title']} {$contact['legalName']} ({$contact['preName']})</a><br />\r\n";
 		$html .= address($contact);
@@ -391,22 +396,36 @@ class Cart extends NG {
 		$html .= "<hr/>Items:<br /><ul>\r\n";
 
 		foreach ($items as $item) {
-			$html .= "<li><a href=\"http://uastore.wha.la/#/products/{$item['productID']}/{$item['itemID']}\">{$item['name']}</a><ul>";
+
+			$html .= (isset($item['url'])) ? "<li><a href=\"{$item['url']}\">{$item['name']}</a><ul>" : "<li><strong>{$item['name']}</strong><ul>";
 			$data = json_decode($item['data']);
 			foreach ($data as $key => $value) {
-				if ($key == "+Attendees") { // pretty print attendees
-					$html .= "<li><b>Attendee(s):</b><ul>";
-					$attendeeSTH->execute( $item['itemID'] );
-					while ($row = $attendeeSTH->fetch( PDO::FETCH_ASSOC )) {
-						$html .= "<li>";
-						$html .= "<a href=\"mailto:{$row['email']}\" >{$row['title']} {$row['legalName']} ({$row['preName']})</a><br />\r\n";
-						$html .= address($row);
-						$html .= "Phone: <a href=\"tel:{$row['phone']}\">{$row['phone']}</a><br />\r\n";
-						$html .= "</li>";
+				$fieldSTH->execute( $key );
+				if ($fieldSTH->rowCount() > 0) {
+					$fieldData = $fieldSTH->fetch(PDO::FETCH_ASSOC);
+
+					switch ($fieldData['fieldID']) {
+						case '1': // pretty print attendees
+							$html .= "<li><b>Attendee(s):</b><ul>";
+							$attendeeSTH->execute( $item['itemID'] );
+							while ($row = $attendeeSTH->fetch( PDO::FETCH_ASSOC )) {
+								$html .= "<li>";
+								$html .= "<a href=\"mailto:{$row['email']}\" >{$row['title']} {$row['legalName']} ({$row['preName']})</a><br />\r\n";
+								$html .= address($row);
+								$html .= "Phone: <a href=\"tel:{$row['phone']}\">{$row['phone']}</a><br />\r\n";
+								$html .= "</li>";
+							}
+							$html .= "</ul></li>";
+							break;
+						
+						case '2':
+							$value = '$' . money_format('%n', $value);
+							// break; // falls over to default after formatting
+
+						default:
+							$html .= "<li><b>" . $fieldData['name'] . ':</b> ' . $value . "</li>";
+							break;
 					}
-					$html .= "</ul></li>";
-				} else {
-					$html .= "<li><b>" . substr($key, 1) . ':</b> ' . $value . "</li>";
 				}
 			}
 			$html .= "</ul></li>";
@@ -414,8 +433,11 @@ class Cart extends NG {
 
 		$html .= "</ul>\r\n";
 
-		echo $html;
-		// echo mail('nwoods@azworld.com', 'Test Email', 'Da test <b>HTML</b> email.') ? 'true' : 'false';
-		// echo mail('big.nate.w@gmail.com', 'Test Email', 'Da test <b>HTML</b> email.') ? 'true' : 'false';
+		$mail = new UAMail();
+		$mail->addAddress('nwoods@azworld.com', 'Nathan Woods');  // Add a recipient
+		$mail->Subject = "Upstream Academy Payment Information";
+		$mail->Body    = $html;
+		$mail->AltBody = strip_tags($html);
+		if (!$mail->send()) $this->conflict('mail');
 	}
 }

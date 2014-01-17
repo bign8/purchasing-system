@@ -29,7 +29,12 @@
 						<a ng-switch-default ng-href="{{item.url}}">{{item.name}}</a>
 					</td>
 					<td>{{item.description}}</td>
-					<td>{{item.cost.value | currency}}</td>
+					<td>
+						<span>{{item.cost.value | currency}}</span>
+						<span ng-show="item.cost.fullValue">&nbsp;&nbsp;
+							<del class="text-error">&nbsp;{{item.cost.fullValue | currency}}&nbsp;</del>
+						</span>
+					</td>
 				</tr>
 			</tbody>
 			<tfoot>

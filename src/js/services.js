@@ -91,6 +91,7 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function($rootS
 
 	var processItem = function(item, attribute) {
 		var setValue = (attribute=='settings') ? 'value' : 'fullValue';
+		item.cost = item.cost || {};
 		item.cost[setValue] = 0;
 		item.hasOptions = false;
 		switch (item.template) {

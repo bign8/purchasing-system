@@ -23,10 +23,13 @@ CREATE TABLE `attendee` (
   `itemID` int(10) unsigned NOT NULL,
   `contactID` int(10) unsigned NOT NULL,
   `additionalID` int(10) unsigned DEFAULT NULL COMMENT 'spouse / guide',
+  `orderID` int(10) unsigned NOT NULL,
   PRIMARY KEY (`attendeeID`),
   KEY `itemID` (`itemID`),
   KEY `contactID` (`contactID`),
   KEY `additionalID` (`additionalID`),
+  KEY `orderID` (`orderID`),
+  CONSTRAINT `fk_orderID` FOREIGN KEY (`orderID`) REFERENCES `order` (`orderID`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `attendee_ibfk_1` FOREIGN KEY (`itemID`) REFERENCES `item` (`itemID`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `attendee_ibfk_2` FOREIGN KEY (`contactID`) REFERENCES `contact` (`contactID`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `attendee_ibfk_3` FOREIGN KEY (`additionalID`) REFERENCES `contact` (`contactID`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -150,6 +153,7 @@ CREATE TABLE `order` (
   `status` enum('pending','processed','canceled') NOT NULL DEFAULT 'pending',
   `medium` enum('online','check','unknown') NOT NULL,
   `stamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `amount` varchar(10) NOT NULL,
   PRIMARY KEY (`orderID`),
   KEY `contactID` (`contactID`),
   CONSTRAINT `order_ibfk_1` FOREIGN KEY (`contactID`) REFERENCES `contact` (`contactID`)
