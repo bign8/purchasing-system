@@ -8,6 +8,7 @@ sed -i '/^$/d' bak/db.sql # remove blank lines
 sed -i '3d' bak/db.sql # remove 3rd line (database information)
 sed -i '$d' bak/db.sql # remove last line (date 2)
 sed -i '$d' bak/db.sql # remove last line (date 2)
+sed -i $'s/$/\r/' bak/db.sql # for dos line endings
 
 git add bak/db.sql # att to commit
 
