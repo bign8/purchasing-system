@@ -28,9 +28,9 @@ controller('RegisterConFormCtrl', ['$scope', 'myPage', 'interface', 'conference'
 	$scope.attID = (function() {
 		angular.forEach($scope.con.fields, function(value, key) { if (value.name == 'Attendees') attID = value.fieldID; });
 		$scope.con.options.attID = attID;
+		if (attID) $scope.con.options[attID] = $scope.con.options[attID] || []; // set empty attendee array
 		return attID;
 	})();
-	if ($scope.attID) $scope.con.options[attID] = []; // set empty attendee array
 
 	// Attendee list controls (these will be disabled if $scope.attID is undefined)
 	$scope.total = 0;
@@ -89,13 +89,14 @@ controller('RegisterConFormCtrl', ['$scope', 'myPage', 'interface', 'conference'
 			theCart.setDirty();
 			$modal.open({
 				templateUrl: 'registerConfNextActionTPL.html',
-				controller: function ($scope, $modalInstance, $location) {
+				controller: ['$scope', '$modalInstance', '$location', function ($scope, $modalInstance, $location) {
 					$scope.cart = function () {
 						$location.path('/cart');
 						$modalInstance.dismiss('cancel');
 					};
-				}
+				}]
 			});
+			$scope.orig = angular.copy( $scope.con.options );
 		}, function(obj) {
 			console.log(obj);
 			alert('Your save was unsuccessful.\nPlease try again or contact UpstreamAcademy for assistance.');
