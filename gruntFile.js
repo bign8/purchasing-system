@@ -16,7 +16,7 @@ module.exports = function(grunt) {
 		uglify: {
 			release: {
 				files: {
-					'<%= activeDir %>/js.js': ['src/**/*.js']
+					'<%= activeDir %>/js.js': ['src/**/*.js', '!src/assets/**/*.js']
 				},
 			},
 		},

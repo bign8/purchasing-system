@@ -180,7 +180,7 @@ class Cart extends NG {
 		$pass = false;
 		if (false===array_search($itemID, $_SESSION['cart'])) {
 			array_push($_SESSION['cart'], $itemID);
-			$pass = ture;
+			$pass = true;
 		}
 		return $pass;
 	}

@@ -1,66 +1,43 @@
 <?php
-// cross site callback
 
 // Handle cross site
 header('Access-Control-Allow-Origin: http://localhost');
 header('Access-Control-Allow-Credentials: true');
 
+// cross site callback
+require_once('./libinc/main_include.php');
+
 // Initialize session
-session_start();
+$cart = new Cart();
 
-// // change to past session if exists
-// if (isset($_REQUEST['sessionID'])) {
-// 	session_id( $_REQUEST['sessionID']  );
-// }
+if (!isset($_REQUEST['action'])) $_REQUEST['action'] = 'empty';
 
-// create sesson array
-if (!isset($_SESSION['cart'])) {
-	$_SESSION['cart'] = array();
-}
+switch ($_REQUEST['action']) {
+	case 'add':
+		if (isset($_REQUEST['itemId'])) {
+			$cart->addItem($_REQUEST['itemId']);
 
-// add item to cart
-if (isset($_REQUEST['itemId'])) {
-
-	if (false===array_search($_REQUEST['itemId'], $_SESSION['cart'])) {
-		array_push($_SESSION['cart'], $_REQUEST['itemId']);
-	}
+			echo json_encode(array(
+				'items' => sizeof($_SESSION['cart']),
+				'cart' => $_SESSION['cart']
+			));
+		}
+		break;
 	
-	echo json_encode(array(
-		'items' => sizeof($_SESSION['cart']),
-		// 'id' => session_id()
-	));
-} else {
-	// document print (for debug)
-	echo '<pre>';
-	print_r($_SESSION);
+	case 'get':
+		echo json_encode($_SESSION['cart']);
+		break;
+
+	default: // TODO: remove after dev
+		echo '<pre>';
+		print_r($_SESSION);
+		break;
 }
 
 /*
 Snippet for website on other side
-
 <script src="//code.jquery.com/jquery-1.10.2.min.js" type="text/javascript"></script>
-<script type="text/javascript">
-	$(document).ready(function() {
-		$('a.cartAdd').click(function(e) {
-			var target = $(e.target).unbind('click');
-			$.ajax({
-				type: 'GET',
-				dataType: 'json',
-				data: target.data(),
-				url: 'http://uastore.wha.la/cb.php',
-				crossDomain: true,
-				xhrFields: { withCredentials: true },
-				success: function( json, status, xhr ) {
-					console.log(json);
-					target.append(' (Added to cart)').click(function() {
-						alert('Item has already been added to your cart');
-					});
-				}
-			});
-			return false;
-		});
-	});
-</script>
+<script src="//payment.upstreamacademy.com/uacart.js" type="text/javascript"></script>
 
 <a href="#" data-item-id="x" class="cartAdd">item x</a>
 */
