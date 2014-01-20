@@ -446,8 +446,8 @@ class Cart extends NG {
 		$html .= "</ul>\r\n";
 
 		$mail = new UAMail();
-		$mail->addAddress('nwoods@azworld.com', 'Nathan Woods');  // Add a recipient
-		$mail->Subject = "Upstream Academy Payment Information";
+		$mail->addAddress(config::notifyEmail, config::notifyName);
+		$mail->Subject = "UpstreamAcademy Checkout";
 		$mail->Body    = $html;
 		$mail->AltBody = strip_tags($html);
 		if (!$mail->send()) $this->conflict('mail');

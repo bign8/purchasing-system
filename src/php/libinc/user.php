@@ -172,10 +172,15 @@ class User extends NG {
 		if ($checkSTH->rowCount() > 0) return $this->conflict('dup');
 
 		// Add/modify firm
+		$sendEmail = false;
 		if ($d->firmModified && isset($d->firm->firmID)) {
+			$sendEmail = true;
+			$getFirmSTH = $this->db->prepare("SELECT f.firmID, f.name, f.website, a.* FROM `firm` f JOIN `address` a ON f.addressID=a.addressID WHERE `firmID`=?;"); // Get Old data
+			$getFirmSTH->execute( $d->firm->firmID );
+
 			$firmSTH = $this->db->prepare("UPDATE `firm` SET `addressID`=?, `name`=?,`website`=? WHERE `firmID`=?");
 			if (!$firmSTH->execute($d->firm->addr->addressID, $d->firm->name, $d->firm->website, $d->firm->firmID)) return $this->conflict();
-			// TODO: send email
+
 			$firmID = $d->firm->firmID;
 		} else {
 			$firmSTH = $this->db->prepare("INSERT INTO `firm` (addressID, name, website) VALUES (?,?,?);");
@@ -187,6 +192,8 @@ class User extends NG {
 		$contSTH = $this->db->prepare("INSERT INTO `contact` (firmID, addressID, legalName, preName, title, email, phone, pass) VALUES (?,?,?,?,?,?,?,ENCRYPT(?,?));");
 		if (!$contSTH->execute( $firmID, $d->addr->addressID, $d->legalName, $d->preName, $d->title, $d->email, $d->phone, $d->password, config::encryptSTR )) return $this->conflict();
 		$_SESSION['user'] = $this->getUser( $d );
+
+		if ($sendEmail) $this->modifyFirmEmail($firmID, $getFirmSTH, $_SESSION['user']); // send email
 		return true;
 	}
 
@@ -223,10 +230,14 @@ class User extends NG {
 
 		// Add/modify firm
 		if (isset($d->firm->firmID)) {
+			$getFirmSTH = $this->db->prepare("SELECT f.firmID, f.name, f.website, a.* FROM `firm` f JOIN `address` a ON f.addressID=a.addressID WHERE `firmID`=?;"); // Get Old data
+			$getFirmSTH->execute( $d->firm->firmID );
+
 			$firmSTH = $this->db->prepare("UPDATE `firm` SET `addressID`=?, `name`=?,`website`=? WHERE `firmID`=?");
 			if (!$firmSTH->execute($d->firm->addr->addressID, $d->firm->name, $d->firm->website, $d->firm->firmID)) return $this->conflict();
-			// TODO: send email
 			$firmID = $d->firm->firmID;
+
+			$this->modifyFirmEmail($firmID, $getFirmSTH, $user); // send email
 		} else {
 			$firmSTH = $this->db->prepare("INSERT INTO `firm` (addressID, name, website) VALUES (?,?,?);");
 			if (!$firmSTH->execute( $d->firm->addr->addressID, $d->firm->name, $d->firm->website )) return $this->conflict();
@@ -249,6 +260,94 @@ class User extends NG {
 			$updateSTH->execute( $newUser['contactID'] );
 			$_SESSION['user'] = $newUser;
 		}
+	}
+	private function modifyFirmEmail($firmID, $oldDataSTH, $user) { // Helper: updatUser + addUser
+		$newDataSTH = $this->db->prepare("SELECT f.firmID, f.name, f.website, a.* FROM `firm` f JOIN `address` a ON f.addressID=a.addressID WHERE `firmID`=?;");
+		$newDataSTH->execute($firmID);
+		$newData = $newDataSTH->fetch(PDO::FETCH_ASSOC);
+		$oldData = $oldDataSTH->fetch(PDO::FETCH_ASSOC);
+
+		$html = <<<HTML
+<p>The following changes have been made to a firm.</p>
+<table>
+	<tr>
+		<th>Attribute</th>
+		<th>Old Version</th>
+		<th>New Version</th>
+	</td>
+	<tr>
+		<td>Name</td>
+		<td>{$oldData['name']}</td>
+		<td>{$newData['name']}</td>
+	</td>
+	<tr>
+		<td>Website</td>
+		<td>{$oldData['website']}</td>
+		<td>{$newData['website']}</td>
+	</td>
+	<tr>
+		<td>Address Name</td>
+		<td>{$oldData['addrName']}</td>
+		<td>{$newData['addrName']}</td>
+	</td>
+	<tr>
+		<td>Address 1</td>
+		<td>{$oldData['addr1']}</td>
+		<td>{$newData['addr1']}</td>
+	</td>
+	<tr>
+		<td>Address 2</td>
+		<td>{$oldData['addr2']}</td>
+		<td>{$newData['addr2']}</td>
+	</td>
+	<tr>
+		<td>City</td>
+		<td>{$oldData['city']}</td>
+		<td>{$newData['city']}</td>
+	</td>
+	<tr>
+		<td>State</td>
+		<td>{$oldData['state']}</td>
+		<td>{$newData['state']}</td>
+	</td>
+	<tr>
+		<td>Zip</td>
+		<td>{$oldData['zip']}</td>
+		<td>{$newData['zip']}</td>
+	</td>
+</table>
+<p>The above changes were made by the following person</p>
+<table>
+	<tr>
+		<td>Name</td>
+		<td>{$user['legalName']}</td>
+	</tr>
+	<tr>
+		<td>Preferred Name</td>
+		<td>{$user['preName']}</td>
+	</tr>
+	<tr>
+		<td>Title</td>
+		<td>{$user['title']}</td>
+	</tr>
+	<tr>
+		<td>Email</td>
+		<td>{$user['email']}</td>
+	</tr>
+	<tr>
+		<td>Phone</td>
+		<td>{$user['phone']}</td>
+	</tr>
+</table>
+<pre>
+HTML;
+
+		$mail = new UAMail();
+		$mail->addAddress(config::notifyEmail, config::notifyName);
+		$mail->Subject = "UpstreamAcademy Modify Firm Notification";
+		$mail->Body    = $html;
+		$mail->AltBody = strip_tags($html);
+		if (!$mail->send()) $this->conflict('mail');
 	}
 
 }
