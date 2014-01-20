@@ -19,7 +19,6 @@ factory('myPage', ['$rootScope', '$sce', function( $rootScope, $sce ){
 
 factory('breadcrumbs', ['$rootScope', '$location', 'interface', function ($rootScope, $location, interface) {
 	var breadcrumbs = [];
-	var crumbCashe = {};
 
 	$rootScope.$on('$routeChangeSuccess', function(event, current) {
 		var pathElements = $location.path().split('/'), result = [], i;
@@ -29,15 +28,17 @@ factory('breadcrumbs', ['$rootScope', '$location', 'interface', function ($rootS
 
 		// pretty crumb cash and calling function
 		function prettyCrumb(obj) {
+			var crumbCashe = JSON.parse(localStorage.getItem('crumbCashe') || "{}");
 			if (crumbCashe.hasOwnProperty(obj.path)) { // in in cashe
 				obj.name = crumbCashe[obj.path];
 			} else { // otherwise
 				interface.app('prettyCrumb', obj).then(function (label) {
 					crumbCashe[obj.path] = label; // assign cashe
 					breadcrumbs[obj.index].name = label; // assign value out
+					localStorage.setItem('crumbCashe', JSON.stringify(crumbCashe));
 				});
 			}
-			return ucfirst(obj.name);
+			return obj.name;
 		}
 
 		// Pretty path elements (thanks http://phpjs.org/functions/ucfirst/)
