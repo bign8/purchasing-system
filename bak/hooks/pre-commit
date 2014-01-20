@@ -3,7 +3,7 @@
 # stores database schema
 
 curl -s -S --user nate:nate "http://payment.upstreamacademy.com/interface.php?c=test&a=db" > bak/db.sql # get db dump
-sed -i -e 's/^\/\*![0-4][0-9]\{4\}.*\/;$//g' bak/db.sql # remove conditional execution lines
+sed -i '/^\/\*![0-4][0-9]\{4\}.*\/;$/d' bak/db.sql # remove conditional execution lines
 sed -i '/^$/d' bak/db.sql # remove blank lines
 sed -i '3d' bak/db.sql # remove 3rd line (database information)
 sed -i '$d' bak/db.sql # remove last line (date 2)

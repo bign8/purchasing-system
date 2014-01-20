@@ -175,6 +175,16 @@ class Cart extends NG {
 		return $pass;
 	}
 
+	// Worker / Helper: (helper for getOption, will work for cb.php)
+	public function addItem($itemID) {
+		$pass = false;
+		if (false===array_search($itemID, $_SESSION['cart'])) {
+			array_push($_SESSION['cart'], $itemID);
+			$pass = ture;
+		}
+		return $pass;
+	}
+
 	// Worker: clear cart
 	public function clr() {
 		$_SESSION['cart'] = array();
@@ -192,6 +202,8 @@ class Cart extends NG {
 	// Worker: return conference options
 	public function getOption() {
 		$data = $this->getPostData();
+
+		$this->addItem($data->itemID);
 
 		$item = $this->getItemByID( $data->itemID ); // get item + cost information
 		$fields = $this->getProductFields( $item['productID'] ); // get fields for a product
