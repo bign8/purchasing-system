@@ -28,9 +28,9 @@
 					<div class="control-group" ng-repeat="field in con.fields | filter:{name:'!Attendees'}" ng-switch="field.type">
 
 						<div ng-switch-when="text">
-							<label class="control-label" for="legalName">{{field.name}}</label>
+							<label class="control-label" for="{{field.fieldID}}">{{field.name}}</label>
 							<div class="controls">
-								<input type="text" id="legalName" ng-model="con.options[field.fieldID]" placeholder="{{field.name}}" ng-required="field.required">
+								<input type="text" id="{{field.fieldID}}" ng-model="con.options[field.fieldID]" placeholder="{{field.name}}" ng-required="{{field.required}}" ua-magic-formatter="{{field.settings}}">
 							</div>
 						</div>
 
