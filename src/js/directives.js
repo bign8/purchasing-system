@@ -85,6 +85,34 @@ directive('uaPhone', function() {
 	};
 }).
 
+directive('notify', ['$timeout', function($timeout) { // extending from ui.bootstrap.alert
+	return {
+		restrict:'EA',
+		replace: true,
+		template: '<div ng-show="message">'+
+			'	<alert type="message.type" close="clearMessage()">' +
+			'		<strong ng-show="message.pre">{{message.pre}}&nbsp;</strong>{{message.msg}}' +
+			'	</alert>'+
+			'</div>',
+		scope: {
+			'message': '='
+		},
+		link: function($scope) {
+			var timer;
+
+			$scope.clearMessage = function() {
+				$scope.message = false;
+			};
+			$scope.$watch('message', function(val) {
+				console.log(val);
+				$timeout.cancel(timer);
+				$scope.messages = [val];
+				if (val) timer = $timeout($scope.clearMessage, (val.delay || 5)*1000);
+			});
+		}
+	};
+}]).
+
 directive('uaMagicFormatter', ['$filter', function($filter) {
 	var formatters = {
 		currency: function(val) {

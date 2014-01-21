@@ -3,13 +3,7 @@
 		<fieldset>
 			<legend>Custom Payment Form</legend>
 
-			<div class="alert alert-error" ng-show="error">
-				<strong>Error!</strong> A payment with this name and value is already in your cart.
-			</div>
-
-			<div class="alert alert-success" ng-show="success">
-				<strong>Thanks!</strong> This custom payment has been added to your cart.
-			</div>
+			<notify message="message"></notify>
 
 			<div class="control-group">
 				<label class="control-label" for="desc">Invoice # / Description</label>
