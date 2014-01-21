@@ -206,7 +206,7 @@ factory('interface', ['$http', '$q', '$rootScope', '$timeout', function ($http, 
 			if (loading) {
 				activeTimeout = $timeout(function() {
 					$rootScope.loadWarn = true;
-				}, 10000);
+				}, 20*1000);
 			}
 		}
 	);
