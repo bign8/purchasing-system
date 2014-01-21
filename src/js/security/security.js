@@ -1,13 +1,12 @@
 // Based loosely around work by Witold Szczerba - https://github.com/witoldsz/angular-http-auth
 angular.module('security.service', [
-	'security.retryQueue',	// Keeps track of failed requests that need to be retried once the user logs in
-	'security.login',			// Contains the login form template and controller
+	'security.retryQueue', // Keeps track of failed requests that need to be retried once the user logs in
+	'security.login', // Contains the login form template and controller
 	'ui.bootstrap',
 	'myApp.services'
 ]).
 
 factory('security', ['$http', '$q', '$location', 'securityRetryQueue', '$modal', 'interface', function($http, $q, $location, queue, $modal, interface) {
-// factory('security', ['$http', '$q', '$location', 'securityRetryQueue', function($http, $q, $location, queue) {
 
 	// Redirect to the given url (defaults to '/')
 	function redirect(url) {
@@ -16,16 +15,11 @@ factory('security', ['$http', '$q', '$location', 'securityRetryQueue', '$modal',
 	}
 
 	// Login form dialog stuff
-	// var loginDialog = null;
 	var loginModal = null;
 	function openLoginDialog() {
 		if ( loginModal ) {
 			throw new Error('Trying to open a dialog that is already open!');
 		}
-		// loginDialog = $dialog.dialog();
-		// loginDialog.open('security/login/form.tpl.html', 'LoginFormController').then(onLoginDialogClose);
-
-		// // rewrite tu use modal
 		loginModal = $modal.open({
 			templateUrl: 'js/security/login/form.tpl.html',
 			controller: 'LoginFormController',
@@ -34,16 +28,11 @@ factory('security', ['$http', '$q', '$location', 'securityRetryQueue', '$modal',
 		loginModal.result.then(onLoginDialogClose);
 	}
 	function closeLoginDialog(success) {
-		// if (loginDialog) {
-		// 	loginDialog.close(success);
-		// }
 		if (loginModal) {
 			loginModal.close(success);
 		}
-		// alert('closeLoginDialog');
 	}
 	function onLoginDialogClose(success) {
-		// loginDialog = null;
 		loginModal = null;
 		if ( success ) {
 			queue.retryAll();
@@ -51,7 +40,6 @@ factory('security', ['$http', '$q', '$location', 'securityRetryQueue', '$modal',
 			queue.cancelAll();
 			redirect();
 		}
-		// alert('onLoginDialogClose');
 	}
 
 	// Register a handler for when an item is added to the retry queue
@@ -108,14 +96,14 @@ factory('security', ['$http', '$q', '$location', 'securityRetryQueue', '$modal',
 
 		// Ask the backend to see if a user is already authenticated - this may be from a previous session.
 		requestCurrentUser: function() {
-			if ( service.isAuthenticated() ) {
-				return $q.when(service.currentUser);
-			} else {
-				return interface.user('currentUser').then(function(user) {
-					service.currentUser = user;
-					return service.currentUser;
-				});
-			}
+			return service.isAuthenticated() ? $q.when(service.currentUser) : service.forceCurrentUser();
+		},
+
+		forceCurrentUser: function() {
+			return interface.user('currentUser').then(function(user) {
+				service.currentUser = user;
+				return service.currentUser;
+			});
 		},
 
 		// Information about the current user

@@ -442,9 +442,11 @@ controller('UserFormCtrl', ['$scope', 'myPage', '$modal', 'interface', 'security
 		if ($scope.user.addr.addressID === undefined) return alert('Please assign a user address');
 		
 		interface.user('updateUser', $scope.user).then(function() {
-			alert('Your account has successfully updated');
-			security.requestCurrentUser();
-			window.location.reload();
+			alert('Your account has successfully updated'); // TODO: move to dom alert box
+			security.forceCurrentUser();
+			myPage.setTitle("Account Settings", "for " + $scope.user.legalName);
+			$scope.origUser = angular.copy( $scope.user );
+			$scope.settings.$setPristine(true);
 		}, function (err) {
 			if (err == 'dup') {
 				alert('This email already has an account\nPlease click the login button and attempt a password reset.');
