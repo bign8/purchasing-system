@@ -260,6 +260,7 @@ class User extends NG {
 			$updateSTH->execute( $newUser['contactID'] );
 			$_SESSION['user'] = $newUser;
 		}
+		return 'check';
 	}
 	private function modifyFirmEmail($firmID, $oldDataSTH, $user) { // Helper: updatUser + addUser
 		$newDataSTH = $this->db->prepare("SELECT f.firmID, f.name, f.website, a.* FROM `firm` f JOIN `address` a ON f.addressID=a.addressID WHERE `firmID`=?;");
@@ -267,87 +268,32 @@ class User extends NG {
 		$newData = $newDataSTH->fetch(PDO::FETCH_ASSOC);
 		$oldData = $oldDataSTH->fetch(PDO::FETCH_ASSOC);
 
+		// This is called HEREDOC syntax : http://www.php.net/manual/en/language.types.string.php#language.types.string.syntax.heredoc
 		$html = <<<HTML
 <p>The following changes have been made to a firm.</p>
 <table>
-	<tr>
-		<th>Attribute</th>
-		<th>Old Version</th>
-		<th>New Version</th>
-	</td>
-	<tr>
-		<td>Name</td>
-		<td>{$oldData['name']}</td>
-		<td>{$newData['name']}</td>
-	</td>
-	<tr>
-		<td>Website</td>
-		<td>{$oldData['website']}</td>
-		<td>{$newData['website']}</td>
-	</td>
-	<tr>
-		<td>Address Name</td>
-		<td>{$oldData['addrName']}</td>
-		<td>{$newData['addrName']}</td>
-	</td>
-	<tr>
-		<td>Address 1</td>
-		<td>{$oldData['addr1']}</td>
-		<td>{$newData['addr1']}</td>
-	</td>
-	<tr>
-		<td>Address 2</td>
-		<td>{$oldData['addr2']}</td>
-		<td>{$newData['addr2']}</td>
-	</td>
-	<tr>
-		<td>City</td>
-		<td>{$oldData['city']}</td>
-		<td>{$newData['city']}</td>
-	</td>
-	<tr>
-		<td>State</td>
-		<td>{$oldData['state']}</td>
-		<td>{$newData['state']}</td>
-	</td>
-	<tr>
-		<td>Zip</td>
-		<td>{$oldData['zip']}</td>
-		<td>{$newData['zip']}</td>
-	</td>
+	<tr><th>Attribute</th><th>Old Version</th><th>New Version</th></tr>
+	<tr><td>Name</td><td>{$oldData['name']}</td><td>{$newData['name']}</td></tr>
+	<tr><td>Website</td><td>{$oldData['website']}</td><td>{$newData['website']}</td></tr>
+	<tr><td>Address Name</td><td>{$oldData['addrName']}</td><td>{$newData['addrName']}</td></tr>
+	<tr><td>Address 1</td><td>{$oldData['addr1']}</td><td>{$newData['addr1']}</td></tr>
+	<tr><td>Address 2</td><td>{$oldData['addr2']}</td><td>{$newData['addr2']}</td></tr>
+	<tr><td>City</td><td>{$oldData['city']}</td><td>{$newData['city']}</td></tr>
+	<tr><td>State</td><td>{$oldData['state']}</td><td>{$newData['state']}</td></tr>
+	<tr><td>Zip</td><td>{$oldData['zip']}</td><td>{$newData['zip']}</td></tr>
 </table>
 <p>The above changes were made by the following person</p>
 <table>
-	<tr>
-		<td>Name</td>
-		<td>{$user['legalName']}</td>
-	</tr>
-	<tr>
-		<td>Preferred Name</td>
-		<td>{$user['preName']}</td>
-	</tr>
-	<tr>
-		<td>Title</td>
-		<td>{$user['title']}</td>
-	</tr>
-	<tr>
-		<td>Email</td>
-		<td>{$user['email']}</td>
-	</tr>
-	<tr>
-		<td>Phone</td>
-		<td>{$user['phone']}</td>
-	</tr>
+	<tr><td>Name</td><td>{$user['legalName']}</td></tr>
+	<tr><td>Preferred</td><td>{$user['preName']}</td></tr>
+	<tr><td>Title</td><td>{$user['title']}</td></tr>
+	<tr><td>Email</td><td>{$user['email']}</td></tr>
+	<tr><td>Phone</td><td>{$user['phone']}</td></tr>
 </table>
-<pre>
 HTML;
 
 		$mail = new UAMail();
-		$mail->addAddress(config::notifyEmail, config::notifyName);
-		$mail->Subject = "UpstreamAcademy Modify Firm Notification";
-		$mail->Body    = $html;
-		$mail->AltBody = strip_tags($html);
-		if (!$mail->send()) $this->conflict('mail');
+		if (!$mail->notify("UpstreamAcademy Modify Firm Notification", $html)) $this->conflict('mail');
 	}
 
 }
