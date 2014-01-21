@@ -18,7 +18,8 @@ class NG {
 
 	// Helper(angular): angular data retriever / because angular is wierd
 	protected function getPostData() {
-		return json_decode(file_get_contents("php://input"));
+		$data = isset($_REQUEST['input']) ? $_REQUEST['input'] : file_get_contents("php://input") ; // DEBUG
+		return json_decode( $data );
 	}
 
 	// Helper(app): returns interpolated item (see: http://bit.ly/198oCOP)
