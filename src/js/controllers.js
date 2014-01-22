@@ -289,29 +289,24 @@ controller('ModalListAttendeesCtrl', ['$scope', '$modalInstance', 'item', functi
 	$scope.cancel = function () { $modalInstance.dismiss('cancel'); };
 }]).
 
-controller('CustPayFormCtrl', ['$scope', 'myPage', 'theCart', '$location', function ($scope, myPage, theCart, $location){
+controller('CustPayFormCtrl', ['$scope', 'myPage', 'theCart', '$location', 'appStrings', function ($scope, myPage, theCart, $location, appStrings){
 	myPage.setTitle("Custom Payment Form");
-
-	$scope.message = false;
-	var timer = 0;
-
 	var orig = {
 		itemID: -1,
 		productID: -1,
-		name: 'Custom Payment',
+		name: appStrings.pay.customPayName,
 		template: 'custom',
 		img: null
 	};
 	$scope.item = angular.copy(orig);
-
 	$scope.add = function() {
 		var promise = theCart.add( $scope.item );
 		promise.then(function (res) {
 			if (res) {
-				$scope.message = {type:'success', pre:'Thanks!', msg:'This custom payment has been added to your cart.', delay: 5};
+				$scope.message = appStrings.pay.success;
 				$scope.item = angular.copy(orig);
 			} else {
-				$scope.message = {type:'error', pre:'Error!', msg:'A payment with this name and value is already in your cart.', delay: 10};
+				$scope.message = appStrings.pay.failure;
 			}
 		});
 	};

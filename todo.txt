@@ -22,6 +22,8 @@ ToDo:
 - show if event is un-open or not available at current time (manual)
 - store referrer for redirects back to site
 
+- CUSTOM PAYMENT DELETE NOT WORKING!
+
 Emails (to-do):
 - New firm registration
 - Adding people to firm
