@@ -478,7 +478,7 @@ controller('UserFormCtrl', ['$scope', 'myPage', '$modal', 'interface', 'security
 	};
 }]).
 
-controller('ModalAddressCtrl', ['$scope', '$modalInstance', 'address', 'interface', function($scope, $modalInstance, address, interface){
+controller('ModalAddressCtrl', ['$scope', '$modalInstance', 'address', 'interface', 'appStrings', function($scope, $modalInstance, address, interface, appStrings){
 	$scope.address = address || {addressID:null, addr2: null};
 	$scope.ok = function() {
 		// use interface to add/edit address in db
@@ -489,7 +489,7 @@ controller('ModalAddressCtrl', ['$scope', '$modalInstance', 'address', 'interfac
 			$modalInstance.close($scope.address);
 		}, function (err) {
 			console.log(err);
-			console.log("There has been an error adding you address\nPlease try again or contact Upstream Academy for further assistance");
+			$scope.message = appStrings.address.error;
 		});
 	};
 	$scope.cancel = function() {
