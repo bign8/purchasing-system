@@ -168,7 +168,7 @@ controller('ContactModalCtrl', ['$scope', '$modalInstance', 'contact', 'prep', '
 	};
 }]).
 
-controller('CartCtrl', ['$scope', 'myPage', '$modal', 'interface', '$location', 'theCart', 'discounts', '$timeout', function ($scope, myPage, $modal, interface, $location, theCart, discounts, $timeout) {
+controller('CartCtrl', ['$scope', 'myPage', '$modal', 'interface', '$location', 'theCart', 'discounts', function ($scope, myPage, $modal, interface, $location, theCart, discounts) {
 	myPage.setTitle("Shopping Cart", "Checkout");
 	$scope.theCart = theCart;
 	$scope.discounts = discounts;
@@ -180,15 +180,6 @@ controller('CartCtrl', ['$scope', 'myPage', '$modal', 'interface', '$location', 
 			$scope.discounts = res;
 		});
 	});
-
-	var msgPromises = {}; // A reset-able messang function (clears timeout on recall)
-	var setMessage = function(myVar, msgObj, delay) {
-		$scope[myVar] = msgObj;
-		$timeout.cancel( msgPromises[myVar] );
-		msgPromises[myVar] = $timeout(function() {
-			$scope[myVar] = false;
-		}, delay*1000);
-	};
 
 	$scope.total = function() { // Cart total calculation
 		return $scope.theCart.total() - $scope.discountTotal();
@@ -206,10 +197,10 @@ controller('CartCtrl', ['$scope', 'myPage', '$modal', 'interface', '$location', 
 			if (item.code == code) isDuplicateCode = true;
 		});
 		if ( isDuplicateCode ) { // is a duplicate code
-			setMessage('discountMsg', {'pre': 'Duplicate Code!', 'msg': 'Are you trying to cheat us?', 'type': 'error'}, 10);
+			$scope.discountMsg = {'pre': 'Duplicate Code!', 'msg': 'Are you trying to cheat us?', 'type': 'error', delay: 10};
 		} else { // new discount
 			interface.cart('addDiscount', {code:code}).then(function(res) {
-				setMessage('discountMsg', res, 10); // assign a reset-able message
+				$scope.discountMsg = res; // assign a reset-able message
 				if (res.type == 'success') $scope.discounts.push( res.obj ); // add object on good callback
 			});
 		}
@@ -224,14 +215,28 @@ controller('CartCtrl', ['$scope', 'myPage', '$modal', 'interface', '$location', 
 		angular.forEach(theCart.get(), function(item) { // verify options are set
 			if ( item.hasOptions && !item.cost.set ) fail = true;
 		});
-		if (fail) return setMessage('submitMsg', {pre:'Options Needed', msg:'Some of the items in your cart require you to fill out a form. Please click the orange "Set" buttons to assign these options.', type:'error'}, 20);
-
+		if (fail) {
+			$scope.submitMsg = {
+				pre:'Options Needed',
+				msg:'Some of the items in your cart require you to fill out a form. Please click the orange "Set" buttons to assign these options.',
+				type:'error',
+				delay: 20
+			};
+			return;
+		}
 		angular.forEach(theCart.get(), function(item) { // verify double purchases
 			if (item.warn) fail = true;
 		});
-		if (fail) return setMessage('submitMsg', {pre:'Previous Purchase',msg:'An item in your cart has already been purchased (shown in red).  Please remove it before continueing to checkout.',type:'error'}, 20);
-
-		setMessage('submitMsg', {pre:'Checkout Complete',msg:'You will be redirected to either a) PayPal processing to handle your online payment or b) our recipt page with payment instructions',type:'success'}, 20);
+		if (fail) {
+			$scope.submitMsg = {
+				pre:'Previous Purchase',
+				msg:'An item in your cart has already been purchased (shown in red).  Please remove it before continueing to checkout.',
+				type:'error',
+				delay: 20
+			};
+			return;
+		}
+		$scope.submitMsg = {pre:'Checkout Complete',msg:'You will be redirected to either a) PayPal processing to handle your online payment or b) our recipt page with payment instructions',type:'success', delay: 20};
 		interface.cart('save', {cost:$scope.total(), medium:medium}).then(function() {
 			var returnPath = '/recipt', cart = {
 				list: theCart.get(),
@@ -241,7 +246,7 @@ controller('CartCtrl', ['$scope', 'myPage', '$modal', 'interface', '$location', 
 			};
 			localStorage.setItem('UA-recipt', JSON.stringify( cart )); // store off cart
 
-			if (medium == 'online') { // direct accordingly
+			if (medium == 'online') { // direct accordingly TODO: $.param({x:'x',y:'y',z:'z'});
 				var loc = "https://payflowlink.paypal.com?";
 				loc += "LOGIN=UpstreamAcademy&";
 				loc += "PARTNER=PayPal&";

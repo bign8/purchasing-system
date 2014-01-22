@@ -67,9 +67,7 @@
 						</tbody>
 					</table>
 
-					<div class="alert alert-{{submitMsg.type}}" ng-show="submitMsg" style="margin-top:20px;">
-						<strong>{{submitMsg.pre}}</strong> {{submitMsg.msg}}
-					</div>
+					<notify message="submitMsg"></notify>
 
 					<div class="fluid-row">
 						<button ng-click="saveCart('online')" class="btn btn-primary btn-lg span6" role="button">
@@ -93,9 +91,7 @@
 						</div>
 					</form>
 
-					<div class="alert alert-{{discountMsg.type}}" ng-show="discountMsg" style="margin-top:20px;">
-						<strong>{{discountMsg.pre}}</strong> {{discountMsg.msg}}
-					</div>
+					<notify message="discountMsg" style="margin-top:20px;"></notify>
 
 					<table class="table table-striped table-hover" style="margin:0" ng-show="discounts.length > 0">
 						<thead>
