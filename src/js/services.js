@@ -297,6 +297,18 @@ factory('appStrings', function() {
 				msg: 'There was an error on our side of things, please try again later or contact us.',
 				type:ERROR, delay:10
 			}
+		},
+		pay: { // Custom payment form
+			success: {
+				pre:'Thanks!',
+				msg:'This custom payment has been added to your cart.',
+				type:SUCCESS, delay:5
+			},
+			failure: {
+				pre:'Error!', msg:'A payment with this name and value is already in your cart.',
+				type:ERROR, delay:10
+			},
+			customPayName: 'Custom Payment' // shows up in cart
 		}
 	};
 });
