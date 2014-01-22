@@ -1,20 +1,28 @@
 ToDo: 
 - Account for all special cases
-	- hardcopy vs softcopy price -> before and after purchases
-	- classes and their recurring wierdness
-	- mpa on users not firm
+	- hard-copy vs soft-copy price -> before and after purchases
+	- classes and their recurring weirdness
+	- MPA on users not firm
+	- MP (live + hard-copy or digital) (Note about CPE credit can be applied)
+	- MP-past (hard-copy or digital) (Note about CPE credit cannot be applied)
 	- ...
 - allow registration of email w/o login information (process)?
+- Explain setting up an account (your information, not person signing up for conference)
+- Group access codes
+- Hard-copy price
 - non-angular feedback form
+- Notify users of un-supported browsers
 - output strings objects (both php and js)
-- password reset functionoality
+- password reset functionality
+- phone validator (register/xx > add attendee > add employee)
 - photo upload field (doesn't store, just emails)
 - possible to add more attendees, not remove attendees
-- replace all alert statements with dom level alerts
+- Purchases page (calling in attendee changes)
+- replace all alert statements with DOM level alerts
 - show if event is un-open or not available at current time (manual)
 - store referrer for redirects back to site
 
-Emails (todo):
+Emails (to-do):
 - New firm registration
 - Adding people to firm
 - New registration
@@ -34,18 +42,21 @@ In a holding pattern:
 Notes:
 - Add conference type product -> Force insert into tie_product_field
 - Add price to new products
+- Admin can drop attendees
 
 Questions:
 - how old of a browser do we need to support (provide un-supported browser warnings)
 
 Future releases
 - assign status to orders (processing, confirmed, etc)
+- care about custom payments (find a way to store them)
 - download proxy? to ensure files have been purchased? (php script)
 - find a better deployment than 'ftp-deploy'
 - handle invoices
 - have `item` settings store raw data instead of json encoded data
 - periodically make calls back to server to check for additions to php cart
 - register user / select address for a list of firm addresses
+- sync with Luke's UAN member site
 - use key based paypal checkout
 
 Git Commands:

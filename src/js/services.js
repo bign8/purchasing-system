@@ -244,10 +244,9 @@ factory('interface', ['$http', '$q', '$rootScope', '$timeout', function ($http, 
 }]).
 
 factory('appStrings', function() {
+	var ERROR = 'error', SUCCESS = 'success';
 	return {
-
-		// Paypal (this is for the app)
-		paypal: {
+		paypal: { // Paypal (this is for the app)
 			url: 'https://payflowlink.paypal.com',
 			uri: { // used $.param()
 				'AMOUNT': '0',
@@ -260,36 +259,43 @@ factory('appStrings', function() {
 			},
 			totalParam: 'AMOUNT'
 		},
-
-		// Cart Pages
-		cart: {
-			// Duplicate Discount (notify object)
-			discDup: {
+		cart: { // Cart Pages
+			discDup: { // Duplicate Discount (notify object)
 				pre: 'Duplicate Code!',
 				msg: 'Are you trying to cheat us?',
-				type: 'error',
-				delay: 10
+				type:ERROR, delay:10
 			},
-			// Options needed (notify object)
-			needOpt: {
-				pre:'Options Needed',
-				msg:'Some of the items in your cart require you to fill out a form. Please click the orange "Set" buttons to assign these options.',
-				type:'error',
-				delay: 20
+			needOpt: { // Options needed (notify object)
+				pre: 'Options Needed',
+				msg: 'Some of the items in your cart require you to fill out a form. Please click the orange "Set" buttons to assign these options.',
+				type:ERROR, delay:20
 			},
-			// Previous Purchase (notify object)
-			prevPur: {
-				pre:'Previous Purchase',
-				msg:'An item in your cart has already been purchased (shown in red).  Please remove it before continueing to checkout.',
-				type:'error',
-				delay: 20
+			prevPur: { // Previous Purchase (notify object)
+				pre: 'Previous Purchase',
+				msg: 'An item in your cart has already been purchased (shown in red).  Please remove it before continueing to checkout.',
+				type:ERROR, delay:20
 			},
-			// Checkout Complete (notify object)
-			chekOut: {
-				pre:'Checkout Complete',
-				msg:'You will be redirected to either a) PayPal processing to handle your online payment or b) our recipt page with payment instructions',
-				type:'success',
-				delay: 20
+			chekOut: { // Checkout Complete (notify object)
+				pre: 'Checkout Complete',
+				msg: 'You will be redirected to either a) PayPal processing to handle your online payment or b) our recipt page with payment instructions',
+				type:SUCCESS, delay:20
+			},
+			negative: { // Negative Cart
+				pre: 'Negative Cart',
+				msg: 'You have provided informatinon in such a way that we are paying you.  Please contact us directly if we owe you money',
+				type:ERROR, delay:20
+			}
+		},
+		contact: { // Modal address form (register/xx > add attendee > add employee)
+			address: { // No contact address (notify object)
+				pre: 'No address!',
+				msg: 'Please assign an address to this new contact.',
+				type:ERROR, delay:10
+			},
+			error: { // Server error (notify object)
+				pre: 'Server error!',
+				msg: 'There was an error on our side of things, please try again later or contact us.',
+				type:ERROR, delay:10
 			}
 		}
 	};

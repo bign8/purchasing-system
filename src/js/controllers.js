@@ -104,7 +104,7 @@ controller('RegisterConFormCtrl', ['$scope', 'myPage', 'interface', 'conference'
 	};
 }]).
 
-controller('ContactModalCtrl', ['$scope', '$modalInstance', 'contact', 'prep', 'interface', '$modal', 'opt', '$filter', function ($scope, $modalInstance, contact, prep, interface, $modal, opt, $filter) {
+controller('ContactModalCtrl', ['$scope', '$modalInstance', 'contact', 'prep', 'interface', '$modal', 'opt', '$filter', 'appStrings', function ($scope, $modalInstance, contact, prep, interface, $modal, opt, $filter, appStrings) {
 	var blankAddr = {addressID:null, addr2:null};
 	var oldUserAddr = ( contact && contact.addr.addressID != prep.add.addressID ) ? contact.addr : blankAddr ; // null address handler
 	$scope.contact = contact || {addr:blankAddr}; // null contact handler
@@ -145,16 +145,17 @@ controller('ContactModalCtrl', ['$scope', '$modalInstance', 'contact', 'prep', '
 		$event.preventDefault();
 		$modalInstance.close(user);
 	};
-	$scope.ok = function ( invalid ) {
-		if (invalid) return alert('Form is not valid\nPlease try again.');
-		if ($scope.contact.addr.addressID === null) return alert('Please assign an address');
-
+	$scope.ok = function () {
+		if ($scope.contact.addr.addressID === null) {
+			$scope.message = appStrings.contact.address;
+			return;
+		}
 		var query = ($scope.contact.contactID === undefined) ? 'add' : 'edit'; // change add or edit based on existence of contactID
 		interface.user(query + 'Contact', $scope.contact).then(function(res) {
 			$scope.contact.contactID = JSON.parse(res);
 			$modalInstance.close( $scope.contact );
 		}, function (err) {
-			alert('There was an unknown error adding this user\nPlease try again or contact Upstream Academy for help.');
+			$scope.message = appStrings.contact.error;
 			console.log(err);
 		});
 	};
@@ -211,6 +212,10 @@ controller('CartCtrl', ['$scope', 'myPage', '$modal', 'interface', '$location', 
 		});
 	};
 	$scope.saveCart = function(medium) { // save price (everything else is already on server)
+		if ($scope.total() < 0) {
+			$scope.submitMsg = appStrings.cart.negative;
+			return;
+		}
 		var fail = false;
 		angular.forEach(theCart.get(), function(item) { // verify options are set
 			if ( item.hasOptions && !item.cost.set ) fail = true;
@@ -250,7 +255,6 @@ controller('CartCtrl', ['$scope', 'myPage', '$modal', 'interface', '$location', 
 
 controller('ReciptCtrl', ['$scope', 'myPage', function ($scope, myPage) {
 	myPage.setTitle("Recipt", "from last purchase");
-
 	$scope.recipt = JSON.parse(localStorage.getItem('UA-recipt'));
 }]).
 
