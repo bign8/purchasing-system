@@ -104,10 +104,9 @@ directive('notify', ['$timeout', function($timeout) { // extending from ui.boots
 				$scope.message = false;
 			};
 			$scope.$watch('message', function(val) {
-				console.log(val);
 				$timeout.cancel(timer);
 				$scope.messages = [val];
-				if (val) timer = $timeout($scope.clearMessage, (val.delay || 5)*1000);
+				if (val) timer = $timeout($scope.clearMessage, (val.delay || 15)*1000);
 			});
 		}
 	};

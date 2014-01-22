@@ -2,8 +2,11 @@ ToDo:
 - Account for all special cases
 	- hardcopy vs softcopy price -> before and after purchases
 	- classes and their recurring wierdness
+	- mpa on users not firm
 	- ...
 - allow registration of email w/o login information (process)?
+- non-angular feedback form
+- output strings objects (both php and js)
 - password reset functionoality
 - photo upload field (doesn't store, just emails)
 - possible to add more attendees, not remove attendees
@@ -13,6 +16,8 @@ ToDo:
 
 Emails (todo):
 - New firm registration
+- Adding people to firm
+- New registration
 
 In a holding pattern:
 - build administration section (see if user end is accepted)

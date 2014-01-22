@@ -272,15 +272,16 @@ class Cart extends NG {
 
 		// test if valid for current cart
 		$ids = array("0");
-		foreach ($_SESSION['cart'] as $itemID) array_push($ids, $itemID); // grab ids from current cart
+		foreach ($_SESSION['cart'] as $itemID) if (is_string($itemID)) array_push($ids, $itemID); // grab ids from current cart
 		$questionMarks = trim(str_repeat("?,", sizeof($ids)),",");
+
 		$finalSTH = $this->db->prepare("SELECT * FROM `discount` WHERE ((productID IN (SELECT DISTINCT productID FROM `item` WHERE itemID IN ($questionMarks)) AND itemID IS NULL) OR (productID IS NULL AND itemID IN ($questionMarks)) OR (productID IS NULL AND itemID IS NULL) ) AND discountID = ?;");
 		if (!$finalSTH->execute( array_merge( $ids, $ids, array($codeID) ) ) || $finalSTH->rowCount() == 0) 
 			return array('pre'=>'Unrelated!', 'msg'=>'Not associated with any items in your cart.', 'type'=>'error');
 
 		$obj = $finalSTH->fetch(PDO::FETCH_ASSOC);
 		array_push($_SESSION['cart.discounts'], $obj);
-		// successfull callback
+
 		return array('pre'=>'Success!', 'msg'=>'Added discount to current order!', 'type'=>'success', 'obj'=>$obj );
 	}
 
