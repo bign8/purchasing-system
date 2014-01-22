@@ -47,3 +47,11 @@ Future releases
 - periodically make calls back to server to check for additions to php cart
 - register user / select address for a list of firm addresses
 - use key based paypal checkout
+
+Git Commands:
+- git add -p
+- git log --graph --decorate --oneline (--stat)
+- git commit --amend --no-edit
+- git config --global branch.autosetuprebase always
+- git push <remote> --tags OR git push <remote> --all
+- http://stackoverflow.com/a/5719854/3220865 (rename tags)

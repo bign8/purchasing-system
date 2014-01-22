@@ -168,7 +168,7 @@ controller('ContactModalCtrl', ['$scope', '$modalInstance', 'contact', 'prep', '
 	};
 }]).
 
-controller('CartCtrl', ['$scope', 'myPage', '$modal', 'interface', '$location', 'theCart', 'discounts', function ($scope, myPage, $modal, interface, $location, theCart, discounts) {
+controller('CartCtrl', ['$scope', 'myPage', '$modal', 'interface', '$location', 'theCart', 'discounts', 'appStrings', function ($scope, myPage, $modal, interface, $location, theCart, discounts, appStrings) {
 	myPage.setTitle("Shopping Cart", "Checkout");
 	$scope.theCart = theCart;
 	$scope.discounts = discounts;
@@ -197,7 +197,7 @@ controller('CartCtrl', ['$scope', 'myPage', '$modal', 'interface', '$location', 
 			if (item.code == code) isDuplicateCode = true;
 		});
 		if ( isDuplicateCode ) { // is a duplicate code
-			$scope.discountMsg = {'pre': 'Duplicate Code!', 'msg': 'Are you trying to cheat us?', 'type': 'error', delay: 10};
+			$scope.discountMsg = appStrings.cart.discDup;
 		} else { // new discount
 			interface.cart('addDiscount', {code:code}).then(function(res) {
 				$scope.discountMsg = res; // assign a reset-able message
@@ -216,29 +216,19 @@ controller('CartCtrl', ['$scope', 'myPage', '$modal', 'interface', '$location', 
 			if ( item.hasOptions && !item.cost.set ) fail = true;
 		});
 		if (fail) {
-			$scope.submitMsg = {
-				pre:'Options Needed',
-				msg:'Some of the items in your cart require you to fill out a form. Please click the orange "Set" buttons to assign these options.',
-				type:'error',
-				delay: 20
-			};
+			$scope.submitMsg = appStrings.cart.needOpt;
 			return;
 		}
 		angular.forEach(theCart.get(), function(item) { // verify double purchases
 			if (item.warn) fail = true;
 		});
 		if (fail) {
-			$scope.submitMsg = {
-				pre:'Previous Purchase',
-				msg:'An item in your cart has already been purchased (shown in red).  Please remove it before continueing to checkout.',
-				type:'error',
-				delay: 20
-			};
+			$scope.submitMsg = appStrings.cart.prevPer;
 			return;
 		}
-		$scope.submitMsg = {pre:'Checkout Complete',msg:'You will be redirected to either a) PayPal processing to handle your online payment or b) our recipt page with payment instructions',type:'success', delay: 20};
+		$scope.submitMsg = appStrings.cart.checkOut;
 		interface.cart('save', {cost:$scope.total(), medium:medium}).then(function() {
-			var returnPath = '/recipt', cart = {
+			var cart = {
 				list: theCart.get(),
 				disTotal: $scope.discountTotal(),
 				total: $scope.total(),
@@ -246,18 +236,12 @@ controller('CartCtrl', ['$scope', 'myPage', '$modal', 'interface', '$location', 
 			};
 			localStorage.setItem('UA-recipt', JSON.stringify( cart )); // store off cart
 
-			if (medium == 'online') { // direct accordingly TODO: $.param({x:'x',y:'y',z:'z'});
-				var loc = "https://payflowlink.paypal.com?";
-				loc += "LOGIN=UpstreamAcademy&";
-				loc += "PARTNER=PayPal&";
-				loc += "TYPE=S&";
-				loc += "SHOWCONFIRM=FALSE&";
-				loc += "AMOUNT=" + cart.total + "&";
-				loc += "DESCRIPTION=Upstream Academy Purchase&";
-				loc += "MODE=TEST&";
-				document.location = loc;
+			if (medium == 'online') { // direct accordingly
+				var obj = appStrings.paypal.uri;
+				obj[appStrings.paypal.totalParam] = cart.total;
+				document.location = appStrings.paypal.url + '?' + $.param(obj);
 			} else {
-				$location.path(returnPath); // go to checkout page
+				$location.path('/recipt'); // go to checkout page
 			}
 			theCart.setDirty(); // make sure empty cart gets loaded into the system
 		});

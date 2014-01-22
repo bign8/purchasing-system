@@ -12,7 +12,7 @@ angular.module('myApp', [
 ]).
 
 config(['$routeProvider', 'securityAuthorizationProvider', '$locationProvider', function( $routeProvider, securityAuthorizationProvider, $locationProvider ){
-	$locationProvider.html5Mode(true);//.hashPrefix('!');
+	$locationProvider.html5Mode(true).hashPrefix('!');
 
 	$routeProvider.
 		when('/payment', {
