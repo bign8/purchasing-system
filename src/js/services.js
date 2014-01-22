@@ -241,6 +241,58 @@ factory('interface', ['$http', '$q', '$rootScope', '$timeout', function ($http, 
 			return cb('app', myAction, myData);
 		}
 	};
-}]);
+}]).
+
+factory('appStrings', function() {
+	return {
+
+		// Paypal (this is for the app)
+		paypal: {
+			url: 'https://payflowlink.paypal.com',
+			uri: { // used $.param()
+				'AMOUNT': '0',
+				'DESCRIPTION': 'Upstream Academy Purchase',
+				'LOGIN': 'UpstreamAcademy',
+				'MODE': 'TEST',
+				'PARTNER': 'PayPal',
+				'SHOWCONFIRM': 'FALSE',
+				'TYPE': 'S'
+			},
+			totalParam: 'AMOUNT'
+		},
+
+		// Cart Pages
+		cart: {
+			// Duplicate Discount (notify object)
+			discDup: {
+				pre: 'Duplicate Code!',
+				msg: 'Are you trying to cheat us?',
+				type: 'error',
+				delay: 10
+			},
+			// Options needed (notify object)
+			needOpt: {
+				pre:'Options Needed',
+				msg:'Some of the items in your cart require you to fill out a form. Please click the orange "Set" buttons to assign these options.',
+				type:'error',
+				delay: 20
+			},
+			// Previous Purchase (notify object)
+			prevPur: {
+				pre:'Previous Purchase',
+				msg:'An item in your cart has already been purchased (shown in red).  Please remove it before continueing to checkout.',
+				type:'error',
+				delay: 20
+			},
+			// Checkout Complete (notify object)
+			chekOut: {
+				pre:'Checkout Complete',
+				msg:'You will be redirected to either a) PayPal processing to handle your online payment or b) our recipt page with payment instructions',
+				type:'success',
+				delay: 20
+			}
+		}
+	};
+});
 
 // http://www.codeproject.com/Articles/576246/A-Shopping-Cart-Application-Built-with-AngularJS
