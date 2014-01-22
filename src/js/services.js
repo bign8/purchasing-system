@@ -263,7 +263,7 @@ factory('appStrings', function() {
 			discDup: { // Duplicate Discount (notify object)
 				pre: 'Duplicate Code!',
 				msg: 'Are you trying to cheat us?',
-				type:ERROR, delay:10
+				type:ERROR
 			},
 			needOpt: { // Options needed (notify object)
 				pre: 'Options Needed',
@@ -290,12 +290,12 @@ factory('appStrings', function() {
 			address: { // No contact address (notify object)
 				pre: 'No address!',
 				msg: 'Please assign an address to this new contact.',
-				type:ERROR, delay:10
+				type:ERROR
 			},
 			error: { // Server error (notify object)
 				pre: 'Server error!',
 				msg: 'There was an error on our side of things, please try again later or contact us.',
-				type:ERROR, delay:10
+				type:ERROR
 			}
 		},
 		pay: { // Custom payment form
@@ -306,7 +306,7 @@ factory('appStrings', function() {
 			},
 			failure: { // Server Error
 				pre:'Error!', msg:'A payment with this name and value is already in your cart.',
-				type:ERROR, delay:10
+				type:ERROR
 			},
 			customPayName: 'Custom Payment' // shows up in cart
 		},
@@ -314,32 +314,39 @@ factory('appStrings', function() {
 			passMatch: { // Passwords Match
 				pre:'Passwords do not match!',
 				msg:'Please try again.',
-				type:ERROR, delay:10
+				type:ERROR
 			},
 			firmAddr: { // Assign Firm Address
 				pre:'No firm Address!',
 				msg:'Please assign a firm address.',
-				type:ERROR, delay:10
+				type:ERROR
 			},
 			userAddr: { // Assign User Address
 				pre:'No user Address!',
 				msg:'Please assign a user address.',
-				type:ERROR, delay:10
+				type:ERROR
 			},
 			success: { // Account created
 				pre:'Success!',
 				msg:'Your account has successfully been created',
-				type:SUCCESS, delay:10
+				type:SUCCESS
 			},
 			duplicate: { // Duplicate email
 				pre:'Duplicate Email!',
 				msg:'This email already has an account\nPlease click the login button and attempt a password reset.',
-				type:ERROR, delay:10
+				type:ERROR
 			},
 			failure: { // Server Error
 				pre:'Error!',
 				msg:'There was an unknown error creating your account\nPlease try again or contact Upstream Academy for help.',
-				type:ERROR, delay:10
+				type:ERROR
+			}
+		},
+		address: {
+			error: { // server error
+				pre:'Error!',
+				msg:'There was an unknown error creating your address\nPlease try again or contact Upstream Academy for help.',
+				type:ERROR
 			}
 		}
 	};
