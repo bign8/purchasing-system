@@ -304,11 +304,43 @@ factory('appStrings', function() {
 				msg:'This custom payment has been added to your cart.',
 				type:SUCCESS, delay:5
 			},
-			failure: {
+			failure: { // Server Error
 				pre:'Error!', msg:'A payment with this name and value is already in your cart.',
 				type:ERROR, delay:10
 			},
 			customPayName: 'Custom Payment' // shows up in cart
+		},
+		register: { // Registration Form
+			passMatch: { // Passwords Match
+				pre:'Passwords do not match!',
+				msg:'Please try again.',
+				type:ERROR, delay:10
+			},
+			firmAddr: { // Assign Firm Address
+				pre:'No firm Address!',
+				msg:'Please assign a firm address.',
+				type:ERROR, delay:10
+			},
+			userAddr: { // Assign User Address
+				pre:'No user Address!',
+				msg:'Please assign a user address.',
+				type:ERROR, delay:10
+			},
+			success: { // Account created
+				pre:'Success!',
+				msg:'Your account has successfully been created',
+				type:SUCCESS, delay:10
+			},
+			duplicate: { // Duplicate email
+				pre:'Duplicate Email!',
+				msg:'This email already has an account\nPlease click the login button and attempt a password reset.',
+				type:ERROR, delay:10
+			},
+			failure: { // Server Error
+				pre:'Error!',
+				msg:'There was an unknown error creating your account\nPlease try again or contact Upstream Academy for help.',
+				type:ERROR, delay:10
+			}
 		}
 	};
 });

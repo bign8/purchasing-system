@@ -23,7 +23,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr ng-repeat="item in recipt.list"> <!-- printList -->
+				<tr ng-repeat="item in recipt.list">
 					<td ng-switch="!item.url">
 						<span ng-switch-when="true">{{item.name}}</span>
 						<a ng-switch-default ng-href="{{item.url}}">{{item.name}}</a>

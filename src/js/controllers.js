@@ -312,7 +312,7 @@ controller('CustPayFormCtrl', ['$scope', 'myPage', 'theCart', '$location', 'appS
 	};
 }]).
 
-controller('RegisterFormCtrl', ['$scope', 'myPage', '$modal', 'interface', 'security', 'firms', function ($scope, myPage, $modal, interface, security, firms){
+controller('RegisterFormCtrl', ['$scope', 'myPage', '$modal', 'interface', 'security', 'firms', 'appStrings', function ($scope, myPage, $modal, interface, security, firms, appStrings){
 	myPage.setTitle("Registration Form");
 
 	// find firm vs. register
@@ -331,23 +331,26 @@ controller('RegisterFormCtrl', ['$scope', 'myPage', '$modal', 'interface', 'secu
 	$scope.modifyFirm = function() { $scope.user.firmModified = true; };
 
 	// handle registration clicks
-	$scope.register = function( invalid ) {
-		if (invalid) return alert('Form is not valid\nPlease try again.');
-		if ($scope.passVerify !== $scope.user.password) return alert('Passwords do not match\nPlease try again.');
-		if ($scope.user.firm.addr.addressID === undefined) return alert('Please assign a firm address');
-		if ($scope.user.addr.addressID === undefined) return alert('Please assign a user address');
-		
+	$scope.register = function() {
+		if ($scope.passVerify !== $scope.user.password) {
+			$scope.message = appStrings.register.passMatch;
+			return;
+		}
+		if ($scope.user.firm.addr.addressID === undefined) {
+			$scope.message = appStrings.register.firmAddr;
+			return;
+		}
+		if ($scope.user.addr.addressID === undefined) {
+			$scope.message = appStrings.register.userAddr;
+			return;
+		}
 		interface.user('addUser', $scope.user).then(function() {
-			alert('Your account has successfully been created');
+			$scope.message = appStrings.register.success; // some sort of callback on close
 			security.requestCurrentUser();
 			// security.redirect('/cart');
 			window.history.back(); // go to last page!
 		}, function (err) {
-			if (err == 'dup') {
-				alert('This email already has an account\nPlease click the login button and attempt a password reset.');
-			} else {
-				alert('There was an unknown error creating your account\nPlease try again or contact Upstream Academy for help.');
-			}
+			$scope.message = (err=='dup') ? appStrings.register.duplicate : appStrings.register.failure ;
 			console.log(err);
 		});
 	};
