@@ -333,19 +333,56 @@ factory('appStrings', function() {
 			},
 			duplicate: { // Duplicate email
 				pre:'Duplicate Email!',
-				msg:'This email already has an account\nPlease click the login button and attempt a password reset.',
+				msg:'This email already has an account.  Please click the login button and attempt a password reset.',
 				type:ERROR
 			},
 			failure: { // Server Error
 				pre:'Error!',
-				msg:'There was an unknown error creating your account\nPlease try again or contact Upstream Academy for help.',
+				msg:'There was an unknown error creating your account.  Please try again or contact Upstream Academy for help.',
+				type:ERROR
+			}
+		},
+		user: { // Account settings Form
+			passMatch: { // Passwords Match
+				pre:'Passwords do not match!',
+				msg:'Please try again.',
+				type:ERROR
+			},
+			firmAddr: { // Assign Firm Address
+				pre:'No firm Address!',
+				msg:'Please assign a firm address.',
+				type:ERROR
+			},
+			userAddr: { // Assign User Address
+				pre:'No user Address!',
+				msg:'Please assign a user address.',
+				type:ERROR
+			},
+			success: { // Account created
+				pre:'Success!',
+				msg:'Your account has successfully been created',
+				type:SUCCESS
+			},
+			duplicate: { // Duplicate email
+				pre:'Duplicate Email!',
+				msg:'This email already has an account. Please click the login button and attempt a password reset.',
+				type:ERROR
+			},
+			badPass: { // Bad password
+				pre:'bad Password!',
+				msg:'Your password is incorrect. Please try again or attempt to reset you password.',
+				type:ERROR
+			},
+			failure: { // Server Error
+				pre:'Error!',
+				msg:'There was an unknown error creating your account. Please try again or contact Upstream Academy for help.',
 				type:ERROR
 			}
 		},
 		address: {
 			error: { // server error
 				pre:'Error!',
-				msg:'There was an unknown error creating your address\nPlease try again or contact Upstream Academy for help.',
+				msg:'There was an unknown error creating your address.  Please try again or contact Upstream Academy for help.',
 				type:ERROR
 			}
 		}

@@ -419,25 +419,33 @@ controller('UserFormCtrl', ['$scope', 'myPage', '$modal', 'interface', 'security
 	};
 	$scope.reset();
 
-	$scope.store = function( invalid ) {
-		if (invalid) return alert('Form is not valid\nPlease try again.');
-		if ($scope.user.oldPass && $scope.passVerify !== $scope.user.password) return alert('Passwords do not match\nPlease try again.');
-		if ($scope.user.firm.addr.addressID === undefined) return alert('Please assign a firm address');
-		if ($scope.user.addr.addressID === undefined) return alert('Please assign a user address');
+	$scope.store = function() {
+		if ($scope.user.oldPass && $scope.passVerify !== $scope.user.password) {
+			$scope.message = appStrings.user.passMatch;
+			return;
+		}
+		if ($scope.user.firm.addr.addressID === undefined) {
+			$scope.message = appStrings.user.firmAddr;
+			return;
+		}
+		if ($scope.user.addr.addressID === undefined) {
+			$scope.message = appStrings.user.userAddr;
+			return;
+		}
 		
 		interface.user('updateUser', $scope.user).then(function() {
-			alert('Your account has successfully updated'); // TODO: move to dom alert box
+			$scope.message = appStrings.user.success; // some sort of callback on close
 			security.forceCurrentUser();
 			myPage.setTitle("Account Settings", "for " + $scope.user.legalName);
 			$scope.origUser = angular.copy( $scope.user );
 			$scope.settings.$setPristine(true);
 		}, function (err) {
 			if (err == 'dup') {
-				alert('This email already has an account\nPlease click the login button and attempt a password reset.');
+				$scope.message = appStrings.user.duplicate;
 			} else if (err == 'badPass') {
-				alert('Your password is incorrect\nPlease try again or attempt to reset you password.');
+				$socpe.message = appStrings.user.badPass;
 			} else {
-				alert('There was an unknown error saving your account\nPlease try again or contact UpstreamAcademy for help.');
+				$scope.message = appStrings.user.failure;
 			}
 			console.log(err);
 		});

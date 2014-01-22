@@ -66,6 +66,8 @@
 				</div>
 			</div>
 
+			<notify message="message"></notify>
+			
 			<!-- <pre>Model: {{user.firm | json}}</pre> -->
 		</fieldset>
 
@@ -169,7 +171,7 @@
 	</div>
 
 	<div class="form-actions">
-		<button type="submit" class="btn btn-primary" ng-click="store( settings.$invalid )" ng-disabled="check(origUser, user) || settings.$invalid">Save Account Settings</button>&nbsp;&nbsp;
+		<button type="submit" class="btn btn-primary" ng-click="store()" ng-disabled="check(origUser, user) || settings.$invalid">Save Account Settings</button>&nbsp;&nbsp;
 		<button type="button" class="btn" ng-click="reset()" ng-disabled="check(origUser, user)">Reset Settings</button>
 	</div>	
 
