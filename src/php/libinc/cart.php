@@ -148,13 +148,13 @@ class Cart extends NG {
 
 		if ($data->itemID == -1) { // wierd thing to make custom payments work
 			$data->cost = $data->cost->settings->cost; // clean cost
+			unset($data->hasOptions); // drop hasOptions
 
 			$_SESSION['cart'] = array_values( array_udiff($_SESSION['cart'], array( $this->object_to_array($data) ), function($a, $b) {
 				$tempA = json_encode($a);
 				$tempB = json_encode($b);
 				if ($tempA == $tempB) { return 0; } elseif ($tempA < $tempB) { return -1; } else { return 1; }
 			}) );
-
 		} else {
 			if (isset($_SESSION['cart.options'][$data->itemID])) unset($_SESSION['cart.options'][$data->itemID]);
 			$_SESSION['cart'] = array_diff($_SESSION['cart'], array($data->itemID) ); // http://stackoverflow.com/a/9268826
@@ -288,7 +288,7 @@ class Cart extends NG {
 	// Helper: check discounts agains removed item
 	private function chkDiscounts() {
 		$ids = array("0");
-		foreach ($_SESSION['cart'] as $itemID) array_push($ids, $itemID); // grab ids from current cart
+		foreach ($_SESSION['cart'] as $itemID) if (is_string($itemID)) array_push($ids, $itemID); // grab ids from current cart
 		$questionMarks = trim(str_repeat("?,", sizeof($ids)),",");
 		$finalSTH = $this->db->prepare("SELECT * FROM `discount` WHERE ((productID IN (SELECT DISTINCT productID FROM `item` WHERE itemID IN ($questionMarks)) AND itemID IS NULL) OR (productID IS NULL AND itemID IN ($questionMarks)) OR (productID IS NULL AND itemID IS NULL) ) AND discountID = ?;");
 		foreach ($_SESSION['cart.discounts'] as $discount) {
