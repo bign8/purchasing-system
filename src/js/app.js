@@ -16,10 +16,14 @@ config(['$routeProvider', 'securityAuthorizationProvider', '$locationProvider', 
 
 	$routeProvider.
 		when('/payment', {
+			title: 'Custom Payment',
+			subTitle: 'form',
 			templateUrl: 'partials/custom-payment-form.tpl.html',
 			controller: 'CustPayFormCtrl'
 		}).
 		when('/register', {
+			title: 'Registration',
+			subTitle: 'Form',
 			templateUrl: 'partials/register-form.tpl.html',
 			controller: 'RegisterFormCtrl',
 			resolve: {
@@ -29,6 +33,8 @@ config(['$routeProvider', 'securityAuthorizationProvider', '$locationProvider', 
 			}
 		}).
 		when('/', { // Home
+			title: "Upstream Academy",
+			subTitle: "Guiding accounting firms to high performance",
 			templateUrl: 'partials/index.tpl.html',
 			controller: 'IndexCtrl',
 			resolve: {
@@ -38,6 +44,7 @@ config(['$routeProvider', 'securityAuthorizationProvider', '$locationProvider', 
 			}
 		}).
 		when('/register/:itemID', {
+			title: 'Register',
 			templateUrl: 'partials/register-conf.tpl.html',
 			controller: 'RegisterConFormCtrl',
 			resolve: {
@@ -48,6 +55,8 @@ config(['$routeProvider', 'securityAuthorizationProvider', '$locationProvider', 
 			}
 		}).
 		when('/cart', { // list items in cart
+			title: "Shopping Cart",
+			subTitle: "Checkout",
 			templateUrl: 'partials/show-cart.tpl.html',
 			controller: 'CartCtrl',
 			resolve: {
@@ -61,6 +70,8 @@ config(['$routeProvider', 'securityAuthorizationProvider', '$locationProvider', 
 			}
 		}).
 		when('/recipt', { // shows a recipt of items purchased for last order
+			title: "Recipt",
+			subTitle: "from last purchase",
 			templateUrl: 'partials/recipt-print.tpl.html',
 			controller: 'ReciptCtrl',
 			resolve: {
@@ -68,6 +79,7 @@ config(['$routeProvider', 'securityAuthorizationProvider', '$locationProvider', 
 			}
 		}).
 		when('/purchases', {
+			title: "Previous Purchases",
 			templateUrl: 'partials/list-purchases.tpl.html',
 			controller: 'ListPurchasesCtrl',
 			resolve: {
@@ -78,6 +90,7 @@ config(['$routeProvider', 'securityAuthorizationProvider', '$locationProvider', 
 			}
 		}).
 		when('/user', {
+			title: "Account Settings",
 			templateUrl: 'partials/user-form.tpl.html',
 			controller: 'UserFormCtrl',
 			resolve: {
@@ -89,7 +102,6 @@ config(['$routeProvider', 'securityAuthorizationProvider', '$locationProvider', 
 				}]
 			}
 		}).
-
 
 		// // TODO: build administration section
 		// when('/admin', {

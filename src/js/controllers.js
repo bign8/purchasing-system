@@ -5,13 +5,10 @@ angular.module('myApp.controllers', [
 	'ui.bootstrap'
 ]).
 
-controller('IndexCtrl', ['$scope', 'myPage', 'theCart', 'security', function ($scope, myPage, theCart, security) {
-	myPage.setTitle("Upstream Academy", "Guiding accounting firms to high performance");
-
+controller('IndexCtrl', ['$scope', 'theCart', 'security', function ($scope, theCart, security) {
 	$scope.$watch(function() {return security.currentUser;}, function() {
 		if (security.currentUser !== null) security.redirect('/cart');
 	}, true);
-	
 	$scope.theCart = theCart;
 }]).
 
@@ -169,8 +166,7 @@ controller('ContactModalCtrl', ['$scope', '$modalInstance', 'contact', 'prep', '
 	};
 }]).
 
-controller('CartCtrl', ['$scope', 'myPage', '$modal', 'interface', '$location', 'theCart', 'discounts', 'appStrings', function ($scope, myPage, $modal, interface, $location, theCart, discounts, appStrings) {
-	myPage.setTitle("Shopping Cart", "Checkout");
+controller('CartCtrl', ['$scope', '$modal', 'interface', '$location', 'theCart', 'discounts', 'appStrings', function ($scope, $modal, interface, $location, theCart, discounts, appStrings) {
 	$scope.theCart = theCart;
 	$scope.discounts = discounts;
 	$scope.discountMsg = false;
@@ -253,8 +249,7 @@ controller('CartCtrl', ['$scope', 'myPage', '$modal', 'interface', '$location', 
 	};
 }]).
 
-controller('ReciptCtrl', ['$scope', 'myPage', function ($scope, myPage) {
-	myPage.setTitle("Recipt", "from last purchase");
+controller('ReciptCtrl', ['$scope', function ($scope) {
 	$scope.recipt = JSON.parse(localStorage.getItem('UA-recipt'));
 }]).
 
@@ -265,13 +260,11 @@ controller('HeadCtrl', ['$scope', 'myPage', 'breadcrumbs', 'theCart', 'security'
 	$scope.security = security;
 }]).
 
-controller('ListPurchasesCtrl', ['$scope', 'myPage', 'items', '$modal', function ($scope, myPage, items, $modal){
-	myPage.setTitle("Previous Purchases");
+controller('ListPurchasesCtrl', ['$scope', 'items', '$modal', function ($scope, items, $modal){
 	$scope.items = items;
 	angular.forEach($scope.items, function(ele) {
 		if (ele.stamp) ele.stamp = new Date( ele.stamp );
 	});
-
 	$scope.showAttendees = function( item ) {
 		$modal.open({
 			templateUrl: 'partials/modal-list-attendees.tpl.html',
@@ -289,8 +282,7 @@ controller('ModalListAttendeesCtrl', ['$scope', '$modalInstance', 'item', functi
 	$scope.cancel = function () { $modalInstance.dismiss('cancel'); };
 }]).
 
-controller('CustPayFormCtrl', ['$scope', 'myPage', 'theCart', '$location', 'appStrings', function ($scope, myPage, theCart, $location, appStrings){
-	myPage.setTitle("Custom Payment Form");
+controller('CustPayFormCtrl', ['$scope', 'theCart', '$location', 'appStrings', function ($scope, theCart, $location, appStrings){
 	var orig = {
 		itemID: -1,
 		productID: -1,
@@ -312,8 +304,7 @@ controller('CustPayFormCtrl', ['$scope', 'myPage', 'theCart', '$location', 'appS
 	};
 }]).
 
-controller('RegisterFormCtrl', ['$scope', 'myPage', '$modal', 'interface', 'security', 'firms', 'appStrings', function ($scope, myPage, $modal, interface, security, firms, appStrings){
-	myPage.setTitle("Registration Form");
+controller('RegisterFormCtrl', ['$scope', '$modal', 'interface', 'security', 'firms', 'appStrings', function ($scope, $modal, interface, security, firms, appStrings){
 
 	// find firm vs. register
 	$scope.firms = firms;
