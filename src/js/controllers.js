@@ -318,7 +318,7 @@ controller('RegisterFormCtrl', ['$scope', 'myPage', '$modal', 'interface', 'secu
 	// find firm vs. register
 	$scope.firms = firms;
 	$scope.clearFirm = function () { 
-		$scope.user.firm = undefined;
+		$scope.user.firm = '';
 		$scope.user.firmModified = false;
 	};
 
@@ -336,7 +336,7 @@ controller('RegisterFormCtrl', ['$scope', 'myPage', '$modal', 'interface', 'secu
 			$scope.message = appStrings.register.passMatch;
 			return;
 		}
-		if ($scope.user.firm.addr.addressID === undefined) {
+		if (($scope.user.firm.addr || {}).addressID === undefined) {
 			$scope.message = appStrings.register.firmAddr;
 			return;
 		}
