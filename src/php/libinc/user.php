@@ -134,6 +134,8 @@ class User extends NG {
 		$d = $this->getPostData();
 		$STH = $this->db->prepare("INSERT INTO `contact` (firmID, addressID, legalName, preName, title, email, phone) VALUES (?,?,?,?,?,?,?);");
 		if (!$STH->execute( $user['firmID'], $d->addr->addressID, $d->legalName, $d->preName, $d->title, $d->email, $d->phone )) return $this->conflict();
+
+		// TODO: send email -> add people to firm
 		return $this->db->lastInsertId();
 	}
 
@@ -172,28 +174,32 @@ class User extends NG {
 		if ($checkSTH->rowCount() > 0) return $this->conflict('dup');
 
 		// Add/modify firm
-		$sendEmail = false;
-		if ($d->firmModified && isset($d->firm->firmID)) {
-			$sendEmail = true;
+		$editFirm = false;
+		if (isset($d->firm->firmID)) {
+			$editFirm = true;
 			$getFirmSTH = $this->db->prepare("SELECT f.firmID, f.name, f.website, a.* FROM `firm` f JOIN `address` a ON f.addressID=a.addressID WHERE `firmID`=?;"); // Get Old data
 			$getFirmSTH->execute( $d->firm->firmID );
 
 			$firmSTH = $this->db->prepare("UPDATE `firm` SET `addressID`=?, `name`=?,`website`=? WHERE `firmID`=?");
 			if (!$firmSTH->execute($d->firm->addr->addressID, $d->firm->name, $d->firm->website, $d->firm->firmID)) return $this->conflict();
-
 			$firmID = $d->firm->firmID;
 		} else {
 			$firmSTH = $this->db->prepare("INSERT INTO `firm` (addressID, name, website) VALUES (?,?,?);");
 			if (!$firmSTH->execute( $d->firm->addr->addressID, $d->firm->name, $d->firm->website )) return $this->conflict();
 			$firmID = $this->db->lastInsertId();
 		}
-
 		// Add Contact
 		$contSTH = $this->db->prepare("INSERT INTO `contact` (firmID, addressID, legalName, preName, title, email, phone, pass) VALUES (?,?,?,?,?,?,?,ENCRYPT(?,?));");
 		if (!$contSTH->execute( $firmID, $d->addr->addressID, $d->legalName, $d->preName, $d->title, $d->email, $d->phone, $d->password, config::encryptSTR )) return $this->conflict();
 		$_SESSION['user'] = $this->getUser( $d );
 
-		if ($sendEmail) $this->modifyFirmEmail($firmID, $getFirmSTH, $_SESSION['user']); // send email
+		if ($editFirm) {
+			$this->modifyFirmEmail($firmID, $getFirmSTH, $_SESSION['user']); // send email
+		} else {
+			// TODO: email on new firms
+		}
+
+		// TODO: email new registration
 		return true;
 	}
 

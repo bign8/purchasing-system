@@ -304,16 +304,15 @@ controller('RegisterFormCtrl', ['$scope', '$modal', 'interface', 'security', 'fi
 	$scope.firms = firms;
 	$scope.clearFirm = function () { 
 		$scope.user.firm = '';
-		$scope.user.firmModified = false;
+		$scope.firmModified = false;
 	};
 
 	// initialize empty user
 	$scope.user = {
 		preName: '',
-		firm: '',
-		firmModified: false
+		firm: ''
 	};
-	$scope.modifyFirm = function() { $scope.user.firmModified = true; };
+	$scope.modifyFirm = function() { $scope.firmModified = true; };
 
 	// handle registration clicks
 	$scope.register = function() {

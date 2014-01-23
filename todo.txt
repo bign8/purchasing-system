@@ -17,9 +17,6 @@ ToDo:
 - show if event is un-open or not available at current time (manual)
 - store referrer for redirects back to site
 
-ToDo Error:
-- created a new firm instead of using old one on registration
-
 ToDo Directives:
 - address setting
 - email checking (with server)
