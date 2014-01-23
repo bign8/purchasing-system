@@ -132,6 +132,10 @@ class User extends NG {
 	public function addContact() {
 		$user = $this->requiresAuth();
 		$d = $this->getPostData();
+		$testSTH = $this->db->prepare("SELECT * FROM `contact` WHERE `email`=?;");
+		if (!$testSTH->execute( $d->email )) return $this->conflict();
+		if ($testSTH->rowCount() > 0) return $this->conflict('dup');
+
 		$STH = $this->db->prepare("INSERT INTO `contact` (firmID, addressID, legalName, preName, title, email, phone) VALUES (?,?,?,?,?,?,?);");
 		if (!$STH->execute( $user['firmID'], $d->addr->addressID, $d->legalName, $d->preName, $d->title, $d->email, $d->phone )) return $this->conflict();
 

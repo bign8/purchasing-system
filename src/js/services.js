@@ -322,6 +322,11 @@ factory('appStrings', function() {
 				pre: 'Server error!',
 				msg: 'There was an error on our side of things, please try again later or contact us.',
 				type:ERROR
+			},
+			duplicate: { // Duplicate email
+				pre:'Duplicate Email!',
+				msg:'This email is already associated with an account in the system.  Please choose "Select Employee" to find them or choose a different email.',
+				type:ERROR
 			}
 		},
 		pay: { // Custom payment form

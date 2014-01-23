@@ -52,6 +52,7 @@ CREATE TABLE `contact` (
   `lastLogin` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `isAdmin` enum('yes','no') NOT NULL DEFAULT 'no',
   PRIMARY KEY (`contactID`),
+  UNIQUE KEY `email` (`email`),
   KEY `firmID` (`firmID`),
   KEY `addressID` (`addressID`),
   CONSTRAINT `contact_ibfk_1` FOREIGN KEY (`firmID`) REFERENCES `firm` (`firmID`) ON DELETE CASCADE ON UPDATE CASCADE,
