@@ -65,7 +65,7 @@ directive('uaPhone', function() {
 				break;
 
 			default:
-				return tel;
+				return value;
 		}
 		if (country == 1) country = "";
 		number = number.slice(0, 3) + '-' + number.slice(3);
