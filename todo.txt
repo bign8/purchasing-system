@@ -14,7 +14,6 @@ ToDo:
 - photo upload field (doesn't store, just emails)
 - possible to add more attendees, not remove attendees
 - Purchases page (calling in attendee changes)
-- Push page titles to route providers that can be overriden by controllers (more strings stuff)
 - replace all alert statements with DOM level alerts
 - show if event is un-open or not available at current time (manual)
 - store referrer for redirects back to site
