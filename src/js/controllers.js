@@ -152,7 +152,7 @@ controller('ContactModalCtrl', ['$scope', '$modalInstance', 'contact', 'prep', '
 			$scope.contact.contactID = JSON.parse(res);
 			$modalInstance.close( $scope.contact );
 		}, function (err) {
-			$scope.message = appStrings.contact.error;
+			$scope.message = (err == 'dup') ? appStrings.contact.duplicate : appStrings.contact.error;
 			console.log(err);
 		});
 	};
