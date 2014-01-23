@@ -26,7 +26,6 @@ ToDo Directives:
 - phone validator (register/xx > add attendee > add employee)
 
 ToDo Emails:
-- Adding people to firm
 - New firm registration
 - New registration
 

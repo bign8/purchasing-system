@@ -138,9 +138,35 @@ class User extends NG {
 
 		$STH = $this->db->prepare("INSERT INTO `contact` (firmID, addressID, legalName, preName, title, email, phone) VALUES (?,?,?,?,?,?,?);");
 		if (!$STH->execute( $user['firmID'], $d->addr->addressID, $d->legalName, $d->preName, $d->title, $d->email, $d->phone )) return $this->conflict();
+		// send email -> add people to firm
+		$contactID = $this->db->lastInsertId();
+		$this->addContactToFirmEmail($contactID);
+		return $contactID;
+	}
+	private function addContactToFirmEmail($contactID) {
+		$dataSTH = $this->db->prepare("SELECT c.contactID, legalName, preName, title, email, phone, a.*, f.* FROM (SELECT * FROM `contact` WHERE contactID=?) c LEFT JOIN address a on c.addressID = a.addressID LEFT JOIN firm f ON c.firmID = f.firmID;");
+		$dataSTH->execute( $contactID );
+		$data = $dataSTH->fetch(PDO::FETCH_ASSOC);
 
-		// TODO: send email -> add people to firm
-		return $this->db->lastInsertId();
+		$html = <<<HTML
+			<p>The following person has been added to the firm {$data['name']} ({$data['website']})</p>
+			<table>
+				<tr><th>Property</th><th>Value</th></tr>
+				<tr><td>Name</td><td>{$data['legalName']}</td></tr>
+				<tr><td>Preferred</td><td>{$data['preName']}</td></tr>
+				<tr><td>Title</td><td>{$data['title']}</td></tr>
+				<tr><td>Email</td><td>{$data['email']}</td></tr>
+				<tr><td>Phone</td><td>{$data['phone']}</td></tr>
+				<tr><td>Address</td><td>{$data['addrName']}</td></tr>
+				<tr><td>Address 1</td><td>{$data['addr1']}</td></tr>
+				<tr><td>Address 2</td><td>{$data['addr2']}</td></tr>
+				<tr><td>City</td><td>{$data['city']}</td></tr>
+				<tr><td>State</td><td>{$data['state']}</td></tr>
+				<tr><td>Zip</td><td>{$data['zip']}</td></tr>
+			</table>
+HTML;
+		$mail = new UAMail();
+		if (!$mail->notify("UpstreamAcademy Modify Contact Added to Firm", $html)) $this->conflict('mail');
 	}
 
 	// Worker: add contact to system
