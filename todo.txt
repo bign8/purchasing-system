@@ -9,7 +9,6 @@ ToDo:
 - Hard-copy price
 - non-angular feedback form
 - Notify users of un-supported browsers
-- output strings objects (both php and js)
 - password reset functionality
 - photo upload field (doesn't store, just emails)
 - possible to add more attendees, not remove attendees
@@ -17,6 +16,9 @@ ToDo:
 - replace all alert statements with DOM level alerts
 - show if event is un-open or not available at current time (manual)
 - store referrer for redirects back to site
+
+ToDo Error:
+- created a new firm instead of using old one on registration
 
 ToDo Directives:
 - address setting
