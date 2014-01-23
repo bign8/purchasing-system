@@ -250,6 +250,8 @@ factory('interface', ['$http', '$q', '$rootScope', '$timeout', function ($http, 
 factory('appStrings', function() {
 	var ERROR = 'error', SUCCESS = 'success';
 	return {
+		ERROR: ERROR,
+		SUCCESS: SUCCESS,
 		paypal: { // Paypal (this is for the app)
 			url: 'https://payflowlink.paypal.com',
 			uri: { // used $.param()
@@ -264,10 +266,30 @@ factory('appStrings', function() {
 			totalParam: 'AMOUNT'
 		},
 		cart: { // Cart Pages
-			discDup: { // Duplicate Discount (notify object)
+			disc_dup: { // Duplicate Discount (notify object)
 				pre: 'Duplicate Code!',
 				msg: 'Are you trying to cheat us?',
 				type:ERROR
+			},
+			disc_inv: { // Invalid Discount (notify object)
+				pre: 'Invalid!',
+				msg: 'Invalid discount code.',
+				type:ERROR
+			},
+			disc_exp: { // Expired Discount (notify object)
+				pre: 'Expired!',
+				msg: 'This code has expired!',
+				type:ERROR
+			},
+			disc_unr: { // Unrelated Discount (notify object)
+				pre: 'Unrelated!',
+				msg: 'Not associated with any items in your cart.',
+				type:ERROR
+			},
+			disc_yep: { // Unrelated Discount (notify object)
+				pre: 'Success!',
+				msg: 'Added discount to current order!',
+				type:SUCCESS
 			},
 			needOpt: { // Options needed (notify object)
 				pre: 'Options Needed',

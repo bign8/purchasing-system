@@ -256,19 +256,15 @@ class Cart extends NG {
 
 		// Check if any code matches the inputed code
 		$anyCodeSTH = $this->db->prepare("SELECT discountID FROM `discount` WHERE `code`=?;");
-		if (!$anyCodeSTH->execute( $data->code ) || $anyCodeSTH->rowCount() == 0) 
-			return array('pre'=>'Error!','msg'=>'Invalid discount code.', 'type'=>'error');
+		if (!$anyCodeSTH->execute( $data->code ) || $anyCodeSTH->rowCount() == 0) return $this->conflict('inv');
 		$codeID = $anyCodeSTH->fetchColumn();
+
+		// server duplicate check
+		foreach ($_SESSION['cart.discounts'] as $discount) if ($discount['discountID'] == $codeID) return $this->conflict('dup');
 
 		// Check if code is still valid
 		$validTimeSTH = $this->db->prepare("SELECT * FROM `discount` WHERE `active`='yes' AND discountID=?;");
-		if (!$validTimeSTH->execute( $codeID ) || $validTimeSTH->rowCount() == 0) 
-			return array('pre'=>'Sorry!', 'msg'=>'This code has expired!', 'type'=>'error');
-
-		// server duplicate check
-		$found = false;
-		foreach ($_SESSION['cart.discounts'] as $discount) if ($discount['discountID'] == $codeID) $found = true;
-		if ($found) return array('pre'=>'Duplicate Code!', 'msg'=>'Are you trying to cheat us?', 'type'=>'error');
+		if (!$validTimeSTH->execute( $codeID ) || $validTimeSTH->rowCount() == 0) return $this->conflict('exp');
 
 		// test if valid for current cart
 		$ids = array("0");
@@ -276,13 +272,11 @@ class Cart extends NG {
 		$questionMarks = trim(str_repeat("?,", sizeof($ids)),",");
 
 		$finalSTH = $this->db->prepare("SELECT * FROM `discount` WHERE ((productID IN (SELECT DISTINCT productID FROM `item` WHERE itemID IN ($questionMarks)) AND itemID IS NULL) OR (productID IS NULL AND itemID IN ($questionMarks)) OR (productID IS NULL AND itemID IS NULL) ) AND discountID = ?;");
-		if (!$finalSTH->execute( array_merge( $ids, $ids, array($codeID) ) ) || $finalSTH->rowCount() == 0) 
-			return array('pre'=>'Unrelated!', 'msg'=>'Not associated with any items in your cart.', 'type'=>'error');
+		if (!$finalSTH->execute( array_merge( $ids, $ids, array($codeID) ) ) || $finalSTH->rowCount() == 0) return $this->conflict('unr');
 
 		$obj = $finalSTH->fetch(PDO::FETCH_ASSOC);
 		array_push($_SESSION['cart.discounts'], $obj);
-
-		return array('pre'=>'Success!', 'msg'=>'Added discount to current order!', 'type'=>'success', 'obj'=>$obj );
+		return $obj;
 	}
 
 	// Helper: check discounts agains removed item
