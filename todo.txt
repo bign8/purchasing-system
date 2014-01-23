@@ -19,9 +19,6 @@ ToDo:
 - show if event is un-open or not available at current time (manual)
 - store referrer for redirects back to site
 
-ToDo Errors:
-- CUSTOM PAYMENT DELETE NOT WORKING!
-
 ToDo Directives:
 - address setting
 - email checking (with server)
