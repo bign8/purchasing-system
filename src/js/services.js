@@ -248,10 +248,11 @@ factory('interface', ['$http', '$q', '$rootScope', '$timeout', function ($http, 
 }]).
 
 factory('appStrings', function() {
-	var ERROR = 'error', SUCCESS = 'success';
+	var ERROR = 'error', SUCCESS = 'success', INFO = 'info';
 	return {
 		ERROR: ERROR,
 		SUCCESS: SUCCESS,
+		INFO: INFO,
 		paypal: { // Paypal (this is for the app)
 			url: 'https://payflowlink.paypal.com',
 			uri: { // used $.param()
@@ -298,18 +299,23 @@ factory('appStrings', function() {
 			},
 			prevPur: { // Previous Purchase (notify object)
 				pre: 'Previous Purchase',
-				msg: 'An item in your cart has already been purchased (shown in red).  Please remove it before continueing to checkout.',
+				msg: 'An item in your cart has already been purchased (shown in red).  Please remove it before continuing to checkout.',
 				type:ERROR, delay:20
 			},
 			chekOut: { // Checkout Complete (notify object)
 				pre: 'Checkout Complete',
-				msg: 'You will be redirected to either a) PayPal processing to handle your online payment or b) our recipt page with payment instructions',
+				msg: 'You will be redirected to your appropriate payment processing method',
 				type:SUCCESS, delay:20
 			},
 			negative: { // Negative Cart
 				pre: 'Negative Cart',
-				msg: 'You have provided informatinon in such a way that we are paying you.  Please contact us directly if we owe you money',
+				msg: 'You have provided information in such a way that we are paying you.  Please contact us directly if we owe you money',
 				type:ERROR, delay:20
+			},
+			warn: {
+				pre: 'Previously purchased items in cart',
+				msg: 'You will have to remove the items marked in <span style="color:red">RED</span> before you can checkout',
+				type:INFO, delay:60
 			}
 		},
 		contact: { // Modal address form (register/xx > add attendee > add employee)
