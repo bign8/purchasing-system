@@ -248,10 +248,11 @@ factory('interface', ['$http', '$q', '$rootScope', '$timeout', function ($http, 
 }]).
 
 factory('appStrings', function() {
-	var ERROR = 'error', SUCCESS = 'success';
+	var ERROR = 'error', SUCCESS = 'success', INFO = 'info';
 	return {
 		ERROR: ERROR,
 		SUCCESS: SUCCESS,
+		INFO: INFO,
 		paypal: { // Paypal (this is for the app)
 			url: 'https://payflowlink.paypal.com',
 			uri: { // used $.param()
@@ -310,6 +311,11 @@ factory('appStrings', function() {
 				pre: 'Negative Cart',
 				msg: 'You have provided informatinon in such a way that we are paying you.  Please contact us directly if we owe you money',
 				type:ERROR, delay:20
+			},
+			warn: {
+				pre: 'Previously purchased items in cart',
+				msg: 'You will have to remove the items marked in <span style="color:red">RED</span> before you can checkout',
+				type:INFO, delay:60
 			}
 		},
 		contact: { // Modal address form (register/xx > add attendee > add employee)
