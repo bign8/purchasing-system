@@ -7,7 +7,6 @@ ToDo:
 	- MP-past (hard-copy or digital) (Note about CPE credit cannot be applied) - download not currently available
 - Group access codes
 - Hard-copy price
-- non-angular feedback form
 - Notify users of un-supported browsers
 - password reset functionality
 - photo upload field (doesn't store, just emails)

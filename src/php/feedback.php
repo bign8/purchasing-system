@@ -1,28 +1,23 @@
 <?php
 require_once('./libinc/main_include.php');
 
-// TODO: check hidden $_REQUEST['email'] for spam!
-
+$sent = -1; // nothing set
 if (!isset($_REQUEST['submit'])) {
 	$_REQUEST = array('name'=>'', 'crazyField'=>'', 'type'=>' ', 'feedback'=>'', 'invalid'=>'');
-	$sent = -1; // nothing set
+} elseif (isset($_REQUEST['email']) && $_REQUEST['email'] != '') {
+	// HACKER! (quietly do nothing)
 } elseif (!filter_var($_REQUEST['crazyField'], FILTER_VALIDATE_EMAIL) && $_REQUEST['crazyField'] != $_REQUEST['invalid']) {
 	$sent = 0; // invalid email
 	$_REQUEST['invalid'] = $_REQUEST['crazyField'];
 } else {
 	$sent = 1; // sending error (2 = success)
-	$now = date('r');
-	$html = <<<HTML
-<table>
-	<tr><td>Name</td><td>{$_REQUEST['name']}</td></tr>
-	<tr><td>Email</td><td>{$_REQUEST['crazyField']}</td></tr>
-	<tr><td>Type</td><td>{$_REQUEST['type']}</td></tr>
-	<tr><td>Time</td><td>{$now}</td></tr>
-	<tr><td>Feedback</td><td>{$_REQUEST['feedback']}</td></tr>
-</table>
-HTML;
+	$html  = "<tr><td>Name</td><td>{$_REQUEST['name']}</td></tr>";
+	$html .= "<tr><td>Email</td><td>{$_REQUEST['crazyField']}</td></tr>";
+	$html .= "<tr><td>Type</td><td>{$_REQUEST['type']}</td></tr>";
+	$html .= "<tr><td>Time</td><td>" . date('r') . "</td></tr>";
+	$html .= "<tr><td>Feedback</td><td>{$_REQUEST['feedback']}</td></tr>";
 	$mail = new UAMail();
-	$sent = ($mail->notify("UpstreamAcademy Feedback", $html)) ? 2 : 1;
+	$sent = ($mail->notify("UpstreamAcademy Feedback", '<table>' . $html . '</table>')) ? 2 : 1;
 }
 
 ?>
@@ -108,13 +103,10 @@ HTML;
 					<div class="form-actions">
 						<input type="hidden" name="email" />
 						<input type="hidden" name="invalid" value="<?php echo $_REQUEST['invalid']; ?>" />
-						<button type="submit" class="btn btn-primary" name="submit" value="yep" <?php if ($sent == 1) echo "disabled='disabled'"; ?>>Send Feedback</button>
+						<button type="submit" class="btn btn-primary" name="submit" value="yep" <?php if ($sent == 2) echo "disabled='disabled'"; ?>>Send Feedback</button>
 						<a class="btn" href="/feedback.php">Clear</a>
 					</div>
 				</form>
-
-				<!-- <pre><?php print_r($_REQUEST); ?></pre> -->
-
 			</div>
 		</div>
 
