@@ -16,7 +16,6 @@ ToDo:
 - show if event is un-open or not available at current time (manual)
 - store referrer for redirects back to site
 
-- add note about where discount came from (groups / discount / etc)
 - On warned items in cart, give note about removing them right away and tell them to go to past products to add more attendees
 
 ToDo Directives:
