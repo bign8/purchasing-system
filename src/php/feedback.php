@@ -1,16 +1,28 @@
 <?php
+require_once('./libinc/main_include.php');
 
-// echo 'here';
+// TODO: check hidden $_REQUEST['email'] for spam!
+
 if (!isset($_REQUEST['submit'])) {
-	$_REQUEST = array(
-		'name'=>'',
-		'crazyField'=>'',
-		'type'=>' ',
-		'feedback'=>''
-	);
-	$sent = -1;
+	$_REQUEST = array('name'=>'', 'crazyField'=>'', 'type'=>' ', 'feedback'=>'', 'invalid'=>'');
+	$sent = -1; // nothing set
+} elseif (!filter_var($_REQUEST['crazyField'], FILTER_VALIDATE_EMAIL) && $_REQUEST['crazyField'] != $_REQUEST['invalid']) {
+	$sent = 0; // invalid email
+	$_REQUEST['invalid'] = $_REQUEST['crazyField'];
 } else {
-	$sent = 0;
+	$sent = 1; // sending error (2 = success)
+	$now = date('r');
+	$html = <<<HTML
+<table>
+	<tr><td>Name</td><td>{$_REQUEST['name']}</td></tr>
+	<tr><td>Email</td><td>{$_REQUEST['crazyField']}</td></tr>
+	<tr><td>Type</td><td>{$_REQUEST['type']}</td></tr>
+	<tr><td>Time</td><td>{$now}</td></tr>
+	<tr><td>Feedback</td><td>{$_REQUEST['feedback']}</td></tr>
+</table>
+HTML;
+	$mail = new UAMail();
+	$sent = ($mail->notify("UpstreamAcademy Feedback", $html)) ? 2 : 1;
 }
 
 ?>
@@ -24,8 +36,8 @@ if (!isset($_REQUEST['submit'])) {
 	<link href="/favicon.ico" rel="icon" type="image/x-icon" />
 
 	<!-- Bootstrap -->
-	<!-- // <script src="//code.jquery.com/jquery-1.10.2.min.js"></script> -->
 	<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet" />
+	<link rel="stylesheet" href="/css.css">
 
 	<!-- local live-reload -->
 	<script src="http://127.0.0.1:1337/livereload.js"></script>
@@ -39,84 +51,69 @@ if (!isset($_REQUEST['submit'])) {
 
 			<ul class="breadcrumb">
 				<li><a href="/">Home</a></li>
-				<li>
-					<span class="divider">/</span>  
-					<span>Feedback</span>
-				</li>
+				<li><span class="divider">/</span> Feedback</li>
 			</ul>
 		</div>
 
 		<div class="row">
 			<div class="offset2 span8">
-				<?php
-					switch($sent) {
-						case -1: 
-				?>
+				<?php switch($sent): case 0: // Bad Email ?>
+				<div class="alert alert-block">
+					<h4>Invalid Email</h4>
+					If you would like to send the form anyway, just click submit again.<br/>
+					We will not be able to communicate with you without a valid email.
+				</div>
+				<?php break; case 1: // Bad server ?>
 				<div class="alert alert-error alert-block">
 					<h4>Server Error</h4>
-					Your response has been <strong>NOT</strong> been submitted to our team.  Please contact us directly at ### PHONE NUMBER ###
+					Your response has been <strong>NOT</strong> been submitted to our team.  Please contact us directly at <a href="tel:4064951850">(406) 495-1850</a>
 				</div>
-				<?php
-							break;
-						case 0:
-				?>
-				<div class="alert alert-error alert-block">
-					<h4>Server Error</h4>
-					Your response has been <strong>NOT</strong> been submitted to our team.  Please contact us directly at ### PHONE NUMBER ###
-				</div>
-				<?php
-							break;
-						case 1:
-				?>
+				<?php break; case 2: // All Good ?>
 				<div class="alert alert-success alert-block">
 					<h4>Success</h4>
 					Your response has been submitted to our team.  Thank you for you feedback.
 				</div>
-				<?php
-							break;
-					}
-				?>
+				<?php break; endswitch; ?>
 
-				<!-- <div class="well"> -->
-					<form class="form-horizontal" method="post"><!--  method="post" -->
-						<div class="control-group">
-							<label class="control-label" for="inputName">Name</label>
-							<div class="controls">
-								<input type="text" id="inputName" placeholder="Name" class="input-xlarge" name="name" value="<?php echo $_REQUEST['name']; ?>">
-							</div>
+				<form class="form-horizontal" method="post">
+					<div class="control-group">
+						<label class="control-label" for="inputName">Name</label>
+						<div class="controls">
+							<input type="text" id="inputName" placeholder="Name" class="input-xlarge" name="name" value="<?php echo $_REQUEST['name']; ?>">
 						</div>
-						<div class="control-group">
-							<label class="control-label" for="inputEmail">Email</label>
-							<div class="controls">
-								<input type="text" id="inputEmail" placeholder="Email" class="input-xlarge" name="crazyField" value="<?php echo $_REQUEST['crazyField']; ?>">
-							</div>
+					</div>
+					<div class="control-group">
+						<label class="control-label" for="inputEmail">Email</label>
+						<div class="controls">
+							<input type="text" id="inputEmail" placeholder="Email" class="input-xlarge" name="crazyField" value="<?php echo $_REQUEST['crazyField']; ?>">
 						</div>
-						<div class="control-group">
-							<label class="control-label" for="inputFeedbackType">Type</label>
-							<div class="controls">
-								<select id="inputFeedbackType" class="input-xlarge" name="type">
-									<option <?php if ($_REQUEST['type'][0] == 'Q') echo 'selected="selected"'; ?>>Question</option>
-									<option <?php if ($_REQUEST['type'][0] == 'C') echo 'selected="selected"'; ?>>Comment</option>
-									<option <?php if ($_REQUEST['type'][0] == 'B') echo 'selected="selected"'; ?>>Bug / Issue</option>
-									<option <?php if ($_REQUEST['type'][0] == 'O') echo 'selected="selected"'; ?>>Other (Please indicate below)</option>
-								</select>
-							</div>
+					</div>
+					<div class="control-group">
+						<label class="control-label" for="inputFeedbackType">Type</label>
+						<div class="controls">
+							<select id="inputFeedbackType" class="input-xlarge" name="type">
+								<option <?php if ($_REQUEST['type'][0] == 'Q') echo 'selected="selected"'; ?>>Question</option>
+								<option <?php if ($_REQUEST['type'][0] == 'C') echo 'selected="selected"'; ?>>Comment</option>
+								<option <?php if ($_REQUEST['type'][0] == 'B') echo 'selected="selected"'; ?>>Bug / Issue</option>
+								<option <?php if ($_REQUEST['type'][0] == 'O') echo 'selected="selected"'; ?>>Other (Please indicate below)</option>
+							</select>
 						</div>
-						<div class="control-group">
-							<label class="control-label" for="inputFeedback">Feedback</label>
-							<div class="controls">
-								<textarea rows="5" id="inputFeedback" class="input-block-level" name="feedback"><?php echo $_REQUEST['feedback']; ?></textarea>
-							</div>
+					</div>
+					<div class="control-group">
+						<label class="control-label" for="inputFeedback">Feedback</label>
+						<div class="controls">
+							<textarea rows="5" id="inputFeedback" class="input-block-level" name="feedback"><?php echo $_REQUEST['feedback']; ?></textarea>
 						</div>
-						<div class="form-actions">
-							<input type="hidden" name="email"></input>
-							<button type="submit" class="btn btn-primary" name="submit" value="yep">Send Feedback</button>
-							<a class="btn" href="/feedback.php">Clear</a>
-						</div>
-					</form>
-				<!-- </div> -->
+					</div>
+					<div class="form-actions">
+						<input type="hidden" name="email" />
+						<input type="hidden" name="invalid" value="<?php echo $_REQUEST['invalid']; ?>" />
+						<button type="submit" class="btn btn-primary" name="submit" value="yep" <?php if ($sent == 1) echo "disabled='disabled'"; ?>>Send Feedback</button>
+						<a class="btn" href="/feedback.php">Clear</a>
+					</div>
+				</form>
 
-				<pre><?php print_r($_REQUEST); ?></pre>
+				<!-- <pre><?php print_r($_REQUEST); ?></pre> -->
 
 			</div>
 		</div>
