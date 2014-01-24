@@ -176,7 +176,16 @@ controller('CartCtrl', ['$scope', '$modal', 'interface', '$location', 'theCart',
 		interface.cart('getDiscount').then(function(res) {
 			$scope.discounts = res;
 		});
+		checkWarn();
 	});
+	var checkWarn = function() {
+		var found = false;
+		angular.forEach(theCart.get(), function(item) {
+			if (item.warn) found = true;
+		});
+		$scope.submitMsg = (found) ? appStrings.cart.warn : false ;
+	};
+	checkWarn();
 
 	$scope.total = function() { // Cart total calculation
 		return $scope.theCart.total() - $scope.discountTotal();
