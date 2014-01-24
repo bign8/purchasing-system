@@ -1,10 +1,10 @@
 ToDo: 
 - Account for all special cases
-	- hard-copy vs soft-copy price -> before and after purchases
+	- hard-copy vs soft-copy price -> before and after purchases (MP + LS)
 	- classes and their recurring weirdness
 	- MPA on users not firm
 	- MP (live + hard-copy or digital) (Note about CPE credit can be applied)
-	- MP-past (hard-copy or digital) (Note about CPE credit cannot be applied)
+	- MP-past (hard-copy or digital) (Note about CPE credit cannot be applied) - download not currently available
 - Group access codes
 - Hard-copy price
 - non-angular feedback form
@@ -16,6 +16,9 @@ ToDo:
 - replace all alert statements with DOM level alerts
 - show if event is un-open or not available at current time (manual)
 - store referrer for redirects back to site
+
+- add note about where discount came from (groups / discount / etc)
+- On warned items in cart, give note about removing them right away and tell them to go to past products to add more attendees
 
 ToDo Directives:
 - address setting
@@ -46,6 +49,7 @@ Notes:
 - Add conference type product -> Force insert into tie_product_field
 - Add price to new products
 - Admin can drop attendees
+- Classes (HPF + ELA) just register for first class (others will be invoiced)
 
 Future releases
 - assign status to orders (processing, confirmed, etc)
