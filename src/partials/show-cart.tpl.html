@@ -30,7 +30,8 @@
 						<td>
 							<span>{{item.cost.value | currency}}</span>
 							<span ng-show="item.cost.fullValue">&nbsp;&nbsp;
-								<del class="text-error">&nbsp;{{item.cost.fullValue | currency}}&nbsp;</del>
+								<del class="text-error">&nbsp;{{item.cost.fullValue | currency}}&nbsp;</del>&nbsp;
+								<span class="muted">{{item.cost.reason}} Pricing</span>
 							</span>
 							<a href ng-click="theCart.rem(item)" role="button" class="close">&times;</a>
 						</td>
