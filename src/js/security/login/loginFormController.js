@@ -6,6 +6,7 @@ angular.module('security.login.form', [])
 	// The model for this form 
 	$scope.user = {};
 	$scope.isLogin = true;
+	$scope.processing = false; // disable submit when processing
 
 	// Any error message from failing to login
 	$scope.authError = null;
@@ -23,6 +24,7 @@ angular.module('security.login.form', [])
 	$scope.login = function() {
 		// Clear any previous security errors
 		$scope.authError = null;
+		$scope.processing = true;
 
 		// Try to login
 		security.login($scope.user.email, $scope.user.password).then(function (loggedIn) {
@@ -33,6 +35,8 @@ angular.module('security.login.form', [])
 		}, function(x) {
 			// If we get here then there was a problem with the login request to the server
 			$scope.authError = 'There was a problem with authenticating: ' + x;
+		}).finally(function() {
+			$scope.processing = false;
 		});
 	};
 
@@ -61,11 +65,14 @@ angular.module('security.login.form', [])
 	};
 
 	$scope.reset = function() {
+		$scope.processing = true;
 		$scope.authError = null;
 		security.reset($scope.user.email).then(function() {
 			$scope.authReason = "An email will be sent to you with reset instructions.";
 		}, function() {
 			$scope.authError = "Your email has not yet been registered.";
+		}).finally(function() {
+			$scope.processing = false;
 		});
 	};
 }]);
