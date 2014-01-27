@@ -1,18 +1,28 @@
 <form name="form" novalidate class="login-form" style="margin-bottom:0">
 	<div class="modal-header">
-		<h4>Sign in <small>or</small> <a ng-click="register()">Register</a></h4>
+		<h4 ng-switch="isLogin">
+			<span ng-switch-when="true">Sign in</span>
+			<span ng-switch-default>Enter email</span>
+			<small>&nbsp;or&nbsp;</small>
+			<a ng-click="register()">Register</a>
+		</h4>
 	</div>
 	<div class="modal-body">
 		<div class="alert alert-warning" ng-show="authReason">{{authReason}}</div>
 		<div class="alert alert-error" ng-show="authError">{{authError}}</div>
-		<div class="alert alert-info">Please enter your login details</div>
+		<div class="alert alert-info" ng-show="isLogin">Please enter your login details</div>
 		<label>E-mail</label>
 		<input name="login" type="email" ng-model="user.email" required autofocus>
-		<label>Password</label>
-		<input name="pass" type="password" ng-model="user.password" required>
+		<div ng-show="isLogin">
+			<label>Password</label>
+			<input name="pass" type="password" ng-model="user.password" ng-required="isLogin">
+		</div>
 	</div>
 	<div class="modal-footer">
-		<button class="btn btn-primary login" ng-click="login()" ng-disabled='form.$invalid'>Sign in</button>
+		<button class="btn btn-info pull-left" ng-click="setIsLogin(false)" ng-show="isLogin">Forgot Password</button>
+		<button class="btn btn-info pull-left" ng-click="setIsLogin(true)" ng-hide="isLogin">Login</button>
+		<button class="btn btn-primary login" ng-click="login()" ng-disabled="form.$invalid" ng-show="isLogin">Sign in</button>
+		<button class="btn btn-primary reset" ng-click="reset()" ng-disabled="form.$invalid" ng-hide="isLogin">Reset Password</button>
 		<button class="btn clear" ng-click="clearForm()">Clear</button>
 		<button class="btn btn-warning cancel" ng-click="cancelLogin()">Cancel</button>
 	</div>

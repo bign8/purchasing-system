@@ -1,16 +1,17 @@
 angular.module('security.login.form', [])
 
-// The LoginFormController provides the behaviour behind a reusable form to allow users to authenticate.
+// The LoginFormController provides the behavior behind a reusable form to allow users to authenticate.
 // This controller and its template (login/form.tpl.html) are used in a modal dialog box by the security service.
-.controller('LoginFormController', ['$scope', 'security', function($scope, security) {
+.controller('LoginFormController', ['$scope', 'security', function ($scope, security) {
 	// The model for this form 
 	$scope.user = {};
+	$scope.isLogin = true;
 
 	// Any error message from failing to login
 	$scope.authError = null;
 
 	// The reason that we are being asked to login - for instance because we tried to access something to which we are not authorized
-	// We could do something diffent for each reason here but to keep it simple...
+	// We could do something different for each reason here but to keep it simple...
 	$scope.authReason = null;
 	if ( security.getLoginReason() ) {
 		$scope.authReason = ( security.isAuthenticated() ) ?
@@ -24,7 +25,7 @@ angular.module('security.login.form', [])
 		$scope.authError = null;
 
 		// Try to login
-		security.login($scope.user.email, $scope.user.password).then(function(loggedIn) {
+		security.login($scope.user.email, $scope.user.password).then(function (loggedIn) {
 			if ( !loggedIn ) {
 				// If we get here then the login failed due to bad credentials
 				$scope.authError = 'Login failed.  Please check your credentials and try again.';
@@ -38,14 +39,35 @@ angular.module('security.login.form', [])
 	$scope.clearForm = function() {
 		$scope.user = {};
 	};
-
 	$scope.cancelLogin = function(path) {
 		console.log(path);
 		console.log('cancelingLogin in security.login.form');
 		security.cancelLogin(path);
 	};
-
 	$scope.register = function() {
 		security.register();
+	};
+
+	var store = {};
+	$scope.setIsLogin = function(value) {
+		if (value) {
+			$scope.authError = store.err;
+			$scope.authReason = store.rea;
+		} else {
+			store.err = $scope.authError;
+			store.rea = $scope.authReason;
+			$scope.authError = null;
+			$scope.authReason = "Please enter your email. An email will be sent to you with reset instructions.";
+		}
+		$scope.isLogin = value;
+	};
+
+	$scope.reset = function() {
+		$scope.authError = null;
+		security.reset($scope.user.email).then(function() {
+			$scope.authReason = "You will be sent an email soon";
+		}, function() {
+			$scope.authError = "Your email has not yet been registered.";
+		});
 	};
 }]);
