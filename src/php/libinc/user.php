@@ -19,7 +19,7 @@ class User extends NG {
 			$user['admin'] = $user['isAdmin'] == 'yes';
 			unset( $user['pass'], $user['resetHash'], $user['resetExpires'], $user['isAdmin'] );
 
-			$updateSTH = $this->db->prepare( "UPDATE `contact` SET lastLogin=NOW() WHERE `contactID`=?;" );
+			$updateSTH = $this->db->prepare( "UPDATE `contact` SET lastLogin=NOW(), `resetHash`=NULL, `resetExpires`=NULL WHERE `contactID`=?;" );
 			$updateSTH->execute( $user['contactID'] );
 		}
 		return $user;
@@ -81,6 +81,37 @@ class User extends NG {
 	// Worker(security): destroys a particular session
 	public function logout() {
 		$_SESSION['user'] = NULL;
+	}
+
+	// Worker(security): sends reset emails
+	public function reset() {
+		$data = $this->getPostData();
+		$getSTH = $this->db->prepare("SELECT *, SHA1(CONCAT(email, ?, NOW())) AS newHash FROM `contact` WHERE `email`=?;");
+		if (!$getSTH->execute( config::encryptSTR, $data->email ) || $getSTH->rowCount() < 1) return $this->conflict('no-email');
+		$user = $getSTH->fetch( PDO::FETCH_ASSOC );
+
+		$setSTH = $this->db->prepare("UPDATE `contact` SET `resetHash`=?, `resetExpires`=NOW() + INTERVAL 3 DAY WHERE `contactID`=?;");
+		if (!$setSTH->execute($user['newHash'], $user['contactID'] )) return $this->conflict();
+
+		$html = <<<HTML
+			<p>You requested that your payment.upstreamacademy.com account password be reset.  This notice tells you how to do exactly that.</p>
+			<p>
+				Please navigate to our 
+				<a href="http://payment.upstreamacademy.com/reset/{$user['newHash']}">password reset page</a> 
+				to assign yourself a new password.
+			</p>
+			<p>
+				If the above link does not work, try navigating to this address manually:
+				<b>http://payment.upstreamacademy.com/reset/{$user['newHash']}</b>
+			</p>
+			<p>
+				You have <b>3</b> days to reset your password, after which time, 
+				this address becomes invalid and you must restart the password reset process.
+			</p>
+HTML;
+		$mail = new UAMail();
+		if (!$mail->sendMsg('Password Reset Instructions (payment.upstreamacademy.com)', $html, $user['email'], $user['legalName'])) $this->conflict('mail');
+		return 'sent';
 	}
 
 	// Worker: list all firms in db
