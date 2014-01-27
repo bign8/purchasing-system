@@ -19,11 +19,11 @@
 		</div>
 	</div>
 	<div class="modal-footer">
-		<button class="btn btn-info pull-left" ng-click="setIsLogin(false)" ng-show="isLogin">Forgot Password</button>
-		<button class="btn btn-info pull-left" ng-click="setIsLogin(true)" ng-hide="isLogin">Login</button>
 		<button class="btn btn-primary login" ng-click="login()" ng-disabled="form.$invalid" ng-show="isLogin">Sign in</button>
 		<button class="btn btn-primary reset" ng-click="reset()" ng-disabled="form.$invalid" ng-hide="isLogin">Reset Password</button>
 		<button class="btn clear" ng-click="clearForm()">Clear</button>
 		<button class="btn btn-warning cancel" ng-click="cancelLogin()">Cancel</button>
+		<button class="btn btn-info pull-left" ng-click="setIsLogin(false)" ng-show="isLogin">Forgot Password</button>
+		<button class="btn btn-info pull-left" ng-click="setIsLogin(true)" ng-hide="isLogin">Login</button>
 	</div>
 </form>

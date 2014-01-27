@@ -40,8 +40,6 @@ angular.module('security.login.form', [])
 		$scope.user = {};
 	};
 	$scope.cancelLogin = function(path) {
-		console.log(path);
-		console.log('cancelingLogin in security.login.form');
 		security.cancelLogin(path);
 	};
 	$scope.register = function() {
@@ -57,7 +55,7 @@ angular.module('security.login.form', [])
 			store.err = $scope.authError;
 			store.rea = $scope.authReason;
 			$scope.authError = null;
-			$scope.authReason = "Please enter your email. An email will be sent to you with reset instructions.";
+			$scope.authReason = "Please enter your email.";
 		}
 		$scope.isLogin = value;
 	};
@@ -65,7 +63,7 @@ angular.module('security.login.form', [])
 	$scope.reset = function() {
 		$scope.authError = null;
 		security.reset($scope.user.email).then(function() {
-			$scope.authReason = "You will be sent an email soon";
+			$scope.authReason = "An email will be sent to you with reset instructions.";
 		}, function() {
 			$scope.authError = "Your email has not yet been registered.";
 		});
