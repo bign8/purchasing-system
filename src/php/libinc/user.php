@@ -15,13 +15,15 @@ class User extends NG {
 		$user = NULL;
 		$STH = $this->db->prepare("SELECT * FROM `contact` WHERE `email`=? AND `pass`=ENCRYPT(?,?) LIMIT 1;");
 		if ( $STH->execute( $data->email, $data->password, config::encryptSTR ) && $STH->rowCount() > 0 ) {
-			$user = $STH->fetch( PDO::FETCH_ASSOC );
-			$user['admin'] = $user['isAdmin'] == 'yes';
-			unset( $user['pass'], $user['resetHash'], $user['resetExpires'], $user['isAdmin'] );
-
+			$user = $this->cleanUser($STH->fetch( PDO::FETCH_ASSOC ));
 			$updateSTH = $this->db->prepare( "UPDATE `contact` SET lastLogin=NOW(), `resetHash`=NULL, `resetExpires`=NULL WHERE `contactID`=?;" );
 			$updateSTH->execute( $user['contactID'] );
 		}
+		return $user;
+	}
+	private function cleanUser( $user ) { // helper: getUser + resetPass
+		$user['admin'] = $user['isAdmin'] == 'yes';
+		unset( $user['pass'], $user['resetHash'], $user['resetExpires'], $user['isAdmin'] );
 		return $user;
 	}
 	/*
@@ -120,6 +122,18 @@ HTML;
 		$STH = $this->db->prepare("SELECT * FROM `contact` WHERE `resetHash`=? AND `resetExpires` > NOW() LIMIT 0,1;");
 		if (!$STH->execute($data->hash)) return $this->conflict();
 		return $STH->rowCount();
+	}
+
+	// Worker(reset): updates password, and assigns user (logs in)
+	public function resetPass() {
+		$data = $this->getPostData();
+		$getSTH = $this->db->prepare("SELECT * FROM `contact` WHERE `resetHash`=? AND `resetExpires` > NOW() LIMIT 0,1;");
+		if (!$getSTH->execute($data->hash) || $getSTH->rowCount() < 1) return $this->conflict();
+		$user = $getSTH->fetch( PDO::FETCH_ASSOC );
+		$setSTH = $this->db->prepare("UPDATE `contact` SET `lastLogin`=NOW(),`pass`=ENCRYPT(?,?),`resetHash`=NULL,`resetExpires`=NULL WHERE `contactID`=?;");
+		if ( !$setSTH->execute( $data->password, config::encryptSTR, $user['contactID'] ) ) return $this->conflict();
+		$_SESSION['user'] = $this->cleanUser($user);
+		return $_SESSION['user'];
 	}
 
 	// Worker: list all firms in db

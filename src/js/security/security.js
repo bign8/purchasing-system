@@ -96,9 +96,16 @@ factory('security', ['$http', '$q', '$location', 'securityRetryQueue', '$modal',
 
 		reset: function(email) {
 			var request = interface.user('reset', {email: email});
-			return request;//.then(function(res) {
-			// 	return res;
-			// });
+			return request;
+		},
+
+		resetPass: function(hash, pass) {
+			var request = interface.user('resetPass', {hash: hash, password: pass});
+			request.then(function (user){
+				service.currentUser = user;
+				redirect('/');
+			});
+			return request;
 		},
 
 		// Ask the backend to see if a user is already authenticated - this may be from a previous session.

@@ -53,6 +53,7 @@ if ( $_REQUEST['c'] == 'cart' ) {
 		case 'logout':      $data = $obj->logout();      break;
 		case 'prepAtten':   $data = $obj->prepAtten();   break;
 		case 'reset':       $data = $obj->reset();       break;
+		case 'resetPass':   $data = $obj->resetPass();   break;
 		case 'updateUser':  $data = $obj->updateUser();  break;
 
 		// DEV
