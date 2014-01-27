@@ -43,6 +43,7 @@ if ( $_REQUEST['c'] == 'cart' ) {
 		case 'addAddress':  $data = $obj->addAddress();  break;
 		case 'addContact':  $data = $obj->addContact();  break;
 		case 'addUser':     $data = $obj->addUser();     break;
+		case 'checkReset':  $data = $obj->checkReset();  break;
 		case 'currentUser': $data = $obj->currentUser(); break;
 		case 'editAddress': $data = $obj->editAddress(); break;
 		case 'editContact': $data = $obj->editContact(); break;
@@ -51,6 +52,8 @@ if ( $_REQUEST['c'] == 'cart' ) {
 		case 'login':       $data = $obj->login();       break;
 		case 'logout':      $data = $obj->logout();      break;
 		case 'prepAtten':   $data = $obj->prepAtten();   break;
+		case 'reset':       $data = $obj->reset();       break;
+		case 'resetPass':   $data = $obj->resetPass();   break;
 		case 'updateUser':  $data = $obj->updateUser();  break;
 
 		// DEV

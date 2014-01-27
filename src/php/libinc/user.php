@@ -15,13 +15,15 @@ class User extends NG {
 		$user = NULL;
 		$STH = $this->db->prepare("SELECT * FROM `contact` WHERE `email`=? AND `pass`=ENCRYPT(?,?) LIMIT 1;");
 		if ( $STH->execute( $data->email, $data->password, config::encryptSTR ) && $STH->rowCount() > 0 ) {
-			$user = $STH->fetch( PDO::FETCH_ASSOC );
-			$user['admin'] = $user['isAdmin'] == 'yes';
-			unset( $user['pass'], $user['resetHash'], $user['resetExpires'], $user['isAdmin'] );
-
-			$updateSTH = $this->db->prepare( "UPDATE `contact` SET lastLogin=NOW() WHERE `contactID`=?;" );
+			$user = $this->cleanUser($STH->fetch( PDO::FETCH_ASSOC ));
+			$updateSTH = $this->db->prepare( "UPDATE `contact` SET lastLogin=NOW(), `resetHash`=NULL, `resetExpires`=NULL WHERE `contactID`=?;" );
 			$updateSTH->execute( $user['contactID'] );
 		}
+		return $user;
+	}
+	private function cleanUser( $user ) { // helper: getUser + resetPass
+		$user['admin'] = $user['isAdmin'] == 'yes';
+		unset( $user['pass'], $user['resetHash'], $user['resetExpires'], $user['isAdmin'] );
 		return $user;
 	}
 	/*
@@ -81,6 +83,57 @@ class User extends NG {
 	// Worker(security): destroys a particular session
 	public function logout() {
 		$_SESSION['user'] = NULL;
+	}
+
+	// Worker(security): sends reset emails
+	public function reset() {
+		$data = $this->getPostData();
+		$getSTH = $this->db->prepare("SELECT *, SHA1(CONCAT(email, ?, NOW())) AS newHash FROM `contact` WHERE `email`=?;");
+		if (!$getSTH->execute( config::encryptSTR, $data->email ) || $getSTH->rowCount() < 1) return $this->conflict('no-email');
+		$user = $getSTH->fetch( PDO::FETCH_ASSOC );
+
+		$setSTH = $this->db->prepare("UPDATE `contact` SET `resetHash`=?, `resetExpires`=NOW() + INTERVAL 3 DAY WHERE `contactID`=?;");
+		if (!$setSTH->execute($user['newHash'], $user['contactID'] )) return $this->conflict();
+
+		$html = <<<HTML
+			<p>You requested that your payment.upstreamacademy.com account password be reset.  This notice tells you how to do exactly that.</p>
+			<p>
+				Please navigate to our 
+				<a href="http://payment.upstreamacademy.com/reset/{$user['newHash']}">password reset page</a> 
+				to assign yourself a new password.
+			</p>
+			<p>
+				If the above link does not work, try navigating to this address manually:
+				<b>http://payment.upstreamacademy.com/reset/{$user['newHash']}</b>
+			</p>
+			<p>
+				You have <b>3</b> days to reset your password, after which time, 
+				this address becomes invalid and you must restart the password reset process.
+			</p>
+HTML;
+		$mail = new UAMail();
+		if (!$mail->sendMsg('Password Reset Instructions (payment.upstreamacademy.com)', $html, $user['email'], $user['legalName'])) $this->conflict('mail');
+		return 'sent';
+	}
+
+	// Worker(reset): returns user object
+	public function checkReset() {
+		$data = $this->getPostData();
+		$STH = $this->db->prepare("SELECT * FROM `contact` WHERE `resetHash`=? AND `resetExpires` > NOW() LIMIT 0,1;");
+		if (!$STH->execute($data->hash)) return $this->conflict();
+		return $STH->rowCount();
+	}
+
+	// Worker(reset): updates password, and assigns user (logs in)
+	public function resetPass() {
+		$data = $this->getPostData();
+		$getSTH = $this->db->prepare("SELECT * FROM `contact` WHERE `resetHash`=? AND `resetExpires` > NOW() LIMIT 0,1;");
+		if (!$getSTH->execute($data->hash) || $getSTH->rowCount() < 1) return $this->conflict();
+		$user = $getSTH->fetch( PDO::FETCH_ASSOC );
+		$setSTH = $this->db->prepare("UPDATE `contact` SET `lastLogin`=NOW(),`pass`=ENCRYPT(?,?),`resetHash`=NULL,`resetExpires`=NULL WHERE `contactID`=?;");
+		if ( !$setSTH->execute( $data->password, config::encryptSTR, $user['contactID'] ) ) return $this->conflict();
+		$_SESSION['user'] = $this->cleanUser($user);
+		return $_SESSION['user'];
 	}
 
 	// Worker: list all firms in db
