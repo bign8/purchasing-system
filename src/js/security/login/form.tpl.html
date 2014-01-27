@@ -20,7 +20,7 @@
 	</div>
 	<div class="modal-footer">
 		<button class="btn btn-primary login" ng-click="login()" ng-disabled="form.$invalid || processing" ng-show="isLogin">Sign in</button>
-		<button class="btn btn-primary reset" ng-click="reset()" ng-disabled="form.$invalid || processing" ng-hide="isLogin">Reset Password</button>
+		<button class="btn btn-primary reset" ng-click="reset()" ng-disabled="form.$invalid || processing || success" ng-hide="isLogin">Reset Password</button>
 		<button class="btn clear" ng-click="clearForm()">Clear</button>
 		<button class="btn btn-warning cancel" ng-click="cancelLogin()">Cancel</button>
 		<button class="btn btn-info pull-left" ng-click="setIsLogin(false)" ng-show="isLogin">Forgot Password</button>

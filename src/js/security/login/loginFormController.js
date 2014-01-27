@@ -7,6 +7,7 @@ angular.module('security.login.form', [])
 	$scope.user = {};
 	$scope.isLogin = true;
 	$scope.processing = false; // disable submit when processing
+	$scope.success = false;
 
 	// Any error message from failing to login
 	$scope.authError = null;
@@ -69,6 +70,7 @@ angular.module('security.login.form', [])
 		$scope.authError = null;
 		security.reset($scope.user.email).then(function() {
 			$scope.authReason = "An email will be sent to you with reset instructions.";
+			$scope.success = true;
 		}, function() {
 			$scope.authError = "Your email has not yet been registered.";
 		}).finally(function() {
