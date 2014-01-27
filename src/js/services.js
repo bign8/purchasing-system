@@ -1,6 +1,4 @@
-angular.module('myApp.services', [
-
-]).
+angular.module('myApp.services', []).
 
 factory('myPage', ['$rootScope', '$sce', '$route', function( $rootScope, $sce, $route ){
 	$rootScope.pageTitle = "Upstream Academy Shop"; // for actual title - https://coderwall.com/p/vcfo4q
@@ -420,6 +418,18 @@ factory('appStrings', function() {
 			error: { // server error
 				pre:'Error!',
 				msg:'There was an unknown error creating your address.  Please try again or contact Upstream Academy for help.',
+				type:ERROR
+			}
+		},
+		reset: {
+			match: { // Passwords Match
+				pre:'Passwords do not match!',
+				msg:'Please try again.',
+				type:ERROR
+			},
+			error: { // some server error
+				pre:'Error!',
+				msg: 'There was an unknown error creating your address.  Please try again or contact Upstream Academy for help.',
 				type:ERROR
 			}
 		}
