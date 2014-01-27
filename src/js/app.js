@@ -48,10 +48,20 @@ config(['$routeProvider', 'securityAuthorizationProvider', '$locationProvider', 
 			templateUrl: 'partials/register-conf.tpl.html',
 			controller: 'RegisterConFormCtrl',
 			resolve: {
-				conference: ['interface', '$route', function(interface, $route) {
+				conference: ['interface', '$route', function (interface, $route) {
 					return interface.cart('getOption', $route.current.params);
 				}],
 				user: securityAuthorizationProvider.requireAuthenticatedUser
+			}
+		}).
+		when('/reset/:hash', {
+			title: 'Reset Password',
+			templateUrl: 'partials/reset-password.tpl.html',
+			controller: 'ResetPassCtrl',
+			resolve: {
+				check: ['interface', '$route', function (interface, $route) {
+					return interface.user('checkReset', $route.current.params);
+				}]
 			}
 		}).
 		when('/cart', { // list items in cart

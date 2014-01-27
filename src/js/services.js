@@ -1,6 +1,4 @@
-angular.module('myApp.services', [
-
-]).
+angular.module('myApp.services', []).
 
 factory('myPage', ['$rootScope', '$sce', '$route', function( $rootScope, $sce, $route ){
 	$rootScope.pageTitle = "Upstream Academy Shop"; // for actual title - https://coderwall.com/p/vcfo4q

@@ -114,6 +114,14 @@ HTML;
 		return 'sent';
 	}
 
+	// Worker(reset): returns user object
+	public function checkReset() {
+		$data = $this->getPostData();
+		$STH = $this->db->prepare("SELECT * FROM `contact` WHERE `resetHash`=? AND `resetExpires` > NOW() LIMIT 0,1;");
+		if (!$STH->execute($data->hash)) return $this->conflict();
+		return $STH->rowCount();
+	}
+
 	// Worker: list all firms in db
 	public function listFirms() {
 		$STH = $this->db->query("SELECT f.firmID, f.name, f.website, a.* FROM `firm` f JOIN `address` a ON f.addressID=a.addressID;");
