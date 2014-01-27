@@ -385,11 +385,23 @@ controller('RegisterFormCtrl', ['$scope', '$modal', 'interface', 'security', 'fi
 	};
 }]).
 
-controller('ResetPassCtrl', ['$scope', 'check', 'security', '$route', function ($scope, check, security, $route) {
+controller('ResetPassCtrl', ['$scope', 'check', 'security', '$route', 'appStrings', function ($scope, check, security, $route, appStrings) {
 	$scope.check = check;
 	$scope.user = angular.copy( $route.current.params );
 	$scope.message = false;
+	$scope.processing = false;
 
+	$scope.changePass = function() {
+		$scope.processing = true;
+		if ($scope.user.passVerify != $scope.user.password) {
+			$scope.message = appStrings.reset.match;
+			return;
+		}
+		security.resetPass($scope.user.hash, $scope.user.password).catch(function() {
+			$scope.message = appStrings.reset.error;
+			processing = false;
+		});
+	};
 }]).
 
 controller('UserFormCtrl', ['$scope', 'myPage', '$modal', 'interface', 'security', 'user', 'firms', function ($scope, myPage, $modal, interface, security, user, firms) {
