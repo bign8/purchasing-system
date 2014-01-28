@@ -95,8 +95,7 @@ controller('RegisterConFormCtrl', ['$scope', 'myPage', 'interface', 'conference'
 				}]
 			});
 			$scope.orig = angular.copy( $scope.con.options );
-		}, function(obj) {
-			console.log(obj);
+		}, function() {
 			$scope.message = appStrings.conference.error;
 		});
 	};

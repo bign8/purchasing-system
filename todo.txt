@@ -8,11 +8,11 @@ ToDo:
 - Group access codes
 - Hard-copy price
 - Notify users of un-supported browsers
+- ommit reset id's from pretty crumb
 - photo upload field (doesn't store, just emails)
 - possible to add more attendees, not remove attendees
 - Purchases page (calling in attendee changes)
 - reduce cart requests on app init
-- replace all alert statements with DOM level alerts
 - show if event is un-open or not available at current time (manual)
 - store referrer for redirects back to site
 
