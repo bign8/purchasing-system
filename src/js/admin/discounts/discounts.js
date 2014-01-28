@@ -28,4 +28,10 @@ controller('DiscountsCtrl', ['$scope', 'discounts', 'interface', function ($scop
 			discount = res;
 		});
 	};
+
+	$scope.rem = function($event, discount) {
+		$event.stopPropagation();
+		console.log('deleting');
+		console.log(discount);
+	};
 }]);
