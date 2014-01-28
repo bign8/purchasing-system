@@ -1,5 +1,5 @@
 <div class="row">
-	<div class="span9">
+	<div class="span10 offset1">
 		<p>Click a discount to modify, toggle it's active status with the checkbox on the left, or delete a discount with the "x" on the right.</p>
 		<table class="table table-hover">
 			<thead>
@@ -11,7 +11,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr ng-repeat="discount in discounts" ng-click="edit(discount)" ng-class="{error:discount.active=='no'}">
+				<tr ng-repeat="discount in discounts" ng-click="edit(discount)">
 					<td>
 						<input type="checkbox" ng-model="discount.active" ng-true-value="yes" ng-false-value="no" 
 							title="Enable/Disable Code" ng-change="change(discount)" ng-click="clickCatch($event)" />
@@ -30,17 +30,6 @@
 						<button class="close pull-right" ng-click="rem($event, discount)">&times;</button>
 					</td>
 				</tr>
-			</tbody>
-		</table>
-	</div>
-	<div class="span3">
-		<table class="table">
-			<thead>
-				<tr><th>Row Color Means</th></tr>
-			</thead>
-			<tbody>
-				<tr><td>Active Discount</td></tr>
-				<tr class="error"><td>Inactive Discount</td></tr>
 			</tbody>
 		</table>
 	</div>
