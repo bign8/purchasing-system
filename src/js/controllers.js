@@ -153,7 +153,6 @@ controller('ContactModalCtrl', ['$scope', '$modalInstance', 'contact', 'prep', '
 			$modalInstance.close( $scope.contact );
 		}, function (err) {
 			$scope.message = (err == 'dup') ? appStrings.contact.duplicate : appStrings.contact.error;
-			console.log(err);
 		});
 	};
 	$scope.setAddr = function () { // open modal here with address form
@@ -344,7 +343,6 @@ controller('RegisterFormCtrl', ['$scope', '$modal', 'interface', 'security', 'fi
 			window.history.back(); // go to last page!
 		}, function (err) {
 			$scope.message = (err=='dup') ? appStrings.register.duplicate : appStrings.register.failure ;
-			console.log(err);
 		});
 	};
 
@@ -459,7 +457,6 @@ controller('UserFormCtrl', ['$scope', 'myPage', '$modal', 'interface', 'security
 			} else {
 				$scope.message = appStrings.user.failure;
 			}
-			console.log(err);
 		});
 	};
 
@@ -504,11 +501,9 @@ controller('ModalAddressCtrl', ['$scope', '$modalInstance', 'address', 'interfac
 		// use interface to add/edit address in db
 		var fun = ($scope.address.addressID === null) ? 'add' : 'edit' ;
 		interface.user(fun + 'Address', $scope.address).then(function (res) {
-			console.log(res);
 			$scope.address.addressID = JSON.parse(res);
 			$modalInstance.close($scope.address);
-		}, function (err) {
-			console.log(err);
+		}, function() {
 			$scope.message = appStrings.address.error;
 		});
 	};
