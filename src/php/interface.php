@@ -38,29 +38,7 @@ if ( $_REQUEST['c'] == 'cart' ) {
 		default: $pass = false;
 	}
 } elseif ( $_REQUEST['c'] == 'user' ) {
-	$obj = new User();
-	switch ($_REQUEST['a']) {
-		case 'addAddress':  $data = $obj->addAddress();  break;
-		case 'addContact':  $data = $obj->addContact();  break;
-		case 'addUser':     $data = $obj->addUser();     break;
-		case 'checkReset':  $data = $obj->checkReset();  break;
-		case 'currentUser': $data = $obj->currentUser(); break;
-		case 'editAddress': $data = $obj->editAddress(); break;
-		case 'editContact': $data = $obj->editContact(); break;
-		case 'getFullUser': $data = $obj->getFullUser(); break;
-		case 'listFirms':   $data = $obj->listFirms();   break;
-		case 'login':       $data = $obj->login();       break;
-		case 'logout':      $data = $obj->logout();      break;
-		case 'prepAtten':   $data = $obj->prepAtten();   break;
-		case 'reset':       $data = $obj->reset();       break;
-		case 'resetPass':   $data = $obj->resetPass();   break;
-		case 'updateUser':  $data = $obj->updateUser();  break;
-
-		// DEV
-		case 'testAuth':  $data = $obj->testAuth();  break;
-		case 'testAdmin': $data = $obj->testAdmin(); break;
-		default: $pass = false;
-	}
+	User::process( $_REQUEST['a'], $pass, $data );
 } elseif ( $_REQUEST['c'] == 'test' ) {
 	switch ($_REQUEST['a']) {
 		case 'demo': 
