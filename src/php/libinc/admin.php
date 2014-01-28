@@ -13,8 +13,11 @@ class Admin extends NG {
 	public static function process( $action, &$pass, &$data ) {
 		$obj = new Admin();
 		switch ( $action ) {
+			// Discount Functions
 			case 'getDiscounts':      $data = $obj->getDiscounts();      break;
 			case 'setDiscountActive': $data = $obj->setDiscountActive(); break;
+			case 'remDiscount':       $data = $obj->remDiscount();       break;
+
 			default: $pass = false;
 		}
 	}
@@ -34,6 +37,14 @@ class Admin extends NG {
 		$data = $this->getPostData();
 		$STH = $this->db->prepare("UPDATE `discount` SET `active`=? WHERE `discountID`=?;");
 		if (!$STH->execute($data->active, $data->discountID)) return $this->conflict();
+		return $data;
+	}
+
+	// Worker(discount): removes discount from db
+	public function remDiscount() {
+		$data = $this->getPostData();
+		$STH = $this->db->prepare("DELETE FROM `discount` WHERE `discountID`=? LIMIT 1;");
+		if (!$STH->execute($data->discountID)) return $this->conflict();
 		return $data;
 	}
 }
