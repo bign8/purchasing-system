@@ -12,9 +12,10 @@ controller('IndexCtrl', ['$scope', 'theCart', 'security', function ($scope, theC
 	$scope.theCart = theCart;
 }]).
 
-controller('RegisterConFormCtrl', ['$scope', 'myPage', 'interface', 'conference', '$modal', 'theCart', function ($scope, myPage, interface, conference, $modal, theCart) {
+controller('RegisterConFormCtrl', ['$scope', 'myPage', 'interface', 'conference', '$modal', 'theCart', 'appStrings', function ($scope, myPage, interface, conference, $modal, theCart, appStrings) {
 	$scope.con = conference;
 	$scope.orig = angular.copy( $scope.con.options );
+	$scope.message = false;
 
 	var title = ($scope.con.item.template == 'conference') ? "Register" : "Options" ;
 	myPage.setTitle(title, "for " + $scope.con.item.name);
@@ -77,11 +78,11 @@ controller('RegisterConFormCtrl', ['$scope', 'myPage', 'interface', 'conference'
 	$scope.equal = function(x,y) { return angular.equals(x,y);};
 	$scope.reset = function() { $scope.con.options = angular.copy( $scope.orig ); };
 
-	$scope.save = function( invalid ) {
-		console.log(invalid);
-		if (invalid) return alert('Form is not valid\nPlease try again.');
-		if ($scope.attID && $scope.con.options[ $scope.attID ].length === 0) 
-			return alert('Please add at least one Attendee to the conference');
+	$scope.save = function() {
+		if ($scope.attID && $scope.con.options[ $scope.attID ].length === 0) {
+			$scope.message = appStrings.conference.attendee;
+			return;
+		}
 		interface.cart('setOption', $scope.con).then(function() {
 			theCart.setDirty();
 			$modal.open({
@@ -96,7 +97,7 @@ controller('RegisterConFormCtrl', ['$scope', 'myPage', 'interface', 'conference'
 			$scope.orig = angular.copy( $scope.con.options );
 		}, function(obj) {
 			console.log(obj);
-			alert('Your save was unsuccessful.\nPlease try again or contact UpstreamAcademy for assistance.');
+			$scope.message = appStrings.conference.error;
 		});
 	};
 }]).
