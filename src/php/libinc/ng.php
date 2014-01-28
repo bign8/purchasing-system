@@ -16,6 +16,14 @@ class NG {
 		$this->db = new myPDO();
 	}
 
+	public static function process( $action, &$pass, &$data ) {
+		$obj = new NG();
+		switch ( $action ) {
+			case 'prettyCrumb': $data = $obj->prettyCrumb(); break;
+			default: $pass = false;
+		}
+	}
+
 	// Helper(angular): angular data retriever / because angular is wierd
 	protected function getPostData() {
 		$data = isset($_REQUEST['input']) ? $_REQUEST['input'] : file_get_contents("php://input") ; // DEBUG
