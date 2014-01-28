@@ -30,15 +30,18 @@ factory('breadcrumbs', ['$rootScope', '$location', 'interface', function ($rootS
 
 		// pretty crumb cash and calling function
 		function prettyCrumb(obj) {
-			var crumbCashe = JSON.parse(localStorage.getItem('crumbCashe') || "{}");
-			if (crumbCashe.hasOwnProperty(obj.path)) { // in in cashe
-				obj.name = crumbCashe[obj.path];
-			} else { // otherwise
-				interface.app('prettyCrumb', obj).then(function (label) {
-					crumbCashe[obj.path] = label; // assign cashe
-					breadcrumbs[obj.index].name = label; // assign value out
-					localStorage.setItem('crumbCashe', JSON.stringify(crumbCashe));
-				});
+			console.log($location.path());
+			if (!$location.path().match(/\/(reset)\//)) {
+				var crumbCashe = JSON.parse(localStorage.getItem('crumbCashe') || "{}");
+				if (crumbCashe.hasOwnProperty(obj.path)) { // in in cashe
+					obj.name = crumbCashe[obj.path];
+				} else { // otherwise
+					interface.app('prettyCrumb', obj).then(function (label) {
+						crumbCashe[obj.path] = label; // assign cashe
+						breadcrumbs[obj.index].name = label; // assign value out
+						localStorage.setItem('crumbCashe', JSON.stringify(crumbCashe));
+					});
+				}
 			}
 			return obj.name;
 		}
@@ -59,7 +62,7 @@ factory('breadcrumbs', ['$rootScope', '$location', 'interface', function ($rootS
 					path: breadcrumbPath(i),
 					index: i, // used for prettyCrumb
 				};
-				if (!isNaN(parseInt(obj.name))) obj.name = prettyCrumb(obj); // make that ugly (numeric) crumb pretty
+				if (!isNaN(parseInt(obj.name,16))) obj.name = prettyCrumb(obj); // make that ugly (numeric) crumb pretty
 				result.push(obj);
 			}
 		}
