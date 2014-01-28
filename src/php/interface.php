@@ -14,29 +14,7 @@ $data = array(); // return json data array
 
 // Application logic, choose proper class and function
 if ( $_REQUEST['c'] == 'cart' ) {
-	$obj = new Cart();
-	switch ($_REQUEST['a']) {
-		// Cart Functions
-		case 'get': $data = $obj->get(); break; // get entire cart
-		case 'rem': $data = $obj->rem(); break; // remove item from cart
-		case 'add': $data = $obj->add(); break; // add invoice to cart
-		case 'clr': $data = $obj->clr(); break; // clear cart
-
-		// Cart.Options Functions
-		case 'getOptions': $data = $obj->getOptions(); break; // get all options
-		case 'getOption':  $data = $obj->getOption();  break; // get conference form data
-		case 'setOption':  $data = $obj->setOption();  break; // get conference form data
-
-		// Cart.Discount Functions
-		case 'getDiscount': $data = $obj->getDiscount(); break; // get all discounts
-		case 'addDiscount': $data = $obj->addDiscount(); break; // add discounts
-		case 'remDiscount': $data = $obj->remDiscount(); break; // rem discounts
-
-		// Generic Functions
-		case 'save': $data = $obj->save(); break;
-		case 'getPurchases': $data = $obj->getPurchases(); break;
-		default: $pass = false;
-	}
+	Cart::process( $_REQUEST['a'], $pass, $data );
 } elseif ( $_REQUEST['c'] == 'user' ) {
 	User::process( $_REQUEST['a'], $pass, $data );
 } elseif ( $_REQUEST['c'] == 'test' ) {
