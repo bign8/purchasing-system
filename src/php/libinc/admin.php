@@ -10,6 +10,14 @@ class Admin extends NG {
 		$this->usr = new User();
 	}
 
+	public static function process( &$pass, &$data ) {
+		$obj = new Admin();
+		switch ($_REQUEST['a']) {
+			case 'getDiscounts': $data = $obj->getDiscounts(); break;
+			default: $pass = false;
+		}
+	}
+
 	// Worker(disocunts): returns all discounts
 	public function getDiscounts() {
 		$STH = $this->db->query("SELECT * FROM `discount`;");
