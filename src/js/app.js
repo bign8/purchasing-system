@@ -113,12 +113,14 @@ config(['$routeProvider', 'securityAuthorizationProvider', '$locationProvider', 
 			}
 		}).
 
-		// // TODO: build administration section
-		// when('/admin', {
-		// 	resolve: {
-		// 		user: securityAuthorizationProvider.requireAdminUser
-		// 	}
-		// }).
+		// Administration pages
+		when('/admin', {
+			title: 'Administration',
+			templateUrl: 'partials/admin/index.tpl.html',
+			resolve: {
+				user: securityAuthorizationProvider.requireAdminUser
+			}
+		}).
 		otherwise({ redirectTo: '/' });
 }]).
 
