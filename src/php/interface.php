@@ -74,11 +74,7 @@ if ( $_REQUEST['c'] == 'cart' ) {
 		default: $pass = false;
 	}
 } elseif ( $_REQUEST['c'] == 'app') {
-	$obj = new NG();
-	switch ($_REQUEST['a']) {
-		case 'prettyCrumb': $data = $obj->prettyCrumb(); break;
-		default: $pass = false;
-	}
+	NG::process( $_REQUEST['a'], $pass, $data );
 } else {
 	$pass = false;
 }
