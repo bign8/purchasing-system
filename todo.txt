@@ -8,7 +8,6 @@ ToDo:
 - Group access codes
 - Hard-copy price
 - Notify users of un-supported browsers
-- ommit reset id's from pretty crumb
 - photo upload field (doesn't store, just emails)
 - possible to add more attendees, not remove attendees
 - Purchases page (calling in attendee changes)
