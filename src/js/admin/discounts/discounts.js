@@ -1,4 +1,7 @@
-angular.module('myApp.admin.discounts', ['myApp.services']).
+angular.module('myApp.admin.discounts', [
+	'myApp.services',
+	'ui.bootstrap'
+]).
 
 config(['$routeProvider', 'securityAuthorizationProvider', function ($routeProvider, securityAuthorizationProvider) {
 	$routeProvider.when('/admin/discounts', {
@@ -14,7 +17,7 @@ config(['$routeProvider', 'securityAuthorizationProvider', function ($routeProvi
 	});
 }]).
 
-controller('DiscountsCtrl', ['$scope', 'discounts', 'interface', function ($scope, discounts, interface){
+controller('DiscountsCtrl', ['$scope', 'discounts', 'interface', '$modal', function ($scope, discounts, interface, $modal){
 	$scope.discounts = discounts;
 	$scope.clickCatch = function($event) { $event.stopPropagation(); };
 
@@ -31,7 +34,21 @@ controller('DiscountsCtrl', ['$scope', 'discounts', 'interface', function ($scop
 
 	$scope.rem = function($event, discount) {
 		$event.stopPropagation();
-		console.log('deleting');
-		console.log(discount);
+		var modalInstance = $modal.open({
+			templateUrl: 'discountConfirmDelete.tpl.html',
+			controller: ['$scope', '$modalInstance', 'discount', function($scope, $modalInstance, discount) {
+				$scope.discount = discount;
+				$scope.yes = function() { $modalInstance.close(); };
+				$scope.no = function() { $modalInstance.dismiss(); };
+			}],
+			resolve: {
+				discount: function() { return discount; }
+			}
+		});
+		modalInstance.result.then(function() {
+			interface.admin('remDiscount', discount).then(function() {
+				$scope.discounts.splice($scope.discounts.indexOf(discount), 1);
+			});
+		});
 	};
 }]);
