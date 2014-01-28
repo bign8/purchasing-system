@@ -243,6 +243,9 @@ factory('interface', ['$http', '$q', '$rootScope', '$timeout', function ($http, 
 		},
 		app: function(myAction, myData) {
 			return cb('app', myAction, myData);
+		},
+		admin: function(myAction, myData) {
+			return cb('admin', myAction, myData);
 		}
 	};
 }]).
