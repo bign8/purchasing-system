@@ -3,7 +3,7 @@ angular.module('myApp.admin.discounts', ['myApp.services']).
 config(['$routeProvider', 'securityAuthorizationProvider', function($routeProvider, securityAuthorizationProvider) {
 	$routeProvider.when('/admin/discounts', {
 		title: 'Manage Discounts',
-		templateUrl: 'partials/admin/discounts.tpl.html',
+		templateUrl: 'js/admin/discounts/discounts.tpl.html',
 		controller: 'AdminDiscountsCtrl',
 		resolve: {
 			user: securityAuthorizationProvider.requireAdminUser,

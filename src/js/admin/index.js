@@ -6,7 +6,7 @@ angular.module('myApp.admin', [
 config(['$routeProvider', 'securityAuthorizationProvider', function($routeProvider, securityAuthorizationProvider) {
 	$routeProvider.when('/admin', {
 		title: 'Administration',
-		templateUrl: 'partials/admin/index.tpl.html',
+		templateUrl: 'js/admin/index.tpl.html',
 		resolve: {
 			user: securityAuthorizationProvider.requireAdminUser
 		}

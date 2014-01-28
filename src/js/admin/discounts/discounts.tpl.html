@@ -1,0 +1,29 @@
+<div class="row">
+	<div class="span10 offset1">
+		<table class="table">
+			<thead>
+				<tr>
+					<th>Name</th>
+					<th>Code</th>
+					<th>Items</th>
+					<th>Amount</th>
+					<th>Active</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="discount in discounts">
+					<td>{{discount.name}}</td>
+					<td><code>{{discount.code}}</code></td>
+					<td>{{discount.itemID}}</td>
+					<td>{{discount.amount | currency}}</td>
+					<td>
+						<input type="checkbox" ng-model="discount.active" ng-true-value="yes" ng-false-value="no" />
+						<button class="close pull-right">&times;</button>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
+
+<pre>{{discounts | json}}</pre>
