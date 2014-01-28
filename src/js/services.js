@@ -30,7 +30,6 @@ factory('breadcrumbs', ['$rootScope', '$location', 'interface', function ($rootS
 
 		// pretty crumb cash and calling function
 		function prettyCrumb(obj) {
-			console.log($location.path());
 			if (!$location.path().match(/\/(reset)\//)) {
 				var crumbCashe = JSON.parse(localStorage.getItem('crumbCashe') || "{}");
 				if (crumbCashe.hasOwnProperty(obj.path)) { // in in cashe
