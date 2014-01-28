@@ -432,6 +432,18 @@ factory('appStrings', function() {
 				msg: 'There was an unknown error creating your address.  Please try again or contact Upstream Academy for help.',
 				type:ERROR
 			}
+		},
+		conference: {
+			attendee: { // Passwords Match
+				pre:'Whose coming?',
+				msg:'Please add at least one Attendee to the conference.',
+				type:ERROR
+			},
+			error: { // some server error
+				pre:'Error!',
+				msg: 'There was an unknown error saving your information.  Please try again or contact Upstream Academy for help.',
+				type:ERROR
+			}
 		}
 	};
 });
