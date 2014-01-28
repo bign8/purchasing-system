@@ -121,6 +121,13 @@ config(['$routeProvider', 'securityAuthorizationProvider', '$locationProvider', 
 				user: securityAuthorizationProvider.requireAdminUser
 			}
 		}).
+		when('/admin/discounts', {
+			title: 'Manage Discounts',
+			templateUrl: 'partials/admin/discounts.tpl.html',
+			resolve: {
+				user: securityAuthorizationProvider.requireAdminUser
+			}
+		}).
 		otherwise({ redirectTo: '/' });
 }]).
 
