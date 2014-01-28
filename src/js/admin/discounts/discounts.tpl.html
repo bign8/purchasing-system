@@ -1,5 +1,6 @@
 <div class="row">
 	<div class="span9">
+		<p>Click a discount to modify, toggle it's active status with the checkbox on the left, or delete a discount with the "x" on the right.</p>
 		<table class="table table-hover">
 			<thead>
 				<tr>
@@ -18,15 +19,15 @@
 						{{discount.name}}
 					</td>
 					<td ng-switch="(discount.itemID==null)*2 + (discount.productID==null)">
-						<span ng-switch-when="1">Item: {{discount.itemID}}</span>
-						<span ng-switch-when="2">Product: {{discount.productID}}</span>
-						<span ng-switch-when="3">Global Discount</span>
+						<span ng-switch-when="1">Item: <em>{{discount.display}}</em> of Product: <em>{{discount.parent}}</em></span>
+						<span ng-switch-when="2">Product: <em>{{discount.display}}</em></span>
+						<span ng-switch-when="3"><em>Global Discount</em></span>
 						<span ng-switch-default>What?</span>
 					</td>
 					<td><code>{{discount.code}}</code></td>
 					<td>
 						{{discount.amount | currency}}
-						<button class="close pull-right">&times;</button>
+						<button class="close pull-right" ng-click="rem($event, discount)">&times;</button>
 					</td>
 				</tr>
 			</tbody>

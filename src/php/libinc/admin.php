@@ -25,7 +25,7 @@ class Admin extends NG {
 
 	// Worker(disocunts): returns all discounts
 	public function getDiscounts() {
-		$STH = $this->db->query("SELECT * FROM `discount`;");
+		$STH = $this->db->query("SELECT d.*,q.name AS parent,IFNULL(i.name, p.name) AS display FROM `discount`d LEFT JOIN `item`i ON d.itemID = i.itemID LEFT JOIN `product`p ON d.productID=p.productID LEFT JOIN `product`q ON q.productID=i.productID;");
 		return $STH->fetchAll( PDO::FETCH_ASSOC );
 	}
 
