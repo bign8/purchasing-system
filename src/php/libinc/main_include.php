@@ -8,9 +8,13 @@ if ( file_exists( __DIR__ . '/config.php' ) ) {
 } else {
 	die( 'Please rename "config_blank.php" to "config.php" and configure the appropriate variables<br/>This would be a good place for an install script' );
 }
-		
+
+// Required Includes
 require_once( __DIR__ . '/db.php' );
 require_once( __DIR__ . '/ng.php' );
-require_once( __DIR__ . '/user.php' );
+
+// Included classes
+require_once( __DIR__ . '/admin.php' );
 require_once( __DIR__ . '/cart.php' );
 require_once( __DIR__ . '/mail.php' );
+require_once( __DIR__ . '/user.php' );

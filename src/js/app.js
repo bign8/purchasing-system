@@ -2,6 +2,7 @@
 
 angular.module('myApp', [
 	'ngRoute',
+	'myApp.admin',
 	'myApp.controllers',
 	'myApp.directives',
 	'myApp.filters',
@@ -110,15 +111,6 @@ config(['$routeProvider', 'securityAuthorizationProvider', '$locationProvider', 
 				user: ['interface', function(interface) {
 					return interface.user('getFullUser');
 				}]
-			}
-		}).
-
-		// Administration pages
-		when('/admin', {
-			title: 'Administration',
-			templateUrl: 'partials/admin/index.tpl.html',
-			resolve: {
-				user: securityAuthorizationProvider.requireAdminUser
 			}
 		}).
 		otherwise({ redirectTo: '/' });
