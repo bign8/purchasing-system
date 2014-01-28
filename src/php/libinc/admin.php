@@ -10,9 +10,9 @@ class Admin extends NG {
 		$this->usr = new User();
 	}
 
-	public static function process( &$pass, &$data ) {
+	public static function process( $action, &$pass, &$data ) {
 		$obj = new Admin();
-		switch ($_REQUEST['a']) {
+		switch ( $action ) {
 			case 'getDiscounts': $data = $obj->getDiscounts(); break;
 			default: $pass = false;
 		}
