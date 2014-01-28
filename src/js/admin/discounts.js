@@ -6,11 +6,14 @@ config(['$routeProvider', 'securityAuthorizationProvider', function($routeProvid
 		templateUrl: 'partials/admin/discounts.tpl.html',
 		controller: 'AdminDiscountsCtrl',
 		resolve: {
-			user: securityAuthorizationProvider.requireAdminUser
+			user: securityAuthorizationProvider.requireAdminUser,
+			discounts: ['interface', function (interface) {
+				return interface.admin('getDiscounts');
+			}]
 		}
 	});
 }]).
 
-controller('AdminDiscountsCtrl', ['$scope', function($scope){
-	$scope.magic = 'test';
+controller('AdminDiscountsCtrl', ['$scope', 'discounts', function($scope, discounts){
+	$scope.discounts = discounts;
 }]);

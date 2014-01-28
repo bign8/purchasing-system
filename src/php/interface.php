@@ -79,6 +79,12 @@ if ( $_REQUEST['c'] == 'cart' ) {
 		case 'prettyCrumb': $data = $obj->prettyCrumb(); break;
 		default: $pass = false;
 	}
+} elseif ( $_REQUEST['c'] == 'admin') {
+	$obj = new Admin();
+	switch ($_REQUEST['a']) {
+		case 'getDiscounts': $data = $obj->getDiscounts(); break;
+		default: $pass = false;
+	}
 } else {
 	$pass = false;
 }
