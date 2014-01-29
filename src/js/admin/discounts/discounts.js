@@ -69,19 +69,18 @@ factory('DiscountService', ['interface', function (interface) {
 			if ( Object.keys(casheDiscounts).length > 0 ) {
 				for (var key in casheDiscounts) ret.push(casheDiscounts[key]);
 			} else {
-				ret = interface.admin('getDiscounts').then(function (res) {
-					angular.forEach(res, function(discount) {
+				ret = interface.admin('getDiscounts').then(function (discounts) {
+					angular.forEach(discounts, function(discount) {
 						casheDiscounts[discount.discountID] = discount;
 					});
-					return res;
+					return discounts;
 				});
 			}
 			return ret;
 		},
 		getDiscount: function (discountID) {
-			return casheDiscounts[discountID] || interface.admin('getDiscount', {discountID: discountID}).then(function (res) {
-				casheDiscounts[res.discountID] = res;
-				return res;
+			return casheDiscounts[discountID] || service.initList().then(function () { // allways load all
+				return casheDiscounts[discountID];
 			});
 		},
 		setActive: function (discount) {
