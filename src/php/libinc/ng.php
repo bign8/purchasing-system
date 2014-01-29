@@ -58,15 +58,15 @@ class NG {
 	// Worker(app/breadcrumb): return full name for breadcrumb
 	public function prettyCrumb() {
 		$data = $this->getPostData();
+		$ret = ucfirst(@$data->name);
 
-		$ret = ucfirst($data->name);
+		if ( preg_match('/\/register\/.*/', @$data->path) && @$data->index == 1 ) $q = "`name` FROM `item` WHERE `itemID`";
+		if ( preg_match('/\/admin\/discounts\/.*/', @$data->path) && @$data->index == 2 ) $q = "`name` FROM `discount` WHERE `discountID`";
 
-		// Pretty print product area
-		if ( preg_match('/\/register\/.*/', $data->path) && $data->index == 1 ) {
-			$STH = $this->db->prepare("SELECT `name` FROM `item` WHERE `itemID`=? LIMIT 1;");
-			if ( $STH->execute( $data->name ) && $STH->rowCount() > 0 ) $ret = $STH->fetchColumn();
+		if ( isset($q) ) {
+			$STH = $this->db->prepare( "SELECT $q=? LIMIT 1;" );
+			if ( $STH->execute( @$data->name ) && $STH->rowCount() > 0 ) $ret = $STH->fetchColumn();
 		}
-
 		return $ret;
 	}
 }
