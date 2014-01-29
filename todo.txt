@@ -5,6 +5,7 @@ ToDo:
 	- MPA on users not firm
 	- MP (live + hard-copy or digital) (Note about CPE credit can be applied)
 	- MP-past (hard-copy or digital) (Note about CPE credit cannot be applied) - download not currently available
+- Allow pretty crumb to be set by individual pages (can bind to form elements for changing crumbs)
 - Group access codes
 - Hard-copy price
 - Notify users of un-supported browsers
@@ -14,10 +15,6 @@ ToDo:
 - reduce cart requests on app init
 - show if event is un-open or not available at current time (manual)
 - store referrer for redirects back to site
-
-ToDo Errors:
-- pretty crumb now runs on everything!
-- hide "taking too long" on initial page load
 
 ToDo Directives:
 - address setting
