@@ -16,6 +16,7 @@ class Admin extends NG {
 			// Discount Functions
 			case 'getDiscounts':      $data = $obj->getDiscounts();      break;
 			case 'remDiscount':       $data = $obj->remDiscount();       break;
+			case 'setDiscount':       $data = $obj->setDiscount();       break;
 			case 'setDiscountActive': $data = $obj->setDiscountActive(); break;
 
 			default: $pass = false;
@@ -45,6 +46,14 @@ class Admin extends NG {
 		$data = $this->getPostData();
 		$STH = $this->db->prepare("DELETE FROM `discount` WHERE `discountID`=? LIMIT 1;");
 		if (!$STH->execute($data->discountID)) return $this->conflict();
+		return $data;
+	}
+
+	// Worker(discount): stores discount changes
+	public function setDiscount() {
+		$data = $this->getPostData();
+		$STH = $this->db->prepare("UPDATE `discount` SET `name`=?, `code`=?, `amount`=? WHERE `discountID`=?;");
+		if (!$STH->execute($data->name, $data->code, $data->amount, $data->discountID)) return $this->conflict();
 		return $data;
 	}
 }

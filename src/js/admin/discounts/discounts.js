@@ -11,7 +11,7 @@ config(['$routeProvider', 'securityAuthorizationProvider', function ($routeProvi
 		resolve: {
 			user: securityAuthorizationProvider.requireAdminUser,
 			discounts: ['DiscountService', function (DiscountService) {
-				return DiscountService.initList();
+				return DiscountService.getList();
 			}]
 		}
 	}).when('/admin/discounts/:discountID', {
@@ -57,14 +57,23 @@ controller('DiscountListCtrl', ['$scope', 'discounts', '$modal', '$location', 'D
 	};
 }]).
 
-controller('DiscountEditCtrl', ['$scope', 'discount', 'DiscountService', function ($scope, discount, DiscountService) {
+controller('DiscountEditCtrl', ['$scope', 'discount', 'DiscountService', '$location', function ($scope, discount, DiscountService, $location) {
+	$scope.orig = angular.copy(discount);
 	$scope.discount = discount;
+
+	$scope.equals = function (a,b) { return angular.equals(a,b); };
+	$scope.reset = function() { $scope.discount = angular.copy($scope.orig); };
+	$scope.save = function() {
+		DiscountService.save($scope.discount).then(function() {
+			$location.path('/admin/discounts/');
+		});
+	};
 }]).
 
 factory('DiscountService', ['interface', function (interface) {
 	var casheDiscounts = {};
 	var service = {
-		initList: function () {
+		getList: function () {
 			var ret = [];
 			if ( Object.keys(casheDiscounts).length > 0 ) {
 				for (var key in casheDiscounts) ret.push(casheDiscounts[key]);
@@ -79,7 +88,7 @@ factory('DiscountService', ['interface', function (interface) {
 			return ret;
 		},
 		getDiscount: function (discountID) {
-			return casheDiscounts[discountID] || service.initList().then(function () { // allways load all
+			return casheDiscounts[discountID] || service.getList().then(function () { // allways load all
 				return casheDiscounts[discountID];
 			});
 		},
@@ -94,7 +103,11 @@ factory('DiscountService', ['interface', function (interface) {
 				delete casheDiscounts[discount.discountID];
 			});
 		},
-
+		save: function (discount) {
+			return interface.admin('setDiscount', discount).then(function (res) {
+				casheDiscounts[res.discountID] = res;
+			});
+		}
 	};
 	return service;
 }]);
