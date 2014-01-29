@@ -33,8 +33,9 @@
 	</div>
 
 	<div class="form-actions">
-		<button type="submit" class="btn btn-primary">Save</button>&nbsp;&nbsp;
-		<button type="button" class="btn btn-warning">Reset</button>
+		<button type="submit" class="btn btn-primary" ng-click="save()" ng-disabled="equals(discount, orig)">Save</button>&nbsp;&nbsp;
+		<button type="button" class="btn btn-warning" ng-click="reset()" ng-disabled="equals(discount, orig)">Reset</button>
+		<a href="/admin/discounts" class="btn pull-right">Cancel</a>
 	</div>
 	
 </form>
