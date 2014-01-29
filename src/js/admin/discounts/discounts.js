@@ -60,8 +60,40 @@ controller('DiscountListCtrl', ['$scope', 'discounts', '$modal', '$location', 'D
 controller('DiscountEditCtrl', ['$scope', 'discount', 'DiscountService', '$location', function ($scope, discount, DiscountService, $location) {
 	$scope.orig = angular.copy(discount);
 	$scope.discount = angular.copy(discount);
+	$scope.items = DiscountService.items;
+	$scope.products = DiscountService.products;
+	
+	var resetValues = function() {
+		if (discount.productID) { // Initialize values
+			$scope.prodID = angular.copy( discount.productID );
+			$scope.itemID = null; // clear filter
+		} else if (discount.itemID) {
+			angular.forEach($scope.items, function(item) {
+				if (item.itemID == discount.itemID) $scope.prodID = item.productID;
+			});
+			$scope.itemID = angular.copy( discount.itemID );
+		} else {
+			$scope.prodID = $scope.itemID = null; // clear filter
+		}
+	};
+	resetValues();
 
-	$scope.$watch('discount.code', function (val) {
+	$scope.$watch('prodID', function (val) {
+		$scope.discount.itemID = $scope.itemID = (val) ? null : $scope.discount.itemID;
+		$scope.discount.productID = val;
+	});
+	$scope.$watch('itemID', function (val) {
+		$scope.discount.itemID = val;
+		$scope.discount.productID = (val) ? null : $scope.prodID;
+	});
+	$scope.setGlobal = function() {
+		$scope.prodID = null;
+		$scope.itemID = null;
+		$scope.discount.itemID = null;
+		$scope.discount.productID = null;
+	};
+
+	$scope.$watch('discount.code', function (val) { // check for duplicate codes
 		var clean = true;
 		angular.forEach(DiscountService.getList(), function(thisDis) {
 			if (thisDis.code == val && thisDis.discountID != $scope.discount.discountID) clean = false;
@@ -72,6 +104,7 @@ controller('DiscountEditCtrl', ['$scope', 'discount', 'DiscountService', '$locat
 	$scope.reset = function() { 
 		$scope.discount = angular.copy($scope.orig);
 		$scope.editForm.$setPristine(true);
+		resetValues();
 	};
 	$scope.save = function() {
 		DiscountService.save($scope.discount).then(function() {
@@ -79,6 +112,16 @@ controller('DiscountEditCtrl', ['$scope', 'discount', 'DiscountService', '$locat
 		});
 	};
 }]).
+
+filter('filterProductIDNull', function() {
+	return function(list, productID) {
+		var result = [];
+		angular.forEach(list, function (item) {
+			if (item.productID == productID || item.productID === null) result.push(item);
+		});
+		return result;
+	};
+}).
 
 factory('DiscountService', ['interface', function (interface) {
 	var casheDiscounts = {};
@@ -88,11 +131,16 @@ factory('DiscountService', ['interface', function (interface) {
 			if ( Object.keys(casheDiscounts).length > 0 ) {
 				for (var key in casheDiscounts) ret.push(casheDiscounts[key]);
 			} else {
-				ret = interface.admin('getDiscounts').then(function (discounts) {
-					angular.forEach(discounts, function(discount) {
+				ret = interface.admin('getDiscountData').then(function (data) {
+					service.items = data.items;
+					service.products = data.products;
+					service.items.unshift({itemID:null, productID:null, name:'--- Select an Item ---'});
+					service.products.unshift({productID:null, name:'--- Select a Product ---'});
+
+					angular.forEach(data.discounts, function(discount) {
 						casheDiscounts[discount.discountID] = discount;
 					});
-					return discounts;
+					return data.discounts;
 				});
 			}
 			return ret;
@@ -117,7 +165,9 @@ factory('DiscountService', ['interface', function (interface) {
 			return interface.admin('setDiscount', discount).then(function (res) {
 				casheDiscounts[res.discountID] = res;
 			});
-		}
+		},
+		items: [],
+		products: []
 	};
 	return service;
 }]);

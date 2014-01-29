@@ -2,7 +2,7 @@
 	<div class="row">
 		<div class="span6">
 			<div class="form-horizontal well">
-				<h3>Details</h3>
+				<h3>Discount</h3>
 				<div class="control-group">
 					<label class="control-label" for="name">Name</label>
 					<div class="controls">
@@ -26,9 +26,37 @@
 					</div>
 				</div>
 			</div>
+
+			<!-- <pre>{{discount | json}}</pre> -->
 		</div>
 		<div class="span6">
-			Spanning 6 bro
+			<div class="form-horizontal well">
+				<button type="button" class="btn pull-right" ng-click="setGlobal()" ng-class="{'btn-success':!(prodID||itemID)}">Global Discount</button>
+
+				<h3>Applies To...</h3>
+				<p>Global discount if both boxes are blank</p>
+				<div class="control-group">
+					<label class="control-label" for="product">Product</label>
+					<div class="controls">
+						<select ng-model="prodID" id="product" name="product" ng-options="x.productID as x.name for x in products"></select>
+						&nbsp;&nbsp;
+						<button type="button" class="btn btn-info btn-mini" ng-click="setGlobal()">Clear</button>
+					</div>
+				</div>
+
+				<div class="control-group">
+					<label class="control-label" for="item">Item</label>
+					<div class="controls">
+						<select ng-model="itemID" id="item" name="item" ng-disabled="prodID==null"
+							ng-options="x.itemID as x.name for x in (items|filterProductIDNull:prodID)"></select>
+							&nbsp;&nbsp;
+						<button type="button" class="btn btn-info btn-mini" ng-click="itemID=null">Clear</button>
+					</div>
+				</div>
+			</div>
+
+			<!-- <pre>prodID = {{prodID | json}}</pre> -->
+			<!-- <pre>itemID = {{itemID | json}}</pre> -->
 		</div>
 	</div>
 

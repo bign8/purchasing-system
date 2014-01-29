@@ -14,7 +14,7 @@ class Admin extends NG {
 		$obj = new Admin();
 		switch ( $action ) {
 			// Discount Functions
-			case 'getDiscounts':      $data = $obj->getDiscounts();      break;
+			case 'getDiscountData':   $data = $obj->getDiscountData();   break;
 			case 'remDiscount':       $data = $obj->remDiscount();       break;
 			case 'setDiscount':       $data = $obj->setDiscount();       break;
 			case 'setDiscountActive': $data = $obj->setDiscountActive(); break;
@@ -28,9 +28,15 @@ class Admin extends NG {
 	// ----
 
 	// Worker(disocunts): returns all discounts
-	public function getDiscounts() {
-		$STH = $this->db->query("SELECT d.*,q.name AS parent,IFNULL(i.name, p.name) AS display FROM `discount`d LEFT JOIN `item`i ON d.itemID = i.itemID LEFT JOIN `product`p ON d.productID=p.productID LEFT JOIN `product`q ON q.productID=i.productID;");
-		return $STH->fetchAll( PDO::FETCH_ASSOC );
+	public function getDiscountData() {
+		$disSTH = $this->db->query("SELECT d.*,q.name AS parent,IFNULL(i.name, p.name) AS display FROM `discount`d LEFT JOIN `item`i ON d.itemID = i.itemID LEFT JOIN `product`p ON d.productID=p.productID LEFT JOIN `product`q ON q.productID=i.productID;");
+		$prodSTH = $this->db->query("SELECT `productID`, `name` FROM `product` ORDER BY `name`;");
+		$itemSTH = $this->db->query("SELECT `itemID`, `productID`, `name` FROM `item` ORDER BY `name`;");
+		return array(
+			'discounts' => $disSTH->fetchAll( PDO::FETCH_ASSOC ),
+			'products' => $prodSTH->fetchAll( PDO::FETCH_ASSOC ),
+			'items' => $itemSTH->fetchAll( PDO::FETCH_ASSOC )
+		);
 	}
 
 	// Worker(discounts): assigns discont activness
