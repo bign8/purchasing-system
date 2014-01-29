@@ -6,24 +6,35 @@ angular.module('myApp.admin.discounts', [
 config(['$routeProvider', 'securityAuthorizationProvider', function ($routeProvider, securityAuthorizationProvider) {
 	$routeProvider.when('/admin/discounts', {
 		title: 'Manage Discounts',
-		templateUrl: 'js/admin/discounts/discounts.tpl.html',
-		controller: 'DiscountsCtrl',
+		templateUrl: 'js/admin/discounts/list.tpl.html',
+		controller: 'DiscountListCtrl',
 		resolve: {
 			user: securityAuthorizationProvider.requireAdminUser,
 			discounts: ['interface', function (interface) {
 				return interface.admin('getDiscounts');
 			}]
 		}
+	}).when('/admin/discounts/:discountID', {
+		title: 'Edit discount',
+		templateUrl: 'js/admin/discounts/edit.tpl.html',
+		controller: 'DiscountEditCtrl',
+		resolve: {
+			user: securityAuthorizationProvider.requireAdminUser,
+			discount: ['interface', function (interface) {
+				return interface.admin('getDiscount');
+			}]
+		}
 	});
 }]).
 
-controller('DiscountsCtrl', ['$scope', 'discounts', 'interface', '$modal', function ($scope, discounts, interface, $modal){
+controller('DiscountListCtrl', ['$scope', 'discounts', 'interface', '$modal', '$location', function ($scope, discounts, interface, $modal, $location){
 	$scope.discounts = discounts;
 	$scope.clickCatch = function($event) { $event.stopPropagation(); };
 
 	$scope.edit = function(discount) {
 		console.log('editing');
 		console.log(discount);
+		$location.path('/admin/discounts/' + discount.discountID);
 	};
 
 	$scope.change = function(discount) {
@@ -51,4 +62,8 @@ controller('DiscountsCtrl', ['$scope', 'discounts', 'interface', '$modal', funct
 			});
 		});
 	};
+}]).
+
+controller('DiscountEditCtrl', ['$scope', 'discount', 'interface', '$modal', function ($scope, discount, interface, $modal) {
+	$scope.discount = discount;
 }]);
