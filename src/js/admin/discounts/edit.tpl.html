@@ -1,27 +1,27 @@
-<form name="editForm">
+<form name="editForm" class="css-form">
 	<div class="row">
 		<div class="span6">
 			<div class="form-horizontal well">
 				<h3>Details</h3>
 				<div class="control-group">
-					<label class="control-label" for="inputEmail">Name</label>
+					<label class="control-label" for="name">Name</label>
 					<div class="controls">
-						<input type="text" id="inputEmail" placeholder="Name" ng-model="discount.name" required>
+						<input type="text" id="name" placeholder="Name" ng-model="discount.name" required>
 					</div>
 				</div>
 
 				<div class="control-group">
-					<label class="control-label" for="addr1">Code</label>
+					<label class="control-label" for="code">Code</label>
 					<div class="controls">
-						<input type="text" id="addr1" placeholder="Address 1" ng-model="discount.code" required>
-						<span class="help-inline">Must be unique (check <a href="/admin/discounts/">Here</a> if necessary)</span>
+						<input type="text" id="code" name="code" placeholder="Code" ng-model="discount.code" required>
+						<span class="help-inline" ng-show="editForm.code.$error.duplicate">Must be unique (check <a href="/admin/discounts/">Here</a> if necessary)</span>
 					</div>
 				</div>
 
 				<div class="control-group">
-					<label class="control-label" for="addr2">Amount</label>
+					<label class="control-label" for="amount">Amount</label>
 					<div class="controls">
-						<input type="text" id="addr2" placeholder="Address 2" ng-model="discount.amount" required>
+						<input type="text" id="amount" placeholder="Amount" ng-model="discount.amount" required>
 						<span class="help-inline">Cash Value (no percents)</span>
 					</div>
 				</div>
@@ -33,7 +33,7 @@
 	</div>
 
 	<div class="form-actions">
-		<button type="submit" class="btn btn-primary" ng-click="save()" ng-disabled="equals(discount, orig)">Save</button>&nbsp;&nbsp;
+		<button type="submit" class="btn btn-primary" ng-click="save()" ng-disabled="equals(discount, orig) || editForm.$invalid">Save</button>&nbsp;&nbsp;
 		<button type="button" class="btn btn-warning" ng-click="reset()" ng-disabled="equals(discount, orig)">Reset</button>
 		<a href="/admin/discounts" class="btn pull-right">Cancel</a>
 	</div>
