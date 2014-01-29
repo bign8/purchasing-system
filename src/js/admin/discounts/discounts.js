@@ -59,10 +59,20 @@ controller('DiscountListCtrl', ['$scope', 'discounts', '$modal', '$location', 'D
 
 controller('DiscountEditCtrl', ['$scope', 'discount', 'DiscountService', '$location', function ($scope, discount, DiscountService, $location) {
 	$scope.orig = angular.copy(discount);
-	$scope.discount = discount;
+	$scope.discount = angular.copy(discount);
 
+	$scope.$watch('discount.code', function (val) {
+		var clean = true;
+		angular.forEach(DiscountService.getList(), function(thisDis) {
+			if (thisDis.code == val && thisDis.discountID != $scope.discount.discountID) clean = false;
+		});
+		$scope.editForm.code.$setValidity('duplicate', clean);
+	});
 	$scope.equals = function (a,b) { return angular.equals(a,b); };
-	$scope.reset = function() { $scope.discount = angular.copy($scope.orig); };
+	$scope.reset = function() { 
+		$scope.discount = angular.copy($scope.orig);
+		$scope.editForm.$setPristine(true);
+	};
 	$scope.save = function() {
 		DiscountService.save($scope.discount).then(function() {
 			$location.path('/admin/discounts/');
