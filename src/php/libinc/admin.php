@@ -14,7 +14,6 @@ class Admin extends NG {
 		$obj = new Admin();
 		switch ( $action ) {
 			// Discount Functions
-			case 'getDiscount':       $data = $obj->getDiscount();       break;
 			case 'getDiscounts':      $data = $obj->getDiscounts();      break;
 			case 'remDiscount':       $data = $obj->remDiscount();       break;
 			case 'setDiscountActive': $data = $obj->setDiscountActive(); break;
@@ -31,14 +30,6 @@ class Admin extends NG {
 	public function getDiscounts() {
 		$STH = $this->db->query("SELECT d.*,q.name AS parent,IFNULL(i.name, p.name) AS display FROM `discount`d LEFT JOIN `item`i ON d.itemID = i.itemID LEFT JOIN `product`p ON d.productID=p.productID LEFT JOIN `product`q ON q.productID=i.productID;");
 		return $STH->fetchAll( PDO::FETCH_ASSOC );
-	}
-
-	// Worker(discounts): returns single discount
-	public function getDiscount() {
-		$data = $this->getPostData();
-		$STH = $this->db->prepare("SELECT d.*,q.name AS parent,IFNULL(i.name, p.name) AS display FROM `discount`d LEFT JOIN `item`i ON d.itemID = i.itemID LEFT JOIN `product`p ON d.productID=p.productID LEFT JOIN `product`q ON q.productID=i.productID WHERE d.discountID=?;");
-		if (!$STH->execute($data->discountID)) $this->conflict();
-		return $STH->fetch( PDO::FETCH_ASSOC );
 	}
 
 	// Worker(discounts): assigns discont activness
