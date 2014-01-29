@@ -65,12 +65,18 @@ factory('DiscountService', ['interface', function (interface) {
 	var casheDiscounts = {};
 	var service = {
 		initList: function () {
-			return interface.admin('getDiscounts').then(function (discounts) {
-				angular.forEach(discounts, function(discount) {
-					casheDiscounts[discount.discountID] = discount;
+			var ret = [];
+			if ( Object.keys(casheDiscounts).length > 0 ) {
+				for (var key in casheDiscounts) ret.push(casheDiscounts[key]);
+			} else {
+				ret = interface.admin('getDiscounts').then(function (res) {
+					angular.forEach(res, function(discount) {
+						casheDiscounts[discount.discountID] = discount;
+					});
+					return res;
 				});
-				return discounts;
-			});
+			}
+			return ret;
 		},
 		getDiscount: function (discountID) {
 			return casheDiscounts[discountID] || interface.admin('getDiscount', {discountID: discountID}).then(function (res) {
@@ -85,7 +91,9 @@ factory('DiscountService', ['interface', function (interface) {
 			});
 		},
 		rem: function (discount) {
-			return interface.admin('remDiscount', discount);
+			return interface.admin('remDiscount', discount).then(function (res) {
+				delete casheDiscounts[discount.discountID];
+			});
 		},
 
 	};
