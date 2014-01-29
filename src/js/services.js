@@ -61,7 +61,7 @@ factory('breadcrumbs', ['$rootScope', '$location', 'interface', function ($rootS
 					path: breadcrumbPath(i),
 					index: i, // used for prettyCrumb
 				};
-				if (!isNaN(parseInt(obj.name,16))) obj.name = prettyCrumb(obj); // make that ugly (numeric) crumb pretty
+				if ( obj.name.match(/^[0-9a-fA-F]+$/) ) obj.name = prettyCrumb(obj); // make that ugly (hex) crumb pretty
 				result.push(obj);
 			}
 		}
