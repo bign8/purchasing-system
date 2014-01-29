@@ -17,7 +17,6 @@ ToDo:
 
 ToDo Errors:
 - pretty crumb now runs on everything!
-- hide "taking too long" on initial page load
 
 ToDo Directives:
 - address setting
