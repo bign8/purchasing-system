@@ -406,6 +406,7 @@ controller('UserFormCtrl', ['$scope', 'myPage', '$modal', 'interface', 'security
 	myPage.setTitle("Account Settings", "for " + user.legalName);
 	$scope.origUser = angular.copy( user );
 	$scope.firms = firms;
+	$scope.groups = [{name:'test'},{name:'test'},{name:'test'}];
 
 	var firstLoad = true, oldUserAddr = {addressID:undefined};
 	$scope.$watch('same', function(value) {
@@ -460,6 +461,7 @@ controller('UserFormCtrl', ['$scope', 'myPage', '$modal', 'interface', 'security
 		});
 	};
 
+	$scope.check = function(a, b) { return angular.equals(a, b); };
 	$scope.modifyFirm = function() {
 		$scope.enableFirm = true;
 		$scope.firmNew = "";
@@ -472,9 +474,20 @@ controller('UserFormCtrl', ['$scope', 'myPage', '$modal', 'interface', 'security
 		$scope.user.firm = {};
 		$scope.enableFirm = false;
 	};
-	$scope.check = function(a, b) { return angular.equals(a, b); };
-
-	// handle set address clicks
+	$scope.addFirmCode = function () {
+		interface.user('firmCode', {code:$scope.firmCode}).then(function (group) {
+			console.log('success');
+			$scope.groups.push(group);
+		}, function (res) {
+			if (res == 'dup') {
+				console.log('duplicate');
+			} else {
+				console.log('error');
+			}
+		});
+		$scope.firmCode = '';
+		$scope.settings.firmCode.$setPristine();
+	};
 	$scope.setAddr = function (slug) {
 		var myAddress = (slug == 'firm') ? ($scope.user.firm || {}).addr : $scope.user.addr ;
 		

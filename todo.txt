@@ -20,6 +20,7 @@ ToDo Directives:
 - address setting
 - email checking (with server)
 - matching passwords
+- modify alert to allow multiple msgs at a time (push on change and pop on timeout)
 - modify alert to be able to support callback on close (from object)
 - password directive (set stopping errors)
 - phone validator (register/xx > add attendee > add employee)
