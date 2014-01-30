@@ -21,8 +21,8 @@
 				<div class="control-group">
 					<label class="control-label" for="amount">Amount</label>
 					<div class="controls">
-						<input type="text" id="amount" placeholder="Amount" ng-model="discount.amount" required>
-						<span class="help-inline">Cash Value (no percents)</span>
+						<input type="number" id="amount" placeholder="Amount" ng-model="discount.amount" min="1" required>
+						<span class="help-inline">Cash Value</span>
 					</div>
 				</div>
 			</div>

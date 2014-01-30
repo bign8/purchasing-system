@@ -138,6 +138,7 @@ factory('DiscountService', ['interface', function (interface) {
 					service.products.unshift({productID:null, name:'--- Select a Product ---'});
 
 					angular.forEach(data.discounts, function(discount) {
+						discount.amount = parseInt(discount.amount);
 						casheDiscounts[discount.discountID] = discount;
 					});
 					return data.discounts;
