@@ -57,9 +57,15 @@ class Admin extends NG {
 
 	// Worker(discount): stores discount changes
 	public function setDiscount() {
-		$data = $this->getPostData();
-		$STH = $this->db->prepare("UPDATE `discount` SET `name`=?, `code`=?, `amount`=? WHERE `discountID`=?;");
-		if (!$STH->execute($data->name, $data->code, $data->amount, $data->discountID)) return $this->conflict();
-		return $data;
+		$d = $this->getPostData();
+		if (isset($d->discountID)) {
+			$STH = $this->db->prepare("UPDATE `discount` SET `name`=?,`code`=?,`amount`=?,`itemID`=?,`productID`=? WHERE `discountID`=?;");
+			if (!$STH->execute($d->name, $d->code, $d->amount, $d->itemID, $d->productID, $d->discountID)) return $this->conflict();
+		} else {
+			$STH = $this->db->prepare("INSERT INTO `discount` (`itemID`,`productID`,`name`,`code`,`amount`,`active`) VALUES (?,?,?,?,?,'yes');");
+			if (!$STH->execute($d->itemID, $d->productID, $d->name, $d->code, $d->amount)) return $this->conflict();
+			$d = (object) array_merge( (array)$foo, array('discountID' => $this->db->lastInsertId()) );
+		}
+		return $d;
 	}
 }
