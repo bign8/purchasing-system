@@ -106,7 +106,7 @@ CREATE TABLE `firm` (
 CREATE TABLE `group` (
   `groupID` int(10) unsigned NOT NULL,
   `name` varchar(100) NOT NULL,
-  `shortCode` varchar(20) DEFAULT NULL,
+  `shortCode` varchar(40) DEFAULT NULL,
   PRIMARY KEY (`groupID`)
 );
 --
