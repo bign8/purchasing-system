@@ -19,6 +19,7 @@ class User extends NG {
 			case 'currentUser': $data = $obj->currentUser(); break;
 			case 'editAddress': $data = $obj->editAddress(); break;
 			case 'editContact': $data = $obj->editContact(); break;
+			case 'addFirmCode': $data = $obj->addFirmCode(); break;
 			case 'getFullUser': $data = $obj->getFullUser(); break;
 			case 'listFirms':   $data = $obj->listFirms();   break;
 			case 'login':       $data = $obj->login();       break;
@@ -72,6 +73,23 @@ class User extends NG {
 	public function testAdmin() {
 		$this->requiresAdmin();
 		return 'hello administrator user';
+	}
+
+	// Worker(settings): adds firm membership to group
+	public function addFirmCode() {
+		$data = $this->getPostData();
+		$user = $this->requiresAuth();
+		$existSTH = $this->db->prepare("SELECT * FROM `group` WHERE shortCode=?;"); // check code
+		if (!$existSTH->execute( $data->code ) || $existSTH->rowCount() < 1) return $this->conflict('dne');
+		$group = $existSTH->fetch( PDO::FETCH_ASSOC );
+
+		$checkSTH = $this->db->prepare("SELECT * FROM `member` WHERE firmID=? AND groupID=?;"); // do we have it?
+		$test = $checkSTH->execute( $user['firmID'], $group['groupID'] );
+		if (!$test || $checkSTH->rowCount() >= 1) return $this->conflict('dup');
+
+		$insSTH = $this->db->prepare("INSERT INTO `member` (firmID, groupID) VALUES (?, ?);"); // iff not add it
+		if (!$insSTH->execute( $user['firmID'], $group['groupID'] )) return $this->conflict();
+		return $group;
 	}
 
 	// Helper(security): ensures user is authenticated

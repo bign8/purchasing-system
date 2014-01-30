@@ -406,7 +406,7 @@ controller('UserFormCtrl', ['$scope', 'myPage', '$modal', 'interface', 'security
 	myPage.setTitle("Account Settings", "for " + user.legalName);
 	$scope.origUser = angular.copy( user );
 	$scope.firms = firms;
-	$scope.groups = [{name:'test'},{name:'test'},{name:'test'}];
+	$scope.groups = [];
 
 	var firstLoad = true, oldUserAddr = {addressID:undefined};
 	$scope.$watch('same', function(value) {
@@ -475,12 +475,14 @@ controller('UserFormCtrl', ['$scope', 'myPage', '$modal', 'interface', 'security
 		$scope.enableFirm = false;
 	};
 	$scope.addFirmCode = function () {
-		interface.user('firmCode', {code:$scope.firmCode}).then(function (group) {
+		interface.user('addFirmCode', {code:$scope.firmCode}).then(function (group) {
 			console.log('success');
 			$scope.groups.push(group);
 		}, function (res) {
 			if (res == 'dup') {
 				console.log('duplicate');
+			} else if (res == 'dne') {
+				console.log('does not exist');
 			} else {
 				console.log('error');
 			}
