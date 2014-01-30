@@ -29,7 +29,7 @@ class Admin extends NG {
 
 	// Worker(disocunts): returns all discounts
 	public function getDiscountData() {
-		$disSTH = $this->db->query("SELECT d.*,q.name AS parent,IFNULL(i.name, p.name) AS display FROM `discount`d LEFT JOIN `item`i ON d.itemID = i.itemID LEFT JOIN `product`p ON d.productID=p.productID LEFT JOIN `product`q ON q.productID=i.productID;");
+		$disSTH = $this->db->query("SELECT d.*,IFNULL(q.name,p.name) AS productName,i.name AS itemName FROM `discount`d LEFT JOIN `item`i ON d.itemID = i.itemID LEFT JOIN `product`p ON d.productID=p.productID LEFT JOIN `product`q ON q.productID=i.productID;");
 		$prodSTH = $this->db->query("SELECT `productID`, `name` FROM `product` ORDER BY `name`;");
 		$itemSTH = $this->db->query("SELECT `itemID`, `productID`, `name` FROM `item` ORDER BY `name`;");
 		return array(
@@ -60,6 +60,7 @@ class Admin extends NG {
 		$d = $this->getPostData();
 		if (isset($d->discountID)) {
 			$STH = $this->db->prepare("UPDATE `discount` SET `name`=?,`code`=?,`amount`=?,`itemID`=?,`productID`=? WHERE `discountID`=?;");
+			if ( !is_null($d->itemID) && !is_null($d->productID) )  $productID = null; // clear productID on save
 			if (!$STH->execute($d->name, $d->code, $d->amount, $d->itemID, $d->productID, $d->discountID)) return $this->conflict();
 		} else {
 			$STH = $this->db->prepare("INSERT INTO `discount` (`itemID`,`productID`,`name`,`code`,`amount`,`active`) VALUES (?,?,?,?,?,'yes');");

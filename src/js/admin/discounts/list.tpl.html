@@ -34,8 +34,8 @@
 						{{discount.name}}
 					</td>
 					<td ng-switch="(discount.itemID==null)*2 + (discount.productID==null)">
-						<span ng-switch-when="1">Item: <em>{{discount.display}}</em> of Product: <em>{{discount.parent}}</em></span>
-						<span ng-switch-when="2">Product: <em>{{discount.display}}</em></span>
+						<span ng-switch-when="1">Item: <em>{{discount.itemName}}</em> of Product: <em>{{discount.productName}}</em></span>
+						<span ng-switch-when="2">Product: <em>{{discount.productName}}</em></span>
 						<span ng-switch-when="3"><em>Global Discount</em></span>
 						<span ng-switch-default>What?</span>
 					</td>
