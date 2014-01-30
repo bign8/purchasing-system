@@ -2,6 +2,7 @@
 
 angular.module('myApp', [
 	'ngRoute',
+	'myApp.admin',
 	'myApp.controllers',
 	'myApp.directives',
 	'myApp.filters',
@@ -112,13 +113,6 @@ config(['$routeProvider', 'securityAuthorizationProvider', '$locationProvider', 
 				}]
 			}
 		}).
-
-		// // TODO: build administration section
-		// when('/admin', {
-		// 	resolve: {
-		// 		user: securityAuthorizationProvider.requireAdminUser
-		// 	}
-		// }).
 		otherwise({ redirectTo: '/' });
 }]).
 

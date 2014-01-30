@@ -5,6 +5,7 @@ ToDo:
 	- MPA on users not firm
 	- MP (live + hard-copy or digital) (Note about CPE credit can be applied)
 	- MP-past (hard-copy or digital) (Note about CPE credit cannot be applied) - download not currently available
+- Allow pretty crumb to be set by individual pages (can bind to form elements for changing crumbs)
 - Group access codes
 - Hard-copy price
 - Notify users of un-supported browsers
@@ -30,7 +31,6 @@ ToDo Emails:
 In a holding pattern:
 - allow registration of email w/o login information (process)?
 - build administration section (see if user end is accepted)
-	- Discounts
 	- Downloads
 	- Firms (merge)
 	- Groups

@@ -14,10 +14,11 @@ $data = array(); // return json data array
 
 // Application logic, choose proper class and function
 switch ($_REQUEST['c']) {
-	case 'cart': Cart::process( $_REQUEST['a'], $pass, $data ); break;
-	case 'user': User::process( $_REQUEST['a'], $pass, $data ); break;
-	case 'app' :   NG::process( $_REQUEST['a'], $pass, $data ); break;
-	case 'test':
+	case 'cart' :  Cart::process( $_REQUEST['a'], $pass, $data ); break;
+	case 'user' :  User::process( $_REQUEST['a'], $pass, $data ); break;
+	case 'app'  :    NG::process( $_REQUEST['a'], $pass, $data ); break;
+	case 'admin': Admin::process( $_REQUEST['a'], $pass, $data ); break;
+	case 'test' :
 		switch ($_REQUEST['a']) {
 			case 'info': phpinfo(); break;
 			case 'db': die(system('mysqldump --host=db3.modwest.com -u '.config::db_user.' -p'.config::db_pass.' upstreamacademy_payment -d --skip-opt')); break;
