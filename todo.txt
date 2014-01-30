@@ -31,7 +31,6 @@ ToDo Emails:
 In a holding pattern:
 - allow registration of email w/o login information (process)?
 - build administration section (see if user end is accepted)
-	- Discounts
 	- Downloads
 	- Firms (merge)
 	- Groups

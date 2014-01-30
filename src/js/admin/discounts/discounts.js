@@ -62,36 +62,41 @@ controller('DiscountEditCtrl', ['$scope', 'discount', 'DiscountService', '$locat
 	$scope.discount = angular.copy(discount);
 	$scope.items = DiscountService.items;
 	$scope.products = DiscountService.products;
-	
-	var resetValues = function() {
-		if (discount.productID) { // Initialize values
-			$scope.prodID = angular.copy( discount.productID );
-			$scope.itemID = null; // clear filter
-		} else if (discount.itemID) {
-			angular.forEach($scope.items, function(item) {
-				if (item.itemID == discount.itemID) $scope.prodID = item.productID;
+
+	$scope.setGlobal = function() {
+		$scope.viewProd = DiscountService.blankProd;
+		$scope.viewItem = DiscountService.blankItem;
+	};
+	$scope.clearItem = function() {
+		$scope.viewItem = DiscountService.blankItem;
+	};
+	var initValues = function() {
+		if (discount.productID) {
+			$scope.clearItem();
+			angular.forEach($scope.products, function (product) { // find product
+				if (product.productID == discount.productID) $scope.viewProd = product;
 			});
-			$scope.itemID = angular.copy( discount.itemID );
+		} else if (discount.itemID) {
+			angular.forEach($scope.items, function (item) { // find item
+				if (item.itemID == discount.itemID) $scope.viewItem = item;
+			});
+			angular.forEach($scope.products, function (product) { // find item's parent product
+				if (product.productID == $scope.viewItem.productID) $scope.viewProd = product;
+			});
 		} else {
-			$scope.prodID = $scope.itemID = null; // clear filter
+			$scope.setGlobal();
 		}
 	};
-	resetValues();
+	initValues();
 
-	$scope.$watch('prodID', function (val) {
-		$scope.discount.itemID = $scope.itemID = (val) ? null : $scope.discount.itemID;
-		$scope.discount.productID = val;
+	$scope.$watch('viewProd', function (val) {
+		$scope.discount.productID = val.productID;
+		$scope.discount.productName = (val.productID) ? val.name : null;
 	});
-	$scope.$watch('itemID', function (val) {
-		$scope.discount.itemID = val;
-		$scope.discount.productID = (val) ? null : $scope.prodID;
+	$scope.$watch('viewItem', function (val) {
+		$scope.discount.itemID = val.itemID;
+		$scope.discount.itemName = (val.itemID) ? val.name : null;
 	});
-	$scope.setGlobal = function() {
-		$scope.prodID = null;
-		$scope.itemID = null;
-		$scope.discount.itemID = null;
-		$scope.discount.productID = null;
-	};
 
 	$scope.$watch('discount.code', function (val) { // check for duplicate codes
 		var clean = true;
@@ -104,7 +109,7 @@ controller('DiscountEditCtrl', ['$scope', 'discount', 'DiscountService', '$locat
 	$scope.reset = function() { 
 		$scope.discount = angular.copy($scope.orig);
 		$scope.editForm.$setPristine(true);
-		resetValues();
+		initValues();
 	};
 	$scope.save = function() {
 		DiscountService.save($scope.discount).then(function() {
@@ -114,28 +119,31 @@ controller('DiscountEditCtrl', ['$scope', 'discount', 'DiscountService', '$locat
 }]).
 
 filter('filterProductIDNull', function() {
-	return function(list, productID) {
+	return function(list, prod) {
 		var result = [];
 		angular.forEach(list, function (item) {
-			if (item.productID == productID || item.productID === null) result.push(item);
+			if (item.productID == (prod||{}).productID || item.productID === null) result.push(item);
 		});
 		return result;
 	};
 }).
 
-factory('DiscountService', ['interface', function (interface) {
+factory('DiscountService', ['interface', '$q', function (interface, $q) {
 	var casheDiscounts = {};
 	var service = {
 		getList: function () {
-			var ret = [];
+			var ret = $q.defer();
 			if ( Object.keys(casheDiscounts).length > 0 ) {
-				for (var key in casheDiscounts) ret.push(casheDiscounts[key]);
+				var arr = [];
+				for (var key in casheDiscounts) arr.push(casheDiscounts[key]);
+				ret.resolve(arr);
+				ret = ret.promise; // funky way to return a promise
 			} else {
 				ret = interface.admin('getDiscountData').then(function (data) {
 					service.items = data.items;
 					service.products = data.products;
-					service.items.unshift({itemID:null, productID:null, name:'--- Select an Item ---'});
-					service.products.unshift({productID:null, name:'--- Select a Product ---'});
+					service.items.unshift(service.blankItem);
+					service.products.unshift(service.blankProd);
 
 					angular.forEach(data.discounts, function(discount) {
 						discount.amount = parseInt(discount.amount);
@@ -149,7 +157,7 @@ factory('DiscountService', ['interface', function (interface) {
 		getDiscount: function (discountID) {
 			if (discountID == 'new') {
 				return service.getList().then(function () { // load all
-					return {itemID:null,productID:null};
+					return service.blankDiscount;
 				});
 			} else {
 				return casheDiscounts[discountID] || service.getList().then(function () { // allways load all
@@ -174,7 +182,10 @@ factory('DiscountService', ['interface', function (interface) {
 			});
 		},
 		items: [],
-		products: []
+		products: [],
+		blankItem: {itemID:null, productID:null, name:'--- Select an Item ---'},
+		blankProd: {productID:null, name:'--- Select a Product ---'},
+		blankDiscount:{itemID:null, productID:null, productName:null, itemName:null}
 	};
 	return service;
 }]);
