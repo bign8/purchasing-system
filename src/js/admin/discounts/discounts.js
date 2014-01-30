@@ -147,9 +147,15 @@ factory('DiscountService', ['interface', function (interface) {
 			return ret;
 		},
 		getDiscount: function (discountID) {
-			return casheDiscounts[discountID] || service.getList().then(function () { // allways load all
-				return casheDiscounts[discountID];
-			});
+			if (discountID == 'new') {
+				return service.getList().then(function () { // load all
+					return {itemID:null,productID:null};
+				});
+			} else {
+				return casheDiscounts[discountID] || service.getList().then(function () { // allways load all
+					return casheDiscounts[discountID];
+				});
+			}
 		},
 		setActive: function (discount) {
 			return interface.admin('setDiscountActive', discount).then(function (res) {
