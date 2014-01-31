@@ -104,6 +104,7 @@ directive('notify', ['$timeout', '$sce', function($timeout, $sce) { // extending
 				$scope.message = false;
 			};
 			$scope.$watch('message', function(val) {
+				if (!val) return;
 				$timeout.cancel(timer);
 				$scope.cleanHTML =  $sce.trustAsHtml(val.msg);
 				if (val) timer = $timeout($scope.clearMessage, (val.delay || 15)*1000);

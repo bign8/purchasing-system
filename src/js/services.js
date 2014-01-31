@@ -403,7 +403,7 @@ factory('appStrings', function() {
 				msg:'Your account has successfully been created',
 				type:SUCCESS
 			},
-			duplicate: { // Duplicate email
+			dupEmail: { // Duplicate email
 				pre:'Duplicate Email!',
 				msg:'This email already has an account. Please click the login button and attempt a password reset.',
 				type:ERROR
@@ -417,6 +417,21 @@ factory('appStrings', function() {
 				pre:'Error!',
 				msg:'There was an unknown error creating your account. Please try again or contact Upstream Academy for help.',
 				type:ERROR
+			},
+			dupCode: { // duplicate membership
+				pre:'Duplicate Membership!',
+				msg:'Your firm already has membership in this group.',
+				type:Error
+			},
+			dneCode: { // membership does not exist
+				pre:'Does Not Exist!',
+				msg:'This firm code does not exist.',
+				type:Error
+			},
+			errCode: {
+				pre:'Error!',
+				msg:'There was an unknown error checking you group access code.  Please try again or contact UpstreamAcademy for help.',
+				type:Error
 			}
 		},
 		address: {

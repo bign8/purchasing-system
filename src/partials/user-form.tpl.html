@@ -7,69 +7,88 @@
 
 <form class="form-horizontal css-form" name="settings">
 	<div class="row">
-		<fieldset class="span6">
-			<legend>Firm Information</legend>
+		<div class="span6">
+			<fieldset>
+				<legend>Firm Information</legend>
 
-			<p class="ctr">Modify <strong>Current</strong> Firm Information</p>
+				<p class="ctr">Modify <strong>Current</strong> Firm Information</p>
 
-			<div class="well" style="padding: 20px 0 1px;">
+				<div class="well" style="padding: 20px 0 1px;">
 
-				<div class="control-group">
-					<label class="control-label" for="firmName">Firm Name</label>
-					<div class="controls">
-						<input type="text" id="firmName" ng-model="user.firm.name" placeholder="Firm Name" required>
-					</div>
-				</div>
-
-				<div class="control-group">
-					<label class="control-label" for="firmWeb">Firm Website</label>
-					<div class="controls">
-						<input type="url" id="firmWeb" ng-model="user.firm.website" placeholder="Firm Website" required>
-						<span class="help-inline">http://www.UpstreamAcademy.com/</span>
-					</div>
-				</div>
-
-				<div class="control-group">
-					<label class="control-label" for="firmName">Firm Address</label>
-					<div class="controls">
-						<div class="input-append" ng-switch="user.firm.addr.addressID">
-
-							<div ng-switch-when="undefined">
-								<span class="input-medium uneditable-input">Click 'set' to assign</span>
-								<button type="button" class="btn btn-info" ng-click="setAddr('firm')">Set</button>
-							</div>
-
-							<div ng-switch-default>
-								<span class="input-medium uneditable-input">{{user.firm.addr.addrName}}</span>
-								<button type="button" class="btn btn-warning" ng-click="setAddr('firm')">Edit</button>
-							</div>
-
+					<div class="control-group">
+						<label class="control-label" for="firmName">Firm Name</label>
+						<div class="controls">
+							<input type="text" id="firmName" ng-model="user.firm.name" placeholder="Firm Name" required>
 						</div>
 					</div>
+
+					<div class="control-group">
+						<label class="control-label" for="firmWeb">Firm Website</label>
+						<div class="controls">
+							<input type="url" id="firmWeb" ng-model="user.firm.website" placeholder="Firm Website" required>
+							<span class="help-inline">http://www.UpstreamAcademy.com/</span>
+						</div>
+					</div>
+
+					<div class="control-group">
+						<label class="control-label" for="firmName">Firm Address</label>
+						<div class="controls">
+							<div class="input-append" ng-switch="user.firm.addr.addressID">
+
+								<div ng-switch-when="undefined">
+									<span class="input-medium uneditable-input">Click 'set' to assign</span>
+									<button type="button" class="btn btn-info" ng-click="setAddr('firm')">Set</button>
+								</div>
+
+								<div ng-switch-default>
+									<span class="input-medium uneditable-input">{{user.firm.addr.addrName}}</span>
+									<button type="button" class="btn btn-warning" ng-click="setAddr('firm')">Edit</button>
+								</div>
+
+							</div>
+						</div>
+					</div>
+
 				</div>
 
-			</div>
+				<p class="ctr"><strong>Find</strong> or <strong>Create</strong> your new firm</p>
 
-			<p class="ctr"><strong>Find</strong> or <strong>Create</strong> your new firm</p>
+				<div class="control-group well">
 
-			<div class="control-group well">
+					<div class="well-overlay" ng-hide="enableFirm">
+						<button type="button" class="btn btn-warning well-clear-btn btn-large" ng-click="modifyFirm()">Change Firm</button>
+					</div>
 
-				<div class="well-overlay" ng-hide="enableFirm">
-					<button type="button" class="btn btn-warning well-clear-btn btn-large" ng-click="modifyFirm()">Change Firm</button>
+					<label class="control-label" for="firmFind">Type your Firm Name</label>
+					<div class="controls">
+						<input type="text" id="firmFind" ng-model="firmNew" typeahead="firm as firm.name for firm in firms | filter:{name:$viewValue} | limitTo:8" placeholder="Firm Search" typeahead-template-url="registerFirmTypeAheadTPL.html" typeahead-on-select="selectFirm()">
+						&nbsp;&nbsp;
+						<button type="button" class="btn btn-info" ng-click="newFirm()">Create Firm</button>
+					</div>
+				</div>
+				<!-- <pre>Model: {{user.firm | json}}</pre> -->
+			</fieldset>
+
+			<fieldset>
+				<legend>Add a Firm Membership</legend>
+
+				<div class="input-append input-block-level" style="padding-right:50px;">
+					<input type="text" name="firmCode" class="input-block-level" ng-model="firmCode" placeholder="Firm Access Code">
+					<button type="submit" class="btn btn-success" ng-click="addFirmCode()" ng-disabled="(firmCode.length || 0) < 3">Add</button>
 				</div>
 
-				<label class="control-label" for="firmFind">Type your Firm Name</label>
-				<div class="controls">
-					<input type="text" id="firmFind" ng-model="firmNew" typeahead="firm as firm.name for firm in firms | filter:{name:$viewValue} | limitTo:8" placeholder="Firm Search" typeahead-template-url="registerFirmTypeAheadTPL.html" typeahead-on-select="selectFirm()">
-					&nbsp;&nbsp;
-					<button type="button" class="btn btn-info" ng-click="newFirm()">Create Firm</button>
-				</div>
-			</div>
+				<table class="table table-striped" style="margin:0" ng-show="groups.length > 0">
+					<thead><tr><th>Current Memberships</th></tr></thead>
+					<tbody>
+						<tr ng-repeat="group in groups">
+							<td>{{group.name}}</td>
+						</tr>
+					</tbody>
+				</table>
 
-			<notify message="message"></notify>
-			
-			<!-- <pre>Model: {{user.firm | json}}</pre> -->
-		</fieldset>
+				<notify message="message"></notify>
+			</fieldset>
+		</div>
 
 		<fieldset class="span6">
 			<legend>User Information</legend>
@@ -177,4 +196,4 @@
 
 </form>
 
-<pre>{{user | json}}</pre>
+<!-- <pre>{{user | json}}</pre> -->
