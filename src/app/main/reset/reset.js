@@ -1,7 +1,4 @@
-angular.module('myApp.main.reset', [
-	// 'myApp.services',
-	// 'security'
-]).
+angular.module('myApp.main.reset', []).
 
 config(['$routeProvider', function( $routeProvider ){
 	$routeProvider.when('/reset/:hash', {

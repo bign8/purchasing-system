@@ -184,7 +184,7 @@ controller('ContactModalCtrl', ['$scope', '$modalInstance', 'contact', 'prep', '
 	};
 	$scope.setAddr = function () { // open modal here with address form
 		var modalInstance = $modal.open({ // modal insterts into db and returns full object
-			templateUrl: 'partials/modal-address.tpl.html',
+			templateUrl: 'common/modal/address/modal-address.tpl.html',
 			controller: 'ModalAddressCtrl',
 			resolve: { address: function() { return angular.copy( $scope.contact.addr ); } }
 		});

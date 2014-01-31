@@ -1,5 +1,5 @@
 angular.module('myApp.admin.discounts', [
-	'myApp.services',
+	'myApp.common.services',
 	'ui.bootstrap'
 ]).
 
