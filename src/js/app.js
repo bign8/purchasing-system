@@ -18,17 +18,6 @@ config(['$routeProvider', 'securityAuthorizationProvider', '$locationProvider', 
 	$locationProvider.html5Mode(true).hashPrefix('!');
 
 	$routeProvider.
-		when('/register', {
-			title: 'Registration',
-			subTitle: 'Form',
-			templateUrl: 'partials/register-form.tpl.html',
-			controller: 'RegisterFormCtrl',
-			resolve: {
-				firms: ['interface', function (interface) {
-					return interface.user('listFirms');
-				}]
-			}
-		}).
 		when('/', { // Home
 			title: "Upstream Academy",
 			subTitle: "Guiding accounting firms to high performance",
