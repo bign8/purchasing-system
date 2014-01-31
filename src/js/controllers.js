@@ -251,10 +251,6 @@ controller('CartCtrl', ['$scope', '$modal', 'interface', '$location', 'theCart',
 	};
 }]).
 
-controller('ReciptCtrl', ['$scope', function ($scope) {
-	$scope.recipt = JSON.parse(localStorage.getItem('UA-recipt'));
-}]).
-
 controller('HeadCtrl', ['$scope', 'myPage', 'breadcrumbs', 'theCart', 'security', function ($scope, myPage, breadcrumbs, theCart, security) {
 	$scope.myPage = myPage;
 	$scope.breadcrumbs = breadcrumbs;
