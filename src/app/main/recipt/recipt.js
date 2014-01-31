@@ -6,7 +6,7 @@ config(['$routeProvider', 'securityAuthorizationProvider', function( $routeProvi
 	$routeProvider.when('/recipt', {
 		title: "Recipt",
 		subTitle: "from last purchase",
-		templateUrl: 'js/main/recipt/recipt.tpl.html',
+		templateUrl: 'app/main/recipt/recipt.tpl.html',
 		controller: 'ReciptCtrl',
 		resolve: {
 			user: securityAuthorizationProvider.requireAuthenticatedUser

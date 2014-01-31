@@ -21,7 +21,7 @@ factory('security', ['$http', '$q', '$location', 'securityRetryQueue', '$modal',
 			throw new Error('Trying to open a dialog that is already open!');
 		}
 		loginModal = $modal.open({
-			templateUrl: 'js/security/login/form.tpl.html',
+			templateUrl: 'app/security/login/form.tpl.html',
 			controller: 'LoginFormController',
 			backdrop: 'static'
 		});

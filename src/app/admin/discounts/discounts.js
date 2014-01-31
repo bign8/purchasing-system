@@ -6,7 +6,7 @@ angular.module('myApp.admin.discounts', [
 config(['$routeProvider', 'securityAuthorizationProvider', function ($routeProvider, securityAuthorizationProvider) {
 	$routeProvider.when('/admin/discounts', {
 		title: 'Manage Discounts',
-		templateUrl: 'js/admin/discounts/list.tpl.html',
+		templateUrl: 'app/admin/discounts/list.tpl.html',
 		controller: 'DiscountListCtrl',
 		resolve: {
 			user: securityAuthorizationProvider.requireAdminUser,
@@ -16,7 +16,7 @@ config(['$routeProvider', 'securityAuthorizationProvider', function ($routeProvi
 		}
 	}).when('/admin/discounts/:discountID', {
 		title: 'Edit discount',
-		templateUrl: 'js/admin/discounts/edit.tpl.html',
+		templateUrl: 'app/admin/discounts/edit.tpl.html',
 		controller: 'DiscountEditCtrl',
 		resolve: {
 			user: securityAuthorizationProvider.requireAdminUser,

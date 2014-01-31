@@ -5,20 +5,6 @@ angular.module('myApp.controllers', [
 	'ui.bootstrap'
 ]).
 
-controller('IndexCtrl', ['$scope', 'theCart', 'security', function ($scope, theCart, security) {
-	$scope.$watch(function() {return security.currentUser;}, function() {
-		if (security.currentUser !== null) security.redirect('/cart');
-	}, true);
-	$scope.theCart = theCart;
-}]).
-
-controller('HeadCtrl', ['$scope', 'myPage', 'breadcrumbs', 'theCart', 'security', function ($scope, myPage, breadcrumbs, theCart, security) {
-	$scope.myPage = myPage;
-	$scope.breadcrumbs = breadcrumbs;
-	$scope.theCart = theCart;
-	$scope.security = security;
-}]).
-
 controller('ModalAddressCtrl', ['$scope', '$modalInstance', 'address', 'interface', 'appStrings', function ($scope, $modalInstance, address, interface, appStrings){
 	$scope.address = address || {addressID:null, addr2: null};
 	$scope.ok = function() {

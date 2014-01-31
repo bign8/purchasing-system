@@ -6,7 +6,7 @@ angular.module('myApp.main.reset', [
 config(['$routeProvider', function( $routeProvider ){
 	$routeProvider.when('/reset/:hash', {
 		title: 'Reset Password',
-		templateUrl: 'js/main/reset/index.tpl.html',
+		templateUrl: 'app/main/reset/index.tpl.html',
 		controller: 'ResetPassCtrl',
 		resolve: {
 			check: ['interface', '$route', function (interface, $route) {
