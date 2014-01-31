@@ -111,27 +111,4 @@ directive('notify', ['$timeout', '$sce', function($timeout, $sce) { // extending
 			});
 		}
 	};
-}]).
-
-directive('uaMagicFormatter', ['$filter', function($filter) {
-	var formatters = {
-		currency: function(val) {
-			var decimal = val.split('.')[1];
-			decimal = (decimal === undefined) ? "" : ("." + decimal.substr(0,2)); // decimal formatting
-			val = parseInt(val.replace(/[^\d\.]/g,'')); // convert to number
-			val = $filter('currency')(val, '$'); // format directly
-			val = val.substring(0, val.length-3); // remove decimals
-			return val + decimal;
-		}
-	};
-	return {
-		restrict: 'A',
-		require: '?ngModel',
-		link: function(scope, element, attrs, ctrl) {
-			ctrl.$parsers.unshift(function(val) {
-				val = formatters[ attrs.uaMagicFormatter ]( val );
-				return element.val( val ).val();
-			});
-		}
-	};
 }]);

@@ -14,7 +14,7 @@ angular.module('myApp', [
 	'myApp.main' // to split things up
 ]).
 
-config(['$routeProvider', 'securityAuthorizationProvider', '$locationProvider', function( $routeProvider, securityAuthorizationProvider, $locationProvider ){
+config(['$routeProvider', '$locationProvider', function ( $routeProvider, $locationProvider ){
 	$locationProvider.html5Mode(true).hashPrefix('!');
 
 	$routeProvider.
