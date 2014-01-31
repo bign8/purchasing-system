@@ -29,10 +29,10 @@ CREATE TABLE `attendee` (
   KEY `contactID` (`contactID`),
   KEY `additionalID` (`additionalID`),
   KEY `orderID` (`orderID`),
-  CONSTRAINT `fk_orderID` FOREIGN KEY (`orderID`) REFERENCES `order` (`orderID`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `attendee_ibfk_1` FOREIGN KEY (`itemID`) REFERENCES `item` (`itemID`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `attendee_ibfk_2` FOREIGN KEY (`contactID`) REFERENCES `contact` (`contactID`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `attendee_ibfk_3` FOREIGN KEY (`additionalID`) REFERENCES `contact` (`contactID`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `attendee_ibfk_3` FOREIGN KEY (`additionalID`) REFERENCES `contact` (`contactID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_orderID` FOREIGN KEY (`orderID`) REFERENCES `order` (`orderID`) ON DELETE CASCADE ON UPDATE CASCADE
 );
 --
 -- Table structure for table `contact`

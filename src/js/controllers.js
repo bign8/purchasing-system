@@ -402,11 +402,11 @@ controller('ResetPassCtrl', ['$scope', 'check', 'security', '$route', 'appString
 	};
 }]).
 
-controller('UserFormCtrl', ['$scope', 'myPage', '$modal', 'interface', 'security', 'user', 'firms', function ($scope, myPage, $modal, interface, security, user, firms) {
+controller('UserFormCtrl', ['$scope', 'myPage', '$modal', 'interface', 'security', 'user', 'firms', 'groups', function ($scope, myPage, $modal, interface, security, user, firms, groups) {
 	myPage.setTitle("Account Settings", "for " + user.legalName);
 	$scope.origUser = angular.copy( user );
 	$scope.firms = firms;
-	$scope.groups = [];
+	$scope.groups = groups;
 
 	var firstLoad = true, oldUserAddr = {addressID:undefined};
 	$scope.$watch('same', function(value) {

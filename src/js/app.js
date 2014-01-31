@@ -95,7 +95,7 @@ config(['$routeProvider', 'securityAuthorizationProvider', '$locationProvider', 
 			controller: 'ListPurchasesCtrl',
 			resolve: {
 				user: securityAuthorizationProvider.requireAuthenticatedUser,
-				items: ['interface', function(interface) {
+				items: ['interface', function (interface) {
 					return interface.cart('getPurchases');
 				}]
 			}
@@ -105,11 +105,14 @@ config(['$routeProvider', 'securityAuthorizationProvider', '$locationProvider', 
 			templateUrl: 'partials/user-form.tpl.html',
 			controller: 'UserFormCtrl',
 			resolve: {
-				firms: ['interface', function(interface) {
+				firms: ['interface', function (interface) {
 					return interface.user('listFirms');
 				}],
-				user: ['interface', function(interface) {
+				user: ['interface', function (interface) {
 					return interface.user('getFullUser');
+				}],
+				groups: ['interface', function (interface) {
+					return interface.user('getFirmMem');
 				}]
 			}
 		}).
