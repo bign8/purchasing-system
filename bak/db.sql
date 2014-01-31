@@ -233,4 +233,3 @@ CREATE TABLE `tie_product_field` (
   CONSTRAINT `tie_product_field_ibfk_1` FOREIGN KEY (`fieldID`) REFERENCES `field` (`fieldID`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `tie_product_field_ibfk_2` FOREIGN KEY (`productID`) REFERENCES `product` (`productID`) ON DELETE CASCADE ON UPDATE CASCADE
 );
--- Dump completed on 2014-01-31 11:36:44
