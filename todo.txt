@@ -65,4 +65,5 @@ Git Commands:
 - git commit --amend --no-edit
 - git config --global branch.autosetuprebase always
 - git push <remote> --tags OR git push <remote> --all
+- git rebase -i HEAD~x (where n is the number of commits you want to go back)
 - http://stackoverflow.com/a/5719854/3220865 (rename tags)
