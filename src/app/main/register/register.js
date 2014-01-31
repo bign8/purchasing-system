@@ -6,7 +6,7 @@ config(['$routeProvider', function ( $routeProvider ){
 	$routeProvider.when('/register', {
 		title: 'Registration',
 		subTitle: 'Form',
-		templateUrl: 'js/main/register/register.tpl.html',
+		templateUrl: 'app/main/register/register.tpl.html',
 		controller: 'RegisterFormCtrl',
 		resolve: {
 			firms: ['interface', function (interface) {

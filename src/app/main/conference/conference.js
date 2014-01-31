@@ -5,7 +5,7 @@ angular.module('myApp.main.conference', [
 config(['$routeProvider', 'securityAuthorizationProvider', function ( $routeProvider, securityAuthorizationProvider ){
 	$routeProvider.when('/conference/:itemID', {
 		title: 'Register',
-		templateUrl: 'js/main/conference/conference.tpl.html',
+		templateUrl: 'app/main/conference/conference.tpl.html',
 		controller: 'RegisterConferenceCtrl',
 		resolve: {
 			conference: ['interface', '$route', function (interface, $route) {
@@ -61,7 +61,7 @@ controller('RegisterConferenceCtrl', ['$scope', 'myPage', 'interface', 'conferen
 	$scope.edit = function(contact) {
 		var o = $scope.con.options[ $scope.attID ],
 		modalInstance = $modal.open({
-			templateUrl: 'js/main/conference/modal-contact.tpl.html',
+			templateUrl: 'app/main/conference/modal-contact.tpl.html',
 			controller: 'ContactModalCtrl',
 			resolve: {
 				contact: function() { return angular.copy( contact ); },

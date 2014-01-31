@@ -5,7 +5,7 @@ angular.module('myApp.main.user', [
 config(['$routeProvider', function ( $routeProvider ){
 	$routeProvider.when('/user', {
 		title: "Account Settings",
-		templateUrl: 'js/main/user/user.tpl.html',
+		templateUrl: 'app/main/user/user.tpl.html',
 		controller: 'UserCtrl',
 		resolve: {
 			firms: ['interface', function (interface) {

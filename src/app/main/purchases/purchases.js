@@ -5,7 +5,7 @@ angular.module('myApp.main.purchases', [
 config(['$routeProvider', 'securityAuthorizationProvider', function ($routeProvider, securityAuthorizationProvider){
 	$routeProvider.when('/purchases', {
 		title: "Previous Purchases",
-		templateUrl: 'js/main/purchases/purchases.tpl.html',
+		templateUrl: 'app/main/purchases/purchases.tpl.html',
 		controller: 'ListPurchasesCtrl',
 		resolve: {
 			user: securityAuthorizationProvider.requireAuthenticatedUser,
@@ -23,7 +23,7 @@ controller('ListPurchasesCtrl', ['$scope', 'items', '$modal', function ($scope, 
 	});
 	$scope.showAttendees = function( item ) {
 		$modal.open({
-			templateUrl: 'js/main/purchases/modal-list.tpl.html',
+			templateUrl: 'app/main/purchases/modal-list.tpl.html',
 			controller: 'ModalListAttendeesCtrl',
 			resolve: {
 				item: function() { return item; }

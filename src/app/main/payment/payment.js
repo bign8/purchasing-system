@@ -6,7 +6,7 @@ config(['$routeProvider', function( $routeProvider ){
 	$routeProvider.when('/payment', {
 		title: 'Custom Payment',
 		subTitle: 'form',
-		templateUrl: 'js/main/payment/payment.tpl.html',
+		templateUrl: 'app/main/payment/payment.tpl.html',
 		controller: 'CustomPaymentCtrl'
 	});
 }]).

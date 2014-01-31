@@ -16,20 +16,7 @@ angular.module('myApp', [
 
 config(['$routeProvider', '$locationProvider', function ( $routeProvider, $locationProvider ){
 	$locationProvider.html5Mode(true).hashPrefix('!');
-
-	$routeProvider.
-		when('/', { // Home
-			title: "Upstream Academy",
-			subTitle: "Guiding accounting firms to high performance",
-			templateUrl: 'partials/index.tpl.html',
-			controller: 'IndexCtrl',
-			resolve: {
-				fullCart: ['theCart', function (theCart) {
-					return theCart.load();
-				}]
-			}
-		}).
-		otherwise({ redirectTo: '/' });
+	$routeProvider.otherwise({ redirectTo: '/' });
 }]).
 
 run(['security', 'theCart', function(security, theCart) {
@@ -38,4 +25,11 @@ run(['security', 'theCart', function(security, theCart) {
 
   // prefetch cart if necessary
   theCart.load();
+}]).
+
+controller('HeadCtrl', ['$scope', 'myPage', 'breadcrumbs', 'theCart', 'security', function ($scope, myPage, breadcrumbs, theCart, security) {
+	$scope.myPage = myPage;
+	$scope.breadcrumbs = breadcrumbs;
+	$scope.theCart = theCart;
+	$scope.security = security;
 }]);

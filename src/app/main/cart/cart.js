@@ -6,7 +6,7 @@ config(['$routeProvider', 'securityAuthorizationProvider', function ( $routeProv
 	$routeProvider. when('/cart', {
 		title: "Shopping Cart",
 		subTitle: "Checkout",
-		templateUrl: 'js/main/cart/cart.tpl.html',
+		templateUrl: 'app/main/cart/cart.tpl.html',
 		controller: 'CartCtrl',
 		resolve: {
 			preLoad: ['theCart', function (theCart) {
