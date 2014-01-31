@@ -40,21 +40,6 @@ config(['$routeProvider', 'securityAuthorizationProvider', '$locationProvider', 
 				user: securityAuthorizationProvider.requireAuthenticatedUser
 			}
 		}).
-		when('/cart', { // list items in cart
-			title: "Shopping Cart",
-			subTitle: "Checkout",
-			templateUrl: 'partials/show-cart.tpl.html',
-			controller: 'CartCtrl',
-			resolve: {
-				preLoad: ['theCart', function (theCart) {
-					return theCart.load(); // won't use data, will pre-fetch data
-				}],
-				discounts: ['interface', function (interface) {
-					return interface.cart('getDiscount');
-				}],
-				user: securityAuthorizationProvider.requireAuthenticatedUser
-			}
-		}).
 		otherwise({ redirectTo: '/' });
 }]).
 
