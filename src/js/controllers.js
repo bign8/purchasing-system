@@ -402,7 +402,7 @@ controller('ResetPassCtrl', ['$scope', 'check', 'security', '$route', 'appString
 	};
 }]).
 
-controller('UserFormCtrl', ['$scope', 'myPage', '$modal', 'interface', 'security', 'user', 'firms', 'groups', function ($scope, myPage, $modal, interface, security, user, firms, groups) {
+controller('UserFormCtrl', ['$scope', 'myPage', '$modal', 'interface', 'security', 'user', 'firms', 'groups', 'appStrings', function ($scope, myPage, $modal, interface, security, user, firms, groups, appStrings) {
 	myPage.setTitle("Account Settings", "for " + user.legalName);
 	$scope.origUser = angular.copy( user );
 	$scope.firms = firms;
@@ -452,7 +452,7 @@ controller('UserFormCtrl', ['$scope', 'myPage', '$modal', 'interface', 'security
 			$scope.settings.$setPristine(true);
 		}, function (err) {
 			if (err == 'dup') {
-				$scope.message = appStrings.user.duplicate;
+				$scope.message = appStrings.user.dupEmail;
 			} else if (err == 'badPass') {
 				$socpe.message = appStrings.user.badPass;
 			} else {
@@ -480,11 +480,11 @@ controller('UserFormCtrl', ['$scope', 'myPage', '$modal', 'interface', 'security
 			$scope.groups.push(group);
 		}, function (res) {
 			if (res == 'dup') {
-				console.log('duplicate');
+				$scope.message = appStrings.user.dupCode;
 			} else if (res == 'dne') {
-				console.log('does not exist');
+				$scope.message = appStrings.user.dneCode;
 			} else {
-				console.log('error');
+				$scope.message = appStrings.user.errCode;
 			}
 		});
 		$scope.firmCode = '';
