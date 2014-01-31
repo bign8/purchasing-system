@@ -3,7 +3,7 @@ angular.module('security.service', [
 	'security.retryQueue', // Keeps track of failed requests that need to be retried once the user logs in
 	'security.login', // Contains the login form template and controller
 	'ui.bootstrap',
-	'myApp.services'
+	'myApp.common.services'
 ]).
 
 factory('security', ['$http', '$q', '$location', 'securityRetryQueue', '$modal', 'interface', function($http, $q, $location, queue, $modal, interface) {
@@ -21,7 +21,7 @@ factory('security', ['$http', '$q', '$location', 'securityRetryQueue', '$modal',
 			throw new Error('Trying to open a dialog that is already open!');
 		}
 		loginModal = $modal.open({
-			templateUrl: 'js/security/login/form.tpl.html',
+			templateUrl: 'app/security/login/form.tpl.html',
 			controller: 'LoginFormController',
 			backdrop: 'static'
 		});
