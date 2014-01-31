@@ -29,17 +29,6 @@ config(['$routeProvider', 'securityAuthorizationProvider', '$locationProvider', 
 				}]
 			}
 		}).
-		when('/register/:itemID', {
-			title: 'Register',
-			templateUrl: 'partials/register-conf.tpl.html',
-			controller: 'RegisterConFormCtrl',
-			resolve: {
-				conference: ['interface', '$route', function (interface, $route) {
-					return interface.cart('getOption', $route.current.params);
-				}],
-				user: securityAuthorizationProvider.requireAuthenticatedUser
-			}
-		}).
 		otherwise({ redirectTo: '/' });
 }]).
 
