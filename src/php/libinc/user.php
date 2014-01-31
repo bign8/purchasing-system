@@ -28,6 +28,7 @@ class User extends NG {
 			case 'reset':       $data = $obj->reset();       break;
 			case 'resetPass':   $data = $obj->resetPass();   break;
 			case 'updateUser':  $data = $obj->updateUser();  break;
+			case 'getFirmMem':  $data = $obj->getFirmMem();  break;
 
 			// DEV
 			case 'testAuth':  $data = $obj->testAuth();  break;
@@ -56,7 +57,7 @@ class User extends NG {
 	 * Example response
 	array(
 		'userID' => '1234',
-		'email' => 'nwoods@carroll.edu',
+		'email' => 'nwoods@azworld.com',
 		'firstName' => 'Nathan', // required for pretty print (login-toolbar directive)
 		'lastName' => 'Woods', // required for pretty print (login-toolbar directive)
 		'admin' => false // this field is required by angular
@@ -75,7 +76,7 @@ class User extends NG {
 		return 'hello administrator user';
 	}
 
-	// Worker(settings): adds firm membership to group
+	// Worker(settings/firmCode): adds firm membership to group
 	public function addFirmCode() {
 		$data = $this->getPostData();
 		$user = $this->requiresAuth();
@@ -90,6 +91,14 @@ class User extends NG {
 		$insSTH = $this->db->prepare("INSERT INTO `member` (firmID, groupID) VALUES (?, ?);"); // iff not add it
 		if (!$insSTH->execute( $user['firmID'], $group['groupID'] )) return $this->conflict();
 		return $group;
+	}
+
+	// Worker(settings/firmCode): returns firm membership data
+	public function getFirmMem() {
+		$user = $this->requiresAuth();
+		$memSTH = $this->db->prepare("SELECT g.* FROM `member` m LEFT JOIN `group` g ON m.groupID=g.groupID WHERE `firmID`=?;");
+		if (!$memSTH->execute( $user['firmID'] )) return $this->conflict();
+		return $memSTH->fetchAll( PDO::FETCH_ASSOC );
 	}
 
 	// Helper(security): ensures user is authenticated
