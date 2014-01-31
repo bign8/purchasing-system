@@ -55,22 +55,6 @@ config(['$routeProvider', 'securityAuthorizationProvider', '$locationProvider', 
 				user: securityAuthorizationProvider.requireAuthenticatedUser
 			}
 		}).
-		when('/user', {
-			title: "Account Settings",
-			templateUrl: 'partials/user-form.tpl.html',
-			controller: 'UserFormCtrl',
-			resolve: {
-				firms: ['interface', function (interface) {
-					return interface.user('listFirms');
-				}],
-				user: ['interface', function (interface) {
-					return interface.user('getFullUser');
-				}],
-				groups: ['interface', function (interface) {
-					return interface.user('getFirmMem');
-				}]
-			}
-		}).
 		otherwise({ redirectTo: '/' });
 }]).
 
