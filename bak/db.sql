@@ -29,10 +29,10 @@ CREATE TABLE `attendee` (
   KEY `contactID` (`contactID`),
   KEY `additionalID` (`additionalID`),
   KEY `orderID` (`orderID`),
-  CONSTRAINT `fk_orderID` FOREIGN KEY (`orderID`) REFERENCES `order` (`orderID`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `attendee_ibfk_1` FOREIGN KEY (`itemID`) REFERENCES `item` (`itemID`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `attendee_ibfk_2` FOREIGN KEY (`contactID`) REFERENCES `contact` (`contactID`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `attendee_ibfk_3` FOREIGN KEY (`additionalID`) REFERENCES `contact` (`contactID`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `attendee_ibfk_3` FOREIGN KEY (`additionalID`) REFERENCES `contact` (`contactID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_orderID` FOREIGN KEY (`orderID`) REFERENCES `order` (`orderID`) ON DELETE CASCADE ON UPDATE CASCADE
 );
 --
 -- Table structure for table `contact`
@@ -53,6 +53,7 @@ CREATE TABLE `contact` (
   `isAdmin` enum('yes','no') NOT NULL DEFAULT 'no',
   PRIMARY KEY (`contactID`),
   UNIQUE KEY `email` (`email`),
+  UNIQUE KEY `resetHash` (`resetHash`),
   KEY `firmID` (`firmID`),
   KEY `addressID` (`addressID`),
   CONSTRAINT `contact_ibfk_1` FOREIGN KEY (`firmID`) REFERENCES `firm` (`firmID`) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -105,7 +106,7 @@ CREATE TABLE `firm` (
 CREATE TABLE `group` (
   `groupID` int(10) unsigned NOT NULL,
   `name` varchar(100) NOT NULL,
-  `shortCode` varchar(20) DEFAULT NULL,
+  `shortCode` varchar(40) DEFAULT NULL,
   PRIMARY KEY (`groupID`)
 );
 --

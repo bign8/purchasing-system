@@ -9,26 +9,55 @@ class User extends NG {
 		if ( !isset($_SESSION['user']) ) $_SESSION['user'] = null; // assign empty user if applicable
 	}
 
+	public static function process( $action, &$pass, &$data ) {
+		$obj = new User();
+		switch ( $action ) {
+			case 'addAddress':  $data = $obj->addAddress();  break;
+			case 'addContact':  $data = $obj->addContact();  break;
+			case 'addUser':     $data = $obj->addUser();     break;
+			case 'checkReset':  $data = $obj->checkReset();  break;
+			case 'currentUser': $data = $obj->currentUser(); break;
+			case 'editAddress': $data = $obj->editAddress(); break;
+			case 'editContact': $data = $obj->editContact(); break;
+			case 'addFirmCode': $data = $obj->addFirmCode(); break;
+			case 'getFullUser': $data = $obj->getFullUser(); break;
+			case 'listFirms':   $data = $obj->listFirms();   break;
+			case 'login':       $data = $obj->login();       break;
+			case 'logout':      $data = $obj->logout();      break;
+			case 'prepAtten':   $data = $obj->prepAtten();   break;
+			case 'reset':       $data = $obj->reset();       break;
+			case 'resetPass':   $data = $obj->resetPass();   break;
+			case 'updateUser':  $data = $obj->updateUser();  break;
+			case 'getFirmMem':  $data = $obj->getFirmMem();  break;
+
+			// DEV
+			case 'testAuth':  $data = $obj->testAuth();  break;
+			case 'testAdmin': $data = $obj->testAdmin(); break;
+			default: $pass = false;
+		}
+	}
 
 	// Worker(security): Implements: returns database user object or null
 	protected function getUser( $data ) {
 		$user = NULL;
 		$STH = $this->db->prepare("SELECT * FROM `contact` WHERE `email`=? AND `pass`=ENCRYPT(?,?) LIMIT 1;");
 		if ( $STH->execute( $data->email, $data->password, config::encryptSTR ) && $STH->rowCount() > 0 ) {
-			$user = $STH->fetch( PDO::FETCH_ASSOC );
-			$user['admin'] = $user['isAdmin'] == 'yes';
-			unset( $user['pass'], $user['resetHash'], $user['resetExpires'], $user['isAdmin'] );
-
-			$updateSTH = $this->db->prepare( "UPDATE `contact` SET lastLogin=NOW() WHERE `contactID`=?;" );
+			$user = $this->cleanUser($STH->fetch( PDO::FETCH_ASSOC ));
+			$updateSTH = $this->db->prepare( "UPDATE `contact` SET lastLogin=NOW(), `resetHash`=NULL, `resetExpires`=NULL WHERE `contactID`=?;" );
 			$updateSTH->execute( $user['contactID'] );
 		}
+		return $user;
+	}
+	private function cleanUser( $user ) { // helper: getUser + resetPass
+		$user['admin'] = $user['isAdmin'] == 'yes';
+		unset( $user['pass'], $user['resetHash'], $user['resetExpires'], $user['isAdmin'] );
 		return $user;
 	}
 	/*
 	 * Example response
 	array(
 		'userID' => '1234',
-		'email' => 'nwoods@carroll.edu',
+		'email' => 'nwoods@azworld.com',
 		'firstName' => 'Nathan', // required for pretty print (login-toolbar directive)
 		'lastName' => 'Woods', // required for pretty print (login-toolbar directive)
 		'admin' => false // this field is required by angular
@@ -45,6 +74,31 @@ class User extends NG {
 	public function testAdmin() {
 		$this->requiresAdmin();
 		return 'hello administrator user';
+	}
+
+	// Worker(settings/firmCode): adds firm membership to group
+	public function addFirmCode() {
+		$data = $this->getPostData();
+		$user = $this->requiresAuth();
+		$existSTH = $this->db->prepare("SELECT * FROM `group` WHERE shortCode=?;"); // check code
+		if (!$existSTH->execute( $data->code ) || $existSTH->rowCount() < 1) return $this->conflict('dne');
+		$group = $existSTH->fetch( PDO::FETCH_ASSOC );
+
+		$checkSTH = $this->db->prepare("SELECT * FROM `member` WHERE firmID=? AND groupID=?;"); // do we have it?
+		$test = $checkSTH->execute( $user['firmID'], $group['groupID'] );
+		if (!$test || $checkSTH->rowCount() >= 1) return $this->conflict('dup');
+
+		$insSTH = $this->db->prepare("INSERT INTO `member` (firmID, groupID) VALUES (?, ?);"); // iff not add it
+		if (!$insSTH->execute( $user['firmID'], $group['groupID'] )) return $this->conflict();
+		return $group;
+	}
+
+	// Worker(settings/firmCode): returns firm membership data
+	public function getFirmMem() {
+		$user = $this->requiresAuth();
+		$memSTH = $this->db->prepare("SELECT g.* FROM `member` m LEFT JOIN `group` g ON m.groupID=g.groupID WHERE `firmID`=?;");
+		if (!$memSTH->execute( $user['firmID'] )) return $this->conflict();
+		return $memSTH->fetchAll( PDO::FETCH_ASSOC );
 	}
 
 	// Helper(security): ensures user is authenticated
@@ -81,6 +135,57 @@ class User extends NG {
 	// Worker(security): destroys a particular session
 	public function logout() {
 		$_SESSION['user'] = NULL;
+	}
+
+	// Worker(security): sends reset emails
+	public function reset() {
+		$data = $this->getPostData();
+		$getSTH = $this->db->prepare("SELECT *, SHA1(CONCAT(email, ?, NOW())) AS newHash FROM `contact` WHERE `email`=?;");
+		if (!$getSTH->execute( config::encryptSTR, $data->email ) || $getSTH->rowCount() < 1) return $this->conflict('no-email');
+		$user = $getSTH->fetch( PDO::FETCH_ASSOC );
+
+		$setSTH = $this->db->prepare("UPDATE `contact` SET `resetHash`=?, `resetExpires`=NOW() + INTERVAL 3 DAY WHERE `contactID`=?;");
+		if (!$setSTH->execute($user['newHash'], $user['contactID'] )) return $this->conflict();
+
+		$html = <<<HTML
+			<p>You requested that your payment.upstreamacademy.com account password be reset.  This notice tells you how to do exactly that.</p>
+			<p>
+				Please navigate to our 
+				<a href="http://payment.upstreamacademy.com/reset/{$user['newHash']}">password reset page</a> 
+				to assign yourself a new password.
+			</p>
+			<p>
+				If the above link does not work, try navigating to this address manually:
+				<b>http://payment.upstreamacademy.com/reset/{$user['newHash']}</b>
+			</p>
+			<p>
+				You have <b>3</b> days to reset your password, after which time, 
+				this address becomes invalid and you must restart the password reset process.
+			</p>
+HTML;
+		$mail = new UAMail();
+		if (!$mail->sendMsg('Password Reset Instructions (payment.upstreamacademy.com)', $html, $user['email'], $user['legalName'])) $this->conflict('mail');
+		return 'sent';
+	}
+
+	// Worker(reset): returns user object
+	public function checkReset() {
+		$data = $this->getPostData();
+		$STH = $this->db->prepare("SELECT * FROM `contact` WHERE `resetHash`=? AND `resetExpires` > NOW() LIMIT 0,1;");
+		if (!$STH->execute($data->hash)) return $this->conflict();
+		return $STH->rowCount();
+	}
+
+	// Worker(reset): updates password, and assigns user (logs in)
+	public function resetPass() {
+		$data = $this->getPostData();
+		$getSTH = $this->db->prepare("SELECT * FROM `contact` WHERE `resetHash`=? AND `resetExpires` > NOW() LIMIT 0,1;");
+		if (!$getSTH->execute($data->hash) || $getSTH->rowCount() < 1) return $this->conflict();
+		$user = $getSTH->fetch( PDO::FETCH_ASSOC );
+		$setSTH = $this->db->prepare("UPDATE `contact` SET `lastLogin`=NOW(),`pass`=ENCRYPT(?,?),`resetHash`=NULL,`resetExpires`=NULL WHERE `contactID`=?;");
+		if ( !$setSTH->execute( $data->password, config::encryptSTR, $user['contactID'] ) ) return $this->conflict();
+		$_SESSION['user'] = $this->cleanUser($user);
+		return $_SESSION['user'];
 	}
 
 	// Worker: list all firms in db
