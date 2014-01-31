@@ -9,19 +9,15 @@ angular.module('myApp', [
 	'security',
 	'myApp.services',
 	'myApp.directives',
-	'templates-main' // for html2js
+	'templates-main', // for html2js
+
+	'myApp.main' // to split things up
 ]).
 
 config(['$routeProvider', 'securityAuthorizationProvider', '$locationProvider', function( $routeProvider, securityAuthorizationProvider, $locationProvider ){
 	$locationProvider.html5Mode(true).hashPrefix('!');
 
 	$routeProvider.
-		when('/payment', {
-			title: 'Custom Payment',
-			subTitle: 'form',
-			templateUrl: 'partials/custom-payment-form.tpl.html',
-			controller: 'CustPayFormCtrl'
-		}).
 		when('/register', {
 			title: 'Registration',
 			subTitle: 'Form',
@@ -55,16 +51,6 @@ config(['$routeProvider', 'securityAuthorizationProvider', '$locationProvider', 
 				user: securityAuthorizationProvider.requireAuthenticatedUser
 			}
 		}).
-		when('/reset/:hash', {
-			title: 'Reset Password',
-			templateUrl: 'partials/reset-password.tpl.html',
-			controller: 'ResetPassCtrl',
-			resolve: {
-				check: ['interface', '$route', function (interface, $route) {
-					return interface.user('checkReset', $route.current.params);
-				}]
-			}
-		}).
 		when('/cart', { // list items in cart
 			title: "Shopping Cart",
 			subTitle: "Checkout",
@@ -78,26 +64,6 @@ config(['$routeProvider', 'securityAuthorizationProvider', '$locationProvider', 
 					return interface.cart('getDiscount');
 				}],
 				user: securityAuthorizationProvider.requireAuthenticatedUser
-			}
-		}).
-		when('/recipt', { // shows a recipt of items purchased for last order
-			title: "Recipt",
-			subTitle: "from last purchase",
-			templateUrl: 'partials/recipt-print.tpl.html',
-			controller: 'ReciptCtrl',
-			resolve: {
-				user: securityAuthorizationProvider.requireAuthenticatedUser
-			}
-		}).
-		when('/purchases', {
-			title: "Previous Purchases",
-			templateUrl: 'partials/list-purchases.tpl.html',
-			controller: 'ListPurchasesCtrl',
-			resolve: {
-				user: securityAuthorizationProvider.requireAuthenticatedUser,
-				items: ['interface', function (interface) {
-					return interface.cart('getPurchases');
-				}]
 			}
 		}).
 		when('/user', {
