@@ -66,9 +66,6 @@
 						<button type="button" class="btn btn-info" ng-click="newFirm()">Create Firm</button>
 					</div>
 				</div>
-
-				<notify message="message"></notify>
-				
 				<!-- <pre>Model: {{user.firm | json}}</pre> -->
 			</fieldset>
 
@@ -77,7 +74,7 @@
 
 				<div class="input-append input-block-level" style="padding-right:50px;">
 					<input type="text" name="firmCode" class="input-block-level" ng-model="firmCode" placeholder="Firm Access Code">
-					<button type="submit" class="btn btn-success" ng-click="addFirmCode()">Add</button>
+					<button type="submit" class="btn btn-success" ng-click="addFirmCode()" ng-disabled="(firmCode.length || 0) < 3">Add</button>
 				</div>
 
 				<table class="table table-striped" style="margin:0" ng-show="groups.length > 0">
@@ -88,6 +85,8 @@
 						</tr>
 					</tbody>
 				</table>
+
+				<notify message="message"></notify>
 			</fieldset>
 		</div>
 
