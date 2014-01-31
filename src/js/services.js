@@ -1,6 +1,4 @@
-angular.module('myApp.services', [
-
-]).
+angular.module('myApp.services', []).
 
 factory('myPage', ['$rootScope', '$sce', '$route', function( $rootScope, $sce, $route ){
 	$rootScope.pageTitle = "Upstream Academy Shop"; // for actual title - https://coderwall.com/p/vcfo4q
@@ -32,15 +30,17 @@ factory('breadcrumbs', ['$rootScope', '$location', 'interface', function ($rootS
 
 		// pretty crumb cash and calling function
 		function prettyCrumb(obj) {
-			var crumbCashe = JSON.parse(localStorage.getItem('crumbCashe') || "{}");
-			if (crumbCashe.hasOwnProperty(obj.path)) { // in in cashe
-				obj.name = crumbCashe[obj.path];
-			} else { // otherwise
-				interface.app('prettyCrumb', obj).then(function (label) {
-					crumbCashe[obj.path] = label; // assign cashe
-					breadcrumbs[obj.index].name = label; // assign value out
-					localStorage.setItem('crumbCashe', JSON.stringify(crumbCashe));
-				});
+			if (!$location.path().match(/\/(reset)\//)) {
+				var crumbCashe = JSON.parse(localStorage.getItem('crumbCashe') || "{}");
+				if (crumbCashe.hasOwnProperty(obj.path)) { // in in cashe
+					obj.name = crumbCashe[obj.path];
+				} else { // otherwise
+					interface.app('prettyCrumb', obj).then(function (label) {
+						crumbCashe[obj.path] = label; // assign cashe
+						breadcrumbs[obj.index].name = label; // assign value out
+						localStorage.setItem('crumbCashe', JSON.stringify(crumbCashe));
+					});
+				}
 			}
 			return obj.name;
 		}
@@ -61,7 +61,7 @@ factory('breadcrumbs', ['$rootScope', '$location', 'interface', function ($rootS
 					path: breadcrumbPath(i),
 					index: i, // used for prettyCrumb
 				};
-				if (!isNaN(parseInt(obj.name))) obj.name = prettyCrumb(obj); // make that ugly (numeric) crumb pretty
+				if ( obj.name.match(/^[0-9a-fA-F]+$/) ) obj.name = prettyCrumb(obj); // make that ugly (hex) crumb pretty
 				result.push(obj);
 			}
 		}
@@ -243,15 +243,19 @@ factory('interface', ['$http', '$q', '$rootScope', '$timeout', function ($http, 
 		},
 		app: function(myAction, myData) {
 			return cb('app', myAction, myData);
+		},
+		admin: function(myAction, myData) {
+			return cb('admin', myAction, myData);
 		}
 	};
 }]).
 
 factory('appStrings', function() {
-	var ERROR = 'error', SUCCESS = 'success';
+	var ERROR = 'error', SUCCESS = 'success', INFO = 'info';
 	return {
 		ERROR: ERROR,
 		SUCCESS: SUCCESS,
+		INFO: INFO,
 		paypal: { // Paypal (this is for the app)
 			url: 'https://payflowlink.paypal.com',
 			uri: { // used $.param()
@@ -298,18 +302,23 @@ factory('appStrings', function() {
 			},
 			prevPur: { // Previous Purchase (notify object)
 				pre: 'Previous Purchase',
-				msg: 'An item in your cart has already been purchased (shown in red).  Please remove it before continueing to checkout.',
+				msg: 'An item in your cart has already been purchased (shown in red).  Please remove it before continuing to checkout.',
 				type:ERROR, delay:20
 			},
 			chekOut: { // Checkout Complete (notify object)
 				pre: 'Checkout Complete',
-				msg: 'You will be redirected to either a) PayPal processing to handle your online payment or b) our recipt page with payment instructions',
+				msg: 'You will be redirected to your appropriate payment processing method',
 				type:SUCCESS, delay:20
 			},
 			negative: { // Negative Cart
 				pre: 'Negative Cart',
-				msg: 'You have provided informatinon in such a way that we are paying you.  Please contact us directly if we owe you money',
+				msg: 'You have provided information in such a way that we are paying you.  Please contact us directly if we owe you money',
 				type:ERROR, delay:20
+			},
+			warn: {
+				pre: 'Previously purchased items in cart',
+				msg: 'You will have to remove the items marked in <span style="color:red">RED</span> before you can checkout',
+				type:INFO, delay:60
 			}
 		},
 		contact: { // Modal address form (register/xx > add attendee > add employee)
@@ -394,7 +403,7 @@ factory('appStrings', function() {
 				msg:'Your account has successfully been created',
 				type:SUCCESS
 			},
-			duplicate: { // Duplicate email
+			dupEmail: { // Duplicate email
 				pre:'Duplicate Email!',
 				msg:'This email already has an account. Please click the login button and attempt a password reset.',
 				type:ERROR
@@ -408,12 +417,51 @@ factory('appStrings', function() {
 				pre:'Error!',
 				msg:'There was an unknown error creating your account. Please try again or contact Upstream Academy for help.',
 				type:ERROR
+			},
+			dupCode: { // duplicate membership
+				pre:'Duplicate Membership!',
+				msg:'Your firm already has membership in this group.',
+				type:Error
+			},
+			dneCode: { // membership does not exist
+				pre:'Does Not Exist!',
+				msg:'This firm code does not exist.',
+				type:Error
+			},
+			errCode: {
+				pre:'Error!',
+				msg:'There was an unknown error checking you group access code.  Please try again or contact UpstreamAcademy for help.',
+				type:Error
 			}
 		},
 		address: {
 			error: { // server error
 				pre:'Error!',
 				msg:'There was an unknown error creating your address.  Please try again or contact Upstream Academy for help.',
+				type:ERROR
+			}
+		},
+		reset: {
+			match: { // Passwords Match
+				pre:'Passwords do not match!',
+				msg:'Please try again.',
+				type:ERROR
+			},
+			error: { // some server error
+				pre:'Error!',
+				msg: 'There was an unknown error creating your address.  Please try again or contact Upstream Academy for help.',
+				type:ERROR
+			}
+		},
+		conference: {
+			attendee: { // Passwords Match
+				pre:'Whose coming?',
+				msg:'Please add at least one Attendee to the conference.',
+				type:ERROR
+			},
+			error: { // some server error
+				pre:'Error!',
+				msg: 'There was an unknown error saving your information.  Please try again or contact Upstream Academy for help.',
 				type:ERROR
 			}
 		}

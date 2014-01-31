@@ -16,4 +16,12 @@ class UAMail extends PHPMailer {
 		$this->AltBody = strip_tags($html);
 		return $this->send();
 	}
+
+	public function sendMsg($subject, $html, $to, $name = '') {
+		$this->addAddress($to, $name);
+		$this->Subject = $subject;
+		$this->Body    = $html;
+		$this->AltBody = strip_tags($html);
+		return $this->send();
+	}
 }

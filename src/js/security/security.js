@@ -94,6 +94,20 @@ factory('security', ['$http', '$q', '$location', 'securityRetryQueue', '$modal',
 			redirect('/register');
 		},
 
+		reset: function(email) {
+			var request = interface.user('reset', {email: email});
+			return request;
+		},
+
+		resetPass: function(hash, pass) {
+			var request = interface.user('resetPass', {hash: hash, password: pass});
+			request.then(function (user){
+				service.currentUser = user;
+				redirect('/');
+			});
+			return request;
+		},
+
 		// Ask the backend to see if a user is already authenticated - this may be from a previous session.
 		requestCurrentUser: function() {
 			return service.isAuthenticated() ? $q.when(service.currentUser) : service.forceCurrentUser();

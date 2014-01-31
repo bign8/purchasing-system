@@ -2,6 +2,7 @@
 
 angular.module('myApp', [
 	'ngRoute',
+	'myApp.admin',
 	'myApp.controllers',
 	'myApp.directives',
 	'myApp.filters',
@@ -48,10 +49,20 @@ config(['$routeProvider', 'securityAuthorizationProvider', '$locationProvider', 
 			templateUrl: 'partials/register-conf.tpl.html',
 			controller: 'RegisterConFormCtrl',
 			resolve: {
-				conference: ['interface', '$route', function(interface, $route) {
+				conference: ['interface', '$route', function (interface, $route) {
 					return interface.cart('getOption', $route.current.params);
 				}],
 				user: securityAuthorizationProvider.requireAuthenticatedUser
+			}
+		}).
+		when('/reset/:hash', {
+			title: 'Reset Password',
+			templateUrl: 'partials/reset-password.tpl.html',
+			controller: 'ResetPassCtrl',
+			resolve: {
+				check: ['interface', '$route', function (interface, $route) {
+					return interface.user('checkReset', $route.current.params);
+				}]
 			}
 		}).
 		when('/cart', { // list items in cart
@@ -84,7 +95,7 @@ config(['$routeProvider', 'securityAuthorizationProvider', '$locationProvider', 
 			controller: 'ListPurchasesCtrl',
 			resolve: {
 				user: securityAuthorizationProvider.requireAuthenticatedUser,
-				items: ['interface', function(interface) {
+				items: ['interface', function (interface) {
 					return interface.cart('getPurchases');
 				}]
 			}
@@ -94,21 +105,17 @@ config(['$routeProvider', 'securityAuthorizationProvider', '$locationProvider', 
 			templateUrl: 'partials/user-form.tpl.html',
 			controller: 'UserFormCtrl',
 			resolve: {
-				firms: ['interface', function(interface) {
+				firms: ['interface', function (interface) {
 					return interface.user('listFirms');
 				}],
-				user: ['interface', function(interface) {
+				user: ['interface', function (interface) {
 					return interface.user('getFullUser');
+				}],
+				groups: ['interface', function (interface) {
+					return interface.user('getFirmMem');
 				}]
 			}
 		}).
-
-		// // TODO: build administration section
-		// when('/admin', {
-		// 	resolve: {
-		// 		user: securityAuthorizationProvider.requireAdminUser
-		// 	}
-		// }).
 		otherwise({ redirectTo: '/' });
 }]).
 

@@ -19,13 +19,13 @@ switch ($_REQUEST['action']) {
 
 			echo json_encode(array(
 				'items' => sizeof($_SESSION['cart']),
-				'cart' => $_SESSION['cart']
+				'cart' => array_values($_SESSION['cart'])
 			));
 		}
 		break;
 	
 	case 'get':
-		echo json_encode($_SESSION['cart']);
+		echo json_encode(array_values($_SESSION['cart']));
 		break;
 
 	default: // TODO: remove after dev

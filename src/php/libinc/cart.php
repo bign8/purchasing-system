@@ -14,6 +14,32 @@ class Cart extends NG {
 		$this->usr = new User();
 	}
 
+	public static function process( $action, &$pass, &$data ) {
+		$obj = new Cart();
+		switch ( $action ) {
+			// Cart Functions
+			case 'get': $data = $obj->get(); break; // get entire cart
+			case 'rem': $data = $obj->rem(); break; // remove item from cart
+			case 'add': $data = $obj->add(); break; // add invoice to cart
+			case 'clr': $data = $obj->clr(); break; // clear cart
+
+			// Cart.Options Functions
+			case 'getOptions': $data = $obj->getOptions(); break; // get all options
+			case 'getOption':  $data = $obj->getOption();  break; // get conference form data
+			case 'setOption':  $data = $obj->setOption();  break; // get conference form data
+
+			// Cart.Discount Functions
+			case 'getDiscount': $data = $obj->getDiscount(); break; // get all discounts
+			case 'addDiscount': $data = $obj->addDiscount(); break; // add discounts
+			case 'remDiscount': $data = $obj->remDiscount(); break; // rem discounts
+
+			// Generic Functions
+			case 'save': $data = $obj->save(); break;
+			case 'getPurchases': $data = $obj->getPurchases(); break;
+			default: $pass = false;
+		}
+	}
+
 	// CART ACTIONS
 
 	// Worker(app): return cart with current prices
@@ -102,7 +128,7 @@ class Cart extends NG {
 		
 		// pull prices that match productID and group criteria
 		$questionMarks = trim(str_repeat("?,", sizeof($groups)),","); // build string of questionmarks based on sizeof($groups)
-		$costSTH = $this->db->prepare("SELECT o.`optionID`, `name`, `pretty`, `settings` FROM `price` p JOIN `option` o ON o.optionID = p.optionID WHERE productID=? AND groupID IN ($questionMarks);");
+		$costSTH = $this->db->prepare("SELECT o.*, g.name AS groupName FROM (SELECT o.`optionID`, `name`, `pretty`, `settings`, groupID FROM `price` p JOIN `option` o ON o.optionID = p.optionID WHERE productID=? AND groupID IN ($questionMarks)) o LEFT JOIN `group` g on o.groupID = g.groupID;");
 		array_unshift( $groups, $productID ); // put productID at the beginninng of the array
 		$costSTH->execute( $groups );
 		$costRows = $costSTH->fetchAll(PDO::FETCH_ASSOC);
@@ -129,7 +155,10 @@ class Cart extends NG {
 			}
 		}
 		$ret['text'] = $this->interpolate($leastRow['pretty'], $pretty);
-		if ($leastRow != $fullCostRow) $ret['full'] = (array)json_decode($fullCostRow['settings']);
+		if ($leastRow != $fullCostRow) {
+			$ret['full'] = (array)json_decode($fullCostRow['settings']);
+			$ret['reason'] = $leastRow['groupName'];
+		}
 		return $ret;
 	}
 	private function getRowCost( $row ) {

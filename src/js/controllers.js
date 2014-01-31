@@ -12,9 +12,10 @@ controller('IndexCtrl', ['$scope', 'theCart', 'security', function ($scope, theC
 	$scope.theCart = theCart;
 }]).
 
-controller('RegisterConFormCtrl', ['$scope', 'myPage', 'interface', 'conference', '$modal', 'theCart', function ($scope, myPage, interface, conference, $modal, theCart) {
+controller('RegisterConFormCtrl', ['$scope', 'myPage', 'interface', 'conference', '$modal', 'theCart', 'appStrings', function ($scope, myPage, interface, conference, $modal, theCart, appStrings) {
 	$scope.con = conference;
 	$scope.orig = angular.copy( $scope.con.options );
+	$scope.message = false;
 
 	var title = ($scope.con.item.template == 'conference') ? "Register" : "Options" ;
 	myPage.setTitle(title, "for " + $scope.con.item.name);
@@ -77,11 +78,11 @@ controller('RegisterConFormCtrl', ['$scope', 'myPage', 'interface', 'conference'
 	$scope.equal = function(x,y) { return angular.equals(x,y);};
 	$scope.reset = function() { $scope.con.options = angular.copy( $scope.orig ); };
 
-	$scope.save = function( invalid ) {
-		console.log(invalid);
-		if (invalid) return alert('Form is not valid\nPlease try again.');
-		if ($scope.attID && $scope.con.options[ $scope.attID ].length === 0) 
-			return alert('Please add at least one Attendee to the conference');
+	$scope.save = function() {
+		if ($scope.attID && $scope.con.options[ $scope.attID ].length === 0) {
+			$scope.message = appStrings.conference.attendee;
+			return;
+		}
 		interface.cart('setOption', $scope.con).then(function() {
 			theCart.setDirty();
 			$modal.open({
@@ -94,9 +95,8 @@ controller('RegisterConFormCtrl', ['$scope', 'myPage', 'interface', 'conference'
 				}]
 			});
 			$scope.orig = angular.copy( $scope.con.options );
-		}, function(obj) {
-			console.log(obj);
-			alert('Your save was unsuccessful.\nPlease try again or contact UpstreamAcademy for assistance.');
+		}, function() {
+			$scope.message = appStrings.conference.error;
 		});
 	};
 }]).
@@ -153,7 +153,6 @@ controller('ContactModalCtrl', ['$scope', '$modalInstance', 'contact', 'prep', '
 			$modalInstance.close( $scope.contact );
 		}, function (err) {
 			$scope.message = (err == 'dup') ? appStrings.contact.duplicate : appStrings.contact.error;
-			console.log(err);
 		});
 	};
 	$scope.setAddr = function () { // open modal here with address form
@@ -176,7 +175,16 @@ controller('CartCtrl', ['$scope', '$modal', 'interface', '$location', 'theCart',
 		interface.cart('getDiscount').then(function(res) {
 			$scope.discounts = res;
 		});
+		checkWarn();
 	});
+	var checkWarn = function() {
+		var found = false;
+		angular.forEach(theCart.get(), function(item) {
+			if (item.warn) found = true;
+		});
+		$scope.submitMsg = (found) ? appStrings.cart.warn : false ;
+	};
+	checkWarn();
 
 	$scope.total = function() { // Cart total calculation
 		return $scope.theCart.total() - $scope.discountTotal();
@@ -270,7 +278,7 @@ controller('ListPurchasesCtrl', ['$scope', 'items', '$modal', function ($scope, 
 	};
 }]).
 
-controller('ModalListAttendeesCtrl', ['$scope', '$modalInstance', 'item', function($scope, $modalInstance, item) {
+controller('ModalListAttendeesCtrl', ['$scope', '$modalInstance', 'item', function ($scope, $modalInstance, item) {
 	$scope.item = item;
 	$scope.ok = function () { $modalInstance.close('all good'); };
 	$scope.cancel = function () { $modalInstance.dismiss('cancel'); };
@@ -335,7 +343,6 @@ controller('RegisterFormCtrl', ['$scope', '$modal', 'interface', 'security', 'fi
 			window.history.back(); // go to last page!
 		}, function (err) {
 			$scope.message = (err=='dup') ? appStrings.register.duplicate : appStrings.register.failure ;
-			console.log(err);
 		});
 	};
 
@@ -376,10 +383,30 @@ controller('RegisterFormCtrl', ['$scope', '$modal', 'interface', 'security', 'fi
 	};
 }]).
 
-controller('UserFormCtrl', ['$scope', 'myPage', '$modal', 'interface', 'security', 'user', 'firms', function($scope, myPage, $modal, interface, security, user, firms) {
+controller('ResetPassCtrl', ['$scope', 'check', 'security', '$route', 'appStrings', function ($scope, check, security, $route, appStrings) {
+	$scope.check = check;
+	$scope.user = angular.copy( $route.current.params );
+	$scope.message = false;
+	$scope.processing = false;
+
+	$scope.changePass = function() {
+		$scope.processing = true;
+		if ($scope.user.passVerify != $scope.user.password) {
+			$scope.message = appStrings.reset.match;
+			return;
+		}
+		security.resetPass($scope.user.hash, $scope.user.password).catch(function() {
+			$scope.message = appStrings.reset.error;
+			processing = false;
+		});
+	};
+}]).
+
+controller('UserFormCtrl', ['$scope', 'myPage', '$modal', 'interface', 'security', 'user', 'firms', 'groups', 'appStrings', function ($scope, myPage, $modal, interface, security, user, firms, groups, appStrings) {
 	myPage.setTitle("Account Settings", "for " + user.legalName);
 	$scope.origUser = angular.copy( user );
 	$scope.firms = firms;
+	$scope.groups = groups;
 
 	var firstLoad = true, oldUserAddr = {addressID:undefined};
 	$scope.$watch('same', function(value) {
@@ -425,16 +452,16 @@ controller('UserFormCtrl', ['$scope', 'myPage', '$modal', 'interface', 'security
 			$scope.settings.$setPristine(true);
 		}, function (err) {
 			if (err == 'dup') {
-				$scope.message = appStrings.user.duplicate;
+				$scope.message = appStrings.user.dupEmail;
 			} else if (err == 'badPass') {
 				$socpe.message = appStrings.user.badPass;
 			} else {
 				$scope.message = appStrings.user.failure;
 			}
-			console.log(err);
 		});
 	};
 
+	$scope.check = function(a, b) { return angular.equals(a, b); };
 	$scope.modifyFirm = function() {
 		$scope.enableFirm = true;
 		$scope.firmNew = "";
@@ -447,9 +474,22 @@ controller('UserFormCtrl', ['$scope', 'myPage', '$modal', 'interface', 'security
 		$scope.user.firm = {};
 		$scope.enableFirm = false;
 	};
-	$scope.check = function(a, b) { return angular.equals(a, b); };
-
-	// handle set address clicks
+	$scope.addFirmCode = function () {
+		interface.user('addFirmCode', {code:$scope.firmCode}).then(function (group) {
+			console.log('success');
+			$scope.groups.push(group);
+		}, function (res) {
+			if (res == 'dup') {
+				$scope.message = appStrings.user.dupCode;
+			} else if (res == 'dne') {
+				$scope.message = appStrings.user.dneCode;
+			} else {
+				$scope.message = appStrings.user.errCode;
+			}
+		});
+		$scope.firmCode = '';
+		$scope.settings.firmCode.$setPristine();
+	};
 	$scope.setAddr = function (slug) {
 		var myAddress = (slug == 'firm') ? ($scope.user.firm || {}).addr : $scope.user.addr ;
 		
@@ -470,17 +510,15 @@ controller('UserFormCtrl', ['$scope', 'myPage', '$modal', 'interface', 'security
 	};
 }]).
 
-controller('ModalAddressCtrl', ['$scope', '$modalInstance', 'address', 'interface', 'appStrings', function($scope, $modalInstance, address, interface, appStrings){
+controller('ModalAddressCtrl', ['$scope', '$modalInstance', 'address', 'interface', 'appStrings', function ($scope, $modalInstance, address, interface, appStrings){
 	$scope.address = address || {addressID:null, addr2: null};
 	$scope.ok = function() {
 		// use interface to add/edit address in db
 		var fun = ($scope.address.addressID === null) ? 'add' : 'edit' ;
 		interface.user(fun + 'Address', $scope.address).then(function (res) {
-			console.log(res);
 			$scope.address.addressID = JSON.parse(res);
 			$modalInstance.close($scope.address);
-		}, function (err) {
-			console.log(err);
+		}, function() {
 			$scope.message = appStrings.address.error;
 		});
 	};
