@@ -77,7 +77,7 @@ controller('RegisterFormCtrl', ['$scope', '$modal', 'interface', 'security', 'fi
 		var myAddress = (slug == 'firm') ? ($scope.user.firm || {}).addr : $scope.user.addr ;
 		
 		var modalInstance = $modal.open({ // insterts into db and returns full object
-			templateUrl: 'partials/modal-address.tpl.html',
+			templateUrl: 'common/modal/address/modal-address.tpl.html',
 			controller: 'ModalAddressCtrl',
 			resolve: { address: function() { return angular.copy( myAddress ); } }
 		});

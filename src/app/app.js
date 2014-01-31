@@ -1,17 +1,11 @@
-// Initial application
-
 angular.module('myApp', [
-	'ngRoute',
-	'myApp.admin',
-	'myApp.controllers',
-	'myApp.directives',
-	'myApp.filters',
-	'security',
-	'myApp.services',
-	'myApp.directives',
+	'ngRoute',        // ng-route for in-page routing
+	'security',       // handles all authentication
 	'templates-main', // for html2js
-
-	'myApp.main' // to split things up
+	
+	'myApp.admin',    // administration section
+	'myApp.common',   // directives / filters / modal / services
+	'myApp.main',     // to split things up
 ]).
 
 config(['$routeProvider', '$locationProvider', function ( $routeProvider, $locationProvider ){
@@ -20,16 +14,13 @@ config(['$routeProvider', '$locationProvider', function ( $routeProvider, $locat
 }]).
 
 run(['security', 'theCart', function(security, theCart) {
-  // Get the current user when the application starts (in case they are still logged in from a previous session)
-  security.requestCurrentUser();
-
-  // prefetch cart if necessary
-  theCart.load();
+	security.requestCurrentUser();
+	theCart.load();
 }]).
 
-controller('HeadCtrl', ['$scope', 'myPage', 'breadcrumbs', 'theCart', 'security', function ($scope, myPage, breadcrumbs, theCart, security) {
-	$scope.myPage = myPage;
+controller('HeadCtrl', ['$scope', 'breadcrumbs', 'myPage', 'security', 'theCart', function ($scope, breadcrumbs, myPage, security, theCart) {
 	$scope.breadcrumbs = breadcrumbs;
-	$scope.theCart = theCart;
+	$scope.myPage = myPage;
 	$scope.security = security;
+	$scope.theCart = theCart;
 }]);

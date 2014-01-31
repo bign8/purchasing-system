@@ -1,5 +1,5 @@
 angular.module('myApp.main.purchases', [
-	'myApp.services'
+	'myApp.common.services'
 ]).
 
 config(['$routeProvider', 'securityAuthorizationProvider', function ($routeProvider, securityAuthorizationProvider){

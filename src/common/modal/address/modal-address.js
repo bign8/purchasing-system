@@ -1,8 +1,5 @@
-// This file contains a few controllers
-
-angular.module('myApp.controllers', [
-	'myApp.services',
-	'ui.bootstrap'
+angular.module('myApp.common.modal.address', [
+	
 ]).
 
 controller('ModalAddressCtrl', ['$scope', '$modalInstance', 'address', 'interface', 'appStrings', function ($scope, $modalInstance, address, interface, appStrings){
