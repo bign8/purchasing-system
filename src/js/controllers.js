@@ -284,28 +284,6 @@ controller('ModalListAttendeesCtrl', ['$scope', '$modalInstance', 'item', functi
 	$scope.cancel = function () { $modalInstance.dismiss('cancel'); };
 }]).
 
-controller('CustPayFormCtrl', ['$scope', 'theCart', '$location', 'appStrings', function ($scope, theCart, $location, appStrings){
-	var orig = {
-		itemID: -1,
-		productID: -1,
-		name: appStrings.pay.customPayName,
-		template: 'custom',
-		img: null
-	};
-	$scope.item = angular.copy(orig);
-	$scope.add = function() {
-		var promise = theCart.add( $scope.item );
-		promise.then(function (res) {
-			if (res) {
-				$scope.message = appStrings.pay.success;
-				$scope.item = angular.copy(orig);
-			} else {
-				$scope.message = appStrings.pay.failure;
-			}
-		});
-	};
-}]).
-
 controller('RegisterFormCtrl', ['$scope', '$modal', 'interface', 'security', 'firms', 'appStrings', function ($scope, $modal, interface, security, firms, appStrings){
 
 	// find firm vs. register
