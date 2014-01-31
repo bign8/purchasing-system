@@ -4,4 +4,5 @@ angular.module('myApp.main', [
 	'myApp.main.recipt',
 	'myApp.main.purchases',
 	'myApp.main.register',
+	'myApp.main.user',
 ]);
