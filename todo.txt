@@ -1,3 +1,10 @@
+ToDo Major Process re-design:
+- Register with email already in system
+- photo upload
+- event open
+- hard-copy
+- change attendees
+
 ToDo: 
 - Account for all special cases
 	- hard-copy vs soft-copy price -> before and after purchases (MP + LS)
@@ -6,8 +13,6 @@ ToDo:
 	- MP (live + hard-copy or digital) (Note about CPE credit can be applied)
 	- MP-past (hard-copy or digital) (Note about CPE credit cannot be applied) - download not currently available
 - Allow pretty crumb to be set by individual pages (can bind to form elements for changing crumbs)
-- Group access codes
-- Hard-copy price
 - Notify users of un-supported browsers
 - photo upload field (doesn't store, just emails)
 - possible to add more attendees, not remove attendees
@@ -16,10 +21,14 @@ ToDo:
 - show if event is un-open or not available at current time (manual)
 - store referrer for redirects back to site
 
+Errors:
+- discount code is broken again
+
 ToDo Directives:
 - address setting
 - email checking (with server)
 - matching passwords
+- modify alert to allow multiple msgs at a time (push on change and pop on timeout)
 - modify alert to be able to support callback on close (from object)
 - password directive (set stopping errors)
 - phone validator (register/xx > add attendee > add employee)
@@ -27,6 +36,7 @@ ToDo Directives:
 ToDo Emails:
 - New firm registration
 - New registration
+- New Group Access Code
 
 In a holding pattern:
 - allow registration of email w/o login information (process)?
@@ -64,4 +74,5 @@ Git Commands:
 - git commit --amend --no-edit
 - git config --global branch.autosetuprebase always
 - git push <remote> --tags OR git push <remote> --all
+- git rebase -i HEAD~x (where n is the number of commits you want to go back)
 - http://stackoverflow.com/a/5719854/3220865 (rename tags)

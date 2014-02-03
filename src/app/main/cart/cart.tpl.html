@@ -1,0 +1,128 @@
+<div class="row">
+	<div class="offset0 span12" ng-switch="theCart.len()">
+
+		<div style="text-align:center" ng-switch-when="">
+			<a href="http://upstreamacademy.com/" class="btn btn-primary btn-lg" role="button">Cart is Empty - Go Shop!</a>
+		</div>
+
+		<div ng-switch-default>
+			<table class="table table-striped table-hover">
+				<thead>
+					<tr>
+						<th>Name</th>
+						<th>Description</th>
+						<th>Cost</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="item in theCart.get()" ng-class="{true:'error', false:''}[item.warn]">
+						<td ng-switch="!item.url">
+							<span ng-switch-when="true">{{item.name}}</span>
+							<a ng-switch-default ng-href="{{item.url}}">{{item.name}}</a>
+						</td>
+						<td>
+							<div ng-switch="item.cost.set" class="pull-right" ng-show="item.hasOptions">
+								<a href="/conference/{{item.itemID}}" ng-switch-when="false" class="btn btn-warning btn-mini">Set</a>
+								<a href="/conference/{{item.itemID}}" ng-switch-default class="btn btn-info btn-mini">Edit</a>
+							</div>
+							<span>{{item.description}}</span>
+						</td>
+						<td>
+							<span>{{item.cost.value | currency}}</span>
+							<span ng-show="item.cost.fullValue">&nbsp;&nbsp;
+								<del class="text-error">&nbsp;{{item.cost.fullValue | currency}}&nbsp;</del>&nbsp;
+								<span class="muted">{{item.cost.reason}} Pricing</span>
+							</span>
+							<a href ng-click="theCart.rem(item)" role="button" class="close">&times;</a>
+						</td>
+					</tr>
+				</tbody>
+				<tfoot>
+					<tr>
+						<th></th>
+						<th><span class="pull-right">Sub-Total:</span></th>
+						<th><span>{{theCart.total() | currency}}</span></th>
+					</tr>
+				</tfoot>
+			</table>
+
+			<div class="row-fluid"> <!-- discount + chekcout area -->
+
+				<div class="span6 well"> <!-- checkout + totals -->
+					<h4 style="margin-top:0">Checkout</h4>
+
+					<table class="table">
+						<tbody>
+							<tr>
+								<td><strong class="pull-right">Sub-Total:</strong></td>
+								<td>{{theCart.total() | currency}}</td>
+							</tr>
+							<tr>
+								<td><strong class="pull-right">Discounts:</strong></td>
+								<td>{{discountTotal() | currency}}</td>
+							</tr>
+							<tr>
+								<td><strong class="pull-right">Cart Total:</strong></td>
+								<td>{{total() | currency}}</td>
+							</tr>
+						</tbody>
+					</table>
+
+					<notify message="submitMsg"></notify>
+
+					<div class="fluid-row">
+						<button ng-click="saveCart('online')" class="btn btn-primary btn-lg span6" role="button">
+							via Credit Card 
+							<span class="badge">{{total() | currency}}</span>
+						</button>
+						<button ng-click="saveCart('check')" class="btn btn-lg span6" role="button">
+							via Check 
+							<span class="badge">{{total() | currency}}</span>
+						</button>
+					</div>
+				</div>
+
+				<div class="span6 well"> <!-- discounts -->
+					<h4 style="margin-top:0">Discounts</h4>
+
+					<form class="form-search" style="margin:0">
+						<div class="input-append input-block-level" style="padding-right:50px;">
+							<input type="text" id="code" class="search-query input-block-level" ng-model="discountCode" placeholder="Discount Code">
+							<button type="submit" class="btn btn-success" ng-click="addDiscount(discountCode);discountCode=''">Add</button>
+						</div>
+					</form>
+
+					<notify message="discountMsg" style="margin-top:20px;"></notify>
+
+					<table class="table table-striped table-hover" style="margin:0" ng-show="discounts.length > 0">
+						<thead>
+							<tr>
+								<th>Descripiton</th>
+								<th>Amount</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr ng-repeat="discount in discounts">
+								<td>{{discount.name}}</td>
+								<td>
+									{{discount.amount | currency}}
+									<a href ng-click="remDiscount(discount)" role="button" class="close">&times;</a>
+								</td>
+							</tr>
+						</tbody>
+						<tfoot>
+							<tr>
+								<th><span class="pull-right">Discount Total:</span></th>
+								<th>{{discountTotal() | currency}}</th>
+							</tr>
+						</tfoot>
+					</table>
+				</div>
+			</div>
+			
+			<!-- <pre>{{discounts | json}}</pre> -->
+			<!-- <pre>{{theCart.get() | json}}</pre> -->
+
+		</div>
+	</div>
+</div>
