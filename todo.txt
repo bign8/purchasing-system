@@ -21,9 +21,6 @@ ToDo:
 - show if event is un-open or not available at current time (manual)
 - store referrer for redirects back to site
 
-Errors:
-- discount code is broken again
-
 ToDo Directives:
 - address setting
 - email checking (with server)
