@@ -85,12 +85,32 @@ class User extends NG {
 		$group = $existSTH->fetch( PDO::FETCH_ASSOC );
 
 		$checkSTH = $this->db->prepare("SELECT * FROM `member` WHERE firmID=? AND groupID=?;"); // do we have it?
-		$test = $checkSTH->execute( $user['firmID'], $group['groupID'] );
-		if (!$test || $checkSTH->rowCount() >= 1) return $this->conflict('dup');
+		if (!$checkSTH->execute( $user['firmID'], $group['groupID'] ) || $checkSTH->rowCount() >= 1) return $this->conflict('dup');
 
 		$insSTH = $this->db->prepare("INSERT INTO `member` (firmID, groupID) VALUES (?, ?);"); // iff not add it
 		if (!$insSTH->execute( $user['firmID'], $group['groupID'] )) return $this->conflict();
+
+		$this->addFirmCodeEmail($group, $user);
 		return $group;
+	}
+	private function addFirmCodeEmail($group, $user) { // Helper: addFirmCode
+		$firmSTH = $this->db->prepare("SELECT * FROM `firm` WHERE `firmID`=?;");
+		$firmSTH->execute($user['firmID']);
+		$firm = $firmSTH->fetch( PDO::FETCH_ASSOC );
+
+		$html = <<<HTML
+			<p>The firm "{$firm['name']}" ({$firm['website']}) has been added to the group "{$group['name']}".</p>
+			<p>The above membership addition was made by the following person</p>
+			<table>
+				<tr><td>Name</td><td>{$user['legalName']}</td></tr>
+				<tr><td>Preferred</td><td>{$user['preName']}</td></tr>
+				<tr><td>Title</td><td>{$user['title']}</td></tr>
+				<tr><td>Email</td><td>{$user['email']}</td></tr>
+				<tr><td>Phone</td><td>{$user['phone']}</td></tr>
+			</table>
+HTML;
+		$mail = new UAMail();
+		if (!$mail->notify("UpstreamAcademy New Firm Notification", $html)) $this->conflict('mail');
 	}
 
 	// Worker(settings/firmCode): returns firm membership data
