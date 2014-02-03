@@ -100,7 +100,7 @@ controller('DiscountEditCtrl', ['$scope', 'discount', 'DiscountService', '$locat
 
 	$scope.$watch('discount.code', function (val) { // check for duplicate codes
 		var clean = true;
-		angular.forEach(DiscountService.getList(), function(thisDis) {
+		angular.forEach(DiscountService.theList(), function(thisDis) {
 			if (thisDis.code == val && thisDis.discountID != $scope.discount.discountID) clean = false;
 		});
 		$scope.editForm.code.$setValidity('duplicate', clean);
@@ -134,9 +134,7 @@ factory('DiscountService', ['interface', '$q', function (interface, $q) {
 		getList: function () {
 			var ret = $q.defer();
 			if ( Object.keys(casheDiscounts).length > 0 ) {
-				var arr = [];
-				for (var key in casheDiscounts) arr.push(casheDiscounts[key]);
-				ret.resolve(arr);
+				ret.resolve( service.theList() );
 				ret = ret.promise; // funky way to return a promise
 			} else {
 				ret = interface.admin('getDiscountData').then(function (data) {
@@ -153,6 +151,11 @@ factory('DiscountService', ['interface', '$q', function (interface, $q) {
 				});
 			}
 			return ret;
+		},
+		theList: function () {
+			var arr = [];
+			for (var key in casheDiscounts) arr.push(casheDiscounts[key]);
+			return arr;
 		},
 		getDiscount: function (discountID) {
 			if (discountID == 'new') {
