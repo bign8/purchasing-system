@@ -22,9 +22,7 @@ ToDo:
 - store referrer for redirects back to site
 
 Errors:
-- Footer feedback link is broken!
 - discount code is broken again
-- search firm broken
 
 ToDo Directives:
 - address setting
