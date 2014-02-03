@@ -333,9 +333,22 @@ HTML;
 		} else {
 			$this->newFirmEmail($firmID, $_SESSION['user']);
 		}
-
-		// TODO: email new registration
+		$this->newRegisterEail($_SESSION['user']);
 		return true;
+	}
+	private function newRegisterEail($user) { // helper: addUser
+		$html = <<<HTML
+			<p>The above user was just created</p>
+			<table>
+				<tr><td>Name</td><td>{$user['legalName']}</td></tr>
+				<tr><td>Preferred</td><td>{$user['preName']}</td></tr>
+				<tr><td>Title</td><td>{$user['title']}</td></tr>
+				<tr><td>Email</td><td>{$user['email']}</td></tr>
+				<tr><td>Phone</td><td>{$user['phone']}</td></tr>
+			</table>
+HTML;
+		$mail = new UAMail();
+		if (!$mail->notify("UpstreamAcademy New User Notification", $html)) $this->conflict('mail');
 	}
 
 	// Worker: returns full user object
@@ -406,7 +419,7 @@ HTML;
 		}
 		return 'check';
 	}
-	private function newFirmEmail($firmID, $user) { // helper: updateUser
+	private function newFirmEmail($firmID, $user) { // helper: updateUser + addUser
 		$firmSTH = $this->db->prepare("SELECT f.firmID, f.name, f.website, a.* FROM `firm` f JOIN `address` a ON f.addressID=a.addressID WHERE `firmID`=?;");
 		$firmSTH->execute($firmID);
 		$firm = $firmSTH = $firmSTH->fetch( PDO::FETCH_ASSOC );
@@ -432,7 +445,6 @@ HTML;
 				<tr><td>Email</td><td>{$user['email']}</td></tr>
 				<tr><td>Phone</td><td>{$user['phone']}</td></tr>
 			</table>
-
 HTML;
 		$mail = new UAMail();
 		if (!$mail->notify("UpstreamAcademy New Firm Notification", $html)) $this->conflict('mail');

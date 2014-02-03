@@ -31,7 +31,6 @@ ToDo Directives:
 - phone validator (register/xx > add attendee > add employee)
 
 ToDo Emails:
-- New registration
 - New Group Access Code
 
 In a holding pattern:
