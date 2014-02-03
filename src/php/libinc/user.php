@@ -85,12 +85,32 @@ class User extends NG {
 		$group = $existSTH->fetch( PDO::FETCH_ASSOC );
 
 		$checkSTH = $this->db->prepare("SELECT * FROM `member` WHERE firmID=? AND groupID=?;"); // do we have it?
-		$test = $checkSTH->execute( $user['firmID'], $group['groupID'] );
-		if (!$test || $checkSTH->rowCount() >= 1) return $this->conflict('dup');
+		if (!$checkSTH->execute( $user['firmID'], $group['groupID'] ) || $checkSTH->rowCount() >= 1) return $this->conflict('dup');
 
 		$insSTH = $this->db->prepare("INSERT INTO `member` (firmID, groupID) VALUES (?, ?);"); // iff not add it
 		if (!$insSTH->execute( $user['firmID'], $group['groupID'] )) return $this->conflict();
+
+		$this->addFirmCodeEmail($group, $user);
 		return $group;
+	}
+	private function addFirmCodeEmail($group, $user) { // Helper: addFirmCode
+		$firmSTH = $this->db->prepare("SELECT * FROM `firm` WHERE `firmID`=?;");
+		$firmSTH->execute($user['firmID']);
+		$firm = $firmSTH->fetch( PDO::FETCH_ASSOC );
+
+		$html = <<<HTML
+			<p>The firm "{$firm['name']}" ({$firm['website']}) has been added to the group "{$group['name']}".</p>
+			<p>The above membership addition was made by the following person</p>
+			<table>
+				<tr><td>Name</td><td>{$user['legalName']}</td></tr>
+				<tr><td>Preferred</td><td>{$user['preName']}</td></tr>
+				<tr><td>Title</td><td>{$user['title']}</td></tr>
+				<tr><td>Email</td><td>{$user['email']}</td></tr>
+				<tr><td>Phone</td><td>{$user['phone']}</td></tr>
+			</table>
+HTML;
+		$mail = new UAMail();
+		if (!$mail->notify("UpstreamAcademy New Firm Notification", $html)) $this->conflict('mail');
 	}
 
 	// Worker(settings/firmCode): returns firm membership data
@@ -331,11 +351,24 @@ HTML;
 		if ($editFirm) {
 			$this->modifyFirmEmail($firmID, $getFirmSTH, $_SESSION['user']); // send email
 		} else {
-			// TODO: email on new firms
+			$this->newFirmEmail($firmID, $_SESSION['user']);
 		}
-
-		// TODO: email new registration
+		$this->newRegisterEail($_SESSION['user']);
 		return true;
+	}
+	private function newRegisterEail($user) { // helper: addUser
+		$html = <<<HTML
+			<p>The above user was just created</p>
+			<table>
+				<tr><td>Name</td><td>{$user['legalName']}</td></tr>
+				<tr><td>Preferred</td><td>{$user['preName']}</td></tr>
+				<tr><td>Title</td><td>{$user['title']}</td></tr>
+				<tr><td>Email</td><td>{$user['email']}</td></tr>
+				<tr><td>Phone</td><td>{$user['phone']}</td></tr>
+			</table>
+HTML;
+		$mail = new UAMail();
+		if (!$mail->notify("UpstreamAcademy New User Notification", $html)) $this->conflict('mail');
 	}
 
 	// Worker: returns full user object
@@ -383,6 +416,8 @@ HTML;
 			$firmSTH = $this->db->prepare("INSERT INTO `firm` (addressID, name, website) VALUES (?,?,?);");
 			if (!$firmSTH->execute( $d->firm->addr->addressID, $d->firm->name, $d->firm->website )) return $this->conflict();
 			$firmID = $this->db->lastInsertId();
+
+			$this->newFirmEmail($firmID, $user);
 		}
 
 		// Update Contact
@@ -403,6 +438,36 @@ HTML;
 			$_SESSION['user'] = $newUser;
 		}
 		return 'check';
+	}
+	private function newFirmEmail($firmID, $user) { // helper: updateUser + addUser
+		$firmSTH = $this->db->prepare("SELECT f.firmID, f.name, f.website, a.* FROM `firm` f JOIN `address` a ON f.addressID=a.addressID WHERE `firmID`=?;");
+		$firmSTH->execute($firmID);
+		$firm = $firmSTH = $firmSTH->fetch( PDO::FETCH_ASSOC );
+
+		$html = <<<HTML
+			<p>The following firm has been created.</p>
+			<table>
+				<tr><th>Attribute</th><th>Value</th></tr>
+				<tr><td>Name</td><td>{$firm['name']}</td></tr>
+				<tr><td>Website</td><td>{$firm['website']}</td></tr>
+				<tr><td>Address Name</td><td>{$firm['addrName']}</td></tr>
+				<tr><td>Address 1</td><td>{$firm['addr1']}</td></tr>
+				<tr><td>Address 2</td><td>{$firm['addr2']}</td></tr>
+				<tr><td>City</td><td>{$firm['city']}</td></tr>
+				<tr><td>State</td><td>{$firm['state']}</td></tr>
+				<tr><td>Zip</td><td>{$firm['zip']}</td></tr>
+			</table>
+			<p>The above firm creation was made by the following person</p>
+			<table>
+				<tr><td>Name</td><td>{$user['legalName']}</td></tr>
+				<tr><td>Preferred</td><td>{$user['preName']}</td></tr>
+				<tr><td>Title</td><td>{$user['title']}</td></tr>
+				<tr><td>Email</td><td>{$user['email']}</td></tr>
+				<tr><td>Phone</td><td>{$user['phone']}</td></tr>
+			</table>
+HTML;
+		$mail = new UAMail();
+		if (!$mail->notify("UpstreamAcademy New Firm Notification", $html)) $this->conflict('mail');
 	}
 	private function modifyFirmEmail($firmID, $oldDataSTH, $user) { // Helper: updatUser + addUser
 		$newDataSTH = $this->db->prepare("SELECT f.firmID, f.name, f.website, a.* FROM `firm` f JOIN `address` a ON f.addressID=a.addressID WHERE `firmID`=?;");
