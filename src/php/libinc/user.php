@@ -19,6 +19,7 @@ class User extends NG {
 			case 'currentUser': $data = $obj->currentUser(); break;
 			case 'editAddress': $data = $obj->editAddress(); break;
 			case 'editContact': $data = $obj->editContact(); break;
+			case 'addFirmCode': $data = $obj->addFirmCode(); break;
 			case 'getFullUser': $data = $obj->getFullUser(); break;
 			case 'listFirms':   $data = $obj->listFirms();   break;
 			case 'login':       $data = $obj->login();       break;
@@ -27,6 +28,7 @@ class User extends NG {
 			case 'reset':       $data = $obj->reset();       break;
 			case 'resetPass':   $data = $obj->resetPass();   break;
 			case 'updateUser':  $data = $obj->updateUser();  break;
+			case 'getFirmMem':  $data = $obj->getFirmMem();  break;
 
 			// DEV
 			case 'testAuth':  $data = $obj->testAuth();  break;
@@ -55,7 +57,7 @@ class User extends NG {
 	 * Example response
 	array(
 		'userID' => '1234',
-		'email' => 'nwoods@carroll.edu',
+		'email' => 'nwoods@azworld.com',
 		'firstName' => 'Nathan', // required for pretty print (login-toolbar directive)
 		'lastName' => 'Woods', // required for pretty print (login-toolbar directive)
 		'admin' => false // this field is required by angular
@@ -72,6 +74,31 @@ class User extends NG {
 	public function testAdmin() {
 		$this->requiresAdmin();
 		return 'hello administrator user';
+	}
+
+	// Worker(settings/firmCode): adds firm membership to group
+	public function addFirmCode() {
+		$data = $this->getPostData();
+		$user = $this->requiresAuth();
+		$existSTH = $this->db->prepare("SELECT * FROM `group` WHERE shortCode=?;"); // check code
+		if (!$existSTH->execute( $data->code ) || $existSTH->rowCount() < 1) return $this->conflict('dne');
+		$group = $existSTH->fetch( PDO::FETCH_ASSOC );
+
+		$checkSTH = $this->db->prepare("SELECT * FROM `member` WHERE firmID=? AND groupID=?;"); // do we have it?
+		$test = $checkSTH->execute( $user['firmID'], $group['groupID'] );
+		if (!$test || $checkSTH->rowCount() >= 1) return $this->conflict('dup');
+
+		$insSTH = $this->db->prepare("INSERT INTO `member` (firmID, groupID) VALUES (?, ?);"); // iff not add it
+		if (!$insSTH->execute( $user['firmID'], $group['groupID'] )) return $this->conflict();
+		return $group;
+	}
+
+	// Worker(settings/firmCode): returns firm membership data
+	public function getFirmMem() {
+		$user = $this->requiresAuth();
+		$memSTH = $this->db->prepare("SELECT g.* FROM `member` m LEFT JOIN `group` g ON m.groupID=g.groupID WHERE `firmID`=?;");
+		if (!$memSTH->execute( $user['firmID'] )) return $this->conflict();
+		return $memSTH->fetchAll( PDO::FETCH_ASSOC );
 	}
 
 	// Helper(security): ensures user is authenticated
