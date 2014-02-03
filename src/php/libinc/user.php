@@ -14,12 +14,14 @@ class User extends NG {
 		switch ( $action ) {
 			case 'addAddress':  $data = $obj->addAddress();  break;
 			case 'addContact':  $data = $obj->addContact();  break;
+			case 'addFirmCode': $data = $obj->addFirmCode(); break;
 			case 'addUser':     $data = $obj->addUser();     break;
+			case 'checkEmail':  $data = $obj->checkEmail();  break;
 			case 'checkReset':  $data = $obj->checkReset();  break;
 			case 'currentUser': $data = $obj->currentUser(); break;
 			case 'editAddress': $data = $obj->editAddress(); break;
 			case 'editContact': $data = $obj->editContact(); break;
-			case 'addFirmCode': $data = $obj->addFirmCode(); break;
+			case 'getFirmMem':  $data = $obj->getFirmMem();  break;
 			case 'getFullUser': $data = $obj->getFullUser(); break;
 			case 'listFirms':   $data = $obj->listFirms();   break;
 			case 'login':       $data = $obj->login();       break;
@@ -28,7 +30,6 @@ class User extends NG {
 			case 'reset':       $data = $obj->reset();       break;
 			case 'resetPass':   $data = $obj->resetPass();   break;
 			case 'updateUser':  $data = $obj->updateUser();  break;
-			case 'getFirmMem':  $data = $obj->getFirmMem();  break;
 
 			// DEV
 			case 'testAuth':  $data = $obj->testAuth();  break;
@@ -157,7 +158,15 @@ HTML;
 		$_SESSION['user'] = NULL;
 	}
 
-	// Worker(security): sends reset emails
+	// Worker(register): sees if email is in use
+	public function checkEmail() {
+		$data = $this->getPostData();
+		$STH = $this->db->prepare("SELECT * FROM `contact` WHERE `email`=?;");
+		if ( !$STH->execute($data->email) || $STH->rowCount() > 0 ) return $this->conflict('dup');
+		return 'good';
+	}
+
+	// Worker(reset): sends reset emails
 	public function reset() {
 		$data = $this->getPostData();
 		$getSTH = $this->db->prepare("SELECT *, SHA1(CONCAT(email, ?, NOW())) AS newHash FROM `contact` WHERE `email`=?;");
