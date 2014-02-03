@@ -1,3 +1,10 @@
+ToDo Major Process re-design:
+- Register with email already in system
+- photo upload
+- event open
+- hard-copy
+- change attendees
+
 ToDo: 
 - Account for all special cases
 	- hard-copy vs soft-copy price -> before and after purchases (MP + LS)
@@ -6,7 +13,6 @@ ToDo:
 	- MP (live + hard-copy or digital) (Note about CPE credit can be applied)
 	- MP-past (hard-copy or digital) (Note about CPE credit cannot be applied) - download not currently available
 - Allow pretty crumb to be set by individual pages (can bind to form elements for changing crumbs)
-- Hard-copy price
 - Notify users of un-supported browsers
 - photo upload field (doesn't store, just emails)
 - possible to add more attendees, not remove attendees
@@ -14,6 +20,11 @@ ToDo:
 - reduce cart requests on app init
 - show if event is un-open or not available at current time (manual)
 - store referrer for redirects back to site
+
+Errors:
+- Footer feedback link is broken!
+- discount code is broken again
+- search firm broken
 
 ToDo Directives:
 - address setting
