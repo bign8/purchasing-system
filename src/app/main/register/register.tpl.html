@@ -7,6 +7,30 @@
 
 <form class="form-horizontal css-form" name="registration">
 	<div class="row">
+		<fieldset class="span6 offset3">
+			<legend>Please enter you email address</legend>
+
+			<div class="control-group">
+				<label class="control-label" for="email">Email Address</label>
+				<div class="controls">
+					<div class="input-append input-block-level">
+						<input class="" type="email" name="emailCheck" ng-model="user.email" placeholder="Email Address" required>
+						<button type="button" class="btn btn-success" ng-disabled="registration.emailCheck.$invalid">Check</button>
+					</div>
+				</div>
+			</div>
+		</fieldset>
+	</div>
+	<div class="row">
+		<fieldset class="span6 offset3">
+			<legend>An account for this email address already exists</legend>
+
+			<button type="button" class="btn btn-primary pull-right btn-mini">Password Reset</button>
+			<p>Please perform a password reset by clicking the link to the right.</p>
+		</fieldset>
+	</div>
+
+	<div class="row">
 		<fieldset class="span6">
 			<legend>Firm Information</legend>
 
@@ -108,7 +132,7 @@
 			<div class="control-group">
 				<label class="control-label" for="email">Email Address</label>
 				<div class="controls">
-					<input type="email" id="email" ng-model="user.email" placeholder="Email Address" required>
+					<span class="uneditable-input">{{user.email}}</span>
 				</div>
 			</div>
 
