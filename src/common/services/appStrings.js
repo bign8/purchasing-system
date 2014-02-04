@@ -130,6 +130,16 @@ factory('appStrings', function() {
 				pre:'Error!',
 				msg:'There was an unknown error creating your account.  Please try again or contact Upstream Academy for help.',
 				type:ERROR
+			},
+			resetGood: { // successful reset
+				pre:'Reset Complete',
+				msg:'You have been sent an email with instructions on resetting you password.',
+				type:SUCCESS
+			},
+			resetBad: { // un-successful reset
+				pre:'Reset Error',
+				msg:'There has been an error resetting your password.  Please try again soon',
+				type:ERROR
 			}
 		},
 		user: { // Account settings Form
