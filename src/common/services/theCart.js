@@ -1,6 +1,6 @@
 angular.module('myApp.common.services.theCart', []).
 
-factory('theCart', ['$rootScope', 'interface', 'security', '$q', function($rootScope, interface, security, $q) {
+factory('theCart', ['$rootScope', 'interface', 'security', '$q', function ($rootScope, interface, security, $q) {
 	var cart = [];
 	var options = {};
 	var dirty = true;
@@ -28,10 +28,9 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function($rootS
 				item.hasOptions = true;
 				break;
 			case 'download':
-				item.cost[setValue] = parseFloat(item.cost[attribute].cost); // straight assignment (no options)
-				break;
 			case 'custom':
-				item.cost[setValue] = item.cost[attribute].cost;// = { calc: item.cost, pretty: $filter('currency')(item.cost) }; // invoices
+			case 'group':
+				item.cost[setValue] = parseFloat(item.cost[attribute].cost) || 0; // straight assignment (no options)
 				break;
 			default:
 				item.cost = {};
@@ -42,12 +41,12 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function($rootS
 
 	var processCart = function() {
 		total = 0;
-		angular.forEach(cart, function(item) {
+		angular.forEach(cart, function (item) {
 			processItem(item, 'settings');
 			if (item.cost.hasOwnProperty('full')) processItem(item, 'full');
 			total += item.cost.value;
 		});
-		angular.forEach(observerCallbacks, function(callback) { // Notify observers
+		angular.forEach(observerCallbacks, function (callback) { // Notify observers
 			callback();
 		});
 	};
@@ -62,10 +61,10 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function($rootS
 	};
 
 	var reload = function() {
-		var cartPromise = interface.cart('get').then(function(res) { // get cart
+		var cartPromise = interface.cart('get').then(function (res) { // get cart
 			cart = res;
 		});
-		var optPromise = interface.cart('getOptions').then(function(res) { // get options
+		var optPromise = interface.cart('getOptions').then(function (res) { // get options
 			options = res;
 		});
 		return $q.all([cartPromise, optPromise]).then(function() { // wait for both to respond
