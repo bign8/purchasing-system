@@ -28,6 +28,13 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function ($root
 				item.hasOptions = true;
 				break;
 			case 'download':
+				if (item.cost.settings.hard) {
+					item.hasOptions = true;
+					item.cost[setValue] = parseFloat( options[ item.itemID ] ? item.cost[attribute].hard : item.cost[attribute].soft ) ;
+				} else {
+					item.cost[setValue] = parseFloat(item.cost[attribute].cost) || 0; // straight assignment (no options)
+				}
+				break;
 			case 'custom':
 			case 'group':
 				item.cost[setValue] = parseFloat(item.cost[attribute].cost) || 0; // straight assignment (no options)
@@ -105,6 +112,12 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function ($root
 		// },
 		setDirty: function() {
 			dirty = true;
+		},
+
+		setOption: function(itemID, opts) {
+			// TODO: mirror on server
+			options[itemID] = opts;
+			processCart();
 		},
 
 		// Observer pattern
