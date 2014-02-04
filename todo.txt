@@ -1,5 +1,4 @@
 ToDo Major Process re-design:
-- Register with email already in system
 - photo upload
 - event open
 - hard-copy
@@ -32,7 +31,6 @@ ToDo Directives:
 - phone validator (register/xx > add attendee > add employee)
 
 In a holding pattern:
-- allow registration of email w/o login information (process)?
 - build administration section (see if user end is accepted)
 	- Downloads
 	- Firms (merge)
@@ -44,6 +42,7 @@ In a holding pattern:
 - Explain setting up an account (your information, not person signing up for conference)
 
 Notes:
+- Acquisition is per user / purchase is per firm
 - Add conference type product -> Force insert into tie_product_field
 - Add price to new products
 - Admin can drop attendees
@@ -69,3 +68,11 @@ Git Commands:
 - git push <remote> --tags OR git push <remote> --all
 - git rebase -i HEAD~x (where n is the number of commits you want to go back)
 - http://stackoverflow.com/a/5719854/3220865 (rename tags)
+
+Clipboard:
+	https://dev.mysql.com/doc/refman/5.6/en/create-table-foreign-keys.html
+	ALTER TABLE acquisition
+	ADD FOREIGN KEY (orderID)
+	REFERENCES `order`(orderID)
+	ON DELETE CASCADE
+	ON UPDATE CASCADE

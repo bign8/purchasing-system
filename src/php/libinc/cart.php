@@ -46,7 +46,7 @@ class Cart extends NG {
 	public function get() {
 		$user = $this->usr->currentUser(); // gets user if available
 
-		$checkSTH = $this->db->prepare("SELECT purchaseID FROM `purchase` WHERE firmID=? and itemID=?;");
+		$checkSTH = $this->db->prepare("SELECT purchaseID FROM `purchase` WHERE firmID=? and itemID=? UNION SELECT acquisitionID FROM `acquisition` WHERE itemID=? UNION SELECT memberID FROM `member` WHERE firmID=? AND groupID=?");
 
 		// remove all non-strings to allow invoices, but still grab purchase id's
 		$cleanIDs = array();
@@ -74,7 +74,8 @@ class Cart extends NG {
 				if ($item != null) {
 
 					// warn if item has already been purchased
-					$checkSTH->execute( $user['firmID'], $itemID );
+					$groupID = isset($item['settings']->groupID) ? $item['settings']->groupID : -1;
+					$checkSTH->execute( $user['firmID'], $itemID, $itemID, $user['firmID'], $groupID );
 					$item['warn'] = ($checkSTH->rowCount() > 0);
 
 					array_push($retData, $item);
@@ -95,9 +96,7 @@ class Cart extends NG {
 		return $retData;
 	}
 	private function getItemByID( $itemID ) { // Helper(get): return specific item detail by id
-		$itemSTH = $this->db->prepare("SELECT i.*, t.template FROM (SELECT * FROM `item` WHERE itemID = ?) i JOIN product p ON p.productID=i.productID JOIN template t ON t.templateID = p.templateID;");
-		// $itemSTH = $this->db->prepare("SELECT i.*, t.template, COUNT(f.tiePFID) as `options` FROM (SELECT * FROM `item` WHERE itemID = ?) i JOIN product p ON p.productID=i.productID JOIN template t ON t.templateID = p.templateID LEFT JOIN `tie_product_field` f ON f.productID = i.productID GROUP BY i.itemID, i.productID, i.name, i.description, i.settings, i.img, i.blurb, t.template;");
-		// $itemSTH = $this->db->prepare("SELECT * FROM `item` WHERE itemID = ?;");
+		$itemSTH = $this->db->prepare("SELECT i.*, t.template, p.type FROM (SELECT * FROM `item` WHERE itemID = ?) i JOIN product p ON p.productID=i.productID JOIN template t ON t.templateID = p.templateID;");
 		if (!$itemSTH->execute( $itemID )) return -1;
 		$row = $itemSTH->fetch(PDO::FETCH_ASSOC);
 		if (!isset($row['productID'])) return null; // if can't find product
@@ -335,6 +334,7 @@ class Cart extends NG {
 
 		// Store purchases and options
 		$purchaseSTH = $this->db->prepare("INSERT INTO `purchase` (itemID, orderID, firmID, data) VALUES (?,?,?,?);");
+		$acquisitionSTH = $this->db->prepare("INSERT INTO `acquisition` (itemID, orderID, data) VALUES (?,?,?);");
 		$attendeeSTH = $this->db->prepare("INSERT INTO `attendee` (itemID, contactID, orderID) VALUES (?,?,?);");
 		$memberSTH = $this->db->prepare("INSERT INTO `member` (firmID, groupID) VALUES (?,?);");
 		$cart = $this->get(); // removes random id's
@@ -353,7 +353,12 @@ class Cart extends NG {
 				if (!$memberSTH->execute($user['firmID'], $item['settings']->groupID)) return $this->conflict();
 				$option['memberID'] = $this->db->lastInsertId();
 			}
-			if (!$purchaseSTH->execute($item['itemID'], $orderID, $user['firmID'], json_encode($option))) return $this->conflict(); // store purchase here
+
+			if ($item['type'] == 'purchase') { // store purchase / acquisition
+				if (!$purchaseSTH->execute($item['itemID'], $orderID, $user['firmID'], json_encode($option))) return $this->conflict(); // purchase
+			} else {
+				if (!$acquisitionSTH->execute($item['itemID'], $orderID, json_encode($option))) return $this->conflict(); // acquisition
+			}
 		}
 
 		$this->emailCart($orderID);
