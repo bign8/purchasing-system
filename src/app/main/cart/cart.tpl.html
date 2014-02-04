@@ -21,10 +21,17 @@
 							<a ng-switch-default ng-href="{{item.url}}">{{item.name}}</a>
 						</td>
 						<td>
-							<div ng-switch="item.cost.set" class="pull-right" ng-show="item.hasOptions">
-								<a href="/conference/{{item.itemID}}" ng-switch-when="false" class="btn btn-warning btn-mini">Set</a>
-								<a href="/conference/{{item.itemID}}" ng-switch-default class="btn btn-info btn-mini">Edit</a>
+							<div ng-switch="item.template" ng-show="item.hasOptions">
+								<div ng-switch-when="conference" ng-switch="item.cost.set" class="pull-right">
+									<a href="/conference/{{item.itemID}}" ng-switch-when="false" class="btn btn-warning btn-mini">Set</a>
+									<a href="/conference/{{item.itemID}}" ng-switch-default class="btn btn-info btn-mini">Edit</a>
+								</div>
+								<div ng-switch-when="download" class="pull-right">
+									<button type="button" class="btn btn-mini" ng-click="theCart.setOption(item.itemID, false)">Soft</button>
+									<button type="button" class="btn btn-mini" ng-click="theCart.setOption(item.itemID, true)">Hard</button>
+								</div>
 							</div>
+							
 							<span>{{item.description}}</span>
 						</td>
 						<td>
