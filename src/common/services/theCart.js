@@ -1,7 +1,6 @@
 angular.module('myApp.common.services.theCart', []).
 
 factory('theCart', ['$rootScope', 'interface', 'security', '$q', function ($rootScope, interface, security, $q) {
-	var cart = [];
 	var options = {};
 	var dirty = true;
 	var total = 0;
@@ -10,7 +9,9 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function ($root
 	// Update cart/purchases on current user change
 	$rootScope.$watch(function() {
 		return security.currentUser;
-	}, reload, true);
+	}, function() {
+		reload();
+	}, true);
 
 	var processItem = function(item, attribute) {
 		var setValue = (attribute=='settings') ? 'value' : 'fullValue';
@@ -28,6 +29,13 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function ($root
 				item.hasOptions = true;
 				break;
 			case 'download':
+				if (item.cost.settings.hard) {
+					item.hasOptions = true;
+					item.cost[setValue] = parseFloat( options[ item.itemID ] ? item.cost[attribute].hard : item.cost[attribute].soft ) ;
+				} else {
+					item.cost[setValue] = parseFloat(item.cost[attribute].cost) || 0; // straight assignment (no options)
+				}
+				break;
 			case 'custom':
 			case 'group':
 				item.cost[setValue] = parseFloat(item.cost[attribute].cost) || 0; // straight assignment (no options)
@@ -41,9 +49,10 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function ($root
 
 	var processCart = function() {
 		total = 0;
-		angular.forEach(cart, function (item) {
+		angular.forEach(service.cart, function (item) {
 			processItem(item, 'settings');
 			if (item.cost.hasOwnProperty('full')) processItem(item, 'full');
+			if (options.hasOwnProperty(item.itemID)) item.options = options[item.itemID];
 			total += item.cost.value;
 		});
 		angular.forEach(observerCallbacks, function (callback) { // Notify observers
@@ -61,32 +70,26 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function ($root
 	};
 
 	var reload = function() {
-		var cartPromise = interface.cart('get').then(function (res) { // get cart
-			cart = res;
-		});
-		var optPromise = interface.cart('getOptions').then(function (res) { // get options
-			options = res;
-		});
-		return $q.all([cartPromise, optPromise]).then(function() { // wait for both to respond
-			dirty = false;
+		return interface.cart('getFullCart').then(function (res) {
+			service.cart = res.cart;
+			options = res.options;
+			service.discounts = res.discounts;
 			processCart();
 		});
 	};
 
-	return {
+	var service = {
+		cart: [],
+		cartPromise: null,
 		load: function() {
-			var promise = null;
 			if (dirty) {
-				promise = reload();
-			} else {
-				var deferred = $q.defer();
-				promise = deferred.promise;
-				deferred.resolve(cart);
+				dirty = false;
+				service.cartPromise = reload();
 			}
-			return promise;
+			return service.cartPromise;
 		},
 		len: function() {
-			return cart.length || '';
+			return service.cart.length || '';
 		},
 		add: function(item) {
 			return dbCall('add', item);
@@ -94,11 +97,32 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function ($root
 		rem: function(item) {
 			return dbCall('rem', item);
 		},
-		get: function() {
-			return cart;
-		},
 		total: function() {
 			return total;
+		},
+
+		// DISCOUNT FUNCTIONS
+		discounts: [],
+		addDiscount: function(code) {
+			return interface.cart('addDiscount', {code:code}).then(function (res) {
+				service.discounts.push( res ); // add object on good callback
+			});
+		},
+		remDiscount: function(myDiscount) {
+			return interface.cart('remDiscount', myDiscount).then(function (res) {
+				service.discounts = res;
+			});
+		},
+		totDiscount: function() { // On the fly discount summation
+			var total = 0;
+			angular.forEach(service.discounts, function (item) {
+				total += parseFloat( item.amount );
+			});
+			return total;
+		},
+
+		fullTotal: function() {
+			return service.total() - service.totDiscount();
 		},
 		// dev: function() { // for development only
 		// 	return options;
@@ -107,10 +131,19 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function ($root
 			dirty = true;
 		},
 
+		setOption: function(itemID, opts) {
+			interface.cart('setOption', {item:{'itemID':itemID}, options: opts}).then(function() {
+				options[itemID] = opts;
+				processCart();
+			});
+		},
+
 		// Observer pattern
 		registerObserver: function(callback) { // Nice observer pattern! http://stackoverflow.com/a/17558885
 			if (observerCallbacks.indexOf(callback) === -1)
 				observerCallbacks.push(callback);
 		}
 	};
+
+	return service;
 }]);
