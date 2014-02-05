@@ -9,8 +9,11 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function ($root
 
 	// Update cart/purchases on current user change
 	$rootScope.$watch(function() {
+
 		return security.currentUser;
-	}, reload, true);
+	}, function() {
+		reload();
+	}, true);
 
 	var processItem = function(item, attribute) {
 		var setValue = (attribute=='settings') ? 'value' : 'fullValue';
