@@ -46,7 +46,11 @@ class Cart extends NG {
 	public function get() {
 		$user = $this->usr->currentUser(); // gets user if available
 
-		$checkSTH = $this->db->prepare("SELECT purchaseID FROM `purchase` WHERE firmID=? and itemID=? UNION SELECT acquisitionID FROM `acquisition` WHERE itemID=? UNION SELECT memberID FROM `member` WHERE firmID=? AND groupID=?");
+		// check areas for previously purchased item
+		$q[] = "SELECT purchaseID FROM `purchase` WHERE firmID=? and itemID=?";
+		$q[] = "SELECT CONCAT('a',acquisitionID) FROM `acquisition` a LEFT JOIN `order` o ON a.orderID = o.orderID WHERE itemID=? AND contactID=?";
+		$q[] = "SELECT memberID FROM `member` WHERE firmID=? AND groupID=?";
+		$checkSTH = $this->db->prepare( implode(" UNION ", $q) . ";" );
 
 		// remove all non-strings to allow invoices, but still grab purchase id's
 		$cleanIDs = array();
@@ -75,7 +79,7 @@ class Cart extends NG {
 
 					// warn if item has already been purchased
 					$groupID = isset($item['settings']->groupID) ? $item['settings']->groupID : -1;
-					$checkSTH->execute( $user['firmID'], $itemID, $itemID, $user['firmID'], $groupID );
+					$checkSTH->execute( $user['firmID'], $itemID, $itemID, $user['contactID'], $user['firmID'], $groupID );
 					$item['warn'] = ($checkSTH->rowCount() > 0);
 
 					array_push($retData, $item);
