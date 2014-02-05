@@ -12,24 +12,17 @@ config(['$routeProvider', 'securityAuthorizationProvider', function ( $routeProv
 			preLoad: ['theCart', function (theCart) {
 				return theCart.load(); // won't use data, will pre-fetch data
 			}],
-			discounts: ['interface', function (interface) {
-				return interface.cart('getDiscount');
-			}],
 			user: securityAuthorizationProvider.requireAuthenticatedUser
 		}
 	});
 }]).
 
-controller('CartCtrl', ['$scope', '$modal', 'interface', '$location', 'theCart', 'discounts', 'appStrings', function ($scope, $modal, interface, $location, theCart, discounts, appStrings) {
+controller('CartCtrl', ['$scope', '$modal', 'interface', '$location', 'theCart', 'appStrings', function ($scope, $modal, interface, $location, theCart, appStrings) {
 	$scope.theCart = theCart;
-	$scope.discounts = discounts;
 	$scope.discountMsg = false;
 	$scope.submitMsg = false;
 
-	theCart.registerObserver(function() { // update discounts with cart updates
-		interface.cart('getDiscount').then(function(res) {
-			$scope.discounts = res;
-		});
+	theCart.registerObserver(function() {
 		checkWarn();
 	});
 	var checkWarn = function() {
@@ -41,27 +34,11 @@ controller('CartCtrl', ['$scope', '$modal', 'interface', '$location', 'theCart',
 	};
 	checkWarn();
 
-	$scope.total = function() { // Cart total calculation
-		return $scope.theCart.total() - $scope.discountTotal();
-	};
-	$scope.discountTotal = function() { // On the fly discount summation
-		var total = 0;
-		angular.forEach($scope.discounts, function (item) {
-			total += parseFloat( item.amount );
-		});
-		return total;
-	};
 	$scope.addDiscount = function(code) { // add discount
-		interface.cart('addDiscount', {code:code}).then(function (res) {
+		theCart.addDiscount(code).then(function (res) {
 			$scope.discountMsg = appStrings.cart.disc_yep; // assign a reset-able message
-			$scope.discounts.push( res ); // add object on good callback
-		}, function(res) {
+		}, function (res) {
 			$scope.discountMsg = appStrings.cart['disc_' + res]; // assign a reset-able message
-		});
-	};
-	$scope.remDiscount = function(myDiscount) { // remove discount
-		interface.cart('remDiscount', myDiscount).then(function(res) {
-			$scope.discounts = res;
 		});
 	};
 	$scope.saveCart = function(medium) { // save price (everything else is already on server)
