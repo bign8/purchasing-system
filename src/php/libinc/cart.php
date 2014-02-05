@@ -34,19 +34,32 @@ class Cart extends NG {
 			case 'remDiscount': $data = $obj->remDiscount(); break; // rem discounts
 
 			// Generic Functions
-			case 'save': $data = $obj->save(); break;
+			case 'getFullCart':  $data = $obj->getFullCart();  break;
 			case 'getPurchases': $data = $obj->getPurchases(); break;
+			case 'save':         $data = $obj->save();         break;
 			default: $pass = false;
 		}
 	}
 
 	// CART ACTIONS
 
+	public function getFullCart() {
+		return array(
+			'cart' => $this->get(),
+			'options' => $this->getOptions(),
+			'discounts' => $this->getDiscount()
+		);
+	}
+
 	// Worker(app): return cart with current prices
 	public function get() {
 		$user = $this->usr->currentUser(); // gets user if available
 
-		$checkSTH = $this->db->prepare("SELECT purchaseID FROM `purchase` WHERE firmID=? and itemID=? UNION SELECT acquisitionID FROM `acquisition` WHERE itemID=? UNION SELECT memberID FROM `member` WHERE firmID=? AND groupID=?");
+		// check areas for previously purchased item
+		$q[] = "SELECT purchaseID FROM `purchase` WHERE firmID=? and itemID=?";
+		$q[] = "SELECT CONCAT('a',acquisitionID) FROM `acquisition` a LEFT JOIN `order` o ON a.orderID = o.orderID WHERE itemID=? AND contactID=?";
+		$q[] = "SELECT memberID FROM `member` WHERE firmID=? AND groupID=?";
+		$checkSTH = $this->db->prepare( implode(" UNION ", $q) . ";" );
 
 		// remove all non-strings to allow invoices, but still grab purchase id's
 		$cleanIDs = array();
@@ -75,7 +88,7 @@ class Cart extends NG {
 
 					// warn if item has already been purchased
 					$groupID = isset($item['settings']->groupID) ? $item['settings']->groupID : -1;
-					$checkSTH->execute( $user['firmID'], $itemID, $itemID, $user['firmID'], $groupID );
+					$checkSTH->execute( $user['firmID'], $itemID, $itemID, $user['contactID'], $user['firmID'], $groupID );
 					$item['warn'] = ($checkSTH->rowCount() > 0);
 
 					array_push($retData, $item);
@@ -257,7 +270,7 @@ class Cart extends NG {
 	// Worker: set cart options
 	public function setOption() {
 		$data = $this->getPostData();
-		$_SESSION['cart.options'][ $data->item->itemID ] = $this->object_to_array( $data->options );
+		$_SESSION['cart.options'][ $data->item->itemID ] = (gettype($data->options) == 'object') ? $this->object_to_array( $data->options ) : $data->options ;
 	}
 
 	// CART.DISCOUNTS ACTIONS
