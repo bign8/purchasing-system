@@ -28,6 +28,7 @@ controller('RegisterConferenceCtrl', ['$scope', 'myPage', 'interface', 'conferen
 	if ($scope.noFields) return; // no need to do any further processing if there are no options
 	
 	$scope.attID = (function() {
+		var attID = null;
 		angular.forEach($scope.con.fields, function(value, key) { if (value.name == 'Attendees') attID = value.fieldID; });
 		$scope.con.options.attID = attID;
 		if (attID) $scope.con.options[attID] = $scope.con.options[attID] || []; // set empty attendee array
@@ -82,6 +83,54 @@ controller('RegisterConferenceCtrl', ['$scope', 'myPage', 'interface', 'conferen
 	$scope.equal = function(x,y) { return angular.equals(x,y);};
 	$scope.reset = function() { $scope.con.options = angular.copy( $scope.orig ); };
 
+	// File upload controls
+	$scope.files = [];
+	$scope.setFiles = function(element) {
+		console.log('files:', element.files);
+		// Turn the FileList object into an Array
+		for (var i = 0; i < element.files.length; i++) {
+			$scope.files.push(element.files[i]);
+		}
+		$scope.progressVisible = false;
+		$scope.uploadFile(); // automatic upload
+		$scope.$apply();
+	};
+	$scope.uploadFile = function() {
+		var fd = new FormData();
+		for (var i in $scope.files) fd.append("uploadedFile", $scope.files[i]);
+			var xhr = new XMLHttpRequest();
+		xhr.upload.addEventListener("progress", uploadProgress, false);
+		xhr.addEventListener("load", uploadComplete, false);
+		xhr.addEventListener("error", uploadFailed, false);
+		xhr.addEventListener("abort", uploadCanceled, false);
+		xhr.open("POST", "/upload-test.php");
+		$scope.progressVisible = true;
+		xhr.send(fd);
+		$scope.progress = 1;
+	};
+	function uploadProgress(evt) {
+		if (evt.lengthComputable) {
+			$scope.progress = Math.round(evt.loaded * 100 / evt.total);
+		} else {
+			$scope.progress = 'unable to compute';
+		}
+		$scope.$apply();
+	}
+	function uploadComplete(evt) {
+		alert(evt.target.responseText);
+		$scope.progress = 100;
+		$scope.$apply();
+	}
+	function uploadFailed(evt) {
+		alert("There was an error attempting to upload the file.");
+	}
+	function uploadCanceled(evt) {
+		$scope.progressVisible = false;
+		$scope.$apply();
+		alert("The upload has been canceled by the user or the browser dropped the connection.");
+	}
+
+	// Overall Controlls
 	$scope.save = function() {
 		if ($scope.attID && $scope.con.options[ $scope.attID ].length === 0) {
 			$scope.message = appStrings.conference.attendee;
