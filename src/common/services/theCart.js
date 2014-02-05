@@ -9,7 +9,6 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function ($root
 
 	// Update cart/purchases on current user change
 	$rootScope.$watch(function() {
-
 		return security.currentUser;
 	}, function() {
 		reload();
@@ -77,13 +76,16 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function ($root
 		var optPromise = interface.cart('getOptions').then(function (res) { // get options
 			options = res;
 		});
-		return $q.all([cartPromise, optPromise]).then(function() { // wait for both to respond
-			dirty = false;
+		var discPromise = interface.cart('getDiscount').then(function (res) { // get discounts
+			service.discounts = res;
+		});
+		return $q.all([cartPromise, optPromise, discPromise]).then(function() { // wait for all to respond
 			processCart();
 		});
 	};
 
-	return {
+	var service = {
+		cartPromise: null,
 		load: function() {
 			var promise = null;
 			if (dirty) {
@@ -110,6 +112,30 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function ($root
 		total: function() {
 			return total;
 		},
+
+		// DISCOUNT FUNCTIONS
+		discounts: [],
+		addDiscount: function(code) {
+			return interface.cart('addDiscount', {code:code}).then(function (res) {
+				service.discounts.push( res ); // add object on good callback
+			});
+		},
+		remDiscount: function(myDiscount) {
+			return interface.cart('remDiscount', myDiscount).then(function (res) {
+				service.discounts = res;
+			});
+		},
+		totDiscount: function() { // On the fly discount summation
+			var total = 0;
+			angular.forEach(service.discounts, function (item) {
+				total += parseFloat( item.amount );
+			});
+			return total;
+		},
+
+		fullTotal: function() {
+			return service.total() - service.totDiscount();
+		},
 		// dev: function() { // for development only
 		// 	return options;
 		// },
@@ -129,4 +155,6 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function ($root
 				observerCallbacks.push(callback);
 		}
 	};
+
+	return service;
 }]);
