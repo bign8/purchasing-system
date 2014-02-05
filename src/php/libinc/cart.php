@@ -270,7 +270,7 @@ class Cart extends NG {
 	// Worker: set cart options
 	public function setOption() {
 		$data = $this->getPostData();
-		$_SESSION['cart.options'][ $data->item->itemID ] = $this->object_to_array( $data->options );
+		$_SESSION['cart.options'][ $data->item->itemID ] = (gettype($data->options) == 'object') ? $this->object_to_array( $data->options ) : $data->options ;
 	}
 
 	// CART.DISCOUNTS ACTIONS

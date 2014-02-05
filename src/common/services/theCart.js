@@ -52,6 +52,7 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function ($root
 		angular.forEach(service.cart, function (item) {
 			processItem(item, 'settings');
 			if (item.cost.hasOwnProperty('full')) processItem(item, 'full');
+			if (options.hasOwnProperty(item.itemID)) item.options = options[item.itemID];
 			total += item.cost.value;
 		});
 		angular.forEach(observerCallbacks, function (callback) { // Notify observers
@@ -131,9 +132,10 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function ($root
 		},
 
 		setOption: function(itemID, opts) {
-			// TODO: mirror on server
-			options[itemID] = opts;
-			processCart();
+			interface.cart('setOption', {item:{'itemID':itemID}, options: opts}).then(function() {
+				options[itemID] = opts;
+				processCart();
+			});
 		},
 
 		// Observer pattern

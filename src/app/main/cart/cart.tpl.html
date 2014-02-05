@@ -27,8 +27,11 @@
 									<a href="/conference/{{item.itemID}}" ng-switch-default class="btn btn-info btn-mini">Edit</a>
 								</div>
 								<div ng-switch-when="download" class="pull-right">
-									<button type="button" class="btn btn-mini" ng-click="theCart.setOption(item.itemID, false)">Soft</button>
-									<button type="button" class="btn btn-mini" ng-click="theCart.setOption(item.itemID, true)">Hard</button>
+									
+									<label for="hardcopy">
+										<input type="checkbox" ng-model="item.options" name="hardcopy" id="hardcopy" ng-change="theCart.setOption(item.itemID, item.options);" />
+										&nbsp;&nbsp;Hardcopy?
+									</label>
 								</div>
 							</div>
 							
@@ -128,7 +131,7 @@
 			</div>
 			
 			<!-- <pre>{{discounts | json}}</pre> -->
-			<!-- <pre>{{theCart.cart | json}}</pre> -->
+			<pre>{{theCart.cart | json}}</pre>
 
 		</div>
 	</div>
