@@ -70,16 +70,10 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function ($root
 	};
 
 	var reload = function() {
-		var cartPromise = interface.cart('get').then(function (res) { // get cart
-			cart = res;
-		});
-		var optPromise = interface.cart('getOptions').then(function (res) { // get options
-			options = res;
-		});
-		var discPromise = interface.cart('getDiscount').then(function (res) { // get discounts
-			service.discounts = res;
-		});
-		return $q.all([cartPromise, optPromise, discPromise]).then(function() { // wait for all to respond
+		return interface.cart('getFullCart').then(function (res) {
+			service.cart = res.cart;
+			options = res.options;
+			service.discounts = res.discounts;
 			processCart();
 		});
 	};
@@ -87,15 +81,11 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function ($root
 	var service = {
 		cartPromise: null,
 		load: function() {
-			var promise = null;
 			if (dirty) {
-				promise = reload();
-			} else {
-				var deferred = $q.defer();
-				promise = deferred.promise;
-				deferred.resolve(cart);
+				dirty = false;
+				service.cartPromise = reload();
 			}
-			return promise;
+			return service.cartPromise;
 		},
 		len: function() {
 			return cart.length || '';

@@ -34,13 +34,22 @@ class Cart extends NG {
 			case 'remDiscount': $data = $obj->remDiscount(); break; // rem discounts
 
 			// Generic Functions
-			case 'save': $data = $obj->save(); break;
+			case 'getFullCart':  $data = $obj->getFullCart();  break;
 			case 'getPurchases': $data = $obj->getPurchases(); break;
+			case 'save':         $data = $obj->save();         break;
 			default: $pass = false;
 		}
 	}
 
 	// CART ACTIONS
+
+	public function getFullCart() {
+		return array(
+			'cart' => $this->get(),
+			'options' => $this->getOptions(),
+			'discounts' => $this->getDiscount()
+		);
+	}
 
 	// Worker(app): return cart with current prices
 	public function get() {
