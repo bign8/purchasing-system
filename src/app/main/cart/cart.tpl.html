@@ -15,7 +15,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr ng-repeat="item in theCart.get()" ng-class="{true:'error', false:''}[item.warn]">
+					<tr ng-repeat="item in theCart.cart" ng-class="{true:'error', false:''}[item.warn]">
 						<td ng-switch="!item.url">
 							<span ng-switch-when="true">{{item.name}}</span>
 							<a ng-switch-default ng-href="{{item.url}}">{{item.name}}</a>
@@ -128,7 +128,7 @@
 			</div>
 			
 			<!-- <pre>{{discounts | json}}</pre> -->
-			<!-- <pre>{{theCart.get() | json}}</pre> -->
+			<!-- <pre>{{theCart.cart | json}}</pre> -->
 
 		</div>
 	</div>

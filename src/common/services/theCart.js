@@ -1,7 +1,6 @@
 angular.module('myApp.common.services.theCart', []).
 
 factory('theCart', ['$rootScope', 'interface', 'security', '$q', function ($rootScope, interface, security, $q) {
-	var cart = [];
 	var options = {};
 	var dirty = true;
 	var total = 0;
@@ -50,7 +49,7 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function ($root
 
 	var processCart = function() {
 		total = 0;
-		angular.forEach(cart, function (item) {
+		angular.forEach(service.cart, function (item) {
 			processItem(item, 'settings');
 			if (item.cost.hasOwnProperty('full')) processItem(item, 'full');
 			total += item.cost.value;
@@ -79,6 +78,7 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function ($root
 	};
 
 	var service = {
+		cart: [],
 		cartPromise: null,
 		load: function() {
 			if (dirty) {
@@ -88,16 +88,13 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function ($root
 			return service.cartPromise;
 		},
 		len: function() {
-			return cart.length || '';
+			return service.cart.length || '';
 		},
 		add: function(item) {
 			return dbCall('add', item);
 		},
 		rem: function(item) {
 			return dbCall('rem', item);
-		},
-		get: function() {
-			return cart;
 		},
 		total: function() {
 			return total;

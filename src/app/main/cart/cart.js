@@ -27,7 +27,7 @@ controller('CartCtrl', ['$scope', '$modal', 'interface', '$location', 'theCart',
 	});
 	var checkWarn = function() {
 		var found = false;
-		angular.forEach(theCart.get(), function(item) {
+		angular.forEach(theCart.cart, function(item) {
 			if (item.warn) found = true;
 		});
 		$scope.submitMsg = (found) ? appStrings.cart.warn : false ;
@@ -47,14 +47,14 @@ controller('CartCtrl', ['$scope', '$modal', 'interface', '$location', 'theCart',
 			return;
 		}
 		var fail = false;
-		angular.forEach(theCart.get(), function(item) { // verify options are set
+		angular.forEach(theCart.cart, function(item) { // verify options are set
 			if ( item.hasOptions && !item.cost.set ) fail = true;
 		});
 		if (fail) {
 			$scope.submitMsg = appStrings.cart.needOpt;
 			return;
 		}
-		angular.forEach(theCart.get(), function(item) { // verify double purchases
+		angular.forEach(theCart.cart, function(item) { // verify double purchases
 			if (item.warn) fail = true;
 		});
 		if (fail) {
@@ -64,7 +64,7 @@ controller('CartCtrl', ['$scope', '$modal', 'interface', '$location', 'theCart',
 		$scope.submitMsg = appStrings.cart.checkOut;
 		interface.cart('save', {cost:$scope.total(), medium:medium}).then(function() {
 			var cart = {
-				list: theCart.get(),
+				list: theCart.cart,
 				disTotal: $scope.discountTotal(),
 				total: $scope.total(),
 				medium: medium
