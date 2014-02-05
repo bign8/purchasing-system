@@ -34,6 +34,28 @@
 							</div>
 						</div>
 
+						<div ng-switch-when="file">
+							
+							<label for="fileToUpload">Select a File to Upload</label><br />
+							<input type="file" id="fileToUpload" name="fileToUpload" ng-model-instant onchange="angular.element(this).scope().setFiles(this)" />
+
+							<div ng-show="files.length">
+								<div ng-repeat="file in files.slice(0)">
+									<span>{{file.webkitRelativePath || file.name}}</span>&nbsp;
+									(<span ng-switch="file.size > 1024*1024">
+										<span ng-switch-when="true">{{file.size / 1024 / 1024 | number:2}} MB</span>
+										<span ng-switch-default>{{file.size / 1024 | number:2}} kB</span>
+									</span>)
+								</div>
+								<!-- <input type="button" ng-click="uploadFile()" value="Upload" /> -->
+								<div ng-show="progressVisible">
+									<div class="progress progress-striped active">
+										<div class="bar" ng-style="{'width': progress+'%'}">{{progress}}%</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
 						<div ng-switch-default>
 							<h4>Unknown question type ({{field.type}})</h4>
 						</div>
