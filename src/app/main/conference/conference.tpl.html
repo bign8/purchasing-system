@@ -30,7 +30,14 @@
 						<div ng-switch-when="text">
 							<label class="control-label" for="{{field.fieldID}}">{{field.name}}</label>
 							<div class="controls">
-								<input type="text" id="{{field.fieldID}}" ng-model="con.options[field.fieldID]" placeholder="{{field.name}}" ng-required="{{field.required}}" ua-magic-formatter="{{field.settings}}">
+								<input type="text" id="{{field.fieldID}}" ng-model="con.options[field.fieldID]" placeholder="{{field.name}}" ng-required="{{field.required}}" ua-magic-formatter="{{field.settings}}" class="input-block-level" />
+							</div>
+						</div>
+
+						<div ng-switch-when="textarea">
+							<label class="control-label" for="{{field.fieldID}}">{{field.name}}</label>
+							<div class="controls">
+								<textarea id="{{field.fieldID}}" ng-model="con.options[field.fieldID]" ng-required="{{field.required}}" placeholder="{{field.name}}" class="input-block-level"></textarea>
 							</div>
 						</div>
 
@@ -57,7 +64,7 @@
 						</div>
 
 						<div ng-switch-default>
-							<h4>Unknown question type ({{field.type}})</h4>
+							<h4>Unknown question type ({{field.name}} - {{field.type}})</h4>
 						</div>
 
 					</div>
