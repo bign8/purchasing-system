@@ -21,8 +21,11 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function ($root
 		if (item.template == 'custom') {
 			item.cost[setValue] = parseFloat(item.cost[attribute].cost) || 0; // straight assignment (no options)
 		} else {
-			switch (item.cost.name) {
-				case 'Delayed attendee cost':
+			switch (item.cost.optionID) {
+				case '1':
+					item.cost[setValue] = parseFloat(item.cost[attribute].cost) || 0; // straight assignment (no options)
+					break;
+				case '2':
 					item.cost[setValue] = parseFloat( item.cost[attribute].initial ); // initial cost always in effect
 					if ( options.hasOwnProperty(item.itemID) ) { // apply pricing based on the number of attendees
 						var attID = options[ item.itemID ].attID; // grab attendee id
@@ -31,10 +34,7 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function ($root
 					}
 					item.hasOptions = true;
 					break;
-				case 'Static Cost':
-					item.cost[setValue] = parseFloat(item.cost[attribute].cost) || 0; // straight assignment (no options)
-					break;
-				case 'Hard / Soft':
+				case '3':
 					item.hasOptions = true;
 					item.cost[setValue] = parseFloat( options[ item.itemID ] ? item.cost[attribute].hard : item.cost[attribute].soft ) ;
 					break;
