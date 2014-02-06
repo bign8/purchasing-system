@@ -18,32 +18,32 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function ($root
 		item.cost = item.cost || {};
 		item.cost[setValue] = 0;
 		item.hasOptions = false;
-		switch (item.template) {
-			case 'conference':
-				item.cost[setValue] = parseFloat( item.cost[attribute].initial ); // initial cost always in effect
-				if ( options.hasOwnProperty(item.itemID) ) { // apply pricing based on the number of attendees
-					var attID = options[ item.itemID ].attID; // grab attendee id
-					var multiply = (options[ item.itemID ][ attID ] || []).length - parseFloat( item.cost[attribute].after ); // how many more
-					if (multiply > 0) item.cost[setValue] += parseFloat( item.cost[attribute].later ) * multiply; // for additional attendees
-				}
-				item.hasOptions = true;
-				break;
-			case 'download':
-				if (item.cost.settings.hard) {
+		if (item.template == 'custom') {
+			item.cost[setValue] = parseFloat(item.cost[attribute].cost) || 0; // straight assignment (no options)
+		} else {
+			switch (item.cost.name) {
+				case 'Delayed attendee cost':
+					item.cost[setValue] = parseFloat( item.cost[attribute].initial ); // initial cost always in effect
+					if ( options.hasOwnProperty(item.itemID) ) { // apply pricing based on the number of attendees
+						var attID = options[ item.itemID ].attID; // grab attendee id
+						var multiply = (options[ item.itemID ][ attID ] || []).length - parseFloat( item.cost[attribute].after ); // how many more
+						if (multiply > 0) item.cost[setValue] += parseFloat( item.cost[attribute].later ) * multiply; // for additional attendees
+					}
+					item.hasOptions = true;
+					break;
+				case 'Static Cost':
+					item.cost[setValue] = parseFloat(item.cost[attribute].cost) || 0; // straight assignment (no options)
+					break;
+				case 'Hard / Soft':
 					item.hasOptions = true;
 					item.cost[setValue] = parseFloat( options[ item.itemID ] ? item.cost[attribute].hard : item.cost[attribute].soft ) ;
-				} else {
-					item.cost[setValue] = parseFloat(item.cost[attribute].cost) || 0; // straight assignment (no options)
-				}
-				break;
-			case 'custom':
-			case 'group':
-				item.cost[setValue] = parseFloat(item.cost[attribute].cost) || 0; // straight assignment (no options)
-				break;
-			default:
-				item.cost = {};
-				item.cost[setValue] = 0;
+					break;
+				default:
+					item.cost = {};
+					item.cost[setValue] = 0;
+			}
 		}
+		
 		if (item.hasOptions) item.cost.set = options.hasOwnProperty( item.itemID );
 	};
 
