@@ -180,6 +180,7 @@ class Cart extends NG {
 		switch ($row['optionID']) {
 			case '1': $myCost = $cost['cost']; break; // Static Cost
 			case '2': $myCost = $cost['initial']; break; // Delayed attendee cost
+			case '3': $myCost = $cost['soft']; break; // Delayed attendee cost
 		}
 		return $myCost;
 	}
