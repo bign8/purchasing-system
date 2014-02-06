@@ -4,8 +4,9 @@ var UACart = (function($){
 		if (has) {
 			ele.addClass('added').click(function() {
 				alert('Item has already been added to your cart.');
+				return false;
 			});
-			if (ele.find('.added').length === 0) ele.append('<span class="added"> (Added to cart)</span>');
+			if (ele.find('.added').length === 0) ele.append('<span class="added"> (Added)</span>');
 		} else {
 			ele.removeClass('added').click(addTo).find('.added').remove();
 		}
@@ -23,6 +24,7 @@ var UACart = (function($){
 			xhrFields: { withCredentials: true },
 			success: function( json, status, xhr ) {
 				setHandle(target, true);
+				$('.ua-cart-items').html(json.items);
 			}
 		});
 		return false;
@@ -36,6 +38,7 @@ var UACart = (function($){
 			crossDomain: true,
 			xhrFields: { withCredentials: true},
 			success: function( json, status, xhr ) {
+				$('.ua-cart-items').html(json.length);
 				$('a.cartAdd').each(function() {
 					var ele = $(this);
 					setHandle(ele, json.indexOf("" + ele.data('itemId')) >= 0);
