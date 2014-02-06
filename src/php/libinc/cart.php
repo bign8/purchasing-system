@@ -172,6 +172,7 @@ class Cart extends NG {
 			$ret['reason'] = $leastRow['groupName'];
 		}
 		$ret['name'] = $leastRow['name'];
+		$ret['optionID'] = $leastRow['optionID'];
 		return $ret;
 	}
 	private function getRowCost( $row ) {
