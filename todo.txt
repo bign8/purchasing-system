@@ -1,7 +1,7 @@
 ToDo Major Process re-design:
-- photo upload
 - event open
 - change attendees
+- validate cart sending email correctly
 
 ToDo: 
 - Account for all special cases
@@ -10,7 +10,7 @@ ToDo:
 	- MP-past (hard-copy or digital) (Note about CPE credit cannot be applied) - download not currently available
 - Allow pretty crumb to be set by individual pages (can bind to form elements for changing crumbs)
 - Notify users of un-supported browsers
-- photo upload field (doesn't store, just emails)
+- photo upload field (doesn't store, just emails) [attach to checkout email]
 - possible to add more attendees, not remove attendees
 - Purchases page (calling in attendee changes)
 - show if event is un-open or not available at current time (manual)
