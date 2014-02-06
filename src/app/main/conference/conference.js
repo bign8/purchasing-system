@@ -163,6 +163,10 @@ directive('uaMagicFormatter', ['$filter', function($filter) {
 			val = $filter('currency')(val, '$'); // format directly
 			val = val.substring(0, val.length-3); // remove decimals
 			return val + decimal;
+		},
+		numeric: function(val) {
+			val = parseFloat(val.replace(/[^\d\.]/g, ''));
+			return isNaN(val) ? '' : val ;
 		}
 	};
 	return {
