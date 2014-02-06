@@ -171,6 +171,7 @@ class Cart extends NG {
 			$ret['full'] = (array)json_decode($fullCostRow['settings']);
 			$ret['reason'] = $leastRow['groupName'];
 		}
+		$ret['name'] = $leastRow['name'];
 		return $ret;
 	}
 	private function getRowCost( $row ) {
