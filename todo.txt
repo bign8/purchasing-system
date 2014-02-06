@@ -1,6 +1,7 @@
 ToDo Major Process re-design:
 - event open
 - change attendees
+- validate cart sending email correctly
 
 ToDo: 
 - Account for all special cases
