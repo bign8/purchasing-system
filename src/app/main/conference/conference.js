@@ -174,7 +174,7 @@ directive('uaMagicFormatter', ['$filter', function($filter) {
 		require: '?ngModel',
 		link: function(scope, element, attrs, ctrl) {
 			ctrl.$parsers.unshift(function(val) {
-				val = formatters[ attrs.uaMagicFormatter ]( val );
+				if ( formatters.hasOwnProperty( attrs.uaMagicFormatter ) ) val = formatters[ attrs.uaMagicFormatter ]( val );
 				return element.val( val ).val();
 			});
 		}
