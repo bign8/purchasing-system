@@ -86,7 +86,7 @@ controller('RegisterConferenceCtrl', ['$scope', 'myPage', 'interface', 'conferen
 	// Overall Controlls
 	$scope.save = function() {
 		if ($scope.attID && $scope.con.options[ $scope.attID ].length === 0) {
-			$scope.message = appStrings.conference.attendee;
+			$scope.message = appStrings.conference.attendee();
 			return;
 		}
 		interface.cart('setOption', $scope.con).then(function() {
@@ -102,7 +102,7 @@ controller('RegisterConferenceCtrl', ['$scope', 'myPage', 'interface', 'conferen
 			});
 			$scope.orig = angular.copy( $scope.con.options );
 		}, function() {
-			$scope.message = appStrings.conference.error;
+			$scope.message = appStrings.conference.error();
 		});
 	};
 }]).
@@ -253,7 +253,7 @@ controller('ContactModalCtrl', ['$scope', '$modalInstance', 'contact', 'prep', '
 	};
 	$scope.ok = function () {
 		if ($scope.contact.addr.addressID === null) {
-			$scope.message = appStrings.contact.address;
+			$scope.message = appStrings.contact.address();
 			return;
 		}
 		var query = ($scope.contact.contactID === undefined) ? 'add' : 'edit'; // change add or edit based on existence of contactID
@@ -261,7 +261,7 @@ controller('ContactModalCtrl', ['$scope', '$modalInstance', 'contact', 'prep', '
 			$scope.contact.contactID = JSON.parse(res);
 			$modalInstance.close( $scope.contact );
 		}, function (err) {
-			$scope.message = (err == 'dup') ? appStrings.contact.duplicate : appStrings.contact.error;
+			$scope.message = (err == 'dup') ? appStrings.contact.duplicate() : appStrings.contact.error();
 		});
 	};
 	$scope.setAddr = function () { // open modal here with address form

@@ -46,33 +46,33 @@ controller('RegisterFormCtrl', ['$scope', '$modal', 'interface', 'security', 'fi
 	$scope.resetMsg = null;
 	$scope.pwReset = function() {
 		security.reset( $scope.user.email ).then(function() {
-			$scope.resetMsg = appStrings.register.resetGood;
+			$scope.resetMsg = appStrings.register.resetGood();
 		}, function() {
-			$scope.resetMsg = appStrings.register.resetBad;
+			$scope.resetMsg = appStrings.register.resetBad();
 		});
 	};
 
 	// handle registration clicks
 	$scope.register = function() {
 		if ($scope.passVerify !== $scope.user.password) {
-			$scope.message = appStrings.register.passMatch;
+			$scope.message = appStrings.register.passMatch();
 			return;
 		}
 		if (($scope.user.firm.addr || {}).addressID === undefined) {
-			$scope.message = appStrings.register.firmAddr;
+			$scope.message = appStrings.register.firmAddr();
 			return;
 		}
 		if ($scope.user.addr.addressID === undefined) {
-			$scope.message = appStrings.register.userAddr;
+			$scope.message = appStrings.register.userAddr();
 			return;
 		}
 		interface.user('addUser', $scope.user).then(function() {
-			$scope.message = appStrings.register.success; // some sort of callback on close
+			$scope.message = appStrings.register.success(); // some sort of callback on close
 			security.requestCurrentUser();
 			// security.redirect('/cart');
 			window.history.back(); // go to last page!
 		}, function (err) {
-			$scope.message = (err=='dup') ? appStrings.register.duplicate : appStrings.register.failure ;
+			$scope.message = (err=='dup') ? appStrings.register.duplicate() : appStrings.register.failure() ;
 		});
 	};
 

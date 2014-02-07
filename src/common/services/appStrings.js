@@ -2,23 +2,9 @@ angular.module('myApp.common.services.appStrings', []).
 
 factory('appStrings', function() {
 	var ERROR = 'error', SUCCESS = 'success', INFO = 'info';
-	return {
-		ERROR: ERROR,
-		SUCCESS: SUCCESS,
-		INFO: INFO,
-		paypal: { // Paypal (this is for the app)
-			url: 'https://payflowlink.paypal.com',
-			uri: { // used $.param()
-				'AMOUNT': '0',
-				'DESCRIPTION': 'Upstream Academy Purchase',
-				'LOGIN': 'UpstreamAcademy',
-				'MODE': 'TEST',
-				'PARTNER': 'PayPal',
-				'SHOWCONFIRM': 'FALSE',
-				'TYPE': 'S'
-			},
-			totalParam: 'AMOUNT'
-		},
+
+	// Notify strings (need to be functionalized)
+	var STRINGS = {
 		cart: { // Cart Pages
 			disc_dup: { // Duplicate Discount (notify object)
 				pre: 'Duplicate Code!',
@@ -55,7 +41,7 @@ factory('appStrings', function() {
 				msg: 'An item in your cart has already been purchased (shown in red).  Please remove it before continuing to checkout.',
 				type:ERROR, delay:20
 			},
-			chekOut: { // Checkout Complete (notify object)
+			checkOut: { // Checkout Complete (notify object)
 				pre: 'Checkout Complete',
 				msg: 'You will be redirected to your appropriate payment processing method',
 				type:SUCCESS, delay:20
@@ -97,8 +83,7 @@ factory('appStrings', function() {
 			failure: { // Server Error
 				pre:'Error!', msg:'A payment with this name and value is already in your cart.',
 				type:ERROR
-			},
-			customPayName: 'Custom Payment' // shows up in cart
+			}
 		},
 		register: { // Registration Form
 			passMatch: { // Passwords Match
@@ -226,4 +211,45 @@ factory('appStrings', function() {
 			}
 		}
 	};
+
+	// interpolate + functionalize!
+	var interpolate = function(str, obj) { // http://stackoverflow.com/a/1408373/3220865
+		return str.replace(/{([^{}]+)}/g, function (match, p1) {
+			return typeof obj[p1] === 'string' || typeof obj[p1] === 'number' ? obj[p1] : match;
+		});
+	};
+	angular.forEach(STRINGS, function (area) {
+		angular.forEach(area, function (obj, key) {
+			area[key] = function (interObj) {
+				if (interObj) obj.msg = interpolate(obj.msg, interObj);
+				obj.random = Math.random();
+				return obj;
+			};
+		});
+	});
+
+	// Not functionalized
+	angular.extend(STRINGS, {
+		ERROR: ERROR,
+		SUCCESS: SUCCESS,
+		INFO: INFO,
+		paypal: { // Pay-pal (this is for the app)
+			url: 'https://payflowlink.paypal.com',
+			uri: { // used $.param()
+				'AMOUNT': '0',
+				'DESCRIPTION': 'Upstream Academy Purchase',
+				'LOGIN': 'UpstreamAcademy',
+				'MODE': 'TEST',
+				'PARTNER': 'PayPal',
+				'SHOWCONFIRM': 'FALSE',
+				'TYPE': 'S'
+			},
+			totalParam: 'AMOUNT'
+		},
+		pay: {
+			customPayName: 'Custom Payment' // shows up in cart
+		}
+	});
+
+	return STRINGS;
 });
