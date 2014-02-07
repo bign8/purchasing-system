@@ -387,8 +387,12 @@ class Cart extends NG {
 	public function getPurchases() {
 		$user = $this->usr->requiresAuth();
 
-		$STH = $this->db->prepare("SELECT i.*, p.data, t.template, o.stamp FROM (SELECT * FROM `purchase` WHERE firmID=?) p LEFT JOIN item i ON p.itemID=i.itemID LEFT JOIN `product` pr ON i.productID=pr.productID LEFT JOIN `template` t ON pr.templateID=t.templateID LEFT JOIN `order` o ON p.orderID=o.orderID ORDER BY i.productID, i.name;");
-		$STH->execute( $user['firmID'] );
+		$q[] = "SELECT itemID, orderID, data FROM `purchase` WHERE firmID=?"; // purchases
+		$q[] = "SELECT itemID, a.orderID, data FROM `acquisition`a LEFT JOIN `order`o ON a.orderID=o.orderID WHERE o.contactID=?"; // acquisition
+		$q = implode(" UNION ", $q);
+
+		$STH = $this->db->prepare("SELECT i.*, p.data, t.template, o.stamp FROM ($q) p LEFT JOIN item i ON p.itemID=i.itemID LEFT JOIN `product` pr ON i.productID=pr.productID LEFT JOIN `template` t ON pr.templateID=t.templateID LEFT JOIN `order` o ON p.orderID=o.orderID ORDER BY i.productID, i.name;");
+		$STH->execute( $user['firmID'], $user['contactID'] );
 
 		$retData = $STH->fetchAll( PDO::FETCH_ASSOC );
 		foreach ($retData as &$item) {
