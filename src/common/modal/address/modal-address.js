@@ -1,6 +1,4 @@
-angular.module('myApp.common.modal.address', [
-	
-]).
+angular.module('myApp.common.modal.address', []).
 
 controller('ModalAddressCtrl', ['$scope', '$modalInstance', 'address', 'interface', 'appStrings', function ($scope, $modalInstance, address, interface, appStrings){
 	$scope.address = address || {addressID:null, addr2: null};
@@ -11,7 +9,7 @@ controller('ModalAddressCtrl', ['$scope', '$modalInstance', 'address', 'interfac
 			$scope.address.addressID = JSON.parse(res);
 			$modalInstance.close($scope.address);
 		}, function() {
-			$scope.message = appStrings.address.error;
+			$scope.message = appStrings.address.error();
 		});
 	};
 	$scope.cancel = function() {
