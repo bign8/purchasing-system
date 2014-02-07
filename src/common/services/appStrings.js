@@ -41,7 +41,7 @@ factory('appStrings', function() {
 				msg: 'An item in your cart has already been purchased (shown in red).  Please remove it before continuing to checkout.',
 				type:ERROR, delay:20
 			},
-			chekOut: { // Checkout Complete (notify object)
+			checkOut: { // Checkout Complete (notify object)
 				pre: 'Checkout Complete',
 				msg: 'You will be redirected to your appropriate payment processing method',
 				type:SUCCESS, delay:20
