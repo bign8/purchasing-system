@@ -3,6 +3,20 @@
 -- ------------------------------------------------------
 -- Server version	5.5.30-1.1
 --
+-- Table structure for table `acquisition`
+--
+CREATE TABLE `acquisition` (
+  `acquisitionID` int(10) unsigned NOT NULL,
+  `itemID` int(10) unsigned NOT NULL,
+  `orderID` int(10) unsigned NOT NULL,
+  `data` text,
+  PRIMARY KEY (`acquisitionID`),
+  KEY `itemID` (`itemID`),
+  KEY `orderID` (`orderID`),
+  CONSTRAINT `acquisition_ibfk_2` FOREIGN KEY (`orderID`) REFERENCES `order` (`orderID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `acquisition_ibfk_1` FOREIGN KEY (`itemID`) REFERENCES `item` (`itemID`) ON DELETE CASCADE ON UPDATE CASCADE
+);
+--
 -- Table structure for table `address`
 --
 CREATE TABLE `address` (
@@ -186,6 +200,7 @@ CREATE TABLE `product` (
   `name` varchar(100) NOT NULL,
   `visible` enum('yes','no') NOT NULL DEFAULT 'yes',
   `img` varchar(100) DEFAULT NULL,
+  `type` enum('purchase','acquisition') NOT NULL DEFAULT 'purchase',
   PRIMARY KEY (`productID`),
   KEY `templateID` (`templateID`),
   CONSTRAINT `product_ibfk_1` FOREIGN KEY (`templateID`) REFERENCES `template` (`templateID`)

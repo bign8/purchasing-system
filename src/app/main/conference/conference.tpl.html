@@ -21,21 +21,36 @@
 		</div>
 
 		<div ng-switch-default>
-			<div class="span6">
+			<div class="span6" ng-class="{offset3: !attID}">
 				<div class="form-horizontal css-form well">
 					<h3>Questions</h3>
 					<p>Please fill in as much of the following information as possible</p>
 					<div class="control-group" ng-repeat="field in con.fields | filter:{name:'!Attendees'}" ng-switch="field.type">
 
 						<div ng-switch-when="text">
-							<label class="control-label" for="{{field.fieldID}}">{{field.name}}</label>
+							<label class="control-label" for="{{field.fieldID}}">{{field.name}} <span ng-show="field.required">*</span></label>
 							<div class="controls">
-								<input type="text" id="{{field.fieldID}}" ng-model="con.options[field.fieldID]" placeholder="{{field.name}}" ng-required="{{field.required}}" ua-magic-formatter="{{field.settings}}">
+								<input type="text" id="{{field.fieldID}}" ng-model="con.options[field.fieldID]" placeholder="{{field.name}}" ng-required="{{field.required}}" ua-magic-formatter="{{field.settings}}" class="input-block-level" />
+							</div>
+						</div>
+
+						<div ng-switch-when="textarea">
+							<label class="control-label" for="{{field.fieldID}}">{{field.name}} <span ng-show="field.required">*</span></label>
+							<div class="controls">
+								<textarea id="{{field.fieldID}}" ng-model="con.options[field.fieldID]" ng-required="{{field.required}}" placeholder="{{field.name}}" class="input-block-level" rows="5"></textarea>
+							</div>
+						</div>
+
+						<div ng-switch-when="image">
+							<label class="control-label">{{field.name}} <span ng-show="field.required">*</span></label>
+							<div class="controls">
+								<span ua-image-upload="con.options[field.fieldID]"></span>
+								<input type="hidden" ng-model="con.options[field.fieldID]" ng-required="{{field.required}}" />
 							</div>
 						</div>
 
 						<div ng-switch-default>
-							<h4>Unknown question type ({{field.type}})</h4>
+							<h4>Unknown question type ({{field.name}} - {{field.type}})</h4>
 						</div>
 
 					</div>

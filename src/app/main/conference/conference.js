@@ -28,6 +28,7 @@ controller('RegisterConferenceCtrl', ['$scope', 'myPage', 'interface', 'conferen
 	if ($scope.noFields) return; // no need to do any further processing if there are no options
 	
 	$scope.attID = (function() {
+		var attID = null;
 		angular.forEach($scope.con.fields, function(value, key) { if (value.name == 'Attendees') attID = value.fieldID; });
 		$scope.con.options.attID = attID;
 		if (attID) $scope.con.options[attID] = $scope.con.options[attID] || []; // set empty attendee array
@@ -82,6 +83,7 @@ controller('RegisterConferenceCtrl', ['$scope', 'myPage', 'interface', 'conferen
 	$scope.equal = function(x,y) { return angular.equals(x,y);};
 	$scope.reset = function() { $scope.con.options = angular.copy( $scope.orig ); };
 
+	// Overall Controlls
 	$scope.save = function() {
 		if ($scope.attID && $scope.con.options[ $scope.attID ].length === 0) {
 			$scope.message = appStrings.conference.attendee;
@@ -105,7 +107,83 @@ controller('RegisterConferenceCtrl', ['$scope', 'myPage', 'interface', 'conferen
 	};
 }]).
 
-directive('uaMagicFormatter', ['$filter', function($filter) {
+directive('uaImageUpload', [function() {
+	return {
+		restrict: 'A',
+		scope: {
+			'uaImageUpload': '='
+		},
+		templateUrl: 'app/main/conference/image.tpl.html',
+		link: function($scope, elem, attrs) {
+			$scope.state = 0;
+			$scope.image = false;
+
+			var reader = new FileReader();
+			reader.onload = function (e) {
+				$scope.image = e.target.result;
+				$scope.$apply();
+			};
+
+			elem.on('change', function() {
+				reader.readAsDataURL(elem[0].children[0].children[0].files[0]);
+				$scope.setFiles(elem[0].children[0].children[0]);
+			});
+
+			$scope.setFiles = function(element) {
+				$scope.files = [];
+				for (var i = 0; i < element.files.length; i++) $scope.files.push(element.files[i]);
+				$scope.progressVisible = false;
+				$scope.state = 1;
+				$scope.$apply();
+			};
+			$scope.uploadFile = function() {
+				var fd = new FormData();
+				for (var i in $scope.files) fd.append("uploadedFile", $scope.files[i]);
+					var xhr = new XMLHttpRequest();
+				xhr.upload.addEventListener("progress", uploadProgress, false);
+				xhr.addEventListener("load", uploadComplete, false);
+				xhr.addEventListener("error", uploadFailed, false);
+				xhr.addEventListener("abort", uploadCanceled, false);
+				xhr.open("POST", "/uploader.php");
+				$scope.progressVisible = true;
+				xhr.send(fd);
+				$scope.progress = 1;
+			};
+			function uploadProgress(evt) {
+				if (evt.lengthComputable) {
+					$scope.progress = Math.round(evt.loaded * 100 / evt.total);
+				} else {
+					$scope.progress = 'unable to compute';
+				}
+				$scope.$apply();
+			}
+			function uploadComplete(evt) {
+				$scope.image = document.location.origin + evt.target.responseText.substring(1);
+				$scope.uaImageUpload = $scope.image;
+				$scope.progress = 100;
+				$scope.files = [];
+				$scope.progressVisible = false;
+				$scope.state = 2;
+				$scope.$apply();
+			}
+			function uploadFailed(evt) {
+				alert("There was an error attempting to upload the file.");
+			}
+			function uploadCanceled(evt) {
+				$scope.progressVisible = false;
+				$scope.$apply();
+				alert("The upload has been canceled by the user or the browser dropped the connection.");
+			}
+			$scope.resetImage = function() {
+				$scope.state = 0;
+				$scope.uaImageUpload = undefined;
+				// TODO: delete file on server
+			};
+		}
+	};
+}]).
+
+directive('uaMagicFormatter', ['$filter', function ($filter) {
 	var formatters = {
 		currency: function(val) {
 			var decimal = val.split('.')[1];
@@ -114,6 +192,10 @@ directive('uaMagicFormatter', ['$filter', function($filter) {
 			val = $filter('currency')(val, '$'); // format directly
 			val = val.substring(0, val.length-3); // remove decimals
 			return val + decimal;
+		},
+		numeric: function(val) {
+			val = parseFloat(val.replace(/[^\d\.]/g, ''));
+			return isNaN(val) ? '' : val ;
 		}
 	};
 	return {
@@ -121,7 +203,7 @@ directive('uaMagicFormatter', ['$filter', function($filter) {
 		require: '?ngModel',
 		link: function(scope, element, attrs, ctrl) {
 			ctrl.$parsers.unshift(function(val) {
-				val = formatters[ attrs.uaMagicFormatter ]( val );
+				if ( formatters.hasOwnProperty( attrs.uaMagicFormatter ) ) val = formatters[ attrs.uaMagicFormatter ]( val );
 				return element.val( val ).val();
 			});
 		}
