@@ -4,9 +4,9 @@ directive('notify', ['$timeout', '$sce', function($timeout, $sce) { // extending
 	return {
 		restrict:'EA',
 		replace: true,
-		template: '<div ng-show="message">'+
-			'	<alert type="message.type" close="clearMessage()" class="alert-block">' +
-			'		<h4 ng-show="message.pre">{{message.pre}}</h4>' + 
+		template: '<div ng-show="localMessage">'+
+			'	<alert type="localMessage.type" close="clearMessage()" class="alert-block">' +
+			'		<h4 ng-show="localMessage.pre">{{localMessage.pre}}</h4>' + 
 			'		<span ng-bind-html="cleanHTML"></span>' +
 			'	</alert>'+
 			'</div>',
@@ -15,15 +15,19 @@ directive('notify', ['$timeout', '$sce', function($timeout, $sce) { // extending
 		},
 		link: function($scope) {
 			var timer;
+			$scope.localMessage = false;
 			$scope.clearMessage = function() {
-				$scope.message = false;
+				$scope.localMessage = false;
 			};
 			$scope.$watch('message', function(val) {
+				console.log('in directive');
+				console.log(val);
 				if (!val) return;
 				$timeout.cancel(timer);
 				$scope.cleanHTML =  $sce.trustAsHtml(val.msg);
+				$scope.localMessage = val;
 				if (val) timer = $timeout($scope.clearMessage, (val.delay || 15)*1000);
-			});
+			}, true);
 		}
 	};
 }]);
