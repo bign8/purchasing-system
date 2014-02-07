@@ -1,0 +1,201 @@
+<script type="text/ng-template" id="registerFirmTypeAheadTPL.html">
+	<a>
+		<span bind-html-unsafe="match.label | typeaheadHighlight:query"></span> 
+		(<span>{{ match.model.website | replace:{'http://':'','https://':''} }}</span>)
+	</a>
+</script>
+
+<form class="form-horizontal css-form" name="registration" ng-switch="formState">
+	<div class="row" ng-switch-default >
+		<fieldset class="span6 offset3">
+			<legend>To begin Registration, please enter you email address</legend>
+
+			<div class="control-group">
+				<label class="control-label" for="email">Email Address</label>
+				<div class="controls">
+					<div class="input-append input-block-level">
+						<input class="input-xlarge" type="email" name="check" ng-model="user.email" placeholder="Email Address" required>
+						<button type="submit" class="btn btn-success" ng-disabled="registration.check.$invalid" ng-click="checkEmail()">Check</button>
+					</div>
+					<span ng-show="registration.check.$invalid" class="help-block">Please enter a valid email address.</span>
+				</div>
+			</div>
+		</fieldset>
+	</div>
+
+	<div class="row" ng-switch-when="-1">
+		<fieldset class="span6 offset3">
+			<legend>An account for this email address already exists</legend>
+
+			<button type="button" class="btn btn-primary pull-right btn-mini" ng-click="pwReset()">Password Reset</button>
+			<p>Please perform a password reset by clicking the link to the right.</p>
+
+			<notify message="resetMsg"></notify>
+		</fieldset>
+	</div>
+
+	<div class="row" ng-switch-when="1">
+		<fieldset class="span6">
+			<legend>Firm Information</legend>
+
+			<p class="ctr"><strong>Find</strong> your firm</p>
+
+			<div class="control-group well">
+				<div class="well-overlay" ng-hide=" user.firm.toString() === user.firm || (user.firm.firmID !== undefined || user.firm === undefined) "></div>
+
+				<label class="control-label" for="firmFind">Type your Firm Name</label>
+				<div class="controls">
+					<input type="text" id="firmFind" ng-model="user.firm" typeahead="firm as firm.name for firm in firms | filter:{name:$viewValue} | limitTo:8" placeholder="Firm Search" typeahead-template-url="registerFirmTypeAheadTPL.html">
+					<button type="button" class="close" ng-click="clearFirm()" ng-hide="user.firm === undefined">&times;</button>
+				</div>
+			</div>
+
+			<p class="ctr">Or <strong>Register</strong> a new one</p>
+
+			<div class="well" style="padding: 20px 0 1px;">
+
+				<div class="well-overlay" ng-hide="firmModified || user.firm.firmID === undefined">
+					<button type="button" class="btn btn-warning well-clear-btn btn-large" ng-click="modifyFirm()">Modify Firm</button>
+				</div>
+
+				<div class="control-group">
+					<label class="control-label" for="firmName">Firm Name</label>
+					<div class="controls">
+						<input type="text" id="firmName" ng-model="user.firm.name" placeholder="Firm Name" required>
+						<button type="button" class="close" ng-click="clearFirm()" style="margin-right: 19px;" ng-hide="user.firm === undefined">&times;</button>
+					</div>
+				</div>
+
+				<div class="control-group">
+					<label class="control-label" for="firmWeb">Firm Website</label>
+					<div class="controls">
+						<input type="url" id="firmWeb" ng-model="user.firm.website" placeholder="Firm Website" required>
+						<span class="help-inline">http://www.UpstreamAcademy.com/</span>
+					</div>
+				</div>
+
+				<div class="control-group">
+					<label class="control-label" for="firmName">Firm Address</label>
+					<div class="controls">
+						<div class="input-append" ng-switch="user.firm.addr.addressID">
+
+							<div ng-switch-when="undefined">
+								<span class="input-medium uneditable-input">Click 'set' to assign</span>
+								<button type="button" class="btn btn-info" ng-click="setAddr('firm')">Set</button>
+							</div>
+
+							<div ng-switch-default>
+								<span class="input-medium uneditable-input">{{user.firm.addr.addrName}}</span>
+								<button type="button" class="btn btn-warning" ng-click="setAddr('firm')">Edit</button>
+							</div>
+
+						</div>
+					</div>
+				</div>
+
+			</div>
+
+			<notify message="message"></notify>
+
+			<!-- <pre>Model: {{user.firm | json}}</pre> -->
+		</fieldset>
+
+		<fieldset class="span6">
+			<legend>User Information</legend>
+
+			<div class="control-group">
+				<label class="control-label" for="legalName">Legal Name</label>
+				<div class="controls">
+					<input type="text" id="legalName" ng-model="user.legalName" placeholder="Legal Name" required>
+				</div>
+			</div>
+
+			<div class="control-group">
+				<label class="control-label" for="preName">Preferred Name</label>
+				<div class="controls">
+					<input type="text" id="preName" ng-model="user.preName" placeholder="Preferred Name">
+					<span class="help-inline">(i.e., Bill instead of William, etc.)</span>
+				</div>
+			</div>
+
+			<div class="control-group">
+				<label class="control-label" for="title">Title / Position</label>
+				<div class="controls">
+					<input type="text" id="title" ng-model="user.title" placeholder="Title / Position" required>
+				</div>
+			</div>
+
+			<div class="control-group">
+				<label class="control-label" for="phone">Phone</label>
+				<div class="controls">
+					<input type="text" id="phone" ng-model="user.phone" placeholder="Phone" name="phone" ua-phone required>
+					<span class="help-inline">(xxx) xxx-xxxx</span>
+				</div>
+			</div>
+
+			<div class="control-group">
+				<label class="control-label" for="email">Email Address</label>
+				<div class="controls">
+					<span class="uneditable-input">{{user.email}}</span>
+				</div>
+			</div>
+
+			<div class="control-group">
+				<label class="control-label">Address</label>
+				<div class="controls">
+					<div class="input-append" ng-switch="user.addr.addressID">
+
+						<div ng-switch-when="undefined">
+							<span class="input-medium uneditable-input">Click 'set' to assign</span>
+							<button type="button" class="btn btn-info" ng-click="setAddr('addr')" ng-disabled="same">Set</button>
+						</div>
+
+						<div ng-switch-default>
+							<span class="input-medium uneditable-input">{{user.addr.addrName}}</span>
+							<button type="button" class="btn btn-warning" ng-click="setAddr('addr')"  ng-disabled="same">Edit</button>
+						</div>
+
+					</div>
+					<label class="checkbox"><input type="checkbox" ng-model="same" >Same as Firm</label>
+				</div>
+			</div>
+
+			<div class="well">
+				<div ng-show="registration.inputPassword.$error.passValid">
+					<p>Unfulfilled Password Requirements:</p>
+					<ul>
+						<li ng-show="registration.inputPassword.$error.hasNumber">At least 1 number</li>
+						<li ng-show="registration.inputPassword.$error.specialCh">At least 1 special character</li>
+						<li ng-show="registration.inputPassword.$error.lowerAlph">At least 1 alphabetical character</li>
+						<li ng-show="registration.inputPassword.$error.upperAlph">At least 1 uppercase alphabetical character</li>
+						<li ng-show="registration.inputPassword.$error.metLength">At least 6 characters long</li>
+					</ul>
+				</div>
+
+				<div class="control-group">
+					<label class="control-label" for="inputPassword">Password</label>
+					<div class="controls">
+						<input type="password" id="inputPassword" name="inputPassword" ng-model="user.password" placeholder="Password" ua-pass-validate required>
+					</div>
+				</div>
+
+				<div class="control-group">
+					<label class="control-label" for="inputPassword">Re-type Password</label>
+					<div class="controls">
+						<input type="password" id="inputPassword" ng-model="passVerify" placeholder="Password" required>
+					</div>
+				</div>
+
+			</div>
+
+		</fieldset>
+	</div>
+
+	<div class="form-actions" ng-show="formState == 1">
+		<button type="submit" class="btn btn-primary" ng-click="register()" ng-disabled="registration.$invalid">Create an Account</button>&nbsp;
+		<a href="/" class="btn">Cancel</a>
+	</div>	
+
+</form>
+
+<!-- <pre>{{user | json}}</pre> -->
