@@ -83,8 +83,7 @@ factory('appStrings', function() {
 			failure: { // Server Error
 				pre:'Error!', msg:'A payment with this name and value is already in your cart.',
 				type:ERROR
-			},
-			customPayName: 'Custom Payment' // shows up in cart
+			}
 		},
 		register: { // Registration Form
 			passMatch: { // Passwords Match
@@ -247,6 +246,9 @@ factory('appStrings', function() {
 			},
 			totalParam: 'AMOUNT'
 		},
+		pay: {
+			customPayName: 'Custom Payment' // shows up in cart
+		}
 	});
 
 	return STRINGS;
