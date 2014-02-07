@@ -32,6 +32,26 @@ controller('RegisterFormCtrl', ['$scope', '$modal', 'interface', 'security', 'fi
 	};
 	$scope.modifyFirm = function() { $scope.firmModified = true; };
 
+	// validate email address
+	$scope.formState = 0;
+	$scope.checkEmail = function() {
+		interface.user('checkEmail', {email: $scope.user.email}).then(function (res) {
+			$scope.formState = 1;
+		}, function (res) {
+			$scope.formState = -1;
+		});
+	};
+
+	// pw-reset
+	$scope.resetMsg = null;
+	$scope.pwReset = function() {
+		security.reset( $scope.user.email ).then(function() {
+			$scope.resetMsg = appStrings.register.resetGood;
+		}, function() {
+			$scope.resetMsg = appStrings.register.resetBad;
+		});
+	};
+
 	// handle registration clicks
 	$scope.register = function() {
 		if ($scope.passVerify !== $scope.user.password) {
