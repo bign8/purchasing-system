@@ -19,7 +19,7 @@ th.nowrap, td.nowrap {
 
 /* For printing recipt page, needs re-working */
 @media print {
-	.header, .btn { display: none;}
+	.header, .btn, .feedback { display: none;}
 }
 
 /* form validation */
