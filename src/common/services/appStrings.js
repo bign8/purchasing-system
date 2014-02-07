@@ -2,23 +2,9 @@ angular.module('myApp.common.services.appStrings', []).
 
 factory('appStrings', function() {
 	var ERROR = 'error', SUCCESS = 'success', INFO = 'info';
-	return {
-		ERROR: ERROR,
-		SUCCESS: SUCCESS,
-		INFO: INFO,
-		paypal: { // Paypal (this is for the app)
-			url: 'https://payflowlink.paypal.com',
-			uri: { // used $.param()
-				'AMOUNT': '0',
-				'DESCRIPTION': 'Upstream Academy Purchase',
-				'LOGIN': 'UpstreamAcademy',
-				'MODE': 'TEST',
-				'PARTNER': 'PayPal',
-				'SHOWCONFIRM': 'FALSE',
-				'TYPE': 'S'
-			},
-			totalParam: 'AMOUNT'
-		},
+
+	// Notify strings (need to be functionalized)
+	var STRINGS = {
 		cart: { // Cart Pages
 			disc_dup: { // Duplicate Discount (notify object)
 				pre: 'Duplicate Code!',
@@ -226,4 +212,36 @@ factory('appStrings', function() {
 			}
 		}
 	};
+
+	// functionalize!
+	angular.forEach(STRINGS, function (area) {
+		angular.forEach(area, function (obj, key) {
+			area[key] = function() { // TODO: interpolate here!
+				obj.random = Math.random();
+				return obj;
+			};
+		});
+	});
+
+	// Not functionalized
+	angular.extend(STRINGS, {
+		ERROR: ERROR,
+		SUCCESS: SUCCESS,
+		INFO: INFO,
+		paypal: { // Pay-pal (this is for the app)
+			url: 'https://payflowlink.paypal.com',
+			uri: { // used $.param()
+				'AMOUNT': '0',
+				'DESCRIPTION': 'Upstream Academy Purchase',
+				'LOGIN': 'UpstreamAcademy',
+				'MODE': 'TEST',
+				'PARTNER': 'PayPal',
+				'SHOWCONFIRM': 'FALSE',
+				'TYPE': 'S'
+			},
+			totalParam: 'AMOUNT'
+		},
+	});
+
+	return STRINGS;
 });
