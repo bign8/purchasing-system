@@ -20,8 +20,6 @@ directive('notify', ['$timeout', '$sce', function($timeout, $sce) { // extending
 				$scope.localMessage = false;
 			};
 			$scope.$watch('message', function(val) {
-				console.log('in directive');
-				console.log(val);
 				if (!val) return;
 				$timeout.cancel(timer);
 				$scope.cleanHTML =  $sce.trustAsHtml(val.msg);

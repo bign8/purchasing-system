@@ -213,10 +213,16 @@ factory('appStrings', function() {
 		}
 	};
 
-	// functionalize!
+	// interpolate + functionalize!
+	var interpolate = function(str, obj) { // http://stackoverflow.com/a/1408373/3220865
+		return str.replace(/{([^{}]+)}/g, function (match, p1) {
+			return typeof obj[p1] === 'string' || typeof obj[p1] === 'number' ? obj[p1] : match;
+		});
+	};
 	angular.forEach(STRINGS, function (area) {
 		angular.forEach(area, function (obj, key) {
-			area[key] = function() { // TODO: interpolate here!
+			area[key] = function (interObj) {
+				if (interObj) obj.msg = interpolate(obj.msg, interObj);
 				obj.random = Math.random();
 				return obj;
 			};
