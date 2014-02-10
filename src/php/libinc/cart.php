@@ -348,7 +348,7 @@ class Cart extends NG {
 
 		// Store purchases and options
 		$purchaseSTH = $this->db->prepare("INSERT INTO `purchase` (itemID, orderID, firmID, data) VALUES (?,?,?,?);");
-		$acquisitionSTH = $this->db->prepare("INSERT INTO `acquisition` (itemID, orderID, data) VALUES (?,?,?);");
+		$acquisitionSTH = $this->db->prepare("INSERT INTO `acquisition` (itemID, orderID) VALUES (?,?);");
 		$attendeeSTH = $this->db->prepare("INSERT INTO `attendee` (itemID, contactID, orderID) VALUES (?,?,?);");
 		$memberSTH = $this->db->prepare("INSERT INTO `member` (firmID, groupID) VALUES (?,?);");
 		$cart = $this->get(); // removes random id's
@@ -363,15 +363,15 @@ class Cart extends NG {
 				}
 			}
 
-			if ($item['type'] == 'purchase') { // store purchase / acquisition
-				if (!$purchaseSTH->execute($item['itemID'], $orderID, $user['firmID'], json_encode($option))) return $this->conflict(); // purchase
-
+			if ($item['type'] == 'purchase') { // store groups / acquisition
 				if (isset($item['settings']->groupID)) { // store groups
 					if (!$memberSTH->execute($user['firmID'], $item['settings']->groupID)) return $this->conflict();
 					$option['memberID'] = $this->db->lastInsertId();
 				}
+				if (!$purchaseSTH->execute($item['itemID'], $orderID, $user['firmID'], json_encode($option))) return $this->conflict(); // purchase
 			} else {
-				if (!$acquisitionSTH->execute($item['itemID'], $orderID, json_encode($option))) return $this->conflict(); // acquisition
+				if (!$acquisitionSTH->execute($item['itemID'], $orderID)) return $this->conflict(); // acquisition
+				// $option['acquisitionID'] = $this->db->lastInsertId();
 			}
 		}
 
@@ -385,8 +385,8 @@ class Cart extends NG {
 	public function getPurchases() {
 		$user = $this->usr->requiresAuth();
 
-		$q[] = "SELECT itemID, orderID, data FROM `purchase` WHERE firmID=?"; // purchases
-		$q[] = "SELECT itemID, a.orderID, data FROM `acquisition`a LEFT JOIN `order`o ON a.orderID=o.orderID WHERE o.contactID=?"; // acquisition
+		$q[] = "SELECT itemID, orderID, `data` FROM `purchase` WHERE firmID=?"; // purchases
+		$q[] = "SELECT itemID, a.orderID, 'acq' AS `data` FROM `acquisition`a LEFT JOIN `order`o ON a.orderID=o.orderID WHERE o.contactID=?"; // acquisition
 		$q = implode(" UNION ", $q);
 
 		$STH = $this->db->prepare("SELECT i.*, p.data, t.template, o.stamp FROM ($q) p LEFT JOIN item i ON p.itemID=i.itemID LEFT JOIN `product` pr ON i.productID=pr.productID LEFT JOIN `template` t ON pr.templateID=t.templateID LEFT JOIN `order` o ON p.orderID=o.orderID ORDER BY i.productID, i.name;");
@@ -420,7 +420,10 @@ class Cart extends NG {
 		$firm = $firmSTH->fetch(PDO::FETCH_ASSOC);
 
 		// grab order
-		$itemsSTH = $this->db->prepare("SELECT p.data, i.* FROM `purchase` p LEFT JOIN `item` i ON p.itemID=i.itemID WHERE orderID=?;");
+		$q[] = "SELECT `data`, itemID, orderID FROM `purchase`";
+		$q[] = "SELECT '{}' as `data`, itemID, orderID FROM `acquisition`";
+		$q = implode(" UNION ", $q);
+		$itemsSTH = $this->db->prepare("SELECT p.`data`, i.* FROM ($q) AS `p` LEFT JOIN `item` i ON p.itemID=i.itemID WHERE orderID=?;");
 		$itemsSTH->execute( $orderID );
 		$items = $itemsSTH->fetchAll(PDO::FETCH_ASSOC);
 
