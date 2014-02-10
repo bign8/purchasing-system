@@ -56,9 +56,9 @@ class Cart extends NG {
 		$user = $this->usr->currentUser(); // gets user if available
 
 		// check areas for previously purchased item
-		$q[] = "SELECT purchaseID FROM `purchase` WHERE firmID=? and itemID=?";
-		$q[] = "SELECT CONCAT('a',acquisitionID) FROM `acquisition` a LEFT JOIN `order` o ON a.orderID = o.orderID WHERE itemID=? AND contactID=?";
-		$q[] = "SELECT memberID FROM `member` WHERE firmID=? AND groupID=?";
+		$q[] = "SELECT CONCAT('p-',purchaseID) FROM `purchase` WHERE firmID=? and itemID=?";
+		$q[] = "SELECT CONCAT('a-',acquisitionID) FROM `acquisition` a LEFT JOIN `order` o ON a.orderID = o.orderID WHERE itemID=? AND contactID=?";
+		$q[] = "SELECT CONCAT('m-',memberID) FROM `member` WHERE firmID=? AND groupID=?";
 		$checkSTH = $this->db->prepare( implode(" UNION ", $q) . ";" );
 
 		// remove all non-strings to allow invoices, but still grab purchase id's
@@ -103,9 +103,7 @@ class Cart extends NG {
 				);
 				array_push($retData, $itemID);
 			}
-
 		}
-
 		return $retData;
 	}
 	private function getItemByID( $itemID ) { // Helper(get): return specific item detail by id
@@ -365,13 +363,13 @@ class Cart extends NG {
 				}
 			}
 
-			if (isset($item['settings']->groupID)) { // store groups
-				if (!$memberSTH->execute($user['firmID'], $item['settings']->groupID)) return $this->conflict();
-				$option['memberID'] = $this->db->lastInsertId();
-			}
-
 			if ($item['type'] == 'purchase') { // store purchase / acquisition
 				if (!$purchaseSTH->execute($item['itemID'], $orderID, $user['firmID'], json_encode($option))) return $this->conflict(); // purchase
+
+				if (isset($item['settings']->groupID)) { // store groups
+					if (!$memberSTH->execute($user['firmID'], $item['settings']->groupID)) return $this->conflict();
+					$option['memberID'] = $this->db->lastInsertId();
+				}
 			} else {
 				if (!$acquisitionSTH->execute($item['itemID'], $orderID, json_encode($option))) return $this->conflict(); // acquisition
 			}
