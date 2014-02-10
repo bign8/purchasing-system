@@ -17,7 +17,6 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function ($root
 		var setValue = (attribute=='settings') ? 'value' : 'fullValue';
 		item.cost = item.cost || {};
 		item.cost[setValue] = 0;
-		item.hasOptions = false;
 		if (item.template == 'custom') {
 			item.cost[setValue] = parseFloat(item.cost[attribute].cost) || 0; // straight assignment (no options)
 		} else {
@@ -32,7 +31,6 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function ($root
 						var multiply = (options[ item.itemID ][ attID ] || []).length - parseFloat( item.cost[attribute].after ); // how many more
 						if (multiply > 0) item.cost[setValue] += parseFloat( item.cost[attribute].later ) * multiply; // for additional attendees
 					}
-					item.hasOptions = true;
 					break;
 				case '3':
 					item.hasOptions = true;

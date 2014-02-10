@@ -108,11 +108,14 @@ class Cart extends NG {
 	}
 	private function getItemByID( $itemID ) { // Helper(get): return specific item detail by id
 		$itemSTH = $this->db->prepare("SELECT i.*, t.template, p.type FROM (SELECT * FROM `item` WHERE itemID = ?) i JOIN product p ON p.productID=i.productID JOIN template t ON t.templateID = p.templateID;");
+		$optionSTH = $this->db->prepare("SELECT * FROM `tie_product_field` WHERE productID=?;");
 		if (!$itemSTH->execute( $itemID )) return -1;
 		$row = $itemSTH->fetch(PDO::FETCH_ASSOC);
+
 		if (!isset($row['productID'])) return null; // if can't find product
+		if (!$optionSTH->execute( $row['productID'] )) return -1;
 		$row['settings'] = json_decode($row['settings']);
-		// unset($row['settings']);
+		$row['hasOptions'] = $optionSTH->rowCount() > 0;
 		$row['cost'] = $this->getProductCost( $row['productID'] );
 		return $row;
 	}
