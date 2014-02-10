@@ -460,6 +460,8 @@ class Cart extends NG {
 		$html .= address($firm);
 		$html .= "<hr/>Items:<br /><ul>\r\n";
 
+		$mail = new UAMail();
+
 		foreach ($items as $item) {
 
 			$html .= (isset($item['url'])) ? "<li><a href=\"{$item['url']}\">{$item['name']}</a><ul>" : "<li><strong>{$item['name']}</strong><ul>";
@@ -469,8 +471,16 @@ class Cart extends NG {
 				if ($fieldSTH->rowCount() > 0) {
 					$fieldData = $fieldSTH->fetch(PDO::FETCH_ASSOC);
 
+					// special question formatters
 					switch ($fieldData['fieldID']) {
-						case '1': // pretty print attendees
+						case '2':
+							$value = '$' . money_format('%n', $value);
+							break;
+					}
+
+					// type display
+					switch ($fieldData['type']) {
+						case 'attendees': // pretty print attendees
 							$html .= "<li><b>Attendee(s):</b><ul>";
 							$attendeeSTH->execute( $item['itemID'] );
 							while ($row = $attendeeSTH->fetch( PDO::FETCH_ASSOC )) {
@@ -482,10 +492,12 @@ class Cart extends NG {
 							}
 							$html .= "</ul></li>";
 							break;
-						
-						case '2':
-							$value = '$' . money_format('%n', $value);
-							// break; // falls over to default after formatting
+
+						case 'image':
+							$fileName = $firm['name'] . ', ' . $contact['legalName'] . '.' . pathinfo($value, PATHINFO_EXTENSION);
+							$mail->addAttachment($_SERVER['DOCUMENT_ROOT'].$value, $fileName);
+							$html .= "<li><b>" . $fieldData['name'] . ':</b>' . $fileName . "</li>";
+							break;
 
 						default:
 							$html .= "<li><b>" . $fieldData['name'] . ':</b> ' . $value . "</li>";
@@ -498,7 +510,6 @@ class Cart extends NG {
 
 		$html .= "</ul>\r\n";
 
-		$mail = new UAMail();
 		$mail->addAddress(config::notifyEmail, config::notifyName);
 		$mail->Subject = "UpstreamAcademy Checkout";
 		$mail->Body    = $html;

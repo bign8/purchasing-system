@@ -174,7 +174,7 @@ directive('uaImageUpload', [function() {
 				$scope.$apply();
 			}
 			function uploadComplete(evt) {
-				$scope.image = document.location.origin + evt.target.responseText.substring(1);
+				$scope.image = evt.target.responseText.substring(1);
 				$scope.uaImageUpload = $scope.image;
 				$scope.progress = 100;
 				$scope.files = [];
