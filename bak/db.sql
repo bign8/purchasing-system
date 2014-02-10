@@ -9,12 +9,11 @@ CREATE TABLE `acquisition` (
   `acquisitionID` int(10) unsigned NOT NULL,
   `itemID` int(10) unsigned NOT NULL,
   `orderID` int(10) unsigned NOT NULL,
-  `data` text,
   PRIMARY KEY (`acquisitionID`),
   KEY `itemID` (`itemID`),
   KEY `orderID` (`orderID`),
-  CONSTRAINT `acquisition_ibfk_2` FOREIGN KEY (`orderID`) REFERENCES `order` (`orderID`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `acquisition_ibfk_1` FOREIGN KEY (`itemID`) REFERENCES `item` (`itemID`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `acquisition_ibfk_1` FOREIGN KEY (`itemID`) REFERENCES `item` (`itemID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `acquisition_ibfk_2` FOREIGN KEY (`orderID`) REFERENCES `order` (`orderID`) ON DELETE CASCADE ON UPDATE CASCADE
 );
 --
 -- Table structure for table `address`
