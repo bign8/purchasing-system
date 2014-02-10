@@ -26,6 +26,7 @@
 		<tbody>
 			<tr ng-repeat="item in theCart.cart" ng-class="{true:'error', false:''}[item.warn]">
 				<td ng-switch="!item.url">
+					<span ng-show="item.expired" class="text-error">Expired:&nbsp;</span>
 					<span ng-switch-when="true">{{item.name}}</span>
 					<a ng-switch-default ng-href="{{item.url}}">{{item.name}}</a>
 				</td>
