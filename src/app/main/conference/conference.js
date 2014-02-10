@@ -131,8 +131,8 @@ directive('uaImageUpload', [function() {
 		},
 		templateUrl: 'app/main/conference/image.tpl.html',
 		link: function($scope, elem, attrs) {
-			$scope.state = 0;
-			$scope.image = false;
+			$scope.state = ($scope.uaImageUpload) ? 2 : 0;
+			$scope.image = $scope.uaImageUpload || false;
 
 			var reader = new FileReader();
 			reader.onload = function (e) {
