@@ -461,6 +461,8 @@ class Cart extends NG {
 		$html .= "<hr/>Items:<br /><ul>\r\n";
 
 		$mail = new UAMail();
+		$files = array();
+		// $mail->SMTPDebug  = 2;
 
 		foreach ($items as $item) {
 
@@ -497,6 +499,7 @@ class Cart extends NG {
 							$fileName = $firm['name'] . ', ' . $contact['legalName'] . '.' . pathinfo($value, PATHINFO_EXTENSION);
 							$mail->addAttachment($_SERVER['DOCUMENT_ROOT'].$value, $fileName);
 							$html .= "<li><b>" . $fieldData['name'] . ':</b>' . $fileName . "</li>";
+							array_push($files, $_SERVER['DOCUMENT_ROOT'] . $value);
 							break;
 
 						default:
@@ -514,6 +517,10 @@ class Cart extends NG {
 		$mail->Subject = "UpstreamAcademy Checkout";
 		$mail->Body    = $html;
 		$mail->AltBody = strip_tags($html);
-		if (!$mail->send()) $this->conflict('mail');
+		if (!$mail->send()) {
+			$this->conflict('mail');
+		} else {
+			foreach ($files as $file) unlink($file); // delete sent files
+		}
 	}
 }
