@@ -55,12 +55,6 @@ class Cart extends NG {
 	public function get() {
 		$user = $this->usr->currentUser(); // gets user if available
 
-		// check areas for previously purchased item
-		$q[] = "SELECT CONCAT('p-',purchaseID) FROM `purchase` WHERE firmID=? and itemID=?";
-		$q[] = "SELECT CONCAT('a-',acquisitionID) FROM `acquisition` a LEFT JOIN `order` o ON a.orderID = o.orderID WHERE itemID=? AND contactID=?";
-		$q[] = "SELECT CONCAT('m-',memberID) FROM `member` WHERE firmID=? AND groupID=?";
-		$checkSTH = $this->db->prepare( implode(" UNION ", $q) . ";" );
-
 		// remove all non-strings to allow invoices, but still grab purchase id's
 		$cleanIDs = array();
 		foreach($_SESSION['cart'] as $itemID) if (is_string($itemID)) array_push($cleanIDs, $itemID);
@@ -84,15 +78,7 @@ class Cart extends NG {
 		foreach ($_SESSION['cart'] as $itemID) {
 			if (is_string($itemID)) {
 				$item = $this->getItemByID( $itemID );
-				if ($item != null) {
-
-					// warn if item has already been purchased
-					$groupID = isset($item['settings']->groupID) ? $item['settings']->groupID : -1;
-					$checkSTH->execute( $user['firmID'], $itemID, $itemID, $user['contactID'], $user['firmID'], $groupID );
-					$item['warn'] = ($checkSTH->rowCount() > 0);
-
-					array_push($retData, $item);
-				}
+				if ($item != null) array_push($retData, $item);
 			} else { // format cost for carts
 				$cost = $itemID['cost'];
 				$itemID['cost'] = array(
@@ -108,15 +94,30 @@ class Cart extends NG {
 	}
 	private function getItemByID( $itemID ) { // Helper(get): return specific item detail by id
 		$itemSTH = $this->db->prepare("SELECT i.*, t.template, p.type FROM (SELECT * FROM `item` WHERE itemID = ?) i JOIN product p ON p.productID=i.productID JOIN template t ON t.templateID = p.templateID;");
-		$optionSTH = $this->db->prepare("SELECT * FROM `tie_product_field` WHERE productID=?;");
 		if (!$itemSTH->execute( $itemID )) return -1;
 		$row = $itemSTH->fetch(PDO::FETCH_ASSOC);
-
 		if (!isset($row['productID'])) return null; // if can't find product
+
+		$optionSTH = $this->db->prepare("SELECT * FROM `tie_product_field` WHERE productID=?;");
 		if (!$optionSTH->execute( $row['productID'] )) return -1;
+
+		// check areas for previously purchased item
+		$q[] = "SELECT CONCAT('p-',purchaseID), `data` FROM `purchase` WHERE firmID=? and itemID=?";
+		$q[] = "SELECT CONCAT('a-',acquisitionID), '{}' FROM `acquisition` a LEFT JOIN `order` o ON a.orderID = o.orderID WHERE itemID=? AND contactID=?";
+		$q[] = "SELECT CONCAT('m-',memberID), '{}' FROM `member` WHERE firmID=? AND groupID=?";
+		$checkSTH = $this->db->prepare( implode(" UNION ", $q) . ";" );
+
 		$row['settings'] = json_decode($row['settings']);
 		$row['hasOptions'] = $optionSTH->rowCount() > 0;
 		$row['cost'] = $this->getProductCost( $row['productID'] );
+
+		// warn if item has already been purchased
+		$user = $this->usr->currentUser(); // gets user if available
+		$groupID = isset($row['settings']->groupID) ? $row['settings']->groupID : -1;
+		$checkSTH->execute( $user['firmID'], $itemID, $itemID, $user['contactID'], $user['firmID'], $groupID );
+		$row['warn'] = ($checkSTH->rowCount() > 0);
+		$row['oldData'] = json_decode( $checkSTH->fetchColumn(1) );
+
 		return $row;
 	}
 	private function getProductCost( $productID ) { // Helper(get): return cost for a productID
