@@ -18,28 +18,48 @@ config(['$routeProvider', 'securityAuthorizationProvider', function ( $routeProv
 
 controller('RegisterConferenceCtrl', ['$scope', 'myPage', 'interface', 'conference', '$modal', 'theCart', 'appStrings', function ($scope, myPage, interface, conference, $modal, theCart, appStrings) {
 	$scope.con = conference;
-	$scope.orig = angular.copy( $scope.con.options );
 	$scope.message = false;
 
+	// Data, pre-processing
 	var title = ($scope.con.item.template == 'conference') ? "Register" : "Options" ;
 	myPage.setTitle(title, "for " + $scope.con.item.name);
 
 	$scope.noFields = ($scope.con.fields.length === 0); // ensure item has quesitions
 	if ($scope.noFields) return; // no need to do any further processing if there are no options
 	
-	$scope.attID = (function() {
+	function processAttendees() {
 		var attID = null;
 		angular.forEach($scope.con.fields, function(value, key) { if (value.name == 'Attendees') attID = value.fieldID; });
 		$scope.con.options.attID = attID;
 		if (attID) $scope.con.options[attID] = $scope.con.options[attID] || []; // set empty attendee array
+
+		if ($scope.con.item.oldData && $scope.con.item.oldData.hasOwnProperty(attID)) { // add old immutable attendees
+			angular.forEach($scope.con.item.oldData[attID], function (person) {
+				var found = false;
+				angular.forEach($scope.con.options[attID], function (checkPerson) { // search for same user (re-edit)
+					if (checkPerson.contactID == person.contactID) found = true;
+				});
+				if (!found) { // if user is not in list, add
+					person.immutable = true;
+					$scope.con.options[attID].unshift(person);
+				}
+			});
+			$scope.message = appStrings.conference.immutable();
+		}
 		return attID;
-	})();
+	}
+	$scope.attID = processAttendees();
+
+	$scope.orig = angular.copy( $scope.con.options );
 
 	// Attendee list controls (these will be disabled if $scope.attID is undefined)
 	$scope.total = 0;
-	$scope.computeCost = function(index) {
+	$scope.computeCost = function(index, person) {
 		var cost = 0, s = $scope.con.item.cost.settings;
-		if ( index === 0 ) {
+		if (person.immutable) {
+			$scope.total = 0;
+			cost = 0;
+		} else if ( index === 0 ) {
 			cost = parseFloat( s.initial );
 			$scope.total = 0;
 		} else if ( index >= parseInt( s.after ) ) {
@@ -49,8 +69,9 @@ controller('RegisterConferenceCtrl', ['$scope', 'myPage', 'interface', 'conferen
 		return cost;
 	};
 	$scope.clr = function() { 
-		$scope.con.options[ $scope.attID ] = []; 
-		$scope.total = 0; 
+		$scope.con.options[ $scope.attID ] = [];
+		$scope.total = 0;
+		processAttendees();
 	};
 	$scope.rem = function(index, $event) {
 		$event.preventDefault();

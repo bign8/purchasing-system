@@ -208,6 +208,11 @@ factory('appStrings', function() {
 				pre:'Error!',
 				msg: 'There was an unknown error saving your information.  Please try again or contact Upstream Academy for help.',
 				type:ERROR
+			},
+			immutable: {
+				pre:'Heads up!',
+				msg:'Previously purchased attendees are visable in this view.  They cannot be removed and they will not be added twoard your total.',
+				type:INFO, delay: 60
 			}
 		}
 	};

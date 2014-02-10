@@ -1,6 +1,4 @@
-angular.module('myApp.main.cart', [
-
-]).
+angular.module('myApp.main.cart', []).
 
 config(['$routeProvider', 'securityAuthorizationProvider', function ( $routeProvider, securityAuthorizationProvider ){
 	$routeProvider. when('/cart', {

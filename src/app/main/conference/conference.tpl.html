@@ -87,7 +87,7 @@
 							</tr>
 						</thead>
 						<tbody>
-							<tr ng-repeat="person in con.options[attID]" ng-click="edit(person)">
+							<tr ng-repeat="person in con.options[attID]" ng-click="edit(person)" ng-class="{warning:person.immutable}">
 								<td>
 									<span ng-show="person.title">{{person.title}}<br/></span>
 									{{person.legalName}}<br/>
@@ -101,8 +101,8 @@
 									{{person.addr.city}} {{person.addr.state}}, {{person.addr.zip}}
 								</td>
 								<td>
-									<span style="float:right">{{computeCost($index) | currency}}<br/><br/></span>
-									<button style="clear:both" type="button" class="close" ng-click="rem($index,$event)">&times;</button>
+									<span style="float:right">{{computeCost($index, person) | currency}}<br/><br/></span>
+									<button style="clear:both" type="button" class="close" ng-click="rem($index,$event)" ng-hide="person.immutable">&times;</button>
 								</td>
 							</tr>
 						</tbody>
@@ -139,3 +139,4 @@
 </form>
 
 <!-- <pre>{{con | json}}</pre> -->
+<!-- <pre>{{orig | json}}</pre> -->
