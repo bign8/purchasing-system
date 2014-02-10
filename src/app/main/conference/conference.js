@@ -47,9 +47,12 @@ controller('RegisterConferenceCtrl', ['$scope', 'myPage', 'interface', 'conferen
 
 	// Attendee list controls (these will be disabled if $scope.attID is undefined)
 	$scope.total = 0;
-	$scope.computeCost = function(index) {
+	$scope.computeCost = function(index, person) {
 		var cost = 0, s = $scope.con.item.cost.settings;
-		if ( index === 0 ) {
+		if (person.immutable) {
+			$scope.total = 0;
+			cost = 0;
+		} else if ( index === 0 ) {
 			cost = parseFloat( s.initial );
 			$scope.total = 0;
 		} else if ( index >= parseInt( s.after ) ) {
