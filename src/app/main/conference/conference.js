@@ -105,6 +105,22 @@ controller('RegisterConferenceCtrl', ['$scope', 'myPage', 'interface', 'conferen
 			$scope.message = appStrings.conference.error();
 		});
 	};
+
+	// Generic fields helper
+	$scope.helpers = {
+		otherSelect: {
+			pre: function(arr) {
+				arr = angular.copy( arr );
+				arr.push('Other');
+				return arr;
+			},
+			change: function(elem) {
+				console.log(elem);
+				$scope.helpers.otherSelect.isOther = (elem == 'Other');
+			},
+			isOther: false
+		}
+	};
 }]).
 
 directive('uaImageUpload', [function() {
