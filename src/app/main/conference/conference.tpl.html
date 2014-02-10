@@ -56,6 +56,13 @@
 							</div>
 						</div>
 
+						<div ng-switch-when="otherSelect">
+							<label class="control-label">{{field.name}} <span ng-show="field.required">*</span></label>
+							<div class="controls">
+								<select ng-model="con.options[field.fieldID]" ng-required="field.required" ng-options="x for x in helpers.otherSelect.pre(field.settings)" ng-change="helpers.otherSelect.change(con.options[field.fieldID])" class="input-block-level"></select>
+								<input type="text" ng-show="helpers.otherSelect.isOther" class="input-block-level" style="margin-top:1em" ng-model="con.options[field.fieldID]" />
+							</div>
+						</div>
 
 						<div ng-switch-default>
 							<h4>Unknown question type ({{field.name}} - {{field.type}})</h4>
