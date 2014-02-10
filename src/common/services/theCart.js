@@ -28,8 +28,19 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function ($root
 					item.cost[setValue] = parseFloat( item.cost[attribute].initial ); // initial cost always in effect
 					if ( options.hasOwnProperty(item.itemID) ) { // apply pricing based on the number of attendees
 						var attID = options[ item.itemID ].attID; // grab attendee id
-						var multiply = (options[ item.itemID ][ attID ] || []).length - parseFloat( item.cost[attribute].after ); // how many more
-						if (multiply > 0) item.cost[setValue] += parseFloat( item.cost[attribute].later ) * multiply; // for additional attendees
+						item.cost[setValue] = 0;
+						angular.forEach(options[ item.itemID ][ attID ], function (person, index) {
+							var cost = 0, s = item.cost[attribute];
+							if (person.immutable) {
+								cost = 0;
+								item.warn = false; // reset item warning
+							} else if ( index === 0 ) {
+								cost = parseFloat( s.initial );
+							} else if ( index >= parseInt( s.after ) ) {
+								cost = parseFloat( s.later );
+							}
+							item.cost[setValue] += cost;
+						});
 					}
 					break;
 				case '3':
