@@ -27,7 +27,7 @@ controller('RegisterConferenceCtrl', ['$scope', 'myPage', 'interface', 'conferen
 	$scope.noFields = ($scope.con.fields.length === 0); // ensure item has quesitions
 	if ($scope.noFields) return; // no need to do any further processing if there are no options
 	
-	$scope.attID = (function() {
+	function processAttendees() {
 		var attID = null;
 		angular.forEach($scope.con.fields, function(value, key) { if (value.name == 'Attendees') attID = value.fieldID; });
 		$scope.con.options.attID = attID;
@@ -35,13 +35,20 @@ controller('RegisterConferenceCtrl', ['$scope', 'myPage', 'interface', 'conferen
 
 		if ($scope.con.item.oldData && $scope.con.item.oldData.hasOwnProperty(attID)) { // add old immutable attendees
 			angular.forEach($scope.con.item.oldData[attID], function (person) {
-				person.immutable = true;
-				$scope.con.options[attID].push(person);
+				var found = false;
+				angular.forEach($scope.con.options[attID], function (checkPerson) { // search for same user (re-edit)
+					if (checkPerson.contactID == person.contactID) found = true;
+				});
+				if (!found) { // if user is not in list, add
+					person.immutable = true;
+					$scope.con.options[attID].unshift(person);
+				}
 			});
 			$scope.message = appStrings.conference.immutable();
 		}
 		return attID;
-	})();
+	}
+	$scope.attID = processAttendees();
 
 	$scope.orig = angular.copy( $scope.con.options );
 
@@ -62,8 +69,9 @@ controller('RegisterConferenceCtrl', ['$scope', 'myPage', 'interface', 'conferen
 		return cost;
 	};
 	$scope.clr = function() { 
-		$scope.con.options[ $scope.attID ] = angular.copy( $scope.orig[ $scope.attID ] ); 
-		$scope.total = 0; 
+		$scope.con.options[ $scope.attID ] = [];
+		$scope.total = 0;
+		processAttendees();
 	};
 	$scope.rem = function(index, $event) {
 		$event.preventDefault();
