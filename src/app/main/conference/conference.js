@@ -18,9 +18,9 @@ config(['$routeProvider', 'securityAuthorizationProvider', function ( $routeProv
 
 controller('RegisterConferenceCtrl', ['$scope', 'myPage', 'interface', 'conference', '$modal', 'theCart', 'appStrings', function ($scope, myPage, interface, conference, $modal, theCart, appStrings) {
 	$scope.con = conference;
-	$scope.orig = angular.copy( $scope.con.options );
 	$scope.message = false;
 
+	// Data, pre-processing
 	var title = ($scope.con.item.template == 'conference') ? "Register" : "Options" ;
 	myPage.setTitle(title, "for " + $scope.con.item.name);
 
@@ -32,8 +32,18 @@ controller('RegisterConferenceCtrl', ['$scope', 'myPage', 'interface', 'conferen
 		angular.forEach($scope.con.fields, function(value, key) { if (value.name == 'Attendees') attID = value.fieldID; });
 		$scope.con.options.attID = attID;
 		if (attID) $scope.con.options[attID] = $scope.con.options[attID] || []; // set empty attendee array
+
+		if ($scope.con.item.oldData && $scope.con.item.oldData.hasOwnProperty(attID)) { // add old immutable attendees
+			angular.forEach($scope.con.item.oldData[attID], function (person) {
+				person.immutable = true;
+				$scope.con.options[attID].push(person);
+			});
+			$scope.message = appStrings.conference.immutable();
+		}
 		return attID;
 	})();
+
+	$scope.orig = angular.copy( $scope.con.options );
 
 	// Attendee list controls (these will be disabled if $scope.attID is undefined)
 	$scope.total = 0;
@@ -49,7 +59,7 @@ controller('RegisterConferenceCtrl', ['$scope', 'myPage', 'interface', 'conferen
 		return cost;
 	};
 	$scope.clr = function() { 
-		$scope.con.options[ $scope.attID ] = []; 
+		$scope.con.options[ $scope.attID ] = angular.copy( $scope.orig[ $scope.attID ] ); 
 		$scope.total = 0; 
 	};
 	$scope.rem = function(index, $event) {
