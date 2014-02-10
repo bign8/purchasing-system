@@ -351,7 +351,7 @@ class Cart extends NG {
 		$orderID = $this->db->lastInsertId();
 
 		// Store purchases and options
-		$purchaseSTH = $this->db->prepare("INSERT INTO `purchase` (itemID, orderID, firmID, data) VALUES (?,?,?,?);");
+		$purchaseSTH = $this->db->prepare("INSERT INTO `purchase` (itemID, orderID, firmID, `data`) VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE orderID=VALUES(orderID), `data`=VALUES(`data`);");
 		$acquisitionSTH = $this->db->prepare("INSERT INTO `acquisition` (itemID, orderID) VALUES (?,?);");
 		$attendeeSTH = $this->db->prepare("INSERT INTO `attendee` (itemID, contactID, orderID) VALUES (?,?,?);");
 		$memberSTH = $this->db->prepare("INSERT INTO `member` (firmID, groupID) VALUES (?,?);");

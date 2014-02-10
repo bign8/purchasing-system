@@ -214,6 +214,7 @@ CREATE TABLE `purchase` (
   `firmID` int(10) unsigned NOT NULL COMMENT 'redundant, but simplifying',
   `data` text NOT NULL COMMENT 'JSON object',
   PRIMARY KEY (`purchaseID`),
+  UNIQUE KEY `itemID_2` (`itemID`,`firmID`),
   KEY `itemID` (`itemID`),
   KEY `orderID` (`orderID`),
   KEY `firmID` (`firmID`),
