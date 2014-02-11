@@ -30,10 +30,6 @@ class User extends NG {
 			case 'reset':       $data = $obj->reset();       break;
 			case 'resetPass':   $data = $obj->resetPass();   break;
 			case 'updateUser':  $data = $obj->updateUser();  break;
-
-			// DEV
-			case 'testAuth':  $data = $obj->testAuth();  break;
-			case 'testAdmin': $data = $obj->testAdmin(); break;
 			default: $pass = false;
 		}
 	}
@@ -64,18 +60,6 @@ class User extends NG {
 		'admin' => false // this field is required by angular
 	);
 	 * ---------------------------------------------------------------------- */
-
-	// Worker(test): tests if user is authenticated
-	public function testAuth() {
-		$this->requiresAuth();
-		return 'hello authenticated user';
-	}
-
-	// Worker(test): tests if user is administrator
-	public function testAdmin() {
-		$this->requiresAdmin();
-		return 'hello administrator user';
-	}
 
 	// Worker(settings/firmCode): adds firm membership to group
 	public function addFirmCode() {

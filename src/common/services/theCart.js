@@ -134,9 +134,6 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function ($root
 		fullTotal: function() {
 			return service.total() - service.totDiscount();
 		},
-		// dev: function() { // for development only
-		// 	return options;
-		// },
 		setDirty: function() {
 			dirty = true;
 		},

@@ -7,6 +7,7 @@ ToDo:
 	- MP (live + hard-copy or digital) (Note about CPE credit can be applied)
 	- MP-past (hard-copy or digital) (Note about CPE credit cannot be applied) - download not currently available
 - Allow pretty crumb to be set by individual pages (can bind to form elements for changing crumbs)
+- Fix grunt build to only upload php scripts
 - Notify users of un-supported browsers
 - Service to controll account settings (single data pull) (clearing memberships on new firm creation)
 - store referrer for redirects back to site

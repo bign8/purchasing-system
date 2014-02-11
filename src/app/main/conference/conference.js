@@ -136,7 +136,6 @@ controller('RegisterConferenceCtrl', ['$scope', 'myPage', 'interface', 'conferen
 				return arr;
 			},
 			change: function(elem) {
-				console.log(elem);
 				$scope.helpers.otherSelect.isOther = (elem == 'Other');
 			},
 			isOther: false
