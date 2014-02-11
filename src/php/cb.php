@@ -30,6 +30,7 @@ switch ($_REQUEST['action']) {
 
 	default: // TODO: remove after dev
 		echo '<pre>';
+		echo session_id() . "\r\n";
 		print_r($_SESSION);
 		break;
 }
