@@ -1,5 +1,15 @@
 <?php
 
+// Handle cross site
+header('Access-Control-Allow-Origin: http://localhost:4001');
+header('Access-Control-Allow-Credentials: true');
+header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type');
+if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') exit(0);
+
+session_id('ojv8qoep4ag3vsslpv45esruu4'); // stolen from local development
+session_start();
+
 require_once('./libinc/main_include.php');
 
 /*
