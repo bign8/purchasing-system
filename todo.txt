@@ -64,3 +64,7 @@ Clipboard:
 	REFERENCES `order`(orderID)
 	ON DELETE CASCADE
 	ON UPDATE CASCADE
+
+- Play with production build script (remove lines between comments)
+	- http://regex101.com/#javascript
+	- x.replace(/[\t ]*(###|\/\/\/|<!--) dev(.|[\r\n])*(###|\/\/\/|<!--) end( -->)?/gi,'')
