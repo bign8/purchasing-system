@@ -18,28 +18,48 @@ config(['$routeProvider', 'securityAuthorizationProvider', function ( $routeProv
 
 controller('RegisterConferenceCtrl', ['$scope', 'myPage', 'interface', 'conference', '$modal', 'theCart', 'appStrings', function ($scope, myPage, interface, conference, $modal, theCart, appStrings) {
 	$scope.con = conference;
-	$scope.orig = angular.copy( $scope.con.options );
 	$scope.message = false;
 
+	// Data, pre-processing
 	var title = ($scope.con.item.template == 'conference') ? "Register" : "Options" ;
 	myPage.setTitle(title, "for " + $scope.con.item.name);
 
 	$scope.noFields = ($scope.con.fields.length === 0); // ensure item has quesitions
 	if ($scope.noFields) return; // no need to do any further processing if there are no options
 	
-	$scope.attID = (function() {
+	function processAttendees() {
 		var attID = null;
 		angular.forEach($scope.con.fields, function(value, key) { if (value.name == 'Attendees') attID = value.fieldID; });
 		$scope.con.options.attID = attID;
 		if (attID) $scope.con.options[attID] = $scope.con.options[attID] || []; // set empty attendee array
+
+		if ($scope.con.item.oldData && $scope.con.item.oldData.hasOwnProperty(attID)) { // add old immutable attendees
+			angular.forEach($scope.con.item.oldData[attID], function (person) {
+				var found = false;
+				angular.forEach($scope.con.options[attID], function (checkPerson) { // search for same user (re-edit)
+					if (checkPerson.contactID == person.contactID) found = true;
+				});
+				if (!found) { // if user is not in list, add
+					person.immutable = true;
+					$scope.con.options[attID].unshift(person);
+				}
+			});
+			$scope.message = appStrings.conference.immutable();
+		}
 		return attID;
-	})();
+	}
+	$scope.attID = processAttendees();
+
+	$scope.orig = angular.copy( $scope.con.options );
 
 	// Attendee list controls (these will be disabled if $scope.attID is undefined)
 	$scope.total = 0;
-	$scope.computeCost = function(index) {
+	$scope.computeCost = function(index, person) {
 		var cost = 0, s = $scope.con.item.cost.settings;
-		if ( index === 0 ) {
+		if (person.immutable) {
+			$scope.total = 0;
+			cost = 0;
+		} else if ( index === 0 ) {
 			cost = parseFloat( s.initial );
 			$scope.total = 0;
 		} else if ( index >= parseInt( s.after ) ) {
@@ -49,8 +69,9 @@ controller('RegisterConferenceCtrl', ['$scope', 'myPage', 'interface', 'conferen
 		return cost;
 	};
 	$scope.clr = function() { 
-		$scope.con.options[ $scope.attID ] = []; 
-		$scope.total = 0; 
+		$scope.con.options[ $scope.attID ] = [];
+		$scope.total = 0;
+		processAttendees();
 	};
 	$scope.rem = function(index, $event) {
 		$event.preventDefault();
@@ -86,7 +107,7 @@ controller('RegisterConferenceCtrl', ['$scope', 'myPage', 'interface', 'conferen
 	// Overall Controlls
 	$scope.save = function() {
 		if ($scope.attID && $scope.con.options[ $scope.attID ].length === 0) {
-			$scope.message = appStrings.conference.attendee;
+			$scope.message = appStrings.conference.attendee();
 			return;
 		}
 		interface.cart('setOption', $scope.con).then(function() {
@@ -102,8 +123,23 @@ controller('RegisterConferenceCtrl', ['$scope', 'myPage', 'interface', 'conferen
 			});
 			$scope.orig = angular.copy( $scope.con.options );
 		}, function() {
-			$scope.message = appStrings.conference.error;
+			$scope.message = appStrings.conference.error();
 		});
+	};
+
+	// Generic fields helper
+	$scope.helpers = {
+		otherSelect: {
+			pre: function(arr) {
+				arr = angular.copy( arr );
+				arr.push('Other');
+				return arr;
+			},
+			change: function(elem) {
+				$scope.helpers.otherSelect.isOther = (elem == 'Other');
+			},
+			isOther: false
+		}
 	};
 }]).
 
@@ -115,8 +151,8 @@ directive('uaImageUpload', [function() {
 		},
 		templateUrl: 'app/main/conference/image.tpl.html',
 		link: function($scope, elem, attrs) {
-			$scope.state = 0;
-			$scope.image = false;
+			$scope.state = ($scope.uaImageUpload) ? 2 : 0;
+			$scope.image = $scope.uaImageUpload || false;
 
 			var reader = new FileReader();
 			reader.onload = function (e) {
@@ -158,7 +194,7 @@ directive('uaImageUpload', [function() {
 				$scope.$apply();
 			}
 			function uploadComplete(evt) {
-				$scope.image = document.location.origin + evt.target.responseText.substring(1);
+				$scope.image = evt.target.responseText.substring(1);
 				$scope.uaImageUpload = $scope.image;
 				$scope.progress = 100;
 				$scope.files = [];
@@ -253,7 +289,7 @@ controller('ContactModalCtrl', ['$scope', '$modalInstance', 'contact', 'prep', '
 	};
 	$scope.ok = function () {
 		if ($scope.contact.addr.addressID === null) {
-			$scope.message = appStrings.contact.address;
+			$scope.message = appStrings.contact.address();
 			return;
 		}
 		var query = ($scope.contact.contactID === undefined) ? 'add' : 'edit'; // change add or edit based on existence of contactID
@@ -261,7 +297,7 @@ controller('ContactModalCtrl', ['$scope', '$modalInstance', 'contact', 'prep', '
 			$scope.contact.contactID = JSON.parse(res);
 			$modalInstance.close( $scope.contact );
 		}, function (err) {
-			$scope.message = (err == 'dup') ? appStrings.contact.duplicate : appStrings.contact.error;
+			$scope.message = (err == 'dup') ? appStrings.contact.duplicate() : appStrings.contact.error();
 		});
 	};
 	$scope.setAddr = function () { // open modal here with address form

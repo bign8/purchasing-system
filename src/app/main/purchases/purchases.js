@@ -32,8 +32,12 @@ controller('ListPurchasesCtrl', ['$scope', 'items', '$modal', function ($scope, 
 	};
 }]).
 
-controller('ModalListAttendeesCtrl', ['$scope', '$modalInstance', 'item', function ($scope, $modalInstance, item) {
+controller('ModalListAttendeesCtrl', ['$scope', '$modalInstance', 'item', '$location', function ($scope, $modalInstance, item, $location) {
 	$scope.item = item;
 	$scope.ok = function () { $modalInstance.close('all good'); };
 	$scope.cancel = function () { $modalInstance.dismiss('cancel'); };
+	$scope.more = function () {
+		$location.path('/conference/' + item.itemID);
+		$modalInstance.dismiss('more');
+	};
 }]);

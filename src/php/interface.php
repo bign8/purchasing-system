@@ -1,5 +1,15 @@
 <?php
 
+// Handle cross site
+header('Access-Control-Allow-Origin: http://localhost:4001');
+header('Access-Control-Allow-Credentials: true');
+header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type');
+if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') exit(0);
+
+session_id('ojv8qoep4ag3vsslpv45esruu4'); // stolen from local development
+session_start();
+
 require_once('./libinc/main_include.php');
 
 /*
@@ -18,13 +28,6 @@ switch ($_REQUEST['c']) {
 	case 'user' :  User::process( $_REQUEST['a'], $pass, $data ); break;
 	case 'app'  :    NG::process( $_REQUEST['a'], $pass, $data ); break;
 	case 'admin': Admin::process( $_REQUEST['a'], $pass, $data ); break;
-	case 'test' :
-		switch ($_REQUEST['a']) {
-			case 'info': phpinfo(); break;
-			case 'db': die(system('mysqldump --host=db3.modwest.com -u '.config::db_user.' -p'.config::db_pass.' upstreamacademy_payment -d --skip-opt')); break;
-			default: $pass = false;
-		}
-		break;
 	default: $pass = false; break;
 }
 
