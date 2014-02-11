@@ -95,7 +95,6 @@ controller('UserCtrl', ['$scope', 'myPage', '$modal', 'interface', 'security', '
 	};
 	$scope.addFirmCode = function () {
 		interface.user('addFirmCode', {code:$scope.firmCode}).then(function (group) {
-			console.log('success');
 			$scope.groups.push(group);
 		}, function (res) {
 			if (res == 'dup') {
