@@ -100,22 +100,14 @@ module.exports = function(grunt) {
 					port: 4001,
 					base: 'build',
 					hostname: '*',
-					middleware: function(connect, options) {
+					middleware: function(connect, options) { // https://gist.github.com/ssafejava/8704372
 						var middlewares = [];
-						if (!Array.isArray(options.base)) {
-							options.base = [options.base];
-						}
+						if (!Array.isArray(options.base)) options.base = [options.base];
 						var directory = options.directory || options.base[options.base.length - 1];
 						options.base.forEach(function(base) {
-							// Serve static files.
 							middlewares.push(connect.static(base));
 						});
-						// Make directory browse-able.
 						middlewares.push(connect.directory(directory));
-						
-						// ***
-						// Not found - just serve index.html
-						// ***
 						middlewares.push(function(req, res){
 							for(var file, i = 0; i < options.base.length; i++){
 								file = options.base + "/index.html"; 
@@ -174,7 +166,7 @@ module.exports = function(grunt) {
 
 	// Define task(s)
 	grunt.registerTask('default', ['connect', 'watch']);
-	grunt.registerTask('build',   ['setPath:build', 'process', 'ftp-deploy:php']);
+	grunt.registerTask('build',   ['setPath:build',   'process', 'ftp-deploy:php']);
 	grunt.registerTask('release', ['setPath:release', 'process', 'ftp-deploy:app']);
 	grunt.registerTask('process', ['jshint:files', 'clean', 'uglify', 'copy', 'html2js']);
 };
