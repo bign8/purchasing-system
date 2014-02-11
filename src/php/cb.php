@@ -27,12 +27,6 @@ switch ($_REQUEST['action']) {
 	case 'get':
 		echo json_encode(array_values($_SESSION['cart']));
 		break;
-
-	default: // TODO: remove after dev
-		echo '<pre>';
-		echo session_id() . "\r\n";
-		print_r($_SESSION);
-		break;
 }
 
 /*
