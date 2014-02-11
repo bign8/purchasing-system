@@ -26,7 +26,9 @@ factory('interface', ['$http', '$q', '$rootScope', '$timeout', function ($http, 
 		var deferred = $q.defer();
 		pendingPromisses++;
 
-		$http.post('/interface.php', myData, {params:{c:myClass, a:myFn}}).then(function(obj) {
+		var root = ( document.location.origin.indexOf('payment') === -1 ) ? 'http://payment.upstreamacademy.com/dev' : '' ; // Development
+
+		$http.post(root + '/interface.php', myData, {params:{c:myClass, a:myFn}}).then(function(obj) {
 			deferred.resolve( formatData( obj.data ) );
 			pendingPromisses--;
 		}, function(obj) {
