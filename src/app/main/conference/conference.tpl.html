@@ -49,6 +49,21 @@
 							</div>
 						</div>
 
+						<div ng-switch-when="radioboxes">
+							<label class="control-label">{{field.name}} <span ng-show="field.required">*</span></label>
+							<div class="controls" ng-repeat="option in field.settings">
+								<input type="radio" name="optionsRadios" ng-model="con.options[field.fieldID]" value="{{option}}" ng-required="field.required">&nbsp;{{option}}
+							</div>
+						</div>
+
+						<div ng-switch-when="otherSelect">
+							<label class="control-label">{{field.name}} <span ng-show="field.required">*</span></label>
+							<div class="controls">
+								<select ng-model="con.options[field.fieldID]" ng-required="field.required" ng-options="x for x in helpers.otherSelect.pre(field.settings)" ng-change="helpers.otherSelect.change(con.options[field.fieldID])" class="input-block-level"></select>
+								<input type="text" ng-show="helpers.otherSelect.isOther" class="input-block-level" style="margin-top:1em" ng-model="con.options[field.fieldID]" />
+							</div>
+						</div>
+
 						<div ng-switch-default>
 							<h4>Unknown question type ({{field.name}} - {{field.type}})</h4>
 						</div>
@@ -72,7 +87,7 @@
 							</tr>
 						</thead>
 						<tbody>
-							<tr ng-repeat="person in con.options[attID]" ng-click="edit(person)">
+							<tr ng-repeat="person in con.options[attID]" ng-click="edit(person)" ng-class="{warning:person.immutable}">
 								<td>
 									<span ng-show="person.title">{{person.title}}<br/></span>
 									{{person.legalName}}<br/>
@@ -86,8 +101,8 @@
 									{{person.addr.city}} {{person.addr.state}}, {{person.addr.zip}}
 								</td>
 								<td>
-									<span style="float:right">{{computeCost($index) | currency}}<br/><br/></span>
-									<button style="clear:both" type="button" class="close" ng-click="rem($index,$event)">&times;</button>
+									<span style="float:right">{{computeCost($index, person) | currency}}<br/><br/></span>
+									<button style="clear:both" type="button" class="close" ng-click="rem($index,$event)" ng-hide="person.immutable">&times;</button>
 								</td>
 							</tr>
 						</tbody>
@@ -116,11 +131,9 @@
 	</div>
 
 	<div class="form-actions" ng-hide="noFields">
-		<button type="submit" form="optionsForm" class="btn btn-primary" ng-click="save()" ng-disabled="optionsForm.$invalid" ng-disabled="equal(con.options, orig)">Save</button>&nbsp;&nbsp;
+		<button type="submit" form="optionsForm" class="btn btn-primary" ng-click="save()" ng-disabled="equal(con.options, orig) || optionsForm.$invalid">Save</button>&nbsp;&nbsp;
 		<button type="button" form="optionsForm" class="btn btn-warning" ng-click="reset()" ng-disabled="equal(con.options, orig)">Reset</button>
 		<a href="javascript:history.back()" class="btn btn-info pull-right">Cancel</a>
 	</div>
 
 </form>
-
-<!-- <pre>{{con | json}}</pre> -->

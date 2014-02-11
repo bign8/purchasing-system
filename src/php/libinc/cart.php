@@ -55,12 +55,6 @@ class Cart extends NG {
 	public function get() {
 		$user = $this->usr->currentUser(); // gets user if available
 
-		// check areas for previously purchased item
-		$q[] = "SELECT purchaseID FROM `purchase` WHERE firmID=? and itemID=?";
-		$q[] = "SELECT CONCAT('a',acquisitionID) FROM `acquisition` a LEFT JOIN `order` o ON a.orderID = o.orderID WHERE itemID=? AND contactID=?";
-		$q[] = "SELECT memberID FROM `member` WHERE firmID=? AND groupID=?";
-		$checkSTH = $this->db->prepare( implode(" UNION ", $q) . ";" );
-
 		// remove all non-strings to allow invoices, but still grab purchase id's
 		$cleanIDs = array();
 		foreach($_SESSION['cart'] as $itemID) if (is_string($itemID)) array_push($cleanIDs, $itemID);
@@ -84,15 +78,7 @@ class Cart extends NG {
 		foreach ($_SESSION['cart'] as $itemID) {
 			if (is_string($itemID)) {
 				$item = $this->getItemByID( $itemID );
-				if ($item != null) {
-
-					// warn if item has already been purchased
-					$groupID = isset($item['settings']->groupID) ? $item['settings']->groupID : -1;
-					$checkSTH->execute( $user['firmID'], $itemID, $itemID, $user['contactID'], $user['firmID'], $groupID );
-					$item['warn'] = ($checkSTH->rowCount() > 0);
-
-					array_push($retData, $item);
-				}
+				if ($item != null) array_push($retData, $item);
 			} else { // format cost for carts
 				$cost = $itemID['cost'];
 				$itemID['cost'] = array(
@@ -103,9 +89,7 @@ class Cart extends NG {
 				);
 				array_push($retData, $itemID);
 			}
-
 		}
-
 		return $retData;
 	}
 	private function getItemByID( $itemID ) { // Helper(get): return specific item detail by id
@@ -113,9 +97,27 @@ class Cart extends NG {
 		if (!$itemSTH->execute( $itemID )) return -1;
 		$row = $itemSTH->fetch(PDO::FETCH_ASSOC);
 		if (!isset($row['productID'])) return null; // if can't find product
+
+		$optionSTH = $this->db->prepare("SELECT * FROM `tie_product_field` WHERE productID=?;");
+		if (!$optionSTH->execute( $row['productID'] )) return -1;
+
+		// check areas for previously purchased item
+		$q[] = "SELECT CONCAT('p-',purchaseID), `data` FROM `purchase` WHERE firmID=? and itemID=?";
+		$q[] = "SELECT CONCAT('a-',acquisitionID), '{}' FROM `acquisition` a LEFT JOIN `order` o ON a.orderID = o.orderID WHERE itemID=? AND contactID=?";
+		$q[] = "SELECT CONCAT('m-',memberID), '{}' FROM `member` WHERE firmID=? AND groupID=?";
+		$checkSTH = $this->db->prepare( implode(" UNION ", $q) . ";" );
+
 		$row['settings'] = json_decode($row['settings']);
-		// unset($row['settings']);
+		$row['hasOptions'] = $optionSTH->rowCount() > 0;
 		$row['cost'] = $this->getProductCost( $row['productID'] );
+
+		// warn if item has already been purchased
+		$user = $this->usr->currentUser(); // gets user if available
+		$groupID = isset($row['settings']->groupID) ? $row['settings']->groupID : -1;
+		$checkSTH->execute( $user['firmID'], $itemID, $itemID, $user['contactID'], $user['firmID'], $groupID );
+		$row['warn'] = ($checkSTH->rowCount() > 0);
+		$row['oldData'] = json_decode( $checkSTH->fetchColumn(1) );
+
 		return $row;
 	}
 	private function getProductCost( $productID ) { // Helper(get): return cost for a productID
@@ -349,8 +351,8 @@ class Cart extends NG {
 		$orderID = $this->db->lastInsertId();
 
 		// Store purchases and options
-		$purchaseSTH = $this->db->prepare("INSERT INTO `purchase` (itemID, orderID, firmID, data) VALUES (?,?,?,?);");
-		$acquisitionSTH = $this->db->prepare("INSERT INTO `acquisition` (itemID, orderID, data) VALUES (?,?,?);");
+		$purchaseSTH = $this->db->prepare("INSERT INTO `purchase` (itemID, orderID, firmID, `data`) VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE orderID=VALUES(orderID), `data`=VALUES(`data`);");
+		$acquisitionSTH = $this->db->prepare("INSERT INTO `acquisition` (itemID, orderID) VALUES (?,?);");
 		$attendeeSTH = $this->db->prepare("INSERT INTO `attendee` (itemID, contactID, orderID) VALUES (?,?,?);");
 		$memberSTH = $this->db->prepare("INSERT INTO `member` (firmID, groupID) VALUES (?,?);");
 		$cart = $this->get(); // removes random id's
@@ -365,15 +367,15 @@ class Cart extends NG {
 				}
 			}
 
-			if (isset($item['settings']->groupID)) { // store groups
-				if (!$memberSTH->execute($user['firmID'], $item['settings']->groupID)) return $this->conflict();
-				$option['memberID'] = $this->db->lastInsertId();
-			}
-
-			if ($item['type'] == 'purchase') { // store purchase / acquisition
+			if ($item['type'] == 'purchase') { // store groups / acquisition
+				if (isset($item['settings']->groupID)) { // store groups
+					if (!$memberSTH->execute($user['firmID'], $item['settings']->groupID)) return $this->conflict();
+					$option['memberID'] = $this->db->lastInsertId();
+				}
 				if (!$purchaseSTH->execute($item['itemID'], $orderID, $user['firmID'], json_encode($option))) return $this->conflict(); // purchase
 			} else {
-				if (!$acquisitionSTH->execute($item['itemID'], $orderID, json_encode($option))) return $this->conflict(); // acquisition
+				if (!$acquisitionSTH->execute($item['itemID'], $orderID)) return $this->conflict(); // acquisition
+				// $option['acquisitionID'] = $this->db->lastInsertId();
 			}
 		}
 
@@ -387,8 +389,12 @@ class Cart extends NG {
 	public function getPurchases() {
 		$user = $this->usr->requiresAuth();
 
-		$STH = $this->db->prepare("SELECT i.*, p.data, t.template, o.stamp FROM (SELECT * FROM `purchase` WHERE firmID=?) p LEFT JOIN item i ON p.itemID=i.itemID LEFT JOIN `product` pr ON i.productID=pr.productID LEFT JOIN `template` t ON pr.templateID=t.templateID LEFT JOIN `order` o ON p.orderID=o.orderID ORDER BY i.productID, i.name;");
-		$STH->execute( $user['firmID'] );
+		$q[] = "SELECT itemID, orderID, `data` FROM `purchase` WHERE firmID=?"; // purchases
+		$q[] = "SELECT itemID, a.orderID, 'acq' AS `data` FROM `acquisition`a LEFT JOIN `order`o ON a.orderID=o.orderID WHERE o.contactID=?"; // acquisition
+		$q = implode(" UNION ", $q);
+
+		$STH = $this->db->prepare("SELECT i.*, p.data, t.template, o.stamp FROM ($q) p LEFT JOIN item i ON p.itemID=i.itemID LEFT JOIN `product` pr ON i.productID=pr.productID LEFT JOIN `template` t ON pr.templateID=t.templateID LEFT JOIN `order` o ON p.orderID=o.orderID ORDER BY i.productID, i.name;");
+		$STH->execute( $user['firmID'], $user['contactID'] );
 
 		$retData = $STH->fetchAll( PDO::FETCH_ASSOC );
 		foreach ($retData as &$item) {
@@ -397,8 +403,6 @@ class Cart extends NG {
 		}
 		return $retData;
 	}
-
-	// UNTESTED FUNCTIONS
 
 	// Helper(app/cart/checkout/email): email cart data
 	public function emailCart($orderID) {
@@ -418,7 +422,10 @@ class Cart extends NG {
 		$firm = $firmSTH->fetch(PDO::FETCH_ASSOC);
 
 		// grab order
-		$itemsSTH = $this->db->prepare("SELECT p.data, i.* FROM `purchase` p LEFT JOIN `item` i ON p.itemID=i.itemID WHERE orderID=?;");
+		$q[] = "SELECT `data`, itemID, orderID FROM `purchase`";
+		$q[] = "SELECT '{}' as `data`, itemID, orderID FROM `acquisition`";
+		$q = implode(" UNION ", $q);
+		$itemsSTH = $this->db->prepare("SELECT p.`data`, i.* FROM ($q) AS `p` LEFT JOIN `item` i ON p.itemID=i.itemID WHERE orderID=?;");
 		$itemsSTH->execute( $orderID );
 		$items = $itemsSTH->fetchAll(PDO::FETCH_ASSOC);
 
@@ -452,6 +459,10 @@ class Cart extends NG {
 		$html .= address($firm);
 		$html .= "<hr/>Items:<br /><ul>\r\n";
 
+		$mail = new UAMail();
+		$files = array();
+		// $mail->SMTPDebug  = 2;
+
 		foreach ($items as $item) {
 
 			$html .= (isset($item['url'])) ? "<li><a href=\"{$item['url']}\">{$item['name']}</a><ul>" : "<li><strong>{$item['name']}</strong><ul>";
@@ -461,8 +472,16 @@ class Cart extends NG {
 				if ($fieldSTH->rowCount() > 0) {
 					$fieldData = $fieldSTH->fetch(PDO::FETCH_ASSOC);
 
+					// special question formatters
 					switch ($fieldData['fieldID']) {
-						case '1': // pretty print attendees
+						case '2':
+							$value = '$' . money_format('%n', $value);
+							break;
+					}
+
+					// type display
+					switch ($fieldData['type']) {
+						case 'attendees': // pretty print attendees
 							$html .= "<li><b>Attendee(s):</b><ul>";
 							$attendeeSTH->execute( $item['itemID'] );
 							while ($row = $attendeeSTH->fetch( PDO::FETCH_ASSOC )) {
@@ -474,10 +493,13 @@ class Cart extends NG {
 							}
 							$html .= "</ul></li>";
 							break;
-						
-						case '2':
-							$value = '$' . money_format('%n', $value);
-							// break; // falls over to default after formatting
+
+						case 'image':
+							$fileName = $firm['name'] . ', ' . $contact['legalName'] . '.' . pathinfo($value, PATHINFO_EXTENSION);
+							$mail->addAttachment($_SERVER['DOCUMENT_ROOT'].$value, $fileName);
+							$html .= "<li><b>" . $fieldData['name'] . ':</b>' . $fileName . "</li>";
+							array_push($files, $_SERVER['DOCUMENT_ROOT'] . $value);
+							break;
 
 						default:
 							$html .= "<li><b>" . $fieldData['name'] . ':</b> ' . $value . "</li>";
@@ -490,11 +512,14 @@ class Cart extends NG {
 
 		$html .= "</ul>\r\n";
 
-		$mail = new UAMail();
 		$mail->addAddress(config::notifyEmail, config::notifyName);
 		$mail->Subject = "UpstreamAcademy Checkout";
 		$mail->Body    = $html;
 		$mail->AltBody = strip_tags($html);
-		if (!$mail->send()) $this->conflict('mail');
+		if (!$mail->send()) {
+			$this->conflict('mail');
+		} else {
+			foreach ($files as $file) unlink($file); // delete sent files
+		}
 	}
 }
