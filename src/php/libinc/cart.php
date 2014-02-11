@@ -404,8 +404,6 @@ class Cart extends NG {
 		return $retData;
 	}
 
-	// UNTESTED FUNCTIONS
-
 	// Helper(app/cart/checkout/email): email cart data
 	public function emailCart($orderID) {
 		// grab order info
