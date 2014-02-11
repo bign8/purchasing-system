@@ -1,6 +1,8 @@
 module.exports = function(grunt) {
 	grunt.initConfig({
-		activeDir: 'dev', // this gets overloaded with setPath
+		// Grunt variables
+		activeDir: 'dev',  // this gets overloaded with setPath
+		uploadDir: 'dev/', // this gets overloaded with setPath
 		pkg: grunt.file.readJSON('package.json'),
 		settings: {
 			ftpDeploy: {
@@ -13,6 +15,7 @@ module.exports = function(grunt) {
 			}
 		},
 
+		// Processes configurations
 		uglify: {
 			release: {
 				files: {
@@ -53,19 +56,10 @@ module.exports = function(grunt) {
 		copy: {
 			main: {
 				files:[
-					{dest: '<%= activeDir %>', src: '**', expand: true, cwd: 'src/assets/'},
-					{dest: '<%= activeDir %>/index.html', src: 'src/index.html'}
-				]
-			},
-			php: {
-				dest: '<%= activeDir %>',
-				src: ['**/*.php'],
-				cwd: 'src/php',
-				expand: true
-			},
-			vendor: {
-				files: [
-					{dest: '<%= activeDir %>/libinc', src: '*/*.php', expand: true, cwd: 'vendor'}
+					{dest: '<%= activeDir %>', src: '**', expand: true, cwd: 'src/assets/'},        // assets
+					{dest: '<%= activeDir %>/index.html', src: 'src/index.html'},                   // index
+					{dest: '<%= activeDir %>/libinc', src: '*/*.php', expand: true, cwd: 'vendor'}, // vendor
+					{dest: '<%= activeDir %>', src: '**/*.php', cwd: 'src/php', expand: true}       // php
 				]
 			}
 		},
@@ -74,11 +68,10 @@ module.exports = function(grunt) {
 				src: '<%= activeDir %>',
 				exclusions: ['!build/**/*.php'], // overrides by onChange
 				auth: "<%= settings.ftpDeploy.auth %>",
-				dest: "<%= settings.ftpDeploy.dest %>"
+				dest: "<%= settings.ftpDeploy.dest %><%= uploadDir %>"
 			},
 			app: {
-				src: '<%= activeDir %>',
-				exclusions: ['build/**/*.{php,png,ico,txt}'],
+				src: 'release',
 				auth: "<%= settings.ftpDeploy.auth %>",
 				dest: "<%= settings.ftpDeploy.dest %>"
 			}
@@ -100,9 +93,19 @@ module.exports = function(grunt) {
 				src: 'src/**/*.tpl.html',
 				dest: '<%= activeDir %>/js-tpl.js'
 			}
+		},
+		connect: {
+			server: {
+				options: {
+					port: 4001,
+					base: 'build',
+					hostname: '*'
+				}
+			}
 		}
 	});
 
+	// Watching for php changes or not
 	var changedFiles = Object.create(null);
 	var onChange = grunt.util._.debounce(function() {
 		var hasPhp = false, arr = Object.keys(changedFiles);
@@ -115,19 +118,24 @@ module.exports = function(grunt) {
 		onChange();
 	});
 
+	// Single commands to handle development + build routines
 	grunt.registerTask('setPath', function( arg1 ) {
 		grunt.config.set( 'activeDir', arg1 );
-		grunt.config.set( 'uglify.options.beautify', arg1 == 'build'); // set beautification link
+		var isBuild = (arg1 == 'build');
+		grunt.config.set( 'uploadDir', isBuild ? 'dev/' : '');
+		grunt.config.set( 'uglify.options.beautify', isBuild);      // set beautification link
 		if (arg1 == 'build') grunt.config('copy.vendor.files', []); // don't copy vendor on watch builds
 		grunt.log.writeln('Setting build path to: ' + arg1 );
 	});
 
+	// Exit grunt process
 	grunt.registerTask('exit', 'Just exits.', function() { // http://bit.ly/1aoqnTn
 		process.exit(0);
 	});
 
 	// Load plugins
 	grunt.loadNpmTasks('grunt-contrib-clean');
+	grunt.loadNpmTasks('grunt-contrib-connect');
 	grunt.loadNpmTasks('grunt-contrib-copy');
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
@@ -136,11 +144,10 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-html2js');
 
 	// Define task(s)
-	grunt.registerTask('default', ['watch']);
-
-	grunt.registerTask('build', ['setPath:build', 'process']);
-	grunt.registerTask('release', ['setPath:release', 'process']);
-	grunt.registerTask('process', ['jshint:files', 'clean', 'uglify', 'copy', 'html2js', 'ftp-deploy']);
+	grunt.registerTask('default', ['connect', 'watch']);
+	grunt.registerTask('build',   ['setPath:build', 'process', 'ftp-deploy:php']);
+	grunt.registerTask('release', ['setPath:release', 'process', 'ftp-deploy:app']);
+	grunt.registerTask('process', ['jshint:files', 'clean', 'uglify', 'copy', 'html2js']);
 };
 
 // see https://github.com/gruntjs/grunt-contrib-watch#using-the-watch-event
