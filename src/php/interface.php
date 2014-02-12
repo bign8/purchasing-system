@@ -25,6 +25,7 @@ switch ($_REQUEST['c']) {
 	case 'user' :  User::process( $_REQUEST['a'], $pass, $data ); break;
 	case 'app'  :    NG::process( $_REQUEST['a'], $pass, $data ); break;
 	case 'admin': Admin::process( $_REQUEST['a'], $pass, $data ); break;
+	// START DEV
 	case 'test' :
 		switch ($_REQUEST['a']) {
 			case 'info': phpinfo(); break;
@@ -41,6 +42,7 @@ switch ($_REQUEST['c']) {
 			default: $pass = false;
 		}
 		break;
+	// END DEV
 	default: $pass = false; break;
 }
 
