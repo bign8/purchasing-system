@@ -15,7 +15,7 @@ npm-debug.log
 node_modules
 dev
 build
-release
+/release
 *.sublime-*
 un-used
 
