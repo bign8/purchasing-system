@@ -32,15 +32,15 @@
 				</td>
 				<td>
 					<div ng-switch="item.template" ng-show="item.hasOptions">
-						<div ng-switch-when="conference" ng-switch="item.cost.set" class="pull-right">
-							<a href="/conference/{{item.itemID}}" ng-switch-when="false" class="btn btn-warning btn-mini">Set</a>
-							<a href="/conference/{{item.itemID}}" ng-switch-default class="btn btn-info btn-mini">Edit</a>
-						</div>
 						<div ng-switch-when="download" class="pull-right">
 							<label for="hardcopy">
 								<input type="checkbox" ng-model="item.options" name="hardcopy" id="hardcopy" ng-change="theCart.setOption(item.itemID, item.options);" />
 								&nbsp;&nbsp;Hardcopy?
 							</label>
+						</div>
+						<div ng-switch-default ng-switch="item.cost.set" class="pull-right">
+							<a href="/conference/{{item.itemID}}" ng-switch-when="false" class="btn btn-warning btn-mini">Set</a>
+							<a href="/conference/{{item.itemID}}" ng-switch-default class="btn btn-info btn-mini">Edit</a>
 						</div>
 					</div>
 					
