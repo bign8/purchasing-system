@@ -145,16 +145,16 @@
 
 						<div ng-switch-when="undefined">
 							<span class="input-medium uneditable-input">Click 'set' to assign</span>
-							<button type="button" class="btn btn-info" ng-click="setAddr('addr')" ng-disabled="same">Set</button>
+							<button type="button" class="btn btn-info" ng-click="setAddr('addr')" ng-disabled="user.same">Set</button>
 						</div>
 
 						<div ng-switch-default>
 							<span class="input-medium uneditable-input">{{user.addr.addrName}}</span>
-							<button type="button" class="btn btn-warning" ng-click="setAddr('addr')"  ng-disabled="same">Edit</button>
+							<button type="button" class="btn btn-warning" ng-click="setAddr('addr')"  ng-disabled="user.same">Edit</button>
 						</div>
 
 					</div>
-					<label class="checkbox"><input type="checkbox" ng-model="same" >Same as Firm</label>
+					<label class="checkbox"><input type="checkbox" ng-model="user.same" >Same as Firm</label>
 				</div>
 			</div>
 
@@ -180,7 +180,7 @@
 				<div class="control-group">
 					<label class="control-label" for="inputPassword">Re-type Password</label>
 					<div class="controls">
-						<input type="password" id="inputPassword" ng-model="passVerify" placeholder="Password" required>
+						<input type="password" id="inputPassword" ng-model="user.passCheck" placeholder="Password" required>
 					</div>
 				</div>
 
