@@ -28,7 +28,16 @@ switch ($_REQUEST['c']) {
 	case 'test' :
 		switch ($_REQUEST['a']) {
 			case 'info': phpinfo(); break;
-			case 'db': die(system('mysqldump --host=db3.modwest.com -u '.config::db_user.' -p'.config::db_pass.' upstreamacademy_payment -d --skip-opt')); break;
+			case 'db':
+				$cmd = sprintf(
+					'mysqldump --host=%s -u %s -p%s %s -d --skip-opt',
+					config::db_server,
+					config::db_user,
+					config::db_pass,
+					config::db_name
+				);
+				die(system($cmd));
+				break;
 			default: $pass = false;
 		}
 		break;

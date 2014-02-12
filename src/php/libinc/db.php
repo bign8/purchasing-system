@@ -13,7 +13,8 @@ class myPDO extends PDO
 	public function __construct()
 	{
 		try {
-			parent::__construct( config::db_dsn, config::db_user, config::db_pass, config::$db_opt );
+			$dns = sprintf(config::db_dsn, config::db_server, config::db_name, config::db_user, config::db_pass);
+			parent::__construct( $dns, config::db_user, config::db_pass, config::$db_opt );
 			$this->setAttribute( PDO::ATTR_STATEMENT_CLASS,  array('myPDOStatement') ); // Set Statement_Class
 		} catch (PDOException $e) {
 			if( $_SERVER['REQUEST_URI'] != '/db404' ) { // to be implemented
