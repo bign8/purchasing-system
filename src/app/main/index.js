@@ -23,9 +23,9 @@ config(['$routeProvider', function ( $routeProvider ){
 	});
 }]).
 
-controller('IndexCtrl', ['$scope', 'theCart', 'security', function ($scope, theCart, security) {
+controller('IndexCtrl', ['$scope', 'theCart', 'security', '$location', function ($scope, theCart, security, $location) {
 	$scope.$watch(function() {return security.currentUser;}, function() {
-		if (security.currentUser !== null) security.redirect('/cart');
+		if (security.currentUser !== null) $location.replace('/cart');
 	}, true);
 	$scope.theCart = theCart;
 }]);
