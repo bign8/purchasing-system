@@ -16,6 +16,13 @@ require_once('./libinc/main_include.php');
 if (!isset($_REQUEST['a'])) $_REQUEST['a'] = 'nope'; // catch not assigned
 if (!isset($_REQUEST['c'])) $_REQUEST['c'] = 'nope'; // catch not assigned
 
+// START DEV
+if ($_REQUEST['c'] != 'test' && $_REQUEST['a'] != 'getSession' && isset($_REQUEST['sessionID'])) {
+	session_id($_REQUEST['sessionID']);
+	session_start();
+}
+// END DEV
+
 $pass = true; // determine response type
 $data = array(); // return json data array
 
@@ -38,6 +45,10 @@ switch ($_REQUEST['c']) {
 					config::db_name
 				);
 				die(system($cmd));
+				break;
+			case 'getSession':
+				session_start();
+				die(session_id());
 				break;
 			default: $pass = false;
 		}
