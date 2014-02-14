@@ -23,7 +23,8 @@ factory('security', ['$http', '$q', '$location', 'securityRetryQueue', '$modal',
 		loginModal = $modal.open({
 			templateUrl: 'app/security/login/form.tpl.html',
 			controller: 'LoginFormController',
-			backdrop: 'static'
+			backdrop: 'static',
+			windowClass: 'login'
 		});
 		loginModal.result.then(onLoginDialogClose);
 	}
