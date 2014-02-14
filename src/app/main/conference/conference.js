@@ -128,6 +128,8 @@ controller('RegisterConferenceCtrl', ['$scope', 'myPage', 'interface', 'conferen
 	};
 
 	// Generic fields helper
+	$scope.temp = {};
+	var helpers = 
 	$scope.helpers = {
 		otherSelect: {
 			pre: function(arr) {
@@ -139,6 +141,34 @@ controller('RegisterConferenceCtrl', ['$scope', 'myPage', 'interface', 'conferen
 				$scope.helpers.otherSelect.isOther = (elem == 'Other');
 			},
 			isOther: false
+		},
+		otherCheckbox: {
+			toggle: function(item, fieldID) {
+				var arr = [];
+				if ($scope.con.options[fieldID]) arr = $scope.con.options[fieldID].split(', ');
+				var idx = arr.indexOf(item);
+				if (idx > -1) {
+					arr.splice(idx, 1);
+				} else {
+					arr.push(item);
+				}
+				$scope.con.options[fieldID] = arr.join(', ');
+			},
+			isSelected: function(item, fieldID) {
+				return ($scope.con.options[fieldID] || '').indexOf(item) > -1;
+			},
+			other: function(fieldID) {
+				var arr = [];
+				if ($scope.con.options[fieldID]) arr = $scope.con.options[fieldID].split(', ');
+				for (var i=0; i<arr.length; i++)
+					if (arr[i].substring(0, 7) == 'Other: ')
+						arr[i] = 'Other: ' + $scope.temp[fieldID];
+				$scope.con.options[fieldID] = arr.join(', ');
+			},
+			oToggle: function(fieldID) {
+				$scope.temp[fieldID] = $scope.temp[fieldID] || '';
+				$scope.helpers.otherCheckbox.toggle('Other: ' + $scope.temp[fieldID], fieldID);
+			}
 		}
 	};
 }]).
