@@ -15,7 +15,7 @@
 				<div class="controls">
 					<div class="input-append input-block-level">
 						<input class="input-xlarge" type="email" name="check" ng-model="user.email" placeholder="Email Address" required>
-						<button type="submit" class="btn btn-success" ng-disabled="registration.check.$invalid" ng-click="checkEmail()">Check</button>
+						<button type="submit" class="btn btn-success" ng-disabled="registration.check.$invalid" ng-click="checkEmail()">Start</button>
 					</div>
 					<span ng-show="registration.check.$invalid" class="help-block">Please enter a valid email address.</span>
 				</div>
@@ -69,8 +69,8 @@
 				<div class="control-group">
 					<label class="control-label" for="firmWeb">Firm Website</label>
 					<div class="controls">
-						<input type="url" id="firmWeb" ng-model="user.firm.website" placeholder="Firm Website" required>
-						<span class="help-inline">http://www.UpstreamAcademy.com/</span>
+						<input type="text" id="firmWeb" ng-model="user.firm.website" placeholder="Firm Website" required>
+						<span class="help-inline">www.UpstreamAcademy.com</span>
 					</div>
 				</div>
 
@@ -80,12 +80,12 @@
 						<div class="input-append" ng-switch="user.firm.addr.addressID">
 
 							<div ng-switch-when="undefined">
-								<span class="input-medium uneditable-input">Click 'set' to assign</span>
+								<span class="uneditable-input">Click 'set' to enter an address</span>
 								<button type="button" class="btn btn-info" ng-click="setAddr('firm')">Set</button>
 							</div>
 
 							<div ng-switch-default>
-								<span class="input-medium uneditable-input">{{user.firm.addr.addrName}}</span>
+								<span class="uneditable-input">{{user.firm.addr.addrName}}</span>
 								<button type="button" class="btn btn-warning" ng-click="setAddr('firm')">Edit</button>
 							</div>
 
@@ -144,12 +144,12 @@
 					<div class="input-append" ng-switch="user.addr.addressID">
 
 						<div ng-switch-when="undefined">
-							<span class="input-medium uneditable-input">Click 'set' to assign</span>
+							<span class="uneditable-input">Click 'set' to enter an address</span>
 							<button type="button" class="btn btn-info" ng-click="setAddr('addr')" ng-disabled="user.same">Set</button>
 						</div>
 
 						<div ng-switch-default>
-							<span class="input-medium uneditable-input">{{user.addr.addrName}}</span>
+							<span class="uneditable-input">{{user.addr.addrName}}</span>
 							<button type="button" class="btn btn-warning" ng-click="setAddr('addr')"  ng-disabled="user.same">Edit</button>
 						</div>
 
@@ -189,8 +189,8 @@
 		</fieldset>
 	</div>
 
-	<div class="form-actions" ng-show="formState == 1">
-		<button type="submit" class="btn btn-primary" ng-click="register()" ng-disabled="registration.$invalid">Create an Account</button>&nbsp;
+	<div class="form-actions" ng-show="formState == 1" style="padding-right:180px">
+		<button type="submit" class="btn btn-primary pull-right" ng-click="register()" ng-disabled="registration.$invalid">Create an Account</button>&nbsp;
 		<a href="/" class="btn">Cancel</a>
 	</div>	
 

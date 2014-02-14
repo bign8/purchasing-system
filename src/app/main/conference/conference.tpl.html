@@ -17,7 +17,7 @@
 	<div class="row" ng-switch="noFields">
 		<div class="offset2 span8 well" ng-switch-when="true">
 			<h2>{{con.item.name}} has no options.</h2>
-			<p>Please <a href="http://upstreamacademy.com/">continue shopping</a> or <a href="#/">checkout</a>.</p>
+			<p>Please <a href="http://upstreamacademy.com/">continue shopping</a> or <a href="/">checkout</a>.</p>
 		</div>
 
 		<div ng-switch-default>
@@ -59,8 +59,30 @@
 						<div ng-switch-when="otherSelect">
 							<label class="control-label">{{field.name}} <span ng-show="field.required">*</span></label>
 							<div class="controls">
-								<select ng-model="con.options[field.fieldID]" ng-required="field.required" ng-options="x for x in helpers.otherSelect.pre(field.settings)" ng-change="helpers.otherSelect.change(con.options[field.fieldID])" class="input-block-level"></select>
+								<select ng-model="con.options[field.fieldID]" ng-required="field.required" 
+									ng-options="x for x in helpers.otherSelect.pre(field.settings)" 
+									ng-change="helpers.otherSelect.change(con.options[field.fieldID])" class="input-block-level">
+								</select>
 								<input type="text" ng-show="helpers.otherSelect.isOther" class="input-block-level" style="margin-top:1em" ng-model="con.options[field.fieldID]" />
+							</div>
+						</div>
+
+						<div ng-switch-when="otherCheckbox">
+							<label class="control-label">{{field.name}} <span ng-show="field.required">*</span></label>
+							<div class="controls">
+								<label ng-repeat="option in field.settings">
+									<input type="checkbox" 
+										ng-checked="helpers.otherCheckbox.isSelected(option, field.fieldID)" 
+										ng-click="helpers.otherCheckbox.toggle(option, field.fieldID)">&nbsp;{{option}}
+								</label>
+								<label>
+									<input type="checkbox" 
+										ng-checked="helpers.otherCheckbox.isSelected('Other: ', field.fieldID)" 
+										ng-click="helpers.otherCheckbox.oToggle(field.fieldID)">
+									Other:&nbsp;
+									<input type="text" ng-model="temp[field.fieldID]" placeholder="Other" 
+										ng-change="helpers.otherCheckbox.other(field.fieldID)" ></input>
+								</label>
 							</div>
 						</div>
 
@@ -89,8 +111,8 @@
 						<tbody>
 							<tr ng-repeat="person in con.options[attID]" ng-click="edit(person)" ng-class="{warning:person.immutable}">
 								<td>
-									<span ng-show="person.title">{{person.title}}<br/></span>
 									{{person.legalName}}<br/>
+									<span ng-show="person.title">{{person.title}}<br/></span>
 									<a ng-href="mailto:{{person.email}}">{{person.email}}</a><br/>
 									{{person.phone}}
 								</td>
@@ -137,3 +159,7 @@
 	</div>
 
 </form>
+
+<!-- START DEV -->
+<pre>{{con.options | json}}</pre>
+<!-- END DEV -->
