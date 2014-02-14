@@ -16,7 +16,7 @@ config(['$routeProvider', 'securityAuthorizationProvider', function ( $routeProv
 	});
 }]).
 
-controller('RegisterConferenceCtrl', ['$scope', 'myPage', 'interface', 'conference', '$modal', 'theCart', 'appStrings', function ($scope, myPage, interface, conference, $modal, theCart, appStrings) {
+controller('RegisterConferenceCtrl', ['$scope', 'myPage', 'interface', 'conference', '$modal', 'theCart', 'appStrings', '$location', function ($scope, myPage, interface, conference, $modal, theCart, appStrings, $location) {
 	$scope.con = conference;
 	$scope.message = false;
 
@@ -25,7 +25,7 @@ controller('RegisterConferenceCtrl', ['$scope', 'myPage', 'interface', 'conferen
 	myPage.setTitle(title, "for " + $scope.con.item.name);
 
 	$scope.noFields = ($scope.con.fields.length === 0); // ensure item has quesitions
-	if ($scope.noFields) return; // no need to do any further processing if there are no options
+	if ($scope.noFields) return $location.path('/cart'); // no need to do any further processing if there are no options
 	
 	function processAttendees() {
 		var attID = null;
