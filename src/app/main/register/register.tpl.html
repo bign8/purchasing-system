@@ -15,7 +15,7 @@
 				<div class="controls">
 					<div class="input-append input-block-level">
 						<input class="input-xlarge" type="email" name="check" ng-model="user.email" placeholder="Email Address" required>
-						<button type="submit" class="btn btn-success" ng-disabled="registration.check.$invalid" ng-click="checkEmail()">Check</button>
+						<button type="submit" class="btn btn-success" ng-disabled="registration.check.$invalid" ng-click="checkEmail()">Start</button>
 					</div>
 					<span ng-show="registration.check.$invalid" class="help-block">Please enter a valid email address.</span>
 				</div>
@@ -54,8 +54,8 @@
 
 			<div class="well" style="padding: 20px 0 1px;">
 
-				<div class="well-overlay" ng-hide="firmModified || user.firm.firmID === undefined">
-					<button type="button" class="btn btn-warning well-clear-btn btn-large" ng-click="modifyFirm()">Modify Firm</button>
+				<div class="well-overlay" ng-show="(!firmModified && user.firm.firmID !== undefined) || (user.firm.toString() === user.firm && user.firm !== '')">
+					<button type="button" class="btn btn-warning well-clear-btn btn-large" ng-click="modifyFirm()" ng-hide="user.firm.toString() === user.firm">Modify Firm</button>
 				</div>
 
 				<div class="control-group">
@@ -69,8 +69,8 @@
 				<div class="control-group">
 					<label class="control-label" for="firmWeb">Firm Website</label>
 					<div class="controls">
-						<input type="url" id="firmWeb" ng-model="user.firm.website" placeholder="Firm Website" required>
-						<span class="help-inline">http://www.UpstreamAcademy.com/</span>
+						<input type="text" id="firmWeb" ng-model="user.firm.website" placeholder="Firm Website" required>
+						<span class="help-inline">www.UpstreamAcademy.com</span>
 					</div>
 				</div>
 
@@ -80,12 +80,12 @@
 						<div class="input-append" ng-switch="user.firm.addr.addressID">
 
 							<div ng-switch-when="undefined">
-								<span class="input-medium uneditable-input">Click 'set' to assign</span>
+								<span class="uneditable-input">Click 'set' to enter an address</span>
 								<button type="button" class="btn btn-info" ng-click="setAddr('firm')">Set</button>
 							</div>
 
 							<div ng-switch-default>
-								<span class="input-medium uneditable-input">{{user.firm.addr.addrName}}</span>
+								<span class="uneditable-input">{{user.firm.addr.addrName}}</span>
 								<button type="button" class="btn btn-warning" ng-click="setAddr('firm')">Edit</button>
 							</div>
 
@@ -96,8 +96,6 @@
 			</div>
 
 			<notify message="message"></notify>
-
-			<!-- <pre>Model: {{user.firm | json}}</pre> -->
 		</fieldset>
 
 		<fieldset class="span6">
@@ -146,17 +144,17 @@
 					<div class="input-append" ng-switch="user.addr.addressID">
 
 						<div ng-switch-when="undefined">
-							<span class="input-medium uneditable-input">Click 'set' to assign</span>
-							<button type="button" class="btn btn-info" ng-click="setAddr('addr')" ng-disabled="same">Set</button>
+							<span class="uneditable-input">Click 'set' to enter an address</span>
+							<button type="button" class="btn btn-info" ng-click="setAddr('addr')" ng-disabled="user.same">Set</button>
 						</div>
 
 						<div ng-switch-default>
-							<span class="input-medium uneditable-input">{{user.addr.addrName}}</span>
-							<button type="button" class="btn btn-warning" ng-click="setAddr('addr')"  ng-disabled="same">Edit</button>
+							<span class="uneditable-input">{{user.addr.addrName}}</span>
+							<button type="button" class="btn btn-warning" ng-click="setAddr('addr')"  ng-disabled="user.same">Edit</button>
 						</div>
 
 					</div>
-					<label class="checkbox"><input type="checkbox" ng-model="same" >Same as Firm</label>
+					<label class="checkbox"><input type="checkbox" ng-model="user.same" >Same as Firm</label>
 				</div>
 			</div>
 
@@ -164,11 +162,8 @@
 				<div ng-show="registration.inputPassword.$error.passValid">
 					<p>Unfulfilled Password Requirements:</p>
 					<ul>
-						<li ng-show="registration.inputPassword.$error.hasNumber">At least 1 number</li>
-						<li ng-show="registration.inputPassword.$error.specialCh">At least 1 special character</li>
-						<li ng-show="registration.inputPassword.$error.lowerAlph">At least 1 alphabetical character</li>
-						<li ng-show="registration.inputPassword.$error.upperAlph">At least 1 uppercase alphabetical character</li>
 						<li ng-show="registration.inputPassword.$error.metLength">At least 6 characters long</li>
+						<li ng-show="registration.inputPassword.$error.isSpecial">At least 1 number <strong>OR</strong> 1 special character</li>
 					</ul>
 				</div>
 
@@ -182,7 +177,7 @@
 				<div class="control-group">
 					<label class="control-label" for="inputPassword">Re-type Password</label>
 					<div class="controls">
-						<input type="password" id="inputPassword" ng-model="passVerify" placeholder="Password" required>
+						<input type="password" id="inputPassword" ng-model="user.passCheck" placeholder="Password" required>
 					</div>
 				</div>
 
@@ -191,11 +186,9 @@
 		</fieldset>
 	</div>
 
-	<div class="form-actions" ng-show="formState == 1">
-		<button type="submit" class="btn btn-primary" ng-click="register()" ng-disabled="registration.$invalid">Create an Account</button>&nbsp;
+	<div class="form-actions" ng-show="formState == 1" style="padding-right:180px">
+		<button type="submit" class="btn btn-primary pull-right" ng-click="register()" ng-disabled="registration.$invalid">Create an Account</button>&nbsp;
 		<a href="/" class="btn">Cancel</a>
 	</div>	
 
 </form>
-
-<!-- <pre>{{user | json}}</pre> -->

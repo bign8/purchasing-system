@@ -51,31 +51,31 @@ controller('UserCtrl', ['$scope', 'myPage', '$modal', 'interface', 'security', '
 
 	$scope.store = function() {
 		if ($scope.user.oldPass && $scope.passVerify !== $scope.user.password) {
-			$scope.message = appStrings.user.passMatch;
+			$scope.message = appStrings.user.passMatch();
 			return;
 		}
 		if ($scope.user.firm.addr.addressID === undefined) {
-			$scope.message = appStrings.user.firmAddr;
+			$scope.message = appStrings.user.firmAddr();
 			return;
 		}
 		if ($scope.user.addr.addressID === undefined) {
-			$scope.message = appStrings.user.userAddr;
+			$scope.message = appStrings.user.userAddr();
 			return;
 		}
 		
 		interface.user('updateUser', $scope.user).then(function() {
-			$scope.message = appStrings.user.success; // some sort of callback on close
+			$scope.message = appStrings.user.success(); // some sort of callback on close
 			security.forceCurrentUser();
 			myPage.setTitle("Account Settings", "for " + $scope.user.legalName);
 			$scope.origUser = angular.copy( $scope.user );
 			$scope.settings.$setPristine(true);
 		}, function (err) {
 			if (err == 'dup') {
-				$scope.message = appStrings.user.dupEmail;
+				$scope.message = appStrings.user.dupEmail();
 			} else if (err == 'badPass') {
-				$socpe.message = appStrings.user.badPass;
+				$socpe.message = appStrings.user.badPass();
 			} else {
-				$scope.message = appStrings.user.failure;
+				$scope.message = appStrings.user.failure();
 			}
 		});
 	};
@@ -95,15 +95,14 @@ controller('UserCtrl', ['$scope', 'myPage', '$modal', 'interface', 'security', '
 	};
 	$scope.addFirmCode = function () {
 		interface.user('addFirmCode', {code:$scope.firmCode}).then(function (group) {
-			console.log('success');
 			$scope.groups.push(group);
 		}, function (res) {
 			if (res == 'dup') {
-				$scope.message = appStrings.user.dupCode;
+				$scope.message = appStrings.user.dupCode();
 			} else if (res == 'dne') {
-				$scope.message = appStrings.user.dneCode;
+				$scope.message = appStrings.user.dneCode();
 			} else {
-				$scope.message = appStrings.user.errCode;
+				$scope.message = appStrings.user.errCode();
 			}
 		});
 		$scope.firmCode = '';

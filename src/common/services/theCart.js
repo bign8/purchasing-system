@@ -15,9 +15,9 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function ($root
 
 	var processItem = function(item, attribute) {
 		var setValue = (attribute=='settings') ? 'value' : 'fullValue';
+		var override = false;
 		item.cost = item.cost || {};
 		item.cost[setValue] = 0;
-		item.hasOptions = false;
 		if (item.template == 'custom') {
 			item.cost[setValue] = parseFloat(item.cost[attribute].cost) || 0; // straight assignment (no options)
 		} else {
@@ -29,14 +29,25 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function ($root
 					item.cost[setValue] = parseFloat( item.cost[attribute].initial ); // initial cost always in effect
 					if ( options.hasOwnProperty(item.itemID) ) { // apply pricing based on the number of attendees
 						var attID = options[ item.itemID ].attID; // grab attendee id
-						var multiply = (options[ item.itemID ][ attID ] || []).length - parseFloat( item.cost[attribute].after ); // how many more
-						if (multiply > 0) item.cost[setValue] += parseFloat( item.cost[attribute].later ) * multiply; // for additional attendees
+						item.cost[setValue] = 0;
+						angular.forEach(options[ item.itemID ][ attID ], function (person, index) {
+							var cost = 0, s = item.cost[attribute];
+							if (person.immutable) {
+								cost = 0;
+								item.warn = false; // reset item warning
+							} else if ( index === 0 ) {
+								cost = parseFloat( s.initial );
+							} else if ( index >= parseInt( s.after ) ) {
+								cost = parseFloat( s.later );
+							}
+							item.cost[setValue] += cost;
+						});
 					}
-					item.hasOptions = true;
 					break;
 				case '3':
 					item.hasOptions = true;
 					item.cost[setValue] = parseFloat( options[ item.itemID ] ? item.cost[attribute].hard : item.cost[attribute].soft ) ;
+					override = true;
 					break;
 				default:
 					item.cost = {};
@@ -44,7 +55,7 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function ($root
 			}
 		}
 		
-		if (item.hasOptions) item.cost.set = options.hasOwnProperty( item.itemID );
+		if (item.hasOptions) item.cost.set = options.hasOwnProperty( item.itemID ) || override;
 	};
 
 	var processCart = function() {
@@ -53,6 +64,7 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function ($root
 			processItem(item, 'settings');
 			if (item.cost.hasOwnProperty('full')) processItem(item, 'full');
 			if (options.hasOwnProperty(item.itemID)) item.options = options[item.itemID];
+			item.expired = (item.settings.hasOwnProperty('eventDate') && (item.settings.eventDate < (new Date()).getTime()));
 			total += item.cost.value;
 		});
 		angular.forEach(observerCallbacks, function (callback) { // Notify observers
@@ -124,9 +136,6 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function ($root
 		fullTotal: function() {
 			return service.total() - service.totDiscount();
 		},
-		// dev: function() { // for development only
-		// 	return options;
-		// },
 		setDirty: function() {
 			dirty = true;
 		},
