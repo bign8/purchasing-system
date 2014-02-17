@@ -20,15 +20,19 @@ controller('RegisterFormCtrl', ['$scope', '$modal', 'interface', 'security', 'fi
 
 	// find firm vs. register
 	$scope.firms = firms;
-	$scope.clearFirm = function () { 
+	$scope.firmModified = false;
+	$scope.clearFirm = function () {
 		$scope.user.firm = '';
 		$scope.firmModified = false;
+		$scope.registration.$setPristine(true);
 	};
 
 	// initialize empty user
 	$scope.user = {
 		preName: '',
-		firm: ''
+		firm: '',
+		addr: {},
+		same: false
 	};
 	$scope.modifyFirm = function() { $scope.firmModified = true; };
 
@@ -54,7 +58,7 @@ controller('RegisterFormCtrl', ['$scope', '$modal', 'interface', 'security', 'fi
 
 	// handle registration clicks
 	$scope.register = function() {
-		if ($scope.passVerify !== $scope.user.password) {
+		if ($scope.user.passCheck !== $scope.user.password) {
 			$scope.message = appStrings.register.passMatch();
 			return;
 		}
@@ -77,13 +81,8 @@ controller('RegisterFormCtrl', ['$scope', '$modal', 'interface', 'security', 'fi
 	};
 
 	// For same address handling
-	$scope.same = false;
-	var firstLoad = true, oldUserAddr = null;
-	$scope.$watch('same', function(value) {
-		if (firstLoad) {
-			firstLoad = false;
-			return;
-		}
+	var oldUserAddr = {};
+	$scope.$watch('user.same', function(value) {
 		if (value) {
 			oldUserAddr = $scope.user.addr;
 			$scope.user.addr = $scope.user.firm.addr;

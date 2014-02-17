@@ -16,7 +16,7 @@ config(['$routeProvider', 'securityAuthorizationProvider', function ( $routeProv
 	});
 }]).
 
-controller('RegisterConferenceCtrl', ['$scope', 'myPage', 'interface', 'conference', '$modal', 'theCart', 'appStrings', function ($scope, myPage, interface, conference, $modal, theCart, appStrings) {
+controller('RegisterConferenceCtrl', ['$scope', 'myPage', 'interface', 'conference', '$modal', 'theCart', 'appStrings', '$location', function ($scope, myPage, interface, conference, $modal, theCart, appStrings, $location) {
 	$scope.con = conference;
 	$scope.message = false;
 
@@ -25,7 +25,7 @@ controller('RegisterConferenceCtrl', ['$scope', 'myPage', 'interface', 'conferen
 	myPage.setTitle(title, "for " + $scope.con.item.name);
 
 	$scope.noFields = ($scope.con.fields.length === 0); // ensure item has quesitions
-	if ($scope.noFields) return; // no need to do any further processing if there are no options
+	if ($scope.noFields) return $location.path('/cart'); // no need to do any further processing if there are no options
 	
 	function processAttendees() {
 		var attID = null;
@@ -128,6 +128,7 @@ controller('RegisterConferenceCtrl', ['$scope', 'myPage', 'interface', 'conferen
 	};
 
 	// Generic fields helper
+	$scope.temp = {};
 	$scope.helpers = {
 		otherSelect: {
 			pre: function(arr) {
@@ -139,6 +140,34 @@ controller('RegisterConferenceCtrl', ['$scope', 'myPage', 'interface', 'conferen
 				$scope.helpers.otherSelect.isOther = (elem == 'Other');
 			},
 			isOther: false
+		},
+		otherCheckbox: {
+			toggle: function(item, fieldID) {
+				var arr = [];
+				if ($scope.con.options[fieldID]) arr = $scope.con.options[fieldID].split(', ');
+				var idx = arr.indexOf(item);
+				if (idx > -1) {
+					arr.splice(idx, 1);
+				} else {
+					arr.push(item);
+				}
+				$scope.con.options[fieldID] = arr.join(', ');
+			},
+			isSelected: function(item, fieldID) {
+				return ($scope.con.options[fieldID] || '').indexOf(item) > -1;
+			},
+			other: function(fieldID) {
+				var arr = [];
+				if ($scope.con.options[fieldID]) arr = $scope.con.options[fieldID].split(', ');
+				for (var i=0; i<arr.length; i++)
+					if (arr[i].substring(0, 7) == 'Other: ')
+						arr[i] = 'Other: ' + $scope.temp[fieldID];
+				$scope.con.options[fieldID] = arr.join(', ');
+			},
+			oToggle: function(fieldID) {
+				$scope.temp[fieldID] = $scope.temp[fieldID] || '';
+				$scope.helpers.otherCheckbox.toggle('Other: ' + $scope.temp[fieldID], fieldID);
+			}
 		}
 	};
 }]).
@@ -153,6 +182,14 @@ directive('uaImageUpload', [function() {
 		link: function($scope, elem, attrs) {
 			$scope.state = ($scope.uaImageUpload) ? 2 : 0;
 			$scope.image = $scope.uaImageUpload || false;
+
+			$scope.$watch('uaImageUpload', function (val) {
+				if (!val) {
+					$scope.state = 0;
+					$scope.image = false;
+					// TODO: delete image
+				}
+			});
 
 			var reader = new FileReader();
 			reader.onload = function (e) {
