@@ -184,6 +184,14 @@ directive('uaImageUpload', [function() {
 			$scope.state = ($scope.uaImageUpload) ? 2 : 0;
 			$scope.image = $scope.uaImageUpload || false;
 
+			$scope.$watch('uaImageUpload', function (val) {
+				if (!val) {
+					$scope.state = 0;
+					$scope.image = false;
+					// TODO: delete image
+				}
+			});
+
 			var reader = new FileReader();
 			reader.onload = function (e) {
 				$scope.image = e.target.result;
