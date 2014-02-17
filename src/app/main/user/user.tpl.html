@@ -66,7 +66,6 @@
 						<button type="button" class="btn btn-info" ng-click="newFirm()">Create Firm</button>
 					</div>
 				</div>
-				<!-- <pre>Model: {{user.firm | json}}</pre> -->
 			</fieldset>
 
 			<fieldset>
@@ -162,11 +161,8 @@
 				<div ng-show="settings.inputPassword.$error.passValid">
 					<p>Unfulfilled Password Requirements:</p>
 					<ul>
-						<li ng-show="settings.inputPassword.$error.hasNumber">At least 1 number</li>
-						<li ng-show="settings.inputPassword.$error.specialCh">At least 1 special character</li>
-						<li ng-show="settings.inputPassword.$error.lowerAlph">At least 1 alphabetical character</li>
-						<li ng-show="settings.inputPassword.$error.upperAlph">At least 1 uppercase alphabetical character</li>
 						<li ng-show="settings.inputPassword.$error.metLength">At least 6 characters long</li>
+						<li ng-show="settings.inputPassword.$error.isSpecial">At least 1 number <strong>OR</strong> 1 special character</li>
 					</ul>
 				</div>
 
@@ -195,5 +191,3 @@
 	</div>	
 
 </form>
-
-<!-- <pre>{{user | json}}</pre> -->

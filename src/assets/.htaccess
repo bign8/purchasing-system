@@ -11,9 +11,3 @@ RewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^.*$ - [NC,L]
 RewriteRule ^. /index.html [NC,L]
 
-AuthType	Basic
-AuthName	"Development Only"
-AuthGroupFile	"/dev/null"
-AuthUserFile	"/domains/u/upstreamacademy.com/htdocs/payment/.htpasswd"
-Require		valid-user
-

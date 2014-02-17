@@ -20,15 +20,19 @@ controller('RegisterFormCtrl', ['$scope', '$modal', 'interface', 'security', 'fi
 
 	// find firm vs. register
 	$scope.firms = firms;
-	$scope.clearFirm = function () { 
+	$scope.firmModified = false;
+	$scope.clearFirm = function () {
 		$scope.user.firm = '';
 		$scope.firmModified = false;
+		$scope.registration.$setPristine(true);
 	};
 
 	// initialize empty user
 	$scope.user = {
 		preName: '',
-		firm: ''
+		firm: '',
+		addr: {},
+		same: false
 	};
 	$scope.modifyFirm = function() { $scope.firmModified = true; };
 
@@ -46,44 +50,39 @@ controller('RegisterFormCtrl', ['$scope', '$modal', 'interface', 'security', 'fi
 	$scope.resetMsg = null;
 	$scope.pwReset = function() {
 		security.reset( $scope.user.email ).then(function() {
-			$scope.resetMsg = appStrings.register.resetGood;
+			$scope.resetMsg = appStrings.register.resetGood();
 		}, function() {
-			$scope.resetMsg = appStrings.register.resetBad;
+			$scope.resetMsg = appStrings.register.resetBad();
 		});
 	};
 
 	// handle registration clicks
 	$scope.register = function() {
-		if ($scope.passVerify !== $scope.user.password) {
-			$scope.message = appStrings.register.passMatch;
+		if ($scope.user.passCheck !== $scope.user.password) {
+			$scope.message = appStrings.register.passMatch();
 			return;
 		}
 		if (($scope.user.firm.addr || {}).addressID === undefined) {
-			$scope.message = appStrings.register.firmAddr;
+			$scope.message = appStrings.register.firmAddr();
 			return;
 		}
 		if ($scope.user.addr.addressID === undefined) {
-			$scope.message = appStrings.register.userAddr;
+			$scope.message = appStrings.register.userAddr();
 			return;
 		}
 		interface.user('addUser', $scope.user).then(function() {
-			$scope.message = appStrings.register.success; // some sort of callback on close
+			$scope.message = appStrings.register.success(); // some sort of callback on close
 			security.requestCurrentUser();
 			// security.redirect('/cart');
 			window.history.back(); // go to last page!
 		}, function (err) {
-			$scope.message = (err=='dup') ? appStrings.register.duplicate : appStrings.register.failure ;
+			$scope.message = (err=='dup') ? appStrings.register.duplicate() : appStrings.register.failure() ;
 		});
 	};
 
 	// For same address handling
-	$scope.same = false;
-	var firstLoad = true, oldUserAddr = null;
-	$scope.$watch('same', function(value) {
-		if (firstLoad) {
-			firstLoad = false;
-			return;
-		}
+	var oldUserAddr = {};
+	$scope.$watch('user.same', function(value) {
 		if (value) {
 			oldUserAddr = $scope.user.addr;
 			$scope.user.addr = $scope.user.firm.addr;
