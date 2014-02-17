@@ -20,9 +20,11 @@ controller('RegisterFormCtrl', ['$scope', '$modal', 'interface', 'security', 'fi
 
 	// find firm vs. register
 	$scope.firms = firms;
-	$scope.clearFirm = function () { 
+	$scope.firmModified = false;
+	$scope.clearFirm = function () {
 		$scope.user.firm = '';
 		$scope.firmModified = false;
+		$scope.registration.$setPristine(true);
 	};
 
 	// initialize empty user
