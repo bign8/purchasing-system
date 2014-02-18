@@ -368,9 +368,15 @@ HTML;
 	public function getFullUser() {
 		$user = $this->requiresAuth();
 		$userSTH = $this->db->prepare("SELECT c.contactID, c.firmID, c.legalName, c.preName, c.title, c.email, c.phone, a.* FROM (SELECT * FROM `contact` WHERE `contactID`=?) c LEFT JOIN `address` a ON c.addressID=a.addressID;");
+		// START DEV
+		$userSTH = $this->db->prepare("SELECT contactID, firmID, legalName, preName, title, email, phone, a.* FROM (SELECT * FROM `contact` WHERE `contactID`=?) c LEFT JOIN `address` a ON c.addressID=a.addressID;");
+		// END DEV
 		if (!$userSTH->execute( $user['contactID'] )) return $this->conflict();
 		$userData = $this->cleanAddress( $userSTH->fetch( PDO::FETCH_ASSOC ) );
 		$firmSTH = $this->db->prepare("SELECT c.firmID, c.name, c.website, a.* FROM (SELECT * FROM `firm` WHERE `firmID`=?) c LEFT JOIN `address` a ON c.addressID=a.addressID;");
+		// START DEV
+		$firmSTH = $this->db->prepare("SELECT firmID, name, website, a.* FROM (SELECT * FROM `firm` WHERE `firmID`=?) c LEFT JOIN `address` a ON c.addressID=a.addressID;");
+		// END DEV
 		if (!$firmSTH->execute( $userData['firmID'] )) return $this->conflict();
 		$userData['firm'] = $this->cleanAddress( $firmSTH->fetch( PDO::FETCH_ASSOC ) );
 		return $userData;

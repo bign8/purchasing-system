@@ -62,6 +62,8 @@ class Cart extends NG {
 		// Grab pending group purchases
 		$queryMarks = trim( str_repeat( "?,", sizeof( $cleanIDs ) ), "," );
 		$pendingGroupsSTH = $this->db->prepare("SELECT i.settings FROM (SELECT * FROM `item` WHERE itemID IN ($queryMarks)) i LEFT JOIN `product` p ON i.productID=p.productID LEFT JOIN `template` t ON p.templateID=t.templateID WHERE template='group';");
+		print_r($this->db->errorInfo());
+
 		$pendingGroupsSTH->execute( $cleanIDs );
 
 		// parse out their groupID's
