@@ -95,7 +95,7 @@ class Cart extends NG {
 		// 	$rowData = (array) json_decode($row['settings']);
 		// 	array_push( $arrGroupID, $rowData['groupID'] );
 		// }
-		// $this->groupCashe = $arrGroupID; // store for later use in getItemByID() -> getItemCosts()
+		// $this->groupCashe = $arrGroupID; // store for later use in getItemByID() -> getAllItemCosts()
 
 		// Iterate through ID's and grab items or pass objects through
 		$retData = array();
@@ -135,7 +135,7 @@ class Cart extends NG {
 
 		$row['settings'] = json_decode($row['settings']);
 		// $row['hasOptions'] = $optionSTH->rowCount() > 0;
-		$row['cost'] = $this->getItemCosts( $row['itemID'] ); // Recursive
+		$row['cost'] = $this->getAllItemCosts( $row['itemID'] ); // Recursive
 
 		// warn if item has already been purchased
 		// $user = $this->usr->currentUser(); // gets user if available
@@ -146,19 +146,19 @@ class Cart extends NG {
 
 		return $row;
 	}
-	private function getItemCosts( $itemID ) { // Helper(get): return cost for a productID
+	private function getAllItemCosts( $itemID ) { // Helper(get): return cost for a productID
 		if (is_null($itemID)) return null;
 
-		$STH = $this->db->prepare("SELECT * FROM (SELECT * FROM item WHERE itemID=?) item LEFT JOIN price ON item.itemID = price.itemID LEFT JOIN template ON item.templateID = template.templateID;");
+		$STH = $this->db->prepare("SELECT i.parentID as parentID, t.*, p.* FROM (SELECT * FROM item WHERE itemID=?) i LEFT JOIN price p ON i.itemID=p.itemID LEFT JOIN template t ON i.templateID=t.templateID;");
 		if (!$STH->execute( $itemID )) die($this->conflict());
 		$costs = $STH->fetchAll( PDO::FETCH_ASSOC );
 
 		if ( !is_null($costs[0]['settings']) ) {
 			$ret = $costs;
-			foreach ($costs as $cost) $ret = array_unique($ret, $this->getItemCosts( $cost['parentID'] ) );
+			foreach ($costs as $cost) $ret = array_unique($ret, $this->getAllItemCosts( $cost['parentID'] ) );
 			return $ret;
 		}
-		return $this->getItemCosts( $costs[0]['parentID'] );
+		return $this->getAllItemCosts( $costs[0]['parentID'] );
 
 		// $user = $this->usr->currentUser();
 
@@ -214,7 +214,7 @@ class Cart extends NG {
 		// }
 		// $ret['name'] = $leastRow['name'];
 		// $ret['optionID'] = $leastRow['optionID'];
-		return $ret;
+		// return $ret;
 	}
 	private function getRowCost( $row ) {
 		$cost = (array)json_decode($row['settings']); // parse settings out to compare
