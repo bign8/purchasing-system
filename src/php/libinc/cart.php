@@ -51,28 +51,50 @@ class Cart extends NG {
 		);
 	}
 
+	// Helper: return item's template (recursive)
+	private function getItemTemplate($itemID, $STH = null) { // TODO: return template and array of itemID's to get to overall parent
+		if (is_null($itemID)) return null; // worst case
+		if (is_null($STH)) $STH = $this->db->prepare("SELECT parentID, templateID FROM item WHERE itemID=?;");
+		if (!$STH->execute( $itemID )) $this->conflict();
+		$item = $STH->fetch( PDO::FETCH_ASSOC );
+		if (is_null($item['template'])) { // still looking
+			return $this->getItemTemplate($item['parentID'], $STH);
+		} else { // found
+			$STH = $this->db->prepare("SELECT * FROM 'template' WHERE templateID=?");
+			if (!$STH->execute( $item['template'] )) $this->conflict();
+			return $STH->fetch( PDO::FETCH_ASSOC );
+		}
+	}
+
 	// Worker(app): return cart with current prices
 	public function get() {
 		$user = $this->usr->currentUser(); // gets user if available
 
 		// remove all non-strings to allow invoices, but still grab purchase id's
-		$cleanIDs = array();
-		foreach($_SESSION['cart'] as $itemID) if (is_string($itemID)) array_push($cleanIDs, $itemID);
+		// $cleanIDs = array();
+		// foreach($_SESSION['cart'] as $itemID) {
+		// 	if (is_string($itemID)) {
+		// 		$template = $this->getItemTemplate( $itemID );
+		// 		if (!is_null($template) && $template['name'] = 'Membership') {
+		// 			array_push($cleanIDs, $itemID);
+		// 		}
+		// 	}
+		// }
 
-		// Grab pending group purchases
-		$queryMarks = trim( str_repeat( "?,", sizeof( $cleanIDs ) ), "," );
-		$pendingGroupsSTH = $this->db->prepare("SELECT i.settings FROM (SELECT * FROM `item` WHERE itemID IN ($queryMarks)) i LEFT JOIN `product` p ON i.productID=p.productID LEFT JOIN `template` t ON p.templateID=t.templateID WHERE template='group';");
-		print_r($this->db->errorInfo());
+		// // Grab pending group purchases
+		// $queryMarks = trim( str_repeat( "?,", sizeof( $cleanIDs ) ), "," );
+		// $pendingGroupsSTH = $this->db->prepare("SELECT i.settings FROM (SELECT * FROM `item` WHERE itemID IN ($queryMarks)) i LEFT JOIN `product` p ON i.productID=p.productID LEFT JOIN `template` t ON p.templateID=t.templateID WHERE template='group';");
+		// print_r($this->db->errorInfo());
 
-		$pendingGroupsSTH->execute( $cleanIDs );
+		// $pendingGroupsSTH->execute( $cleanIDs );
 
-		// parse out their groupID's
-		$arrGroupID = array();
-		while ( $row = $pendingGroupsSTH->fetch( PDO::FETCH_ASSOC ) ) {
-			$rowData = (array) json_decode($row['settings']);
-			array_push( $arrGroupID, $rowData['groupID'] );
-		}
-		$this->groupCashe = $arrGroupID; // store for later use in getItemByID() -> getProductCost()
+		// // parse out their groupID's
+		// $arrGroupID = array();
+		// while ( $row = $pendingGroupsSTH->fetch( PDO::FETCH_ASSOC ) ) {
+		// 	$rowData = (array) json_decode($row['settings']);
+		// 	array_push( $arrGroupID, $rowData['groupID'] );
+		// }
+		// $this->groupCashe = $arrGroupID; // store for later use in getItemByID() -> getProductCost()
 
 		// Iterate through ID's and grab items or pass objects through
 		$retData = array();
