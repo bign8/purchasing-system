@@ -101,9 +101,9 @@ HTML;
 	// Worker(settings/firmCode): returns firm membership data
 	public function getFirmMem() {
 		$user = $this->requiresAuth();
-		$memSTH = $this->db->prepare("SELECT g.* FROM `member` m LEFT JOIN `group` g ON m.groupID=g.groupID WHERE `firmID`=?;");
-		if (!$memSTH->execute( $user['firmID'] )) return $this->conflict();
-		return $memSTH->fetchAll( PDO::FETCH_ASSOC );
+		// $memSTH = $this->db->prepare("SELECT g.* FROM `member` m LEFT JOIN `group` g ON m.groupID=g.groupID WHERE `firmID`=?;");
+		// if (!$memSTH->execute( $user['firmID'] )) return $this->conflict();
+		// return $memSTH->fetchAll( PDO::FETCH_ASSOC );
 	}
 
 	// Helper(security): ensures user is authenticated

@@ -11,26 +11,36 @@
 
 require_once('./libinc/main_include.php');
 
-$db = new myPDO();
-
-$itemSTH = $db->prepare("SELECT * FROM `item` WHERE productID=? ORDER BY `name`;");
-$prodSTH = $db->query("SELECT * FROM `product` ORDER BY `name`;");
-$products = $prodSTH->fetchAll( PDO::FETCH_ASSOC );
-
-foreach ($products as $product) {
-	$itemSTH->execute( $product['productID'] );
-
-	echo '<h3>' . $product['name'] . '</h3>' . "\r\n";
-
-	echo '<ul>' . "\r\n";
-	while ($item = $itemSTH->fetch( PDO::FETCH_ASSOC )) {
-		echo '<li>';
-		echo '<a href="#" class="cartAdd" data-item-id="' . $item['itemID'] . '">Cart</a> ';
-		echo '<a href="/conference/' . $item['itemID'] . '">Register</a> ';
-		echo $item['name'] . ': ' . $item['description'] . '</li>' . "\r\n";
+class printer {
+	function __construct() {
+		$this->db = new myPDO();
+		// mysql note: use "<=>" the null save equal operator; source: http://bit.ly/1giuNOP
+		$e = ($this->db->getAttribute( PDO::ATTR_DRIVER_NAME ) == 'sqlite') ? 'is' : '<=>' ; // sqlite and mysql support
+		$this->sth = $this->db->prepare("SELECT * FROM `item` WHERE parentID $e ? ORDER BY `name`;");
 	}
-	echo '</ul>' . "\r\n";
+	public function printChildren( $parentID = null ) {
+		$this->sth->execute( $parentID );
+		$items = $this->sth->fetchAll( PDO::FETCH_ASSOC );
+		$list = '';
+		if (count($items) > 0) {
+			foreach ($items as $item) {
+				$children = $this->printChildren( $item['itemID'] );
+				if (strlen($children) > 0) {
+					$list .= "<li><strong>{$item['name']}:</strong> {$item['desc']} $children</li>\r\n"; // without link
+				} else {
+					$list .=  "<li>"; // with link
+					$list .=  "<a href=\"#\" class=\"cartAdd\" data-item-id=\"{$item['itemID']}\">Cart</a> ";
+					$list .=  "<a href=\"/conference/\"{$item['itemID']}\">Register</a> ";
+					$list .=  "{$item['name']}: {$item['desc']}</li>\r\n";
+				}
+			}
+			$list = "<ul>\r\n$list</ul>\r\n";
+		}
+		return $list;
+	}
 }
+$obj = new printer();
+echo $obj->printChildren();
 
 ?>
 	<div style="position:fixed;bottom:0;right:0;margin:15px 20px">
