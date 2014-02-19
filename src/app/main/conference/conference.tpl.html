@@ -34,6 +34,13 @@
 							</div>
 						</div>
 
+						<div ng-switch-when="year">
+							<label class="control-label" for="{{field.fieldID}}">{{field.name}} <span ng-show="field.required">*</span></label>
+							<div class="controls">
+								<input type="number" id="{{field.fieldID}}" ng-model="con.options[field.fieldID]" placeholder="{{field.name}}" ng-required="{{field.required}}" class="input-block-level" ng-minlength="4" ng-maxlength="4" />
+							</div>
+						</div>
+
 						<div ng-switch-when="textarea">
 							<label class="control-label" for="{{field.fieldID}}">{{field.name}} <span ng-show="field.required">*</span></label>
 							<div class="controls">
