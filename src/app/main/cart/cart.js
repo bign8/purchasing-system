@@ -60,23 +60,13 @@ controller('CartCtrl', ['$scope', '$modal', 'interface', '$location', 'theCart',
 			return;
 		}
 		$scope.submitMsg = appStrings.cart.checkOut();
-		interface.cart('save', {cost:theCart.fullTotal(), medium:medium}).then(function() {
-			var cart = {
-				list: theCart.cart,
-				disTotal: theCart.totDiscount(),
-				total: theCart.fullTotal(),
-				medium: medium
-			};
-			localStorage.setItem('UA-recipt', JSON.stringify( cart )); // store off cart
-
-			if (medium == 'online') { // direct accordingly
-				var obj = appStrings.paypal.uri;
-				obj[appStrings.paypal.totalParam] = cart.total;
-				document.location = appStrings.paypal.url + '?' + $.param(obj);
-			} else {
-				$location.path('/recipt'); // go to checkout page
-			}
-			theCart.setDirty(); // make sure empty cart gets loaded into the system
-		});
+		if (medium == 'online') { // direct accordingly
+			var obj = appStrings.paypal.uri;
+			obj[appStrings.paypal.totalParam] = theCart.fullTotal();
+			document.location = appStrings.paypal.url + '?' + $.param(obj);
+			// callback = /checkout/online
+		} else {
+			$location.path('/checkout/check'); // go to checkout page
+		}
 	};
 }]);
