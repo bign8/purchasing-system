@@ -12,6 +12,7 @@ class Cart extends NG {
 		if ( !isset($_SESSION['cart.options']) ) $_SESSION['cart.options'] = array(); // assign empty cart.options if applicable
 		if ( !isset($_SESSION['cart.discounts']) ) $_SESSION['cart.discounts'] = array(); // assign empty cart.discounts if applicable
 		$this->usr = new User();
+		$this->sth = array();
 	}
 
 	public static function process( $action, &$pass, &$data ) {
@@ -94,7 +95,7 @@ class Cart extends NG {
 		// 	$rowData = (array) json_decode($row['settings']);
 		// 	array_push( $arrGroupID, $rowData['groupID'] );
 		// }
-		// $this->groupCashe = $arrGroupID; // store for later use in getItemByID() -> getProductCost()
+		// $this->groupCashe = $arrGroupID; // store for later use in getItemByID() -> getItemCosts()
 
 		// Iterate through ID's and grab items or pass objects through
 		$retData = array();
@@ -117,88 +118,102 @@ class Cart extends NG {
 		return $retData;
 	}
 	private function getItemByID( $itemID ) { // Helper(get): return specific item detail by id
-		$itemSTH = $this->db->prepare("SELECT i.*, t.template, p.type FROM (SELECT * FROM `item` WHERE itemID = ?) i JOIN product p ON p.productID=i.productID JOIN template t ON t.templateID = p.templateID;");
+		// $itemSTH = $this->db->prepare("SELECT i.*, t.template, p.type FROM (SELECT * FROM `item` WHERE itemID = ?) i JOIN product p ON p.productID=i.productID JOIN template t ON t.templateID = p.templateID;");
+		$itemSTH = $this->db->prepare("SELECT * FROM `item` WHERE itemID = ?;");
 		if (!$itemSTH->execute( $itemID )) return -1;
 		$row = $itemSTH->fetch(PDO::FETCH_ASSOC);
-		if (!isset($row['productID'])) return null; // if can't find product
+		if (!isset($row['itemID'])) return null; // if can't find product
 
-		$optionSTH = $this->db->prepare("SELECT * FROM `tie_product_field` WHERE productID=?;");
-		if (!$optionSTH->execute( $row['productID'] )) return -1;
+		// $optionSTH = $this->db->prepare("SELECT * FROM `tie` WHERE productID=?;");
+		// if (!$optionSTH->execute( $row['productID'] )) return -1;
 
 		// check areas for previously purchased item
-		$q[] = "SELECT CONCAT('p-',purchaseID), `data` FROM `purchase` WHERE firmID=? and itemID=?";
-		$q[] = "SELECT CONCAT('a-',acquisitionID), '{}' FROM `acquisition` a LEFT JOIN `order` o ON a.orderID = o.orderID WHERE itemID=? AND contactID=?";
-		$q[] = "SELECT CONCAT('m-',memberID), '{}' FROM `member` WHERE firmID=? AND groupID=?";
-		$checkSTH = $this->db->prepare( implode(" UNION ", $q) . ";" );
+		// $q[] = "SELECT CONCAT('p-',purchaseID), `data` FROM `purchase` WHERE firmID=? and itemID=?";
+		// $q[] = "SELECT CONCAT('a-',acquisitionID), '{}' FROM `acquisition` a LEFT JOIN `order` o ON a.orderID = o.orderID WHERE itemID=? AND contactID=?";
+		// $q[] = "SELECT CONCAT('m-',memberID), '{}' FROM `member` WHERE firmID=? AND groupID=?";
+		// $checkSTH = $this->db->prepare( implode(" UNION ", $q) . ";" );
 
 		$row['settings'] = json_decode($row['settings']);
-		$row['hasOptions'] = $optionSTH->rowCount() > 0;
-		$row['cost'] = $this->getProductCost( $row['productID'] );
+		// $row['hasOptions'] = $optionSTH->rowCount() > 0;
+		$row['cost'] = $this->getItemCosts( $row['itemID'] ); // Recursive
 
 		// warn if item has already been purchased
-		$user = $this->usr->currentUser(); // gets user if available
-		$groupID = isset($row['settings']->groupID) ? $row['settings']->groupID : -1;
-		$checkSTH->execute( $user['firmID'], $itemID, $itemID, $user['contactID'], $user['firmID'], $groupID );
-		$row['warn'] = ($checkSTH->rowCount() > 0);
-		$row['oldData'] = json_decode( $checkSTH->fetchColumn(1) );
+		// $user = $this->usr->currentUser(); // gets user if available
+		// $groupID = isset($row['settings']->groupID) ? $row['settings']->groupID : -1;
+		// $checkSTH->execute( $user['firmID'], $itemID, $itemID, $user['contactID'], $user['firmID'], $groupID );
+		// $row['warn'] = ($checkSTH->rowCount() > 0);
+		// $row['oldData'] = json_decode( $checkSTH->fetchColumn(1) );
 
 		return $row;
 	}
-	private function getProductCost( $productID ) { // Helper(get): return cost for a productID
-		$user = $this->usr->currentUser();
+	private function getItemCosts( $itemID ) { // Helper(get): return cost for a productID
+		if (is_null($itemID)) return null;
+
+		$STH = $this->db->prepare("SELECT * FROM (SELECT * FROM item WHERE itemID=?) item LEFT JOIN price ON item.itemID = price.itemID LEFT JOIN template ON item.templateID = template.templateID;");
+		if (!$STH->execute( $itemID )) die($this->conflict());
+		$costs = $STH->fetchAll( PDO::FETCH_ASSOC );
+
+		if ( !is_null($costs[0]['settings']) ) {
+			$ret = $costs;
+			foreach ($costs as $cost) $ret = array_unique($ret, $this->getItemCosts( $cost['parentID'] ) );
+			return $ret;
+		}
+		return $this->getItemCosts( $costs[0]['parentID'] );
+
+		// $user = $this->usr->currentUser();
 
 		// pull groups based on firmID if user is assigned
-		$groups = array();
-		if ($user != null) {
-			$groupSTH = $this->db->prepare("SELECT groupID FROM `member` WHERE firmID=?;");
-			$groupSTH->execute( $user['firmID'] );
-			$groups = $groupSTH->fetchAll( PDO::FETCH_COLUMN );
-		}
-		$groups = array_merge($groups, array(0)); // ensure not empty
-		if (isset($this->groupCashe)) $groups = array_merge($groups, $this->groupCashe); // add groups that are in cart
+		// $groups = array();
+		// if ($user != null) {
+		// 	$groupSTH = $this->db->prepare("SELECT groupID FROM `member` WHERE firmID=?;");
+		// 	$groupSTH->execute( $user['firmID'] );
+		// 	$groups = $groupSTH->fetchAll( PDO::FETCH_COLUMN );
+		// }
+		// $groups = array_merge($groups, array(0)); // ensure not empty
+		// if (isset($this->groupCashe)) $groups = array_merge($groups, $this->groupCashe); // add groups that are in cart
 
-		// get origional cost
-		$flatCostSTH = $this->db->prepare("SELECT o.`optionID`, `name`, `pretty`, `settings` FROM `price` p JOIN `option` o ON o.optionID = p.optionID WHERE productID=? AND groupID IS NULL LIMIT 1;");
-		$flatCostSTH->execute( $productID );
-		$fullCostRow = $flatCostSTH->fetch( PDO::FETCH_ASSOC );
-		$leastRow = $fullCostRow;
-		$leastCost = $this->getRowCost( $fullCostRow );
+		// // get origional cost
+		// $flatCostSTH = $this->db->prepare("SELECT o.`optionID`, `name`, `pretty`, `settings` FROM `price` p JOIN `option` o ON o.optionID = p.optionID WHERE productID=? AND groupID IS NULL LIMIT 1;");
+		// $flatCostSTH->execute( $productID );
+		// $fullCostRow = $flatCostSTH->fetch( PDO::FETCH_ASSOC );
+		// $leastRow = $fullCostRow;
+		// $leastCost = $this->getRowCost( $fullCostRow );
 		
-		// pull prices that match productID and group criteria
-		$questionMarks = trim(str_repeat("?,", sizeof($groups)),","); // build string of questionmarks based on sizeof($groups)
-		$costSTH = $this->db->prepare("SELECT o.*, g.name AS groupName FROM (SELECT o.`optionID`, `name`, `pretty`, `settings`, groupID FROM `price` p JOIN `option` o ON o.optionID = p.optionID WHERE productID=? AND groupID IN ($questionMarks)) o LEFT JOIN `group` g on o.groupID = g.groupID;");
-		array_unshift( $groups, $productID ); // put productID at the beginninng of the array
-		$costSTH->execute( $groups );
-		$costRows = $costSTH->fetchAll(PDO::FETCH_ASSOC);
+		// // pull prices that match productID and group criteria
+		// $questionMarks = trim(str_repeat("?,", sizeof($groups)),","); // build string of questionmarks based on sizeof($groups)
+		// $costSTH = $this->db->prepare("SELECT o.*, g.name AS groupName FROM (SELECT o.`optionID`, `name`, `pretty`, `settings`, groupID FROM `price` p JOIN `option` o ON o.optionID = p.optionID WHERE productID=? AND groupID IN ($questionMarks)) o LEFT JOIN `group` g on o.groupID = g.groupID;");
+		// array_unshift( $groups, $productID ); // put productID at the beginninng of the array
+		// $costSTH->execute( $groups );
+		// $costRows = $costSTH->fetchAll(PDO::FETCH_ASSOC);
 
-		// find least price
-		foreach ($costRows as $row) {
-			$myCost = $this->getRowCost( $row );
-			if ($myCost < $leastCost) {
-				$leastCost = $myCost;
-				$leastRow = $row;
-			}
-		}
+		// // find least price
+		// foreach ($costRows as $row) {
+		// 	$myCost = $this->getRowCost( $row );
+		// 	if ($myCost < $leastCost) {
+		// 		$leastCost = $myCost;
+		// 		$leastRow = $row;
+		// 	}
+		// }
 		
-		// parse json for interpolating and pretty printing
-		$pretty = (array)json_decode($leastRow['settings']);
-		$ret = array( 'settings' => $pretty );
+		// // parse json for interpolating and pretty printing
+		// $pretty = (array)json_decode($leastRow['settings']);
+		// $ret = array( 'settings' => $pretty );
 
-		// convert specific values to currency (excluding the values mentioned in the case statements)
-		setlocale(LC_MONETARY, 'en_US');
-		foreach ($pretty as $key => $value) {
-			switch ($key) {
-				case 'after': continue; break;
-				default: $pretty[$key] = '$' . money_format('%n', $value); break;
-			}
-		}
-		$ret['text'] = $this->interpolate($leastRow['pretty'], $pretty);
-		if ($leastRow != $fullCostRow) {
-			$ret['full'] = (array)json_decode($fullCostRow['settings']);
-			$ret['reason'] = $leastRow['groupName'];
-		}
-		$ret['name'] = $leastRow['name'];
-		$ret['optionID'] = $leastRow['optionID'];
+		// // convert specific values to currency (excluding the values mentioned in the case statements)
+		// setlocale(LC_MONETARY, 'en_US');
+		// foreach ($pretty as $key => $value) {
+		// 	switch ($key) {
+		// 		case 'after': continue; break;
+		// 		default: $pretty[$key] = '$' . money_format('%n', $value); break;
+		// 	}
+		// }
+		// $ret['text'] = $this->interpolate($leastRow['pretty'], $pretty);
+		// if ($leastRow != $fullCostRow) {
+		// 	$ret['full'] = (array)json_decode($fullCostRow['settings']);
+		// 	$ret['reason'] = $leastRow['groupName'];
+		// }
+		// $ret['name'] = $leastRow['name'];
+		// $ret['optionID'] = $leastRow['optionID'];
 		return $ret;
 	}
 	private function getRowCost( $row ) {
