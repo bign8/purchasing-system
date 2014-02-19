@@ -7,14 +7,26 @@ class config {
 	const notifyEmail  = '';
 	const notifyName   = '';
 
+	// START DEV
+	const db_dsn    = 'sqlite:%s/%s';
+	const db_server = __DIR__ ;
+	const db_name   = 'file.db';
+	const db_user   = '';
+	const db_pass   = '';
+	static $db_opt  = array(); // PDO connection options
+	/*/
+	// END DEV
 	// For database connection scheme
-	const db_dsn       = 'mysql:host=%s;dbname=%s'; // %s is replaced in following order (server, name, user, pass)
-	const db_server    = '';
-	const db_name      = '';
-	const db_user      = ''; // also passed to new PDO(...) to allow mysql connections
-	const db_pass      = ''; // also passed to new PDO(...) to allow mysql connections
-	static $db_opt     = array(); // PDO connection options
-
+	const db_dsn    = 'mysql:host=%s;dbname=%s'; // passed in following order
+	const db_server = 'server';
+	const db_name   = 'dbname';
+	const db_user   = 'user';
+	const db_pass   = 'pass';
+	static $db_opt  = array(); // PDO connection options
+	// START DEV
+	//*/
+	// END DEV
+	
 	// Misc use
-	const encryptSTR   = 'RandomSaltString'; // Try using random.org/strings
+	const encryptSTR   = '***randomString***'; // try: random.org/strings
 }
