@@ -25,7 +25,7 @@ config(['$routeProvider', function ( $routeProvider ){
 
 controller('IndexCtrl', ['$scope', 'theCart', 'security', '$location', function ($scope, theCart, security, $location) {
 	$scope.$watch(function() {return security.currentUser;}, function() {
-		if (security.currentUser !== null) $location.replace('/cart');
+		if (security.currentUser !== null) $location.path('/cart');
 	}, true);
 	$scope.theCart = theCart;
 }]);

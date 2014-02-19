@@ -24,10 +24,10 @@ controller('CustomPaymentCtrl', ['$scope', 'theCart', '$location', 'appStrings',
 		var promise = theCart.add( $scope.item );
 		promise.then(function (res) {
 			if (res) {
-				$scope.message = appStrings.pay.success();
+				$scope.message = appStrings.payment.success();
 				$scope.item = angular.copy(orig);
 			} else {
-				$scope.message = appStrings.pay.failure();
+				$scope.message = appStrings.payment.failure();
 			}
 		});
 	};
