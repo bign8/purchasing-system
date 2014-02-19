@@ -11,7 +11,7 @@
 			<legend>To begin Registration, please enter you email address</legend>
 
 			<div class="control-group">
-				<label class="control-label" for="email">Email Address</label>
+				<label class="control-label" for="email">Email Address *</label>
 				<div class="controls">
 					<div class="input-append input-block-level">
 						<input class="input-xlarge" type="email" name="check" ng-model="user.email" placeholder="Email Address" required>
@@ -59,7 +59,7 @@
 				</div>
 
 				<div class="control-group">
-					<label class="control-label" for="firmName">Firm Name</label>
+					<label class="control-label" for="firmName">Firm Name *</label>
 					<div class="controls">
 						<input type="text" id="firmName" ng-model="user.firm.name" placeholder="Firm Name" required>
 						<button type="button" class="close" ng-click="clearFirm()" style="margin-right: 19px;" ng-hide="user.firm === undefined">&times;</button>
@@ -67,7 +67,7 @@
 				</div>
 
 				<div class="control-group">
-					<label class="control-label" for="firmWeb">Firm Website</label>
+					<label class="control-label" for="firmWeb">Firm Website *</label>
 					<div class="controls">
 						<input type="text" id="firmWeb" ng-model="user.firm.website" placeholder="Firm Website" required>
 						<span class="help-inline">www.UpstreamAcademy.com</span>
@@ -75,7 +75,7 @@
 				</div>
 
 				<div class="control-group">
-					<label class="control-label" for="firmName">Firm Address</label>
+					<label class="control-label" for="firmName">Firm Address *</label>
 					<div class="controls">
 						<div class="input-append" ng-switch="user.firm.addr.addressID">
 
@@ -102,14 +102,14 @@
 			<legend>User Information</legend>
 
 			<div class="control-group">
-				<label class="control-label" for="legalName">Legal Name</label>
+				<label class="control-label" for="legalName">Legal Name *</label>
 				<div class="controls">
 					<input type="text" id="legalName" ng-model="user.legalName" placeholder="Legal Name" required>
 				</div>
 			</div>
 
 			<div class="control-group">
-				<label class="control-label" for="preName">Preferred Name</label>
+				<label class="control-label" for="preName">Preferred Name *</label>
 				<div class="controls">
 					<input type="text" id="preName" ng-model="user.preName" placeholder="Preferred Name">
 					<span class="help-inline">(i.e., Bill instead of William, etc.)</span>
@@ -117,14 +117,14 @@
 			</div>
 
 			<div class="control-group">
-				<label class="control-label" for="title">Title / Position</label>
+				<label class="control-label" for="title">Title / Position *</label>
 				<div class="controls">
 					<input type="text" id="title" ng-model="user.title" placeholder="Title / Position" required>
 				</div>
 			</div>
 
 			<div class="control-group">
-				<label class="control-label" for="phone">Phone</label>
+				<label class="control-label" for="phone">Phone *</label>
 				<div class="controls">
 					<input type="text" id="phone" ng-model="user.phone" placeholder="Phone" name="phone" ua-phone required>
 					<span class="help-inline">(xxx) xxx-xxxx</span>
@@ -139,7 +139,7 @@
 			</div>
 
 			<div class="control-group">
-				<label class="control-label">Address</label>
+				<label class="control-label">Address *</label>
 				<div class="controls">
 					<div class="input-append" ng-switch="user.addr.addressID">
 
@@ -168,14 +168,14 @@
 				</div>
 
 				<div class="control-group">
-					<label class="control-label" for="inputPassword">Password</label>
+					<label class="control-label" for="inputPassword">Password *</label>
 					<div class="controls">
 						<input type="password" id="inputPassword" name="inputPassword" ng-model="user.password" placeholder="Password" ua-pass-validate required>
 					</div>
 				</div>
 
 				<div class="control-group">
-					<label class="control-label" for="inputPassword">Re-type Password</label>
+					<label class="control-label" for="inputPassword">Re-type Password *</label>
 					<div class="controls">
 						<input type="password" id="inputPassword" ng-model="user.passCheck" placeholder="Password" required>
 					</div>
@@ -190,5 +190,9 @@
 		<button type="submit" class="btn btn-primary pull-right" ng-click="register()" ng-disabled="registration.$invalid">Create an Account</button>&nbsp;
 		<a href="/" class="btn">Cancel</a>
 	</div>	
+
+	<div>
+		<p>* Required Field</p>
+	</div>
 
 </form>
