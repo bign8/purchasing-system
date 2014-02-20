@@ -39,6 +39,14 @@ class NG {
 		return strtr($message, $replace); // interpolate replacement values into the message
 	}
 
+	// Helper(app): returns interpolated item (see: http://bit.ly/198oCOP)
+	protected function interpolate2( $message, array $context = array()) {
+		$callback = function ($matches) use ($context) { // function that formats data as specified
+			return sprintf($matches[2], $context[$matches[1]]);
+		};
+		return preg_replace_callback( '/{([^\|]+)\|([^}]+)}/', $callback, $message ); // replacement query
+	}
+
 	// Helper(cart->setOptions): converts stdObjects to array (see: http://bit.ly/1eJETYC)
 	protected function object_to_array($obj) {
 		$arrObj = is_object($obj) ? get_object_vars($obj) : $obj;
