@@ -39,6 +39,11 @@ class myPDO extends PDO
 */
 class myPDOStatement extends PDOStatement
 {
+	protected function __construct()
+	{
+		$this->setFetchMode( PDO::FETCH_ASSOC );
+	}
+
 	public function execute ( $bound_input_params = NULL )
 	{
 		$arr = func_get_args();
