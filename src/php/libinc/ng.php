@@ -42,7 +42,7 @@ class NG {
 	// Helper(app): returns interpolated item (see: http://bit.ly/198oCOP)
 	protected function interpolate2( $message, array $context = array()) {
 		$callback = function ($matches) use ($context) { // function that formats data as specified
-			return sprintf($matches[2], $context[$matches[1]]);
+			return (isset($context[$matches[1]])) ? sprintf($matches[2], $context[$matches[1]]) : $matches[0];
 		};
 		return preg_replace_callback( '/{([^\|]+)\|([^}]+)}/', $callback, $message ); // replacement query
 	}
