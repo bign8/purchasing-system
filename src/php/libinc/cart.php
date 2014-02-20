@@ -52,54 +52,30 @@ class Cart extends NG {
 		);
 	}
 
-	// Helper: return item's template (recursive)
-	private function getItemTemplate($itemID, $STH = null) { // TODO: return template and array of itemID's to get to overall parent
-		if (is_null($itemID)) return null; // worst case
-		if (is_null($STH)) $STH = $this->db->prepare("SELECT parentID, templateID FROM item WHERE itemID=?;");
-		if (!$STH->execute( $itemID )) $this->conflict();
-		$item = $STH->fetch( PDO::FETCH_ASSOC );
-		if (is_null($item['template'])) { // still looking
-			return $this->getItemTemplate($item['parentID'], $STH);
-		} else { // found
-			$STH = $this->db->prepare("SELECT * FROM 'template' WHERE templateID=?");
-			if (!$STH->execute( $item['template'] )) $this->conflict();
-			return $STH->fetch( PDO::FETCH_ASSOC );
-		}
-	}
-
 	// Worker(app): return cart with current prices
 	public function get() {
 		$user = $this->usr->currentUser(); // gets user if available
 
-		// remove all non-strings to allow invoices, but still grab purchase id's
-		// $cleanIDs = array();
-		// foreach($_SESSION['cart'] as $itemID) {
-		// 	if (is_string($itemID)) {
-		// 		$template = $this->getItemTemplate( $itemID );
-		// 		if (!is_null($template) && $template['name'] = 'Membership') {
-		// 			array_push($cleanIDs, $itemID);
-		// 		}
-		// 	}
-		// }
+		// remove all non-strings to allow invoices, but still grab parent id's
+		$cleanIDs = array();
+		foreach($_SESSION['cart'] as $itemID) {
+			if (is_string($itemID)) {
+				array_push($cleanIDs, $itemID);
+			}
+		}
+		$this->cartIDs = array('0'); // Grab parents of all items in cart (current purchases)
+		foreach( $cleanIDs as $itemID ) $this->cartIDs = array_merge($this->cartIDs, $this->getItemParentIDs( $itemID ));
+		$this->cartIDs = array_values(array_unique( $this->cartIDs ));
 
-		// // Grab pending group purchases
-		// $queryMarks = trim( str_repeat( "?,", sizeof( $cleanIDs ) ), "," );
-		// $pendingGroupsSTH = $this->db->prepare("SELECT i.settings FROM (SELECT * FROM `item` WHERE itemID IN ($queryMarks)) i LEFT JOIN `product` p ON i.productID=p.productID LEFT JOIN `template` t ON p.templateID=t.templateID WHERE template='group';");
-		// print_r($this->db->errorInfo());
-
-		// $pendingGroupsSTH->execute( $cleanIDs );
-
-		// // parse out their groupID's
-		// $arrGroupID = array();
-		// while ( $row = $pendingGroupsSTH->fetch( PDO::FETCH_ASSOC ) ) {
-		// 	$rowData = (array) json_decode($row['settings']);
-		// 	array_push( $arrGroupID, $rowData['groupID'] );
-		// }
-		// $this->groupCashe = $arrGroupID; // store for later use in getItemByID() -> getAllItemCosts()
+		// Past purchase id's
+		$this->pastIDs = array('0');
+		$STH = $this->db->prepare("SELECT itemID FROM 'purchase' WHERE firmID=? OR contactID=?;"); // grab all previous purchases
+		if (!$STH->execute( $user['firmID'], $user['contactID'] )) return $this->conflict();
+		while ($row = $STH->fetch()) $this->pastIDs = array_merge($this->pastIDs, $this->getItemParentIDs( $row['itemID'] ));
+		$this->pastIDs = array_values(array_unique( $this->pastIDs )); // all id's for past and current purchases
 
 		// Iterate through ID's and grab items or pass objects through
 		$retData = array();
-		setlocale(LC_MONETARY, 'en_US');
 		foreach ($_SESSION['cart'] as $itemID) {
 			if (is_string($itemID)) {
 				$item = $this->getItemByID( $itemID );
@@ -107,7 +83,7 @@ class Cart extends NG {
 			} else { // format cost for carts
 				$cost = $itemID['cost'];
 				$itemID['cost'] = array(
-					'pretty' => '$' . money_format('%n', $cost),
+					'pretty' => '$' . sprintf('%01.2f', $cost),
 					'settings' => array(
 						"cost" => $cost
 					)
@@ -128,7 +104,7 @@ class Cart extends NG {
 
 		// find least price
 		$costRows = $this->getAllItemCosts( $row['itemID'] ); // Recursive: returns all costs
-		if (!is_null($costRows)) {
+		if (count($costRows) > 0) {
 			$origRow = null; $origCost = null;
 			$leastRow = null; $leastCost = null;
 			foreach ($costRows as &$costRow) { // search for least
@@ -152,7 +128,7 @@ class Cart extends NG {
 			);
 			if ($leastRow != $origRow)  {
 				$row['cost']['full'] = (array)json_decode($origRow['settings']);
-				$row['cost']['reason'] = 'test'; // TODO: fix query (in getAllItemCosts) to pull item's name!
+				$row['cost']['reason'] = $leastRow['reason'];
 			}
 		}
 		// START DEV
@@ -168,52 +144,50 @@ class Cart extends NG {
 
 		return $row;
 	}
-	private function itemHasOptions( $itemID ) { // Helper(get):bool -> if item or parents has options = true
-		if(is_null($itemID)) return false;
-		$STH = $this->db->prepare("SELECT * FROM (SELECT * FROM 'item' WHERE itemID=?) i LEFT JOIN 'tie' t ON t.itemID=i.itemID"); // TODO: only prepare once
-		if (!$STH->execute($itemID)) die($this->conflict());
-		$item = $STH->fetch( PDO::FETCH_ASSOC );
-		return (is_null($item['tieID'])) ? $this->itemHasOptions( $item['parentID'] ) : true ;
+	private function getItemParentIDs( $itemID ) { // Helper(get): return array of item's parent id's
+		$STH = $this->db->prepare("SELECT parentID FROM item WHERE itemID=?;");
+		$ids = array();
+		do {
+			array_push($ids, $itemID);
+			if (!$STH->execute( $itemID )) die($this->conflict());
+			$itemID = $STH->fetchColumn(0);
+		} while (!is_null($itemID));
+		return $ids;
 	}
-	private function getAllItemCosts( $itemID ) { // Helper(get): return cost for a productID
-		if (is_null($itemID)) return null;
+	private function itemHasOptions( $itemID ) { // Helper(get):bool -> if item or parents has options = true
+		$STH = $this->db->prepare("SELECT * FROM (SELECT * FROM 'item' WHERE itemID=?) i LEFT JOIN 'tie' t ON t.itemID=i.itemID");
+		$found = false;
+		do {
+			if (!$STH->execute( $itemID )) die($this->conflict());
+			$item = $STH->fetch( PDO::FETCH_ASSOC );
+			if (!is_null($item['tieID'])) $found = true;
+			$itemID = $item['parentID'];
+		} while (!is_null($itemID) && !$found);
+		return $found;
+	}
+	private function getAllItemCosts( $itemID, $STH = null ) { // Helper(get): return cost for a productID
 
-		$STH = $this->db->prepare("SELECT i.parentID as parentID, t.*, p.* FROM (SELECT * FROM item WHERE itemID=?) i LEFT JOIN price p ON i.itemID=p.itemID LEFT JOIN template t ON i.templateID=t.templateID;"); // TODO: only prepare once
-		if (!$STH->execute( $itemID )) die($this->conflict());
-		$costs = $STH->fetchAll( PDO::FETCH_ASSOC );
+		$pastCommas = trim(str_repeat("?,", count($this->pastIDs)),","); // build string of question marks
+		$currCommas = trim(str_repeat("?,", count($this->cartIDs)),",");
 
-		if ( !is_null($costs[0]['settings']) ) {
-			$ret = $costs;
-			foreach ($costs as $cost) $ret = array_unique($ret, $this->getAllItemCosts( $cost['parentID'] ) );
-			return $ret;
-		}
-		return $this->getAllItemCosts( $costs[0]['parentID'] );
+		$query  = "SELECT i.parentID as parentID, r.name as reason, t.*, p.* FROM (SELECT * FROM item WHERE itemID=?) i ";
+		$query .= "LEFT JOIN (";
+		$query .= "  SELECT * FROM price WHERE reasonID IS NULL or reasonID IN ($pastCommas)"; // past purchases
+		$query .= "  UNION";
+		$query .= "  SELECT * FROM price WHERE reasonID IN ($currCommas) AND inCart='true'"; // in cart
+		$query .= ") p ON i.itemID=p.itemID ";
+		$query .= "LEFT JOIN template t ON i.templateID=t.templateID ";
+		$query .= "LEFT JOIN item r ON r.itemID=p.reasonID ";
 
-		// $user = $this->usr->currentUser();
-
-		// pull groups based on firmID if user is assigned
-		// $groups = array();
-		// if ($user != null) {
-		// 	$groupSTH = $this->db->prepare("SELECT groupID FROM `member` WHERE firmID=?;");
-		// 	$groupSTH->execute( $user['firmID'] );
-		// 	$groups = $groupSTH->fetchAll( PDO::FETCH_COLUMN );
-		// }
-		// $groups = array_merge($groups, array(0)); // ensure not empty
-		// if (isset($this->groupCashe)) $groups = array_merge($groups, $this->groupCashe); // add groups that are in cart
-
-		// // get origional cost
-		// $flatCostSTH = $this->db->prepare("SELECT o.`optionID`, `name`, `pretty`, `settings` FROM `price` p JOIN `option` o ON o.optionID = p.optionID WHERE productID=? AND groupID IS NULL LIMIT 1;");
-		// $flatCostSTH->execute( $productID );
-		// $fullCostRow = $flatCostSTH->fetch( PDO::FETCH_ASSOC );
-		// $leastRow = $fullCostRow;
-		// $leastCost = $this->getRowCost( $fullCostRow );
-		
-		// // pull prices that match productID and group criteria
-		// $questionMarks = trim(str_repeat("?,", sizeof($groups)),","); // build string of questionmarks based on sizeof($groups)
-		// $costSTH = $this->db->prepare("SELECT o.*, g.name AS groupName FROM (SELECT o.`optionID`, `name`, `pretty`, `settings`, groupID FROM `price` p JOIN `option` o ON o.optionID = p.optionID WHERE productID=? AND groupID IN ($questionMarks)) o LEFT JOIN `group` g on o.groupID = g.groupID;");
-		// array_unshift( $groups, $productID ); // put productID at the beginninng of the array
-		// $costSTH->execute( $groups );
-		// $costRows = $costSTH->fetchAll(PDO::FETCH_ASSOC);
+		$STH = $this->db->prepare( $query );
+		$allCosts = array();
+		do {
+			if (!$STH->execute( array_merge( array($itemID), $this->pastIDs, $this->cartIDs) )) die($this->conflict());
+			$costs = $STH->fetchAll();
+			if (!is_null($costs[0]['settings'])) $allCosts = array_merge($allCosts, $costs);
+			$itemID = $costs[0]['parentID'];
+		} while (!is_null($itemID));
+		return $allCosts;
 	}
 	private function getRowCost( $row ) {
 		if (is_null($row)) return INF; // needed?
