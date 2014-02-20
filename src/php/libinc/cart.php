@@ -119,17 +119,9 @@ class Cart extends NG {
 				}
 			}
 			$leastRow['settings'] = (array)json_decode($leastRow['settings']);
-			// $row['cost'] = $leastRow; // TODO: eventually do this instead of what follows
-			$row['cost'] = array(
-				'settings' => $leastRow['settings'],
-				'text' => $this->interpolate2($leastRow['pretty'], $leastRow['settings']),
-				'name' => 'test2', // TODO: fix query (in getAllItemCosts) to pull item's name!
-				'templateID' => $leastRow['templateID'] // TODO: fix js to render to render off of this
-			);
-			if ($leastRow != $origRow)  {
-				$row['cost']['full'] = (array)json_decode($origRow['settings']);
-				$row['cost']['reason'] = $leastRow['reason'];
-			}
+			$leastRow['text'] =  $this->interpolate2($leastRow['pretty'], $leastRow['settings']);
+			$row['cost'] = $leastRow;
+			if ($leastRow != $origRow) $row['cost']['full'] = (array)json_decode($origRow['settings']);
 		}
 		// START DEV
 		$row['cost2'] = $costRows; // debugging
