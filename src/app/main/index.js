@@ -1,6 +1,5 @@
 angular.module('myApp.main', [
 	'myApp.main.cart',
-	'myApp.main.checkout',
 	'myApp.main.conference',
 	'myApp.main.payment',
 	'myApp.main.purchases',
