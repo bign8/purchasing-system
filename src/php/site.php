@@ -30,7 +30,7 @@ class printer {
 				} else {
 					$list .=  "<li>"; // with link
 					$list .=  "<a href=\"#\" class=\"cartAdd\" data-item-id=\"{$item['itemID']}\">Cart</a> ";
-					$list .=  "<a href=\"/conference/\"{$item['itemID']}\">Register</a> ";
+					$list .=  "<a href=\"/conference/{$item['itemID']}\">Register</a> ";
 					$list .=  "{$item['name']}: {$item['desc']}</li>\r\n";
 				}
 			}
