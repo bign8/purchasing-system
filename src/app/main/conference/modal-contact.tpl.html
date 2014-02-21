@@ -12,7 +12,7 @@
 	<form class="form-horizontal css-form" name="registration" ng-show="addNew">
 
 		<div class="control-group">
-			<label class="control-label" for="legalName">Legal Name</label>
+			<label class="control-label" for="legalName">Legal Name *</label>
 			<div class="controls">
 				<input type="text" id="legalName" ng-model="contact.legalName" placeholder="Legal Name" required>
 			</div>
@@ -27,7 +27,7 @@
 		</div>
 
 		<div class="control-group">
-			<label class="control-label" for="title">Title / Position</label>
+			<label class="control-label" for="title">Title / Position *</label>
 			<div class="controls">
 				<input type="text" id="title" ng-model="contact.title" placeholder="Title / Position" required>
 			</div>
@@ -42,14 +42,14 @@
 		</div>
 
 		<div class="control-group">
-			<label class="control-label" for="email">Email Address</label>
+			<label class="control-label" for="email">Email Address *</label>
 			<div class="controls">
 				<input type="email" id="email" ng-model="contact.email" placeholder="Email Address" required>
 			</div>
 		</div>
 
 		<div class="control-group">
-			<label class="control-label">Address</label>
+			<label class="control-label">Address *</label>
 			<div class="controls">
 				<div class="input-append" ng-switch="contact.addr.addressID">
 
@@ -67,7 +67,7 @@
 				<label class="checkbox"><input type="checkbox" ng-model="$parent.sameAddr" />Same as Firm</label>
 			</div>
 		</div>
-
+		<p>* Required field</p>
 	</form>
 
 	<div ng-hide="addNew">

@@ -64,7 +64,7 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function ($root
 			processItem(item, 'settings');
 			if (item.cost.hasOwnProperty('full')) processItem(item, 'full');
 			if (options.hasOwnProperty(item.itemID)) item.options = options[item.itemID];
-			item.expired = (item.settings.hasOwnProperty('eventDate') && (item.settings.eventDate < (new Date()).getTime()));
+			item.expired = (item.hasOwnProperty('settings') && item.settings.hasOwnProperty('eventDate') && (item.settings.eventDate < (new Date()).getTime()));
 			total += item.cost.value;
 		});
 		angular.forEach(observerCallbacks, function (callback) { // Notify observers
