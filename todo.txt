@@ -48,7 +48,6 @@ Future releases
 - register user / select address for a list of firm addresses
 - sync with Luke's UAN member site
 - use key based paypal checkout
-- rewrite interpolate2 to use this regex "{([^\|}]+)\|?([^}]*)}" with default format '${initial|%01.2f} for first {after} attendee(s)'
 
 Git Commands:
 - git add -p
