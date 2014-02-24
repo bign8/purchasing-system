@@ -50,6 +50,9 @@ switch ($_REQUEST['c']) {
 				session_start();
 				die(session_id());
 				break;
+			case 'sendCart':
+				Cart::process( 'emailCart', $pass, $data );
+				break;
 			default: $pass = false;
 		}
 		break;

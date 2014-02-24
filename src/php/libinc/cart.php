@@ -40,6 +40,9 @@ class Cart extends NG {
 			case 'getFullCart':  $data = $obj->getFullCart();  break;
 			case 'getPurchases': $data = $obj->getPurchases(); break;
 			case 'save':         $data = $obj->save();         break;
+			// START DEV
+			case 'emailCart': $data = $obj->emailCart( 15 ); break;
+			// END DEV
 			default: $pass = false;
 		}
 	}
@@ -337,47 +340,35 @@ class Cart extends NG {
 
 	// Worker(app/checkout): save cart
 	public function save() {
-		// $user = $this->usr->requiresAuth();
-		// $data = $this->getPostData();
+		$user = $this->usr->requiresAuth();
+		$data = $this->getPostData();
 
-		// // Insert order
-		// $orderSTH = $this->db->prepare("INSERT INTO `order` (contactID, medium, amount) VALUES (?,?,?);");
-		// if (!$orderSTH->execute( $user['contactID'], $data->medium, $data->cost )) return $this->conflict();
-		// $orderID = $this->db->lastInsertId();
+		// clean cart id's
+		$cartIDs = array();
+		foreach($_SESSION['cart'] as $itemID) if (is_string($itemID)) array_push($cartIDs, $itemID);
 
-		// // Store purchases and options
-		// $purchaseSTH = $this->db->prepare("INSERT INTO `purchase` (itemID, orderID, firmID, `data`) VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE orderID=VALUES(orderID), `data`=VALUES(`data`);");
-		// $acquisitionSTH = $this->db->prepare("INSERT INTO `acquisition` (itemID, orderID) VALUES (?,?);");
-		// $attendeeSTH = $this->db->prepare("INSERT INTO `attendee` (itemID, contactID, orderID) VALUES (?,?,?);");
-		// $memberSTH = $this->db->prepare("INSERT INTO `member` (firmID, groupID) VALUES (?,?);");
-		// $cart = $this->get(); // removes random id's
-		// foreach ($cart as $item) { // iterate over items
-		// 	if ($item['itemID'] == '-1') continue; // don't care about custom payment storage (yet)
-		// 	$option = isset($_SESSION['cart.options'][ $item['itemID'] ]) ? $_SESSION['cart.options'][ $item['itemID'] ] : array(); // get item's object
+		// Insert order
+		$orderSTH = $this->db->prepare("INSERT INTO `order` (contactID,medium,amount) VALUES (?,?,?);");
+		if (!$orderSTH->execute( $user['contactID'], $data->medium, $data->cost )) return $this->conflict();
+		$orderID = $this->db->lastInsertId();
 
-		// 	if (isset($option['attID'])) { // store attendees
-		// 		foreach($option[$option['attID']] as &$contact) {
-		// 			if (!$attendeeSTH->execute($item['itemID'], $contact['contactID'], $orderID)) return $this->conflict();
-		// 			$contact['attendeeID'] = $this->db->lastInsertId();
-		// 		}
-		// 	}
+		// Store purchases and options
+		$itemSTH = $this->db->prepare("SELECT onFirm FROM item WHERE itemID=?;");
+		$purchaseSTH = $this->db->prepare("INSERT OR REPLACE INTO purchase(contactID,firmID,itemID,orderID,`data`) VALUES (?,?,?,?,?);");
+		foreach ($cartIDs as $itemID) { // iterate over items
+			$option = isset($_SESSION['cart.options'][ $itemID ]) ? $_SESSION['cart.options'][ $itemID ] : array(); // get item's object
 
-		// 	if ($item['type'] == 'purchase') { // store groups / acquisition
-		// 		if (isset($item['settings']->groupID)) { // store groups
-		// 			if (!$memberSTH->execute($user['firmID'], $item['settings']->groupID)) return $this->conflict();
-		// 			$option['memberID'] = $this->db->lastInsertId();
-		// 		}
-		// 		if (!$purchaseSTH->execute($item['itemID'], $orderID, $user['firmID'], json_encode($option))) return $this->conflict(); // purchase
-		// 	} else {
-		// 		if (!$acquisitionSTH->execute($item['itemID'], $orderID)) return $this->conflict(); // acquisition
-		// 		// $option['acquisitionID'] = $this->db->lastInsertId();
-		// 	}
-		// }
+			if (!$itemSTH->execute( $itemID )) return $this->conflict();
 
-		// $this->emailCart($orderID);
-		// $this->clr();
-
-		// return $orderID;	
+			if ($itemSTH->fetchColumn() == 'true') {
+				if (!$purchaseSTH->execute(null, $user['firmID'], $itemID, $orderID, json_encode($option))) return $this->conflict();
+			} else {
+				if (!$purchaseSTH->execute($user['contactID'], null, $itemID, $orderID, json_encode($option))) return $this->conflict();
+			}
+		}
+		$this->emailCart($orderID);
+		$this->clr();
+		return $orderID;
 	}
 
 	// Worker(app/purchases): return purchases
@@ -415,120 +406,113 @@ class Cart extends NG {
 
 	// Helper(app/cart/checkout/email): email cart data
 	public function emailCart($orderID) {
-		// // grab order info
-		// $orderSTH = $this->db->prepare("SELECT * FROM `order` WHERE `orderID`=? LIMIT 1;");
-		// $orderSTH->execute( $orderID );
-		// $order = $orderSTH->fetch();
+		// grab order info
+		$orderSTH = $this->db->prepare("SELECT * FROM `order` WHERE `orderID`=? LIMIT 1;");
+		$orderSTH->execute( $orderID );
+		$order = $orderSTH->fetch();
 
-		// // grab contact info
-		// $contactSTH = $this->db->prepare("SELECT c.firmID, c.legalName, c.preName, c.title, c.email, c.phone, a.* FROM `contact` c LEFT JOIN `address` a ON c.addressID=a.addressID WHERE `contactID`=? LIMIT 1;");
-		// $contactSTH->execute( $order['contactID'] );
-		// $contact = $contactSTH->fetch();
+		// grab contact info
+		$contactSTH = $this->db->prepare("SELECT * FROM `contact` c LEFT JOIN `address` a ON c.addressID=a.addressID WHERE `contactID`=? LIMIT 1;");
+		$contactSTH->execute( $order['contactID'] );
+		$contact = $contactSTH->fetch();
 
-		// // grab contacts firm info
-		// $firmSTH = $this->db->prepare("SELECT f.name, f.website, a.* FROM `firm` f LEFT JOIN `address` a on f.addressID=a.addressID WHERE firmID=? LIMIT 1;");
-		// $firmSTH->execute( $contact['firmID'] );
-		// $firm = $firmSTH->fetch();
+		// grab contacts firm info
+		$firmSTH = $this->db->prepare("SELECT * FROM `firm` f LEFT JOIN `address` a on f.addressID=a.addressID WHERE firmID=? LIMIT 1;");
+		$firmSTH->execute( $contact['firmID'] );
+		$firm = $firmSTH->fetch();
 
-		// // grab order
-		// $q[] = "SELECT `data`, itemID, orderID FROM `purchase`";
-		// $q[] = "SELECT '{}' as `data`, itemID, orderID FROM `acquisition`";
-		// $q = implode(" UNION ", $q);
-		// $itemsSTH = $this->db->prepare("SELECT p.`data`, i.* FROM ($q) AS `p` LEFT JOIN `item` i ON p.itemID=i.itemID WHERE orderID=?;");
-		// $itemsSTH->execute( $orderID );
-		// $items = $itemsSTH->fetchAll();
+		// setup field data grab
+		$fieldSTH = $this->db->prepare("SELECT * FROM `field` WHERE fieldID=? LIMIT 1;");
 
-		// // setup attendees grab
-		// $attendeeSTH = $this->db->prepare("SELECT c.legalName, c.preName, c.title, c.email, c.phone, d.* FROM (SELECT contactID FROM `attendee` a WHERE itemID=?) a LEFT JOIN `contact` c ON a.contactID=c.contactID LEFT JOIN `address` d ON c.addressID=d.addressID;");
-		// $fieldSTH = $this->db->prepare("SELECT * FROM `field` WHERE fieldID=? LIMIT 1;");
+		// grab order
+		$itemsSTH = $this->db->prepare("SELECT * FROM purchase p LEFT JOIN item i ON p.itemID=i.itemID WHERE orderID=?;");
+		$itemsSTH->execute( $orderID );
+		$items = $itemsSTH->fetchAll();
 
-		// // Pretty print addresses
-		// function address($data) {
-		// 	$str  = "{$data['addr1']}<br />\r\n";
-		// 	if ($data['addr2']!='') 
-		// 		$str .= "{$data['addr2']}<br />\r\n";
-		// 	$str .= "{$data['city']} {$data['state']}, {$data['zip']}<br />\r\n";
-		// 	return $str;
-		// }
+		// Pretty print addresses
+		function address($data) {
+			$str  = "{$data['addr1']}<br />\r\n";
+			if ($data['addr2']!='') 
+				$str .= "{$data['addr2']}<br />\r\n";
+			$str .= "{$data['city']} {$data['state']}, {$data['zip']}<br />\r\n";
+			return $str;
+		}
 
-		// setlocale(LC_MONETARY, 'en_US');
-		// $order['amount'] = '$' . money_format('%n', $order['amount']);
+		$order['amount'] = '$' . number_format($order['amount'], 2);
 
-		// // pretty print data for email
-		// $html  = "<b>Order#:</b> $orderID<br />\r\n";
-		// $html .= "<b>Status / medium:</b> {$order['status']} / {$order['medium']}<br />\r\n";
-		// $html .= "<b>Time:</b> {$order['stamp']}<br />\r\n";
-		// $html .= "<b>Total:</b> {$order['amount']}<br />\r\n";
-		// $html .= "<hr/><b>Purchase Contact:</b><br />\r\n";
-		// $html .= "<a href=\"mailto:{$contact['email']}\" >{$contact['title']} {$contact['legalName']} ({$contact['preName']})</a><br />\r\n";
-		// $html .= address($contact);
-		// $html .= "Phone: <a href=\"tel:{$contact['phone']}\">{$contact['phone']}</a><br />\r\n";
-		// $html .= "<hr/><b>Purchase Firm:</b><br />\r\n";
-		// $html .= "<a href=\"{$firm['website']}\">{$firm['name']}</a><br />\r\n";
-		// $html .= address($firm);
-		// $html .= "<hr/>Items:<br /><ul>\r\n";
+		// pretty print data for email
+		$html  = "<b>Order#:</b> $orderID<br />\r\n";
+		$html .= "<b>Status / medium:</b> {$order['status']} / {$order['medium']}<br />\r\n";
+		$html .= "<b>Time:</b> {$order['stamp']}<br />\r\n";
+		$html .= "<b>Total:</b> {$order['amount']}<br />\r\n";
+		$html .= "<hr/><b>Purchase Contact:</b><br />\r\n";
+		$html .= "<a href=\"mailto:{$contact['email']}\" >{$contact['title']} {$contact['legalName']} ({$contact['preName']})</a><br />\r\n";
+		$html .= address($contact);
+		$html .= "Phone: <a href=\"tel:{$contact['phone']}\">{$contact['phone']}</a><br />\r\n";
+		$html .= "<hr/><b>Purchase Firm:</b><br />\r\n";
+		$html .= "<a href=\"{$firm['website']}\">{$firm['name']}</a><br />\r\n";
+		$html .= address($firm);
+		$html .= "<hr/>Items:<br /><ul>\r\n";
 
-		// $mail = new UAMail();
-		// $files = array();
-		// // $mail->SMTPDebug  = 2;
+		$mail = new UAMail();
+		$files = array();
+		// $mail->SMTPDebug  = 2;
 
-		// foreach ($items as $item) {
+		foreach ($items as $item) { // items in cart
 
-		// 	$html .= (isset($item['url'])) ? "<li><a href=\"{$item['url']}\">{$item['name']}</a><ul>" : "<li><strong>{$item['name']}</strong><ul>";
-		// 	$data = json_decode($item['data']);
-		// 	foreach ($data as $key => $value) {
-		// 		$fieldSTH->execute( $key );
-		// 		if ($fieldSTH->rowCount() > 0) {
-		// 			$fieldData = $fieldSTH->fetch();
+			$html .= (isset($item['url'])) ? "<li><a href=\"{$item['url']}\">{$item['name']}</a><ul>" : "<li><strong>{$item['name']}</strong><ul>";
+			$data = json_decode($item['data']);
+			foreach ($data as $key => $value) { // questions on item
+				if (!$fieldSTH->execute( $key )) continue;
+				$fieldData = $fieldSTH->fetch();
+				if ($fieldData == false) continue;
 
-		// 			// special question formatters
-		// 			switch ($fieldData['fieldID']) {
-		// 				case '2':
-		// 					$value = '$' . money_format('%n', $value);
-		// 					break;
-		// 			}
+				// special question formatters
+				switch ($fieldData['fieldID']) {
+					case '2': $value = '$'.number_format($value, 2); break;
+				}
 
-		// 			// type display
-		// 			switch ($fieldData['type']) {
-		// 				case 'attendees': // pretty print attendees
-		// 					$html .= "<li><b>Attendee(s):</b><ul>";
-		// 					$attendeeSTH->execute( $item['itemID'] );
-		// 					while ($row = $attendeeSTH->fetch(  )) {
-		// 						$html .= "<li>";
-		// 						$html .= "<a href=\"mailto:{$row['email']}\" >{$row['title']} {$row['legalName']} ({$row['preName']})</a><br />\r\n";
-		// 						$html .= address($row);
-		// 						$html .= "Phone: <a href=\"tel:{$row['phone']}\">{$row['phone']}</a><br />\r\n";
-		// 						$html .= "</li>";
-		// 					}
-		// 					$html .= "</ul></li>";
-		// 					break;
+				// type display
+				switch ($fieldData['type']) {
+					case 'attendees': // pretty print attendees
+						$html .= "<li><b>Attendee(s):</b><ul>";
+						// $html .= print_r($value, true);
+						foreach ($value as $row) {
+							$row = $this->object_to_array( $row );
+							$html .= "<li>";
+							$html .= "<a href=\"mailto:{$row['email']}\" >{$row['title']} {$row['legalName']} ({$row['preName']})</a><br />\r\n";
+							$html .= address($row['addr']);
+							$html .= "Phone: <a href=\"tel:{$row['phone']}\">{$row['phone']}</a><br />\r\n";
+							$html .= "</li>";
+						}
+						$html .= "</ul></li>";
+						break;
 
-		// 				case 'image':
-		// 					$fileName = $firm['name'] . ', ' . $contact['legalName'] . '.' . pathinfo($value, PATHINFO_EXTENSION);
-		// 					$mail->addAttachment($_SERVER['DOCUMENT_ROOT'].$value, $fileName);
-		// 					$html .= "<li><b>" . $fieldData['name'] . ':</b>' . $fileName . "</li>";
-		// 					array_push($files, $_SERVER['DOCUMENT_ROOT'] . $value);
-		// 					break;
+					case 'image':
+						$fileName = $firm['name'] . ', ' . $contact['legalName'] . '.' . pathinfo($value, PATHINFO_EXTENSION);
+						$mail->addAttachment($_SERVER['DOCUMENT_ROOT'].$value, $fileName);
+						$html .= "<li><b>" . $fieldData['name'] . ':</b>' . $fileName . "</li>";
+						array_push($files, $_SERVER['DOCUMENT_ROOT'] . $value);
+						break;
 
-		// 				default:
-		// 					$html .= "<li><b>" . $fieldData['name'] . ':</b> ' . $value . "</li>";
-		// 					break;
-		// 			}
-		// 		}
-		// 	}
-		// 	$html .= "</ul></li>";
-		// }
+					default:
+						$html .= "<li><b>" . $fieldData['name'] . ':</b> ' . $value . "</li>";
+						break;
+				}
+			}
+			$html .= "</ul></li>";
+		}
 
-		// $html .= "</ul>\r\n";
+		$html .= "</ul>\r\n";
 
-		// $mail->addAddress(config::notifyEmail, config::notifyName);
-		// $mail->Subject = "UpstreamAcademy Checkout";
-		// $mail->Body    = $html;
-		// $mail->AltBody = strip_tags($html);
-		// if (!$mail->send()) {
-		// 	$this->conflict('mail');
-		// } else {
-		// 	foreach ($files as $file) unlink($file); // delete sent files
-		// }
+		$mail->addAddress(config::notifyEmail, config::notifyName);
+		$mail->Subject = "UpstreamAcademy Checkout";
+		$mail->Body    = $html;
+		$mail->AltBody = strip_tags($html);
+		if (!$mail->send()) {
+			$this->conflict('mail');
+		} else {
+			foreach ($files as $file) unlink($file); // delete sent files
+		}
 	}
 }
