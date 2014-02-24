@@ -235,7 +235,7 @@ HTML;
 		);
 	}
 	private function getFirmEmploy( $firmID ) { // Helper: return firms employees
-		$STH = $this->db->prepare("SELECT c.contactID, c.firmID, c.legalName, c.preName, c.title, c.email, c.phone, a.* FROM (SELECT * FROM `contact` WHERE `firmID`=?) c LEFT JOIN `address` a ON c.addressID=a.addressID;");
+		$STH = $this->db->prepare("SELECT * FROM (SELECT * FROM `contact` WHERE `firmID`=?) c LEFT JOIN `address` a ON c.addressID=a.addressID;");
 		if (!$STH->execute( $firmID )) return -1;
 		$ret = $STH->fetchAll( PDO::FETCH_ASSOC );
 		foreach ($ret as &$value) $this->cleanAddress( $value );
