@@ -74,7 +74,9 @@ class NG {
 
 		if ( isset($q) ) {
 			$STH = $this->db->prepare( "SELECT $q=? LIMIT 1;" );
-			if ( $STH->execute( @$data->name ) && $STH->rowCount() > 0 ) $ret = $STH->fetchColumn();
+			$test = $STH->execute( @$data->name );
+			$value = $STH->fetchColumn();
+			if ( $test && $value !== false ) $ret = $value;
 		}
 		return $ret;
 	}

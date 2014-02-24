@@ -46,7 +46,7 @@ class User extends NG {
 		return $user;
 	}
 	private function cleanUser( $user ) { // helper: getUser + resetPass
-		$user['admin'] = $user['isAdmin'] == 'yes';
+		$user['admin'] = $user['isAdmin'] == 'true';
 		unset( $user['pass'], $user['resetHash'], $user['resetExpires'], $user['isAdmin'] );
 		return $user;
 	}
@@ -423,7 +423,7 @@ HTML;
 		$STH = $this->db->prepare("SELECT * FROM `contact` WHERE `contactID`=? LIMIT 1;");
 		if ( $STH->execute( $user['contactID'] ) && $STH->rowCount() > 0 ) {
 			$newUser = $STH->fetch( PDO::FETCH_ASSOC );
-			$newUser['admin'] = $newUser['isAdmin'] == 'yes';
+			$newUser['admin'] = $newUser['isAdmin'] == 'true';
 			unset( $newUser['pass'], $newUser['resetHash'], $newUser['resetExpires'], $newUser['isAdmin'] );
 
 			$updateSTH = $this->db->prepare( "UPDATE `contact` SET lastLogin=CURRENT_TIMESTAMP WHERE `contactID`=?;" );
