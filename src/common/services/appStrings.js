@@ -74,7 +74,7 @@ factory('appStrings', function() {
 				type:ERROR
 			}
 		},
-		pay: { // Custom payment form
+		payment: { // Custom payment form
 			success: {
 				pre:'Thanks!',
 				msg:'This custom payment has been added to your cart.',

@@ -16,6 +16,7 @@ require_once('./libinc/main_include.php');
 if (!isset($_REQUEST['a'])) $_REQUEST['a'] = 'nope'; // catch not assigned
 if (!isset($_REQUEST['c'])) $_REQUEST['c'] = 'nope'; // catch not assigned
 
+
 $pass = true; // determine response type
 $data = array(); // return json data array
 

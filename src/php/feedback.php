@@ -6,7 +6,10 @@ if (!isset($_REQUEST['submit'])) {
 	$_REQUEST = array('name'=>'', 'crazyField'=>'', 'type'=>' ', 'feedback'=>'', 'invalid'=>'');
 } elseif (isset($_REQUEST['email']) && $_REQUEST['email'] != '') {
 	// HACKER! (quietly do nothing)
-} elseif (!filter_var($_REQUEST['crazyField'], FILTER_VALIDATE_EMAIL) && $_REQUEST['crazyField'] != $_REQUEST['invalid']) {
+} elseif (
+	(!filter_var($_REQUEST['crazyField'], FILTER_VALIDATE_EMAIL) && $_REQUEST['crazyField'] != $_REQUEST['invalid']) || 
+	($_REQUEST['crazyField'] == '')
+) {
 	$sent = 0; // invalid email
 	$_REQUEST['invalid'] = $_REQUEST['crazyField'];
 } else {
@@ -15,6 +18,8 @@ if (!isset($_REQUEST['submit'])) {
 	$html .= "<tr><td>Email</td><td>{$_REQUEST['crazyField']}</td></tr>";
 	$html .= "<tr><td>Type</td><td>{$_REQUEST['type']}</td></tr>";
 	$html .= "<tr><td>Time</td><td>" . date('r') . "</td></tr>";
+	session_start(); $sessionID = session_id();
+	$html .= "<tr><td>SessionID</td><td>{$sessionID}</td></tr>";
 	$html .= "<tr><td>Feedback</td><td>{$_REQUEST['feedback']}</td></tr>";
 	$mail = new UAMail();
 	$sent = ($mail->notify("UpstreamAcademy Feedback", '<table>' . $html . '</table>')) ? 2 : 1;
@@ -101,7 +106,7 @@ if (!isset($_REQUEST['submit'])) {
 							<input type="hidden" name="email" />
 							<input type="hidden" name="invalid" value="<?php echo $_REQUEST['invalid']; ?>" />
 							<button type="submit" class="btn btn-primary" name="submit" value="yep" <?php if ($sent == 2) echo "disabled='disabled'"; ?>>Send Feedback</button>
-							<a class="btn" href="/feedback.php">Clear</a>
+							<a class="btn" href="feedback.php">Clear</a>
 						</div>
 					</form>
 				</div>

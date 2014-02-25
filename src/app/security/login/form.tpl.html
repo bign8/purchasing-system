@@ -1,29 +1,44 @@
 <form name="form" novalidate class="login-form" style="margin-bottom:0">
 	<div class="modal-header">
 		<h4 ng-switch="isLogin">
-			<span ng-switch-when="true">Sign in</span>
-			<span ng-switch-default>Enter email</span>
+			<small>Please&nbsp;</small>
+			<span ng-switch-when="true">Log in</span>
+			<span ng-switch-default>enter email</span>
 			<small>&nbsp;or&nbsp;</small>
 			<a ng-click="register()">Register</a>
+			<small>&nbsp;if this is your first time purchasing items using our new system.</small>
 		</h4>
 	</div>
 	<div class="modal-body">
-		<div class="alert alert-warning" ng-show="authReason">{{authReason}}</div>
-		<div class="alert alert-error" ng-show="authError">{{authError}}</div>
-		<div class="alert alert-info" ng-show="isLogin">Please enter your login details</div>
-		<label>E-mail</label>
-		<input name="login" type="email" ng-model="user.email" required autofocus>
-		<div ng-show="isLogin">
-			<label>Password</label>
-			<input name="pass" type="password" ng-model="user.password" ng-required="isLogin">
+		<div class="row-fluid">
+			<div class="span7 well well-small" style="margin-bottom:0">
+				<div class="alert alert-warning no-x" ng-show="authReason">{{authReason}}</div>
+				<div class="alert alert-error no-x" ng-show="authError">{{authError}}</div>
+				<div class="alert alert-info no-x" ng-show="isLogin">If you have previously registered on this site, please enter you login details.</div>
+				<label for="login">E-mail</label>
+				<input id="login" name="login" type="email" ng-model="user.email" required autofocus class="input-block-level">
+				<div ng-show="isLogin">
+					<label for="pass">Password</label>
+					<input id="pass" name="pass" type="password" ng-model="user.password" ng-required="isLogin" class="input-block-level">
+				</div>
+
+				<div>
+					<button class="btn btn-small btn-info" ng-click="setIsLogin(false)" ng-show="isLogin">Forgot Password</button>
+					<button class="btn btn-small btn-info" ng-click="setIsLogin(true)" ng-hide="isLogin">Login</button>
+
+					<span class="pull-right">&nbsp;<button class="btn btn-small clear" ng-click="clearForm()">Clear</button></span>
+
+					<button class="btn btn-small btn-primary login pull-right" ng-click="login()" ng-disabled="processing" ng-show="isLogin">Sign in</button>
+					<button class="btn btn-small btn-primary reset pull-right" ng-click="reset()" ng-disabled="form.$invalid || processing || success" ng-hide="isLogin">Reset Password</button>
+				</div>
+			</div>
+			<div class="span5">
+				<div class="alert alert-info ctr no-x">If you have not yet<br/>signed up for an account,<br/>please register.</div>
+				<button style="margin-left:auto;margin-right:auto;display:block" type="button" class="btn btn-primary" ng-click="register()">Register</button>
+			</div>
 		</div>
 	</div>
 	<div class="modal-footer">
-		<button class="btn btn-primary login" ng-click="login()" ng-disabled="form.$invalid || processing" ng-show="isLogin">Sign in</button>
-		<button class="btn btn-primary reset" ng-click="reset()" ng-disabled="form.$invalid || processing || success" ng-hide="isLogin">Reset Password</button>
-		<button class="btn clear" ng-click="clearForm()">Clear</button>
 		<button class="btn btn-warning cancel" ng-click="cancelLogin()">Cancel</button>
-		<button class="btn btn-info pull-left" ng-click="setIsLogin(false)" ng-show="isLogin">Forgot Password</button>
-		<button class="btn btn-info pull-left" ng-click="setIsLogin(true)" ng-hide="isLogin">Login</button>
 	</div>
 </form>
