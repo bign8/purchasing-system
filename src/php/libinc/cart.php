@@ -170,7 +170,7 @@ class Cart extends NG {
 		$query .= "  UNION";
 		$query .= "  SELECT * FROM price WHERE reasonID IN ({$this->cartMarks}) AND inCart='true'"; // in cart
 		$query .= ") p ON i.itemID=p.itemID ";
-		$query .= "LEFT JOIN template t ON i.templateID=t.templateID ";
+		$query .= "LEFT JOIN template t ON p.templateID=t.templateID ";
 		$query .= "LEFT JOIN item r ON r.itemID=p.reasonID ";
 
 		$STH = $this->db->prepare( $query );
