@@ -12,6 +12,9 @@ class Cart extends NG {
 		if ( !isset($_SESSION['cart.options']) ) $_SESSION['cart.options'] = array(); // assign empty cart.options if applicable
 		if ( !isset($_SESSION['cart.discounts']) ) $_SESSION['cart.discounts'] = array(); // assign empty cart.discounts if applicable
 		$this->usr = new User();
+
+		list($this->cartIDs, $this->cartMarks) = $this->getAllCartParentIDs(); // Store current cartID's for later
+		$this->pastIDs = array('0');
 	}
 
 	public static function process( $action, &$pass, &$data ) {
@@ -37,6 +40,9 @@ class Cart extends NG {
 			case 'getFullCart':  $data = $obj->getFullCart();  break;
 			case 'getPurchases': $data = $obj->getPurchases(); break;
 			case 'save':         $data = $obj->save();         break;
+			// START DEV
+			case 'emailCart': $data = $obj->emailCart( 15 ); break;
+			// END DEV
 			default: $pass = false;
 		}
 	}
@@ -55,26 +61,17 @@ class Cart extends NG {
 	public function get() {
 		$user = $this->usr->currentUser(); // gets user if available
 
-		// remove all non-strings to allow invoices, but still grab purchase id's
-		$cleanIDs = array();
-		foreach($_SESSION['cart'] as $itemID) if (is_string($itemID)) array_push($cleanIDs, $itemID);
-
-		// Grab pending group purchases
-		$queryMarks = trim( str_repeat( "?,", sizeof( $cleanIDs ) ), "," );
-		$pendingGroupsSTH = $this->db->prepare("SELECT i.settings FROM (SELECT * FROM `item` WHERE itemID IN ($queryMarks)) i LEFT JOIN `product` p ON i.productID=p.productID LEFT JOIN `template` t ON p.templateID=t.templateID WHERE template='group';");
-		$pendingGroupsSTH->execute( $cleanIDs );
-
-		// parse out their groupID's
-		$arrGroupID = array();
-		while ( $row = $pendingGroupsSTH->fetch( PDO::FETCH_ASSOC ) ) {
-			$rowData = (array) json_decode($row['settings']);
-			array_push( $arrGroupID, $rowData['groupID'] );
+		// Past purchase id's
+		$STH = $this->db->prepare("SELECT itemID FROM 'purchase' WHERE firmID=? OR contactID=?;"); // grab all previous purchases
+		if (!$STH->execute( $user['firmID'], $user['contactID'] )) return $this->conflict();
+		while ($row = $STH->fetch()) {
+			list($tempIDs) = $this->getItemParentIDs( $row['itemID'] );
+			$this->pastIDs = array_merge($this->pastIDs, $tempIDs);
 		}
-		$this->groupCashe = $arrGroupID; // store for later use in getItemByID() -> getProductCost()
+		$this->pastIDs = array_values(array_unique( $this->pastIDs )); // all id's for past and current purchases
 
 		// Iterate through ID's and grab items or pass objects through
 		$retData = array();
-		setlocale(LC_MONETARY, 'en_US');
 		foreach ($_SESSION['cart'] as $itemID) {
 			if (is_string($itemID)) {
 				$item = $this->getItemByID( $itemID );
@@ -82,7 +79,7 @@ class Cart extends NG {
 			} else { // format cost for carts
 				$cost = $itemID['cost'];
 				$itemID['cost'] = array(
-					'pretty' => '$' . money_format('%n', $cost),
+					'pretty' => '$' . sprintf('%01.2f', $cost),
 					'settings' => array(
 						"cost" => $cost
 					)
@@ -92,99 +89,106 @@ class Cart extends NG {
 		}
 		return $retData;
 	}
+	private function getAllCartParentIDs() { // Helper(get, add discount) remove invoices and grab parent id's
+		$cleanIDs = array();
+		foreach($_SESSION['cart'] as $itemID)
+			if (is_string($itemID))
+				array_push($cleanIDs, $itemID);
+		$cartIDs = array('0'); // Grab parents of all items in cart (current purchases)
+		foreach( $cleanIDs as $itemID ) {
+			list($tempIDs) = $this->getItemParentIDs( $itemID );
+			$cartIDs = array_merge($cartIDs, $tempIDs);
+		}
+		$cartIDs = array_values(array_unique( $cartIDs ));
+		return array( $cartIDs, trim(str_repeat("?,", count($cartIDs)),",") );
+	}
+	private function getItemParentIDs( $itemID ) { // Helper(get,getAllCartParentIDs,getProductFields,getItemByID): return array of item's parent id's
+		$STH = $this->db->prepare("SELECT parentID FROM item WHERE itemID=?;");
+		$ids = array();
+		do {
+			array_push($ids, $itemID);
+			if (!$STH->execute( $itemID )) die($this->conflict());
+			$itemID = $STH->fetchColumn(0);
+		} while (!is_null($itemID));
+		return array( $ids, trim(str_repeat("?,", count($ids)),",") ); // ids, question marks
+	}
 	private function getItemByID( $itemID ) { // Helper(get): return specific item detail by id
-		$itemSTH = $this->db->prepare("SELECT i.*, t.template, p.type FROM (SELECT * FROM `item` WHERE itemID = ?) i JOIN product p ON p.productID=i.productID JOIN template t ON t.templateID = p.templateID;");
+		$user = $this->usr->currentUser();
+		$itemSTH = $this->db->prepare("SELECT * FROM `item` WHERE itemID = ?;");
 		if (!$itemSTH->execute( $itemID )) return -1;
-		$row = $itemSTH->fetch(PDO::FETCH_ASSOC);
-		if (!isset($row['productID'])) return null; // if can't find product
-
-		$optionSTH = $this->db->prepare("SELECT * FROM `tie_product_field` WHERE productID=?;");
-		if (!$optionSTH->execute( $row['productID'] )) return -1;
-
-		// check areas for previously purchased item
-		$q[] = "SELECT CONCAT('p-',purchaseID), `data` FROM `purchase` WHERE firmID=? and itemID=?";
-		$q[] = "SELECT CONCAT('a-',acquisitionID), '{}' FROM `acquisition` a LEFT JOIN `order` o ON a.orderID = o.orderID WHERE itemID=? AND contactID=?";
-		$q[] = "SELECT CONCAT('m-',memberID), '{}' FROM `member` WHERE firmID=? AND groupID=?";
-		$checkSTH = $this->db->prepare( implode(" UNION ", $q) . ";" );
-
+		$row = $itemSTH->fetch();
+		if (!isset($row['itemID'])) return null; // if can't find product
 		$row['settings'] = json_decode($row['settings']);
-		$row['hasOptions'] = $optionSTH->rowCount() > 0;
-		$row['cost'] = $this->getProductCost( $row['productID'] );
+
+		// check if item has options
+		list($parentIDs, $marks) = $this->getItemParentIDs( $row['itemID'] );
+		$STH = $this->db->prepare("SELECT count(*) FROM (SELECT * FROM item WHERE itemID IN ($marks)) i JOIN tie t ON t.itemID=i.itemID;");
+		if (!$STH->execute( $parentIDs )) die($this->conflict());
+		$row['hasOptions'] = $STH->fetchColumn() > 0;
+
+		// find least price
+		$costRows = $this->getAllItemCosts( $row['itemID'] ); // Recursive: returns all costs
+		if (count($costRows) > 0) {
+			$origRow = null; $origCost = null;
+			$leastRow = null; $leastCost = null;
+			foreach ($costRows as &$costRow) { // search for least
+				$myCost = $this->getRowCost( $costRow );
+				if ($myCost < $leastCost || is_null($leastCost)) { // get least
+					$leastCost = $myCost;
+					$leastRow = $costRow;
+				}
+				if ( is_null($costRow['reasonID']) && ( $myCost < $origCost || is_null($origCost) ) ) { // get least origional
+					$origCost = $myCost;
+					$origRow = $costRow;
+				}
+			}
+			$leastRow['settings'] = (array)json_decode($leastRow['settings']);
+			$leastRow['text'] =  $this->interpolate2($leastRow['pretty'], $leastRow['settings']);
+			$row['cost'] = $leastRow;
+			if ($leastRow != $origRow) $row['cost']['full'] = (array)json_decode($origRow['settings']);
+		}
+		// START DEV
+		$row['cost2'] = $costRows; // debugging
+		// END DEV
 
 		// warn if item has already been purchased
-		$user = $this->usr->currentUser(); // gets user if available
-		$groupID = isset($row['settings']->groupID) ? $row['settings']->groupID : -1;
-		$checkSTH->execute( $user['firmID'], $itemID, $itemID, $user['contactID'], $user['firmID'], $groupID );
-		$row['warn'] = ($checkSTH->rowCount() > 0);
-		$row['oldData'] = json_decode( $checkSTH->fetchColumn(1) );
+		$checkSTH = $this->db->prepare("SELECT * FROM purchase WHERE itemID=? AND (contactID=? OR firmID=?);"); // in progress
+		$checkSTH->execute( $itemID, $user['contactID'], $user['firmID'] );
+		$checkData = $checkSTH->fetchAll(  );
+		$row['warn'] = (count($checkData) > 0);
+		if ($row['warn']) $row['oldData'] = json_decode( $checkData[0]['data'] );
 
 		return $row;
 	}
-	private function getProductCost( $productID ) { // Helper(get): return cost for a productID
-		$user = $this->usr->currentUser();
+	private function getAllItemCosts( $itemID, $STH = null ) { // Helper(get): return cost for a productID
 
-		// pull groups based on firmID if user is assigned
-		$groups = array();
-		if ($user != null) {
-			$groupSTH = $this->db->prepare("SELECT groupID FROM `member` WHERE firmID=?;");
-			$groupSTH->execute( $user['firmID'] );
-			$groups = $groupSTH->fetchAll( PDO::FETCH_COLUMN );
-		}
-		$groups = array_merge($groups, array(0)); // ensure not empty
-		if (isset($this->groupCashe)) $groups = array_merge($groups, $this->groupCashe); // add groups that are in cart
+		$pastCommas = trim(str_repeat("?,", count($this->pastIDs)),","); // build string of question marks
 
-		// get origional cost
-		$flatCostSTH = $this->db->prepare("SELECT o.`optionID`, `name`, `pretty`, `settings` FROM `price` p JOIN `option` o ON o.optionID = p.optionID WHERE productID=? AND groupID IS NULL LIMIT 1;");
-		$flatCostSTH->execute( $productID );
-		$fullCostRow = $flatCostSTH->fetch( PDO::FETCH_ASSOC );
-		$leastRow = $fullCostRow;
-		$leastCost = $this->getRowCost( $fullCostRow );
-		
-		// pull prices that match productID and group criteria
-		$questionMarks = trim(str_repeat("?,", sizeof($groups)),","); // build string of questionmarks based on sizeof($groups)
-		$costSTH = $this->db->prepare("SELECT o.*, g.name AS groupName FROM (SELECT o.`optionID`, `name`, `pretty`, `settings`, groupID FROM `price` p JOIN `option` o ON o.optionID = p.optionID WHERE productID=? AND groupID IN ($questionMarks)) o LEFT JOIN `group` g on o.groupID = g.groupID;");
-		array_unshift( $groups, $productID ); // put productID at the beginninng of the array
-		$costSTH->execute( $groups );
-		$costRows = $costSTH->fetchAll(PDO::FETCH_ASSOC);
+		$query  = "SELECT i.parentID as parentID, r.name as reason, t.*, p.* FROM (SELECT * FROM item WHERE itemID=?) i ";
+		$query .= "LEFT JOIN (";
+		$query .= "  SELECT * FROM price WHERE reasonID IS NULL or reasonID IN ($pastCommas)"; // past purchases
+		$query .= "  UNION";
+		$query .= "  SELECT * FROM price WHERE reasonID IN ({$this->cartMarks}) AND inCart='true'"; // in cart
+		$query .= ") p ON i.itemID=p.itemID ";
+		$query .= "LEFT JOIN template t ON i.templateID=t.templateID ";
+		$query .= "LEFT JOIN item r ON r.itemID=p.reasonID ";
 
-		// find least price
-		foreach ($costRows as $row) {
-			$myCost = $this->getRowCost( $row );
-			if ($myCost < $leastCost) {
-				$leastCost = $myCost;
-				$leastRow = $row;
-			}
-		}
-		
-		// parse json for interpolating and pretty printing
-		$pretty = (array)json_decode($leastRow['settings']);
-		$ret = array( 'settings' => $pretty );
-
-		// convert specific values to currency (excluding the values mentioned in the case statements)
-		setlocale(LC_MONETARY, 'en_US');
-		foreach ($pretty as $key => $value) {
-			switch ($key) {
-				case 'after': continue; break;
-				default: $pretty[$key] = '$' . money_format('%n', $value); break;
-			}
-		}
-		$ret['text'] = $this->interpolate($leastRow['pretty'], $pretty);
-		if ($leastRow != $fullCostRow) {
-			$ret['full'] = (array)json_decode($fullCostRow['settings']);
-			$ret['reason'] = $leastRow['groupName'];
-		}
-		$ret['name'] = $leastRow['name'];
-		$ret['optionID'] = $leastRow['optionID'];
-		return $ret;
+		$STH = $this->db->prepare( $query );
+		$allCosts = array();
+		do {
+			if (!$STH->execute( array_merge( array($itemID), $this->pastIDs, $this->cartIDs) )) die($this->conflict());
+			$costs = $STH->fetchAll();
+			if (!is_null($costs[0]['settings'])) $allCosts = array_merge($allCosts, $costs);
+			$itemID = $costs[0]['parentID'];
+		} while (!is_null($itemID));
+		return $allCosts;
 	}
 	private function getRowCost( $row ) {
+		if (is_null($row)) return INF; // needed?
 		$cost = (array)json_decode($row['settings']); // parse settings out to compare
 		$myCost = INF;
-		switch ($row['optionID']) {
-			case '1': $myCost = $cost['cost']; break; // Static Cost
-			case '2': $myCost = $cost['initial']; break; // Delayed attendee cost
-			case '3': $myCost = $cost['soft']; break; // Delayed attendee cost
-		}
+		$costReq = explode(',', $row['costReq']); // explode costReq
+		if (isset($cost[ $costReq[0] ])) $myCost = $cost[ $costReq[0] ]; // cost based on first requirement
 		return $myCost;
 	}
 
@@ -252,7 +256,7 @@ class Cart extends NG {
 		$this->addItem($data->itemID);
 
 		$item = $this->getItemByID( $data->itemID ); // get item + cost information
-		$fields = $this->getProductFields( $item['productID'] ); // get fields for a product
+		$fields = $this->getProductFields( $item['itemID'] ); // get fields for a product
 		if ($fields == -1) return $this->conflict();
 
 		$item = is_null( $item ) ? array( 'name'=>'Not Found' ) : $item ; // account for empty case
@@ -263,12 +267,13 @@ class Cart extends NG {
 			'options' => $options
 		);
 	}
-	private function getProductFields( $productID ) { // Helper: return question's options
-		$STH = $this->db->prepare("SELECT f.*, t.required FROM `tie_product_field` t JOIN `field` f ON f.fieldID = t.fieldID WHERE productID=? ORDER BY `order`;");
-		if (!$STH->execute( $productID )) return -1; // on error
+	private function getProductFields( $itemID ) { // Helper: return question's options
+		list($ids, $marks) = $this->getItemParentIDs( $itemID );
+		$STH = $this->db->prepare("SELECT f.*, t.required FROM tie t JOIN field f ON f.fieldID=t.fieldID WHERE itemID in ($marks) ORDER BY `order`;");
+		if (!$STH->execute( $ids )) return -1; // on error
 
-		$retData = $STH->fetchAll(PDO::FETCH_ASSOC);
-		foreach ($retData as &$item) { $item['settings'] = json_decode($item['settings']); } // Decode those settings!
+		$retData = $STH->fetchAll();
+		foreach ($retData as &$item) $item['settings'] = json_decode($item['settings']); // Decode those settings!
 		return $retData;
 	}
 
@@ -301,41 +306,34 @@ class Cart extends NG {
 		$data = $this->getPostData();
 
 		// Check if any code matches the inputed code
-		$anyCodeSTH = $this->db->prepare("SELECT discountID FROM `discount` WHERE `code`=?;");
-		if (!$anyCodeSTH->execute( $data->code ) || $anyCodeSTH->rowCount() == 0) return $this->conflict('inv');
-		$codeID = $anyCodeSTH->fetchColumn();
+		$codeSTH = $this->db->prepare("SELECT * FROM `discount` WHERE `code`=?;");
+		if (!$codeSTH->execute( $data->code )) return $this->conflict();
+		$discount = $codeSTH->fetch();
+		if ($discount == false) return $this->conflict('inv'); // is not code
+		if ($discount['active'] != 'yes') return $this->conflict('exp'); // is expired
 
 		// server duplicate check
-		foreach ($_SESSION['cart.discounts'] as $discount) if ($discount['discountID'] == $codeID) return $this->conflict('dup');
-
-		// Check if code is still valid
-		$validTimeSTH = $this->db->prepare("SELECT * FROM `discount` WHERE `active`='yes' AND discountID=?;");
-		if (!$validTimeSTH->execute( $codeID ) || $validTimeSTH->rowCount() == 0) return $this->conflict('exp');
+		foreach ($_SESSION['cart.discounts'] as $myDiscount)
+			if ($myDiscount['discountID'] == $discount['discountID']) return $this->conflict('dup'); // is duplicate
 
 		// test if valid for current cart
-		$ids = array("0");
-		foreach ($_SESSION['cart'] as $itemID) if (is_string($itemID)) array_push($ids, $itemID); // grab ids from current cart
-		$questionMarks = trim(str_repeat("?,", sizeof($ids)),",");
+		list($ids, $questionMarks) = $this->getAllCartParentIDs();
+		$params = array_merge($ids, array($discount['discountID']));
+		$chkSTH = $this->db->prepare("SELECT count(*) FROM discount WHERE (itemID IN ($questionMarks) OR itemID IS NULL) AND discountID=?;");
+		if (!$chkSTH->execute( $params ) || $chkSTH->fetchColumn() < 0) return $this->conflict('unr'); // is unrelated
 
-		$finalSTH = $this->db->prepare("SELECT * FROM `discount` WHERE ((productID IN (SELECT DISTINCT productID FROM `item` WHERE itemID IN ($questionMarks)) AND itemID IS NULL) OR (productID IS NULL AND itemID IN ($questionMarks)) OR (productID IS NULL AND itemID IS NULL) ) AND discountID = ?;");
-		if (!$finalSTH->execute( array_merge( $ids, $ids, array($codeID) ) ) || $finalSTH->rowCount() == 0) return $this->conflict('unr');
-
-		$obj = $finalSTH->fetch(PDO::FETCH_ASSOC);
-		array_push($_SESSION['cart.discounts'], $obj);
-		return $obj;
+		// store and return new discount
+		array_push($_SESSION['cart.discounts'], $discount);
+		return $discount;
 	}
 
 	// Helper: check discounts agains removed item
 	private function chkDiscounts() {
-		$ids = array("0");
-		foreach ($_SESSION['cart'] as $itemID) if (is_string($itemID)) array_push($ids, $itemID); // grab ids from current cart
-		$questionMarks = trim(str_repeat("?,", sizeof($ids)),",");
-		$finalSTH = $this->db->prepare("SELECT * FROM `discount` WHERE ((productID IN (SELECT DISTINCT productID FROM `item` WHERE itemID IN ($questionMarks)) AND itemID IS NULL) OR (productID IS NULL AND itemID IN ($questionMarks)) OR (productID IS NULL AND itemID IS NULL) ) AND discountID = ?;");
-		foreach ($_SESSION['cart.discounts'] as $discount) {
-			if (!$finalSTH->execute( array_merge( $ids, $ids, array($discount['discountID']) ) ) || $finalSTH->rowCount() == 0) {
+		list($ids, $questionMarks) = $this->getAllCartParentIDs();
+		$chkSTH = $this->db->prepare("SELECT count(*) FROM discount WHERE (itemID IN ($questionMarks) OR itemID IS NULL) AND discountID=?;");
+		foreach ($_SESSION['cart.discounts'] as $discount) 
+			if (!$chkSTH->execute( array_merge($ids, array($discount['discountID'])) ) || $chkSTH->fetchColumn() < 0) 
 				$this->remDiscount( $discount );
-			}
-		}
 	}
 
 	// GENERIC CART FUNCTION
@@ -345,64 +343,64 @@ class Cart extends NG {
 		$user = $this->usr->requiresAuth();
 		$data = $this->getPostData();
 
+		// clean cart id's
+		$cartIDs = array();
+		foreach($_SESSION['cart'] as $itemID) if (is_string($itemID)) array_push($cartIDs, $itemID);
+
 		// Insert order
-		$orderSTH = $this->db->prepare("INSERT INTO `order` (contactID, medium, amount) VALUES (?,?,?);");
+		$orderSTH = $this->db->prepare("INSERT INTO `order` (contactID,medium,amount) VALUES (?,?,?);");
 		if (!$orderSTH->execute( $user['contactID'], $data->medium, $data->cost )) return $this->conflict();
 		$orderID = $this->db->lastInsertId();
 
 		// Store purchases and options
-		$purchaseSTH = $this->db->prepare("INSERT INTO `purchase` (itemID, orderID, firmID, `data`) VALUES (?,?,?,?) ON DUPLICATE KEY UPDATE orderID=VALUES(orderID), `data`=VALUES(`data`);");
-		$acquisitionSTH = $this->db->prepare("INSERT INTO `acquisition` (itemID, orderID) VALUES (?,?);");
-		$attendeeSTH = $this->db->prepare("INSERT INTO `attendee` (itemID, contactID, orderID) VALUES (?,?,?);");
-		$memberSTH = $this->db->prepare("INSERT INTO `member` (firmID, groupID) VALUES (?,?);");
-		$cart = $this->get(); // removes random id's
-		foreach ($cart as $item) { // iterate over items
-			if ($item['itemID'] == '-1') continue; // don't care about custom payment storage (yet)
-			$option = isset($_SESSION['cart.options'][ $item['itemID'] ]) ? $_SESSION['cart.options'][ $item['itemID'] ] : array(); // get item's object
+		$itemSTH = $this->db->prepare("SELECT onFirm FROM item WHERE itemID=?;");
+		$purchaseSTH = $this->db->prepare("INSERT OR REPLACE INTO purchase(contactID,firmID,itemID,orderID,`data`) VALUES (?,?,?,?,?);");
+		foreach ($cartIDs as $itemID) { // iterate over items
+			$option = isset($_SESSION['cart.options'][ $itemID ]) ? $_SESSION['cart.options'][ $itemID ] : array(); // get item's object
 
-			if (isset($option['attID'])) { // store attendees
-				foreach($option[$option['attID']] as &$contact) {
-					if (!$attendeeSTH->execute($item['itemID'], $contact['contactID'], $orderID)) return $this->conflict();
-					$contact['attendeeID'] = $this->db->lastInsertId();
-				}
-			}
+			if (!$itemSTH->execute( $itemID )) return $this->conflict();
 
-			if ($item['type'] == 'purchase') { // store groups / acquisition
-				if (isset($item['settings']->groupID)) { // store groups
-					if (!$memberSTH->execute($user['firmID'], $item['settings']->groupID)) return $this->conflict();
-					$option['memberID'] = $this->db->lastInsertId();
-				}
-				if (!$purchaseSTH->execute($item['itemID'], $orderID, $user['firmID'], json_encode($option))) return $this->conflict(); // purchase
+			if ($itemSTH->fetchColumn() == 'true') {
+				if (!$purchaseSTH->execute(null, $user['firmID'], $itemID, $orderID, json_encode($option))) return $this->conflict();
 			} else {
-				if (!$acquisitionSTH->execute($item['itemID'], $orderID)) return $this->conflict(); // acquisition
-				// $option['acquisitionID'] = $this->db->lastInsertId();
+				if (!$purchaseSTH->execute($user['contactID'], null, $itemID, $orderID, json_encode($option))) return $this->conflict();
 			}
 		}
-
 		$this->emailCart($orderID);
 		$this->clr();
-
-		return $orderID;	
+		return $orderID;
 	}
 
 	// Worker(app/purchases): return purchases
 	public function getPurchases() {
 		$user = $this->usr->requiresAuth();
 
-		$q[] = "SELECT itemID, orderID, `data` FROM `purchase` WHERE firmID=?"; // purchases
-		$q[] = "SELECT itemID, a.orderID, 'acq' AS `data` FROM `acquisition`a LEFT JOIN `order`o ON a.orderID=o.orderID WHERE o.contactID=?"; // acquisition
-		$q = implode(" UNION ", $q);
-		
-		$STH = $this->db->prepare("SELECT p.*, o.stamp FROM ($q) p LEFT JOIN `order` o ON p.orderID=o.orderID ORDER BY o.stamp;");
-		$STH->execute( $user['firmID'], $user['contactID'] );
+		$itemSTH = $this->db->prepare("SELECT * FROM (SELECT * FROM purchase WHERE contactID=? OR firmID=?) p LEFT JOIN item i ON p.itemID=i.itemID LEFT JOIN 'order' o ON p.orderID=o.orderID;");
+		$itemSTH->execute( $user['contactID'], $user['firmID'] );
 
-		$retData = $STH->fetchAll( PDO::FETCH_ASSOC );
+		$retData = $itemSTH->fetchAll();
 		foreach ($retData as &$item) {
-			$temp = $item;
-			$item = $this->getItemByID($item['itemID']);
-			$item['stamp'] = $temp['stamp'];
+			$item['template'] = $this->getItemTemplate( $item['itemID'] );
+			$item['settings'] = json_decode($item['settings']);
+			$item['data'] = json_decode($item['data']);
 		}
 		return $retData;
+	}
+	private function getItemTemplate( $itemID ) { // Helper (getPurchases);
+		$template = null;
+		$STH = $this->db->prepare("SELECT * FROM (SELECT parentID,templateID FROM item WHERE itemID=?) i LEFT JOIN template t ON i.templateID=t.templateID;");
+		do {
+			if (!$STH->execute($itemID)) die($this->conflict());
+			$row = $STH->fetch();
+			if ($row == false) die($this->conflict());
+			$itemID = $row['parentID'];
+			if (!is_null($row['templateID'])) {
+				unset($row['parentID']);
+				$template = $row;
+				$itemID = null;
+			}
+		} while (!is_null($itemID));
+		return $template;
 	}
 
 	// Helper(app/cart/checkout/email): email cart data
@@ -410,29 +408,25 @@ class Cart extends NG {
 		// grab order info
 		$orderSTH = $this->db->prepare("SELECT * FROM `order` WHERE `orderID`=? LIMIT 1;");
 		$orderSTH->execute( $orderID );
-		$order = $orderSTH->fetch(PDO::FETCH_ASSOC);
+		$order = $orderSTH->fetch();
 
 		// grab contact info
-		$contactSTH = $this->db->prepare("SELECT c.firmID, c.legalName, c.preName, c.title, c.email, c.phone, a.* FROM `contact` c LEFT JOIN `address` a ON c.addressID=a.addressID WHERE `contactID`=? LIMIT 1;");
+		$contactSTH = $this->db->prepare("SELECT * FROM `contact` c LEFT JOIN `address` a ON c.addressID=a.addressID WHERE `contactID`=? LIMIT 1;");
 		$contactSTH->execute( $order['contactID'] );
-		$contact = $contactSTH->fetch(PDO::FETCH_ASSOC);
+		$contact = $contactSTH->fetch();
 
 		// grab contacts firm info
-		$firmSTH = $this->db->prepare("SELECT f.name, f.website, a.* FROM `firm` f LEFT JOIN `address` a on f.addressID=a.addressID WHERE firmID=? LIMIT 1;");
+		$firmSTH = $this->db->prepare("SELECT * FROM `firm` f LEFT JOIN `address` a on f.addressID=a.addressID WHERE firmID=? LIMIT 1;");
 		$firmSTH->execute( $contact['firmID'] );
-		$firm = $firmSTH->fetch(PDO::FETCH_ASSOC);
+		$firm = $firmSTH->fetch();
+
+		// setup field data grab
+		$fieldSTH = $this->db->prepare("SELECT * FROM `field` WHERE fieldID=? LIMIT 1;");
 
 		// grab order
-		$q[] = "SELECT `data`, itemID, orderID FROM `purchase`";
-		$q[] = "SELECT '{}' as `data`, itemID, orderID FROM `acquisition`";
-		$q = implode(" UNION ", $q);
-		$itemsSTH = $this->db->prepare("SELECT p.`data`, i.* FROM ($q) AS `p` LEFT JOIN `item` i ON p.itemID=i.itemID WHERE orderID=?;");
+		$itemsSTH = $this->db->prepare("SELECT * FROM purchase p LEFT JOIN item i ON p.itemID=i.itemID WHERE orderID=?;");
 		$itemsSTH->execute( $orderID );
-		$items = $itemsSTH->fetchAll(PDO::FETCH_ASSOC);
-
-		// setup attendees grab
-		$attendeeSTH = $this->db->prepare("SELECT c.legalName, c.preName, c.title, c.email, c.phone, d.* FROM (SELECT contactID FROM `attendee` a WHERE itemID=?) a LEFT JOIN `contact` c ON a.contactID=c.contactID LEFT JOIN `address` d ON c.addressID=d.addressID;");
-		$fieldSTH = $this->db->prepare("SELECT * FROM `field` WHERE fieldID=? LIMIT 1;");
+		$items = $itemsSTH->fetchAll();
 
 		// Pretty print addresses
 		function address($data) {
@@ -443,8 +437,7 @@ class Cart extends NG {
 			return $str;
 		}
 
-		setlocale(LC_MONETARY, 'en_US');
-		$order['amount'] = '$' . money_format('%n', $order['amount']);
+		$order['amount'] = '$' . number_format($order['amount'], 2);
 
 		// pretty print data for email
 		$html  = "<b>Order#:</b> $orderID<br />\r\n";
@@ -464,48 +457,46 @@ class Cart extends NG {
 		$files = array();
 		// $mail->SMTPDebug  = 2;
 
-		foreach ($items as $item) {
+		foreach ($items as $item) { // items in cart
 
 			$html .= (isset($item['url'])) ? "<li><a href=\"{$item['url']}\">{$item['name']}</a><ul>" : "<li><strong>{$item['name']}</strong><ul>";
 			$data = json_decode($item['data']);
-			foreach ($data as $key => $value) {
-				$fieldSTH->execute( $key );
-				if ($fieldSTH->rowCount() > 0) {
-					$fieldData = $fieldSTH->fetch(PDO::FETCH_ASSOC);
+			foreach ($data as $key => $value) { // questions on item
+				if (!$fieldSTH->execute( $key )) continue;
+				$fieldData = $fieldSTH->fetch();
+				if ($fieldData == false) continue;
 
-					// special question formatters
-					switch ($fieldData['fieldID']) {
-						case '2':
-							$value = '$' . money_format('%n', $value);
-							break;
-					}
+				// special question formatters
+				switch ($fieldData['fieldID']) {
+					case '2': $value = '$'.number_format($value, 2); break;
+				}
 
-					// type display
-					switch ($fieldData['type']) {
-						case 'attendees': // pretty print attendees
-							$html .= "<li><b>Attendee(s):</b><ul>";
-							$attendeeSTH->execute( $item['itemID'] );
-							while ($row = $attendeeSTH->fetch( PDO::FETCH_ASSOC )) {
-								$html .= "<li>";
-								$html .= "<a href=\"mailto:{$row['email']}\" >{$row['title']} {$row['legalName']} ({$row['preName']})</a><br />\r\n";
-								$html .= address($row);
-								$html .= "Phone: <a href=\"tel:{$row['phone']}\">{$row['phone']}</a><br />\r\n";
-								$html .= "</li>";
-							}
-							$html .= "</ul></li>";
-							break;
+				// type display
+				switch ($fieldData['type']) {
+					case 'attendees': // pretty print attendees
+						$html .= "<li><b>Attendee(s):</b><ul>";
+						// $html .= print_r($value, true);
+						foreach ($value as $row) {
+							$row = $this->object_to_array( $row );
+							$html .= "<li>";
+							$html .= "<a href=\"mailto:{$row['email']}\" >{$row['title']} {$row['legalName']} ({$row['preName']})</a><br />\r\n";
+							$html .= address($row['addr']);
+							$html .= "Phone: <a href=\"tel:{$row['phone']}\">{$row['phone']}</a><br />\r\n";
+							$html .= "</li>";
+						}
+						$html .= "</ul></li>";
+						break;
 
-						case 'image':
-							$fileName = $firm['name'] . ', ' . $contact['legalName'] . '.' . pathinfo($value, PATHINFO_EXTENSION);
-							$mail->addAttachment($_SERVER['DOCUMENT_ROOT'].$value, $fileName);
-							$html .= "<li><b>" . $fieldData['name'] . ':</b>' . $fileName . "</li>";
-							array_push($files, $_SERVER['DOCUMENT_ROOT'] . $value);
-							break;
+					case 'image':
+						$fileName = $firm['name'] . ', ' . $contact['legalName'] . '.' . pathinfo($value, PATHINFO_EXTENSION);
+						$mail->addAttachment($_SERVER['DOCUMENT_ROOT'].$value, $fileName);
+						$html .= "<li><b>" . $fieldData['name'] . ':</b>' . $fileName . "</li>";
+						array_push($files, $_SERVER['DOCUMENT_ROOT'] . $value);
+						break;
 
-						default:
-							$html .= "<li><b>" . $fieldData['name'] . ':</b> ' . $value . "</li>";
-							break;
-					}
+					default:
+						$html .= "<li><b>" . $fieldData['name'] . ':</b> ' . $value . "</li>";
+						break;
 				}
 			}
 			$html .= "</ul></li>";
