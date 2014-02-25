@@ -34,12 +34,12 @@
 
 							<ul class="nav">
 								<li ng-class="{active: breadcrumbs.onPage('Cart')}"><a href="/cart">Shopping Cart</a></li>
-								<li ng-class="{active: breadcrumbs.onPage('purchases')}" ng-show="security.isAuthenticated()"><a href="/purchases">Past Products</a></li>
+								<li ng-class="{active: breadcrumbs.onPage('Purchases')}" ng-show="security.isAuthenticated()"><a href="/purchases">Past Purchases</a></li>
 							</ul>
 
 							<ul class="nav pull-right">
 								<li ng-class="{active: breadcrumbs.onPage('Payment')}"><a href="/payment">Make A Payment</a></li>
-								<li class="dropdown" ng-class="{active:breadcrumbs.onPage('admin'), open:isAdminOpen}" ng-show="security.isAdmin()">
+								<li class="dropdown" ng-class="{active:breadcrumbs.onPage('Admin'), open:isAdminOpen}" ng-show="security.isAdmin()">
 									<a id="adminmenu" role="button" class="dropdown-toggle" ng-click="isAdminOpen=!isAdminOpen">
 										Admin<b class="caret"></b>
 									</a>

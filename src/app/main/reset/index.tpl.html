@@ -12,23 +12,20 @@
 			<div ng-show="passChange.inputPassword.$error.passValid">
 				<p>Unfulfilled Password Requirements:</p>
 				<ul>
-					<li ng-show="passChange.inputPassword.$error.hasNumber">At least 1 number</li>
-					<li ng-show="passChange.inputPassword.$error.specialCh">At least 1 special character</li>
-					<li ng-show="passChange.inputPassword.$error.lowerAlph">At least 1 alphabetical character</li>
-					<li ng-show="passChange.inputPassword.$error.upperAlph">At least 1 uppercase alphabetical character</li>
 					<li ng-show="passChange.inputPassword.$error.metLength">At least 6 characters long</li>
+					<li ng-show="passChange.inputPassword.$error.isSpecial">At least 1 number <strong>OR</strong> 1 special character</li>
 				</ul>
 			</div>
 
 			<div class="control-group">
-				<label class="control-label" for="inputPassword">New Password</label>
+				<label class="control-label" for="inputPassword">New Password *</label>
 				<div class="controls">
 					<input type="password" id="inputPassword" name="inputPassword" ng-model="user.password" placeholder="Password" ua-pass-validate required class="input-block-level">
 				</div>
 			</div>
 
 			<div class="control-group">
-				<label class="control-label" for="inputPassword">Re-type Password</label>
+				<label class="control-label" for="inputPassword">Re-type Password *</label>
 				<div class="controls">
 					<input type="password" id="inputPassword" ng-model="user.passVerify" placeholder="Password" required class="input-block-level">
 				</div>

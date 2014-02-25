@@ -50,6 +50,14 @@ switch ($_REQUEST['c']) {
 				session_start();
 				die(session_id());
 				break;
+			case 'session':
+				echo '<pre>';
+				session_start();
+				print_r($_SESSION);
+				echo '</pre>';
+			case 'sendCart':
+				Cart::process( 'emailCart', $pass, $data );
+				break;
 			default: $pass = false;
 		}
 		break;
