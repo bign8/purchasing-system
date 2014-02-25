@@ -102,7 +102,7 @@ class Cart extends NG {
 		$cartIDs = array_values(array_unique( $cartIDs ));
 		return array( $cartIDs, trim(str_repeat("?,", count($cartIDs)),",") );
 	}
-	private function getItemParentIDs( $itemID ) { // Helper(get,getAllCartParentIDs,getProductFields,getItemByID,getAllItemCosts): return array of item's parent id's
+	private function getItemParentIDs( $itemID ) { // Helper(get,getAllCartParentIDs,getProductFields,getItemByID): return array of item's parent id's
 		$STH = $this->db->prepare("SELECT parentID FROM item WHERE itemID=?;");
 		$ids = array();
 		do {
@@ -126,8 +126,21 @@ class Cart extends NG {
 		if (!$STH->execute( $parentIDs )) die($this->conflict());
 		$row['hasOptions'] = $STH->fetchColumn() > 0;
 
+		// get all item prices
+		$pastCommas = trim(str_repeat("?,", count($this->pastIDs)),","); // build string of question marks
+		$query  = "SELECT i.parentID as parentID, r.name as reason, t.*, p.* FROM (SELECT * FROM item WHERE itemID IN ($marks)) i ";
+		$query .= "LEFT JOIN (";
+		$query .= "  SELECT * FROM price WHERE reasonID IS NULL or reasonID IN ($pastCommas)"; // past purchases
+		$query .= "  UNION";
+		$query .= "  SELECT * FROM price WHERE reasonID IN ({$this->cartMarks}) AND inCart='true'"; // in cart
+		$query .= ") p ON i.itemID=p.itemID ";
+		$query .= "LEFT JOIN template t ON p.templateID=t.templateID ";
+		$query .= "LEFT JOIN item r ON r.itemID=p.reasonID ";
+		$STH = $this->db->prepare( $query );
+		if (!$STH->execute( array_merge( $parentIDs, $this->pastIDs, $this->cartIDs) )) die($this->conflict());
+		$costRows = $STH->fetchAll();
+
 		// find least price
-		$costRows = $this->getAllItemCosts( $row['itemID'] ); // Recursive: returns all costs
 		if (count($costRows) > 0) {
 			$origRow = null; $origCost = null;
 			$leastRow = null; $leastCost = null;
@@ -159,24 +172,6 @@ class Cart extends NG {
 		if ($row['warn']) $row['oldData'] = json_decode( $checkData[0]['data'] );
 
 		return $row;
-	}
-	private function getAllItemCosts( $itemID, $STH = null ) { // Helper(get): return cost for a productID
-
-		$pastCommas = trim(str_repeat("?,", count($this->pastIDs)),","); // build string of question marks
-		list($ids, $marks) = $this->getItemParentIDs( $itemID );
-
-		$query  = "SELECT i.parentID as parentID, r.name as reason, t.*, p.* FROM (SELECT * FROM item WHERE itemID IN ($marks)) i ";
-		$query .= "LEFT JOIN (";
-		$query .= "  SELECT * FROM price WHERE reasonID IS NULL or reasonID IN ($pastCommas)"; // past purchases
-		$query .= "  UNION";
-		$query .= "  SELECT * FROM price WHERE reasonID IN ({$this->cartMarks}) AND inCart='true'"; // in cart
-		$query .= ") p ON i.itemID=p.itemID ";
-		$query .= "LEFT JOIN template t ON p.templateID=t.templateID ";
-		$query .= "LEFT JOIN item r ON r.itemID=p.reasonID ";
-
-		$STH = $this->db->prepare( $query );
-		if (!$STH->execute( array_merge( $ids, $this->pastIDs, $this->cartIDs) )) die($this->conflict());
-		return $STH->fetchAll();
 	}
 	private function getRowCost( $row ) {
 		if (is_null($row)) return INF; // needed?
