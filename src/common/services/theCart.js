@@ -62,7 +62,7 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function ($root
 		total = 0;
 		angular.forEach(service.cart, function (item) {
 			processItem(item, 'settings');
-			if (item.cost.hasOwnProperty('full')) processItem(item, 'full');
+			if (item.cost.reasonID) processItem(item, 'full');
 			if (options.hasOwnProperty(item.itemID)) item.options = options[item.itemID];
 			item.expired = (
 				item.hasOwnProperty('settings') && 
