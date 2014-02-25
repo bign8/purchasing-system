@@ -15,6 +15,7 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function ($root
 
 	var processItem = function(item, attribute) {
 		var setValue = (attribute=='settings') ? 'value' : 'fullValue';
+		var override = false;
 		item.cost = item.cost || {};
 		item.cost[setValue] = 0;
 		if (item.template == 'custom') {
@@ -46,6 +47,7 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function ($root
 				case '3':
 					item.hasOptions = true;
 					item.cost[setValue] = parseFloat( options[ item.itemID ] ? item.cost[attribute].hard : item.cost[attribute].soft ) ;
+					override = true;
 					break;
 				default:
 					item.cost = {};
@@ -53,7 +55,7 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function ($root
 			}
 		}
 		
-		if (item.hasOptions) item.cost.set = options.hasOwnProperty( item.itemID );
+		if (item.hasOptions) item.cost.set = options.hasOwnProperty( item.itemID ) || override;
 	};
 
 	var processCart = function() {
@@ -62,7 +64,7 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function ($root
 			processItem(item, 'settings');
 			if (item.cost.hasOwnProperty('full')) processItem(item, 'full');
 			if (options.hasOwnProperty(item.itemID)) item.options = options[item.itemID];
-			item.expired = (item.settings.hasOwnProperty('eventDate') && (item.settings.eventDate < (new Date()).getTime()));
+			item.expired = (item.hasOwnProperty('settings') && item.settings.hasOwnProperty('eventDate') && (item.settings.eventDate < (new Date()).getTime()));
 			total += item.cost.value;
 		});
 		angular.forEach(observerCallbacks, function (callback) { // Notify observers

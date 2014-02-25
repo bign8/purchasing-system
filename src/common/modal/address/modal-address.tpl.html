@@ -8,48 +8,48 @@
 		<notify message="message"></notify>
 
 		<div class="control-group">
-			<label class="control-label" for="inputEmail">Name</label>
+			<label class="control-label" for="inputEmail">Name *</label>
 			<div class="controls">
 				<input type="text" id="inputEmail" placeholder="Name" ng-model="address.addrName" required>
-				<span class="help-inline">Home, Work, Apartment, etc...</span>
+				<span class="help-inline">Billings Office, Home Address, etc...</span>
 			</div>
 		</div>
 
 		<div class="control-group">
-			<label class="control-label" for="addr1">Address 1</label>
+			<label class="control-label" for="addr1">Mailing Address *</label>
 			<div class="controls">
-				<input type="text" id="addr1" placeholder="Address 1" ng-model="address.addr1" required>
+				<input type="text" id="addr1" placeholder="Mailing Address" ng-model="address.addr1" required>
 			</div>
 		</div>
 
 		<div class="control-group">
-			<label class="control-label" for="addr2">Address 2</label>
+			<label class="control-label" for="addr2">Physical Address *</label>
 			<div class="controls">
-				<input type="text" id="addr2" placeholder="Address 2" ng-model="address.addr2">
+				<input type="text" id="addr2" placeholder="Physical Address" ng-model="address.addr2">
 			</div>
 		</div>
 
 		<div class="control-group">
-			<label class="control-label" for="city">City</label>
+			<label class="control-label" for="city">City *</label>
 			<div class="controls">
 				<input type="text" id="city" placeholder="City" ng-model="address.city" required>
 			</div>
 		</div>
 
 		<div class="control-group">
-			<label class="control-label" for="state">State</label>
+			<label class="control-label" for="state">State *</label>
 			<div class="controls">
 				<input type="text" id="state" placeholder="State" ng-model="address.state" required>
 			</div>
 		</div>
 
 		<div class="control-group">
-			<label class="control-label" for="zip">Zip Code</label>
+			<label class="control-label" for="zip">Zip Code *</label>
 			<div class="controls">
 				<input type="text" id="zip" placeholder="Zip Code" ng-model="address.zip" required>
 			</div>
 		</div>
-
+		<p>* Required field</p>
 	</form>
 </div>
 <div class="modal-footer">

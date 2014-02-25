@@ -31,6 +31,9 @@ th.nowrap, td.nowrap {
 }
 
 /* alert styles */
+.alert.no-x {
+	padding-right: 14px;
+}
 .alert a {
 	color: #f09800;
 }
@@ -65,6 +68,12 @@ th.nowrap, td.nowrap {
 	height: 44px;
 	min-width: 140px;
 	margin: -22px 0 0 -70px;
+}
+
+/* modal styled */
+.modal.login {
+	width: 660px;
+	margin-left: -330px;
 }
 
 /* loader styles */

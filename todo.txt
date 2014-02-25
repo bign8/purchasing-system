@@ -7,7 +7,6 @@ ToDo:
 	- MP (live + hard-copy or digital) (Note about CPE credit can be applied)
 	- MP-past (hard-copy or digital) (Note about CPE credit cannot be applied) - download not currently available
 - Allow pretty crumb to be set by individual pages (can bind to form elements for changing crumbs)
-- Fix grunt build to only upload php scripts
 - Notify users of un-supported browsers
 - Service to controll account settings (single data pull) (clearing memberships on new firm creation)
 - store referrer for redirects back to site
@@ -44,6 +43,7 @@ Future releases
 - find a better deployment than 'ftp-deploy'
 - handle invoices
 - have `item` settings store raw data instead of json encoded data
+- Linked list for items, have pricing based on itemID, remove products from the equation (folder structure) (item would have to be labeled [folder or file])
 - periodically make calls back to server to check for additions to php cart
 - register user / select address for a list of firm addresses
 - sync with Luke's UAN member site

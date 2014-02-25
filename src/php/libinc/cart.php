@@ -392,14 +392,15 @@ class Cart extends NG {
 		$q[] = "SELECT itemID, orderID, `data` FROM `purchase` WHERE firmID=?"; // purchases
 		$q[] = "SELECT itemID, a.orderID, 'acq' AS `data` FROM `acquisition`a LEFT JOIN `order`o ON a.orderID=o.orderID WHERE o.contactID=?"; // acquisition
 		$q = implode(" UNION ", $q);
-
-		$STH = $this->db->prepare("SELECT i.*, p.data, t.template, o.stamp FROM ($q) p LEFT JOIN item i ON p.itemID=i.itemID LEFT JOIN `product` pr ON i.productID=pr.productID LEFT JOIN `template` t ON pr.templateID=t.templateID LEFT JOIN `order` o ON p.orderID=o.orderID ORDER BY i.productID, i.name;");
+		
+		$STH = $this->db->prepare("SELECT p.*, o.stamp FROM ($q) p LEFT JOIN `order` o ON p.orderID=o.orderID ORDER BY o.stamp;");
 		$STH->execute( $user['firmID'], $user['contactID'] );
 
 		$retData = $STH->fetchAll( PDO::FETCH_ASSOC );
 		foreach ($retData as &$item) {
-			$item['settings'] = json_decode($item['settings']);
-			$item['data'] = json_decode($item['data']);
+			$temp = $item;
+			$item = $this->getItemByID($item['itemID']);
+			$item['stamp'] = $temp['stamp'];
 		}
 		return $retData;
 	}
