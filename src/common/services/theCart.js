@@ -21,11 +21,11 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function ($root
 		if (item.template == 'custom') {
 			item.cost[setValue] = parseFloat(item.cost[attribute].cost) || 0; // straight assignment (no options)
 		} else {
-			switch (item.cost.optionID) {
-				case '1':
+			switch (item.cost.costReq) {
+				case 'cost':
 					item.cost[setValue] = parseFloat(item.cost[attribute].cost) || 0; // straight assignment (no options)
 					break;
-				case '2':
+				case 'initial,later,after':
 					item.cost[setValue] = parseFloat( item.cost[attribute].initial ); // initial cost always in effect
 					if ( options.hasOwnProperty(item.itemID) ) { // apply pricing based on the number of attendees
 						var attID = options[ item.itemID ].attID; // grab attendee id
@@ -44,7 +44,7 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function ($root
 						});
 					}
 					break;
-				case '3':
+				case 'hard,soft':
 					item.hasOptions = true;
 					item.cost[setValue] = parseFloat( options[ item.itemID ] ? item.cost[attribute].hard : item.cost[attribute].soft ) ;
 					override = true;
@@ -62,9 +62,14 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function ($root
 		total = 0;
 		angular.forEach(service.cart, function (item) {
 			processItem(item, 'settings');
-			if (item.cost.hasOwnProperty('full')) processItem(item, 'full');
+			if (item.cost.reasonID) processItem(item, 'full');
 			if (options.hasOwnProperty(item.itemID)) item.options = options[item.itemID];
-			item.expired = (item.settings.hasOwnProperty('eventDate') && (item.settings.eventDate < (new Date()).getTime()));
+			item.expired = (
+				item.hasOwnProperty('settings') && 
+				!!item.settings &&
+				item.settings.hasOwnProperty('eventDate') &&
+				(item.settings.eventDate < (new Date()).getTime())
+			);
 			total += item.cost.value;
 		});
 		angular.forEach(observerCallbacks, function (callback) { // Notify observers

@@ -29,7 +29,7 @@ factory('interface', ['$http', '$q', '$rootScope', '$timeout', function ($http, 
 		var url = '/interface.php', args = {params:{c:myClass, a:myFn}};
 
 		// START DEV
-		var root = ( document.location.href.indexOf('payment') === -1 ) ? 'http://payment.upstreamacademy.com/dev' : '' ;
+		var root = ( document.location.href.indexOf('payment.upstreamacademy.com') === -1 ) ? 'http://payment.upstreamacademy.com/dev' : '' ;
 		url = root + url;
 		args.params.sessionID = localStorage.getItem('sessionID');
 		// END DEV
