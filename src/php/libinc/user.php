@@ -15,6 +15,7 @@ class User extends NG {
 			case 'addAddress':  $data = $obj->addAddress();  break;
 			case 'addContact':  $data = $obj->addContact();  break;
 			case 'addFirmCode': $data = $obj->addFirmCode(); break;
+			case 'softFirmCode':$data = $obj->softFirmCode();break;
 			case 'addUser':     $data = $obj->addUser();     break;
 			case 'checkEmail':  $data = $obj->checkEmail();  break;
 			case 'checkReset':  $data = $obj->checkReset();  break;
@@ -68,10 +69,27 @@ class User extends NG {
 		$existSTH = $this->db->prepare("SELECT * FROM `item` WHERE code=?;"); // check code
 		if (!$existSTH->execute( $data->code )) return $this->conflict();
 		$group = $existSTH->fetch();
-		if ($group == false) return $this->conflict('dne');
+		if ($group == false || $group == null) return $this->conflict('dne');
 
 		$checkSTH = $this->db->prepare("SELECT * FROM `purchase` WHERE firmID=? AND itemID=?;"); // do we have it?
 		if (!$checkSTH->execute( $user['firmID'], $group['itemID'] ) || $checkSTH->fetch() != false) return $this->conflict('dup');
+
+		$insSTH = $this->db->prepare("INSERT INTO `purchase` (firmID,itemID,data,isMember) VALUES (?,?,?,?);"); // iff not add it
+		if (!$insSTH->execute( $user['firmID'], $group['itemID'], 'manual', 'true' )) return $this->conflict();
+
+		$this->addFirmCodeEmail($group, $user);
+		return $group;
+	}
+	public function softFirmCode() { // same as above but without conflicts
+		$data = $this->getPostData();
+		$user = $this->requiresAuth();
+		$existSTH = $this->db->prepare("SELECT * FROM `item` WHERE code=?;"); // check code
+		if (!$existSTH->execute( $data->code )) return $this->conflict();
+		$group = $existSTH->fetch();
+		if ($group == false || $group == null) return 'dne';
+
+		$checkSTH = $this->db->prepare("SELECT * FROM `purchase` WHERE firmID=? AND itemID=?;"); // do we have it?
+		if (!$checkSTH->execute( $user['firmID'], $group['itemID'] ) || $checkSTH->fetch() != false) return 'dup';
 
 		$insSTH = $this->db->prepare("INSERT INTO `purchase` (firmID,itemID,data,isMember) VALUES (?,?,?,?);"); // iff not add it
 		if (!$insSTH->execute( $user['firmID'], $group['itemID'], 'manual', 'true' )) return $this->conflict();

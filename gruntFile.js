@@ -40,9 +40,10 @@ module.exports = function(grunt) {
 			app: {
 				options: {
 					livereload: 1337,
+					interval: 5007
 					//interrupt: true
 				},
-				files: ['src/**/*.js', 'src/index.html', 'src/**/*.tpl.html', 'src/php/**/*', 'src/assets/css.css'],
+				files: ['src/**/*.js', 'src/index.html', 'src/**/*.tpl.html', 'src/php/**/*.php', 'src/assets/css.css'],
 				tasks: ['build']
 			},
 			config: {
