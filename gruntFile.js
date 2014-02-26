@@ -63,12 +63,12 @@ module.exports = function(grunt) {
 				]
 			},
 			dbOut: {
-				dest: 'bak/dev/ua-purchase-2.sqlite3',
-				src:  'build/libinc/ua-purchase-2.sqlite3'
+				dest: 'bak/dev/ua-purchase.sqlite3',
+				src:  'build/libinc/ua-purchase.sqlite3'
 			},
 			dbIn: {
-				dest: 'build/libinc/ua-purchase-2.sqlite3',
-				src:  'bak/dev/ua-purchase-2.sqlite3'
+				dest: 'build/libinc/ua-purchase.sqlite3',
+				src:  'bak/dev/ua-purchase.sqlite3'
 			}
 		},
 		'ftp-deploy': {
