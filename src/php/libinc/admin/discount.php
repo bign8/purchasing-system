@@ -1,17 +1,16 @@
 <?php
 
-class Admin extends NG {
-
-	private $usr;
+class Discount extends NG {
 
 	// Constructor: Initialize session and db connections
 	function __construct() {
 		parent::__construct();
-		$this->usr = new User();
 	}
 
 	public static function process( $action, &$pass, &$data ) {
-		$obj = new Admin();
+		echo 'inDiscount';
+		$obj = new Discount();
+		
 		switch ( $action ) {
 			// Discount Functions
 			case 'getDiscountData':   $data = $obj->getDiscountData();   break;
