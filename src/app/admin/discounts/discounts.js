@@ -137,7 +137,7 @@ factory('DiscountService', ['interface', '$q', function (interface, $q) {
 				ret.resolve( service.theList() );
 				ret = ret.promise; // funky way to return a promise
 			} else {
-				ret = interface.admin('getDiscountData').then(function (data) {
+				ret = interface.admin('discount-getDiscountData').then(function (data) {
 					service.items = data.items;
 					service.products = data.products;
 					service.items.unshift(service.blankItem);
@@ -169,18 +169,18 @@ factory('DiscountService', ['interface', '$q', function (interface, $q) {
 			}
 		},
 		setActive: function (discount) {
-			return interface.admin('setDiscountActive', discount).then(function (res) {
+			return interface.admin('discount-setDiscountActive', discount).then(function (res) {
 				casheDiscounts[res.discountID] = res;
 				return res;
 			});
 		},
 		rem: function (discount) {
-			return interface.admin('remDiscount', discount).then(function (res) {
+			return interface.admin('discount-remDiscount', discount).then(function (res) {
 				delete casheDiscounts[discount.discountID];
 			});
 		},
 		save: function (discount) {
-			return interface.admin('setDiscount', discount).then(function (res) {
+			return interface.admin('discount-setDiscount', discount).then(function (res) {
 				casheDiscounts[res.discountID] = res;
 			});
 		},
