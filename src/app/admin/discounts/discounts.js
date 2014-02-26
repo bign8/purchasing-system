@@ -40,7 +40,7 @@ controller('DiscountListCtrl', ['$scope', 'discounts', '$modal', '$location', 'D
 		$event.stopPropagation();
 		var modalInstance = $modal.open({
 			templateUrl: 'discountConfirmDelete.tpl.html',
-			controller: ['$scope', '$modalInstance', 'discount', function($scope, $modalInstance, discount) {
+			controller: ['$scope', '$modalInstance', 'discount', function ($scope, $modalInstance, discount) {
 				$scope.discount = discount;
 				$scope.yes = function() { $modalInstance.close(); };
 				$scope.no = function() { $modalInstance.dismiss(); };
@@ -129,23 +129,21 @@ filter('filterProductIDNull', function() {
 }).
 
 factory('DiscountService', ['interface', '$q', function (interface, $q) {
-	var casheDiscounts = {};
+	var myDiscounts = {};
 	var service = {
 		getList: function () {
 			var ret = $q.defer();
-			if ( Object.keys(casheDiscounts).length > 0 ) {
+			if ( Object.keys(myDiscounts).length > 0 ) {
 				ret.resolve( service.theList() );
 				ret = ret.promise; // funky way to return a promise
 			} else {
-				ret = interface.admin('discount-getDiscountData').then(function (data) {
+				ret = interface.admin('discount-init').then(function (data) {
 					service.items = data.items;
-					service.products = data.products;
 					service.items.unshift(service.blankItem);
-					service.products.unshift(service.blankProd);
 
 					angular.forEach(data.discounts, function(discount) {
 						discount.amount = parseInt(discount.amount);
-						casheDiscounts[discount.discountID] = discount;
+						myDiscounts[discount.discountID] = discount;
 					});
 					return data.discounts;
 				});
@@ -154,7 +152,7 @@ factory('DiscountService', ['interface', '$q', function (interface, $q) {
 		},
 		theList: function () {
 			var arr = [];
-			for (var key in casheDiscounts) arr.push(casheDiscounts[key]);
+			for (var key in myDiscounts) arr.push(myDiscounts[key]);
 			return arr;
 		},
 		getDiscount: function (discountID) {
@@ -163,32 +161,30 @@ factory('DiscountService', ['interface', '$q', function (interface, $q) {
 					return service.blankDiscount;
 				});
 			} else {
-				return casheDiscounts[discountID] || service.getList().then(function () { // allways load all
-					return casheDiscounts[discountID];
+				return myDiscounts[discountID] || service.getList().then(function () { // allways load all
+					return myDiscounts[discountID];
 				});
 			}
 		},
 		setActive: function (discount) {
-			return interface.admin('discount-setDiscountActive', discount).then(function (res) {
-				casheDiscounts[res.discountID] = res;
+			return interface.admin('discount-active', discount).then(function (res) {
+				myDiscounts[res.discountID] = res;
 				return res;
 			});
 		},
 		rem: function (discount) {
-			return interface.admin('discount-remDiscount', discount).then(function (res) {
-				delete casheDiscounts[discount.discountID];
+			return interface.admin('discount-rem', discount).then(function (res) {
+				delete myDiscounts[discount.discountID];
 			});
 		},
 		save: function (discount) {
-			return interface.admin('discount-setDiscount', discount).then(function (res) {
-				casheDiscounts[res.discountID] = res;
+			return interface.admin('discount-set', discount).then(function (res) {
+				myDiscounts[res.discountID] = res;
 			});
 		},
 		items: [],
-		products: [],
-		blankItem: {itemID:null, productID:null, name:'--- Select an Item ---'},
-		blankProd: {productID:null, name:'--- Select a Product ---'},
-		blankDiscount:{itemID:null, productID:null, productName:null, itemName:null}
+		blankItem: {itemID:null, parentID:null, name:'--- Select an Item ---'},
+		blankDiscount:{itemID:null, parentID:null, itemName:null}
 	};
 	return service;
 }]);
