@@ -126,8 +126,21 @@ class Cart extends NG {
 		if (!$STH->execute( $parentIDs )) die($this->conflict());
 		$row['hasOptions'] = $STH->fetchColumn() > 0;
 
+		// get all item prices
+		$pastCommas = trim(str_repeat("?,", count($this->pastIDs)),","); // build string of question marks
+		$query  = "SELECT i.parentID as parentID, r.name as reason, t.*, p.* FROM (SELECT * FROM item WHERE itemID IN ($marks)) i ";
+		$query .= "LEFT JOIN (";
+		$query .= "  SELECT * FROM price WHERE reasonID IS NULL or reasonID IN ($pastCommas)"; // past purchases
+		$query .= "  UNION";
+		$query .= "  SELECT * FROM price WHERE reasonID IN ({$this->cartMarks}) AND inCart='true'"; // in cart
+		$query .= ") p ON i.itemID=p.itemID ";
+		$query .= "LEFT JOIN template t ON p.templateID=t.templateID ";
+		$query .= "LEFT JOIN item r ON r.itemID=p.reasonID ";
+		$STH = $this->db->prepare( $query );
+		if (!$STH->execute( array_merge( $parentIDs, $this->pastIDs, $this->cartIDs) )) die($this->conflict());
+		$costRows = $STH->fetchAll();
+
 		// find least price
-		$costRows = $this->getAllItemCosts( $row['itemID'] ); // Recursive: returns all costs
 		if (count($costRows) > 0) {
 			$origRow = null; $origCost = null;
 			$leastRow = null; $leastCost = null;
@@ -159,29 +172,6 @@ class Cart extends NG {
 		if ($row['warn']) $row['oldData'] = json_decode( $checkData[0]['data'] );
 
 		return $row;
-	}
-	private function getAllItemCosts( $itemID, $STH = null ) { // Helper(get): return cost for a productID
-
-		$pastCommas = trim(str_repeat("?,", count($this->pastIDs)),","); // build string of question marks
-
-		$query  = "SELECT i.parentID as parentID, r.name as reason, t.*, p.* FROM (SELECT * FROM item WHERE itemID=?) i ";
-		$query .= "LEFT JOIN (";
-		$query .= "  SELECT * FROM price WHERE reasonID IS NULL or reasonID IN ($pastCommas)"; // past purchases
-		$query .= "  UNION";
-		$query .= "  SELECT * FROM price WHERE reasonID IN ({$this->cartMarks}) AND inCart='true'"; // in cart
-		$query .= ") p ON i.itemID=p.itemID ";
-		$query .= "LEFT JOIN template t ON i.templateID=t.templateID ";
-		$query .= "LEFT JOIN item r ON r.itemID=p.reasonID ";
-
-		$STH = $this->db->prepare( $query );
-		$allCosts = array();
-		do {
-			if (!$STH->execute( array_merge( array($itemID), $this->pastIDs, $this->cartIDs) )) die($this->conflict());
-			$costs = $STH->fetchAll();
-			if (!is_null($costs[0]['settings'])) $allCosts = array_merge($allCosts, $costs);
-			$itemID = $costs[0]['parentID'];
-		} while (!is_null($itemID));
-		return $allCosts;
 	}
 	private function getRowCost( $row ) {
 		if (is_null($row)) return INF; // needed?
@@ -353,17 +343,19 @@ class Cart extends NG {
 		$orderID = $this->db->lastInsertId();
 
 		// Store purchases and options
-		$itemSTH = $this->db->prepare("SELECT onFirm FROM item WHERE itemID=?;");
-		$purchaseSTH = $this->db->prepare("INSERT OR REPLACE INTO purchase(contactID,firmID,itemID,orderID,`data`) VALUES (?,?,?,?,?);");
+		$itemSTH = $this->db->prepare("SELECT onFirm, templateID FROM item WHERE itemID=?;");
+		$purchaseSTH = $this->db->prepare("INSERT OR REPLACE INTO purchase(contactID,firmID,itemID,orderID,`data`,isMember) VALUES (?,?,?,?,?,?);");
 		foreach ($cartIDs as $itemID) { // iterate over items
 			$option = isset($_SESSION['cart.options'][ $itemID ]) ? $_SESSION['cart.options'][ $itemID ] : array(); // get item's object
 
 			if (!$itemSTH->execute( $itemID )) return $this->conflict();
 
-			if ($itemSTH->fetchColumn() == 'true') {
-				if (!$purchaseSTH->execute(null, $user['firmID'], $itemID, $orderID, json_encode($option))) return $this->conflict();
+			$itemParams = $itemSTH->fetch();
+			$isMember = ($itemParams['templateID'] == 2) ? 'true' : 'false'; // memberships
+			if ($itemParams['onFirm'] == 'true') {
+				if (!$purchaseSTH->execute(null, $user['firmID'], $itemID, $orderID, json_encode($option), $isMember)) return $this->conflict();
 			} else {
-				if (!$purchaseSTH->execute($user['contactID'], null, $itemID, $orderID, json_encode($option))) return $this->conflict();
+				if (!$purchaseSTH->execute($user['contactID'], null, $itemID, $orderID, json_encode($option), $isMember)) return $this->conflict();
 			}
 		}
 		$this->emailCart($orderID);

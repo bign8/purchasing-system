@@ -1,5 +1,6 @@
 angular.module('myApp.main.user', [
 	'ui.bootstrap',
+	'myApp.main.user.add',
 ]).
 
 config(['$routeProvider', function ( $routeProvider ){

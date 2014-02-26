@@ -12,7 +12,7 @@ factory('interface', ['$http', '$q', '$rootScope', '$timeout', function ($http, 
 			if (loading) {
 				activeTimeout = $timeout(function() {
 					$rootScope.loadWarn = true;
-				}, 20*1000);
+				}, 15*1000);
 			}
 		}
 	);
@@ -26,15 +26,11 @@ factory('interface', ['$http', '$q', '$rootScope', '$timeout', function ($http, 
 		var deferred = $q.defer();
 		pendingPromisses++;
 
-		var url = '/interface.php', args = {params:{c:myClass, a:myFn}};
-
+		var args = {params:{c:myClass, a:myFn}};
 		// START DEV
-		var root = ( document.location.href.indexOf('payment.upstreamacademy.com') === -1 ) ? 'http://payment.upstreamacademy.com/dev' : '' ;
-		url = root + url;
-		args.params.sessionID = localStorage.getItem('sessionID');
+		if (localStorage.getItem('sessionID')) args.params.sessionID = localStorage.getItem('sessionID');
 		// END DEV
-		
-		$http.post(url, myData, args).then(function (obj) {
+		$http.post('/interface.php', myData, args).then(function (obj) {
 			deferred.resolve( formatData( obj.data ) );
 			pendingPromisses--;
 		}, function(obj) {

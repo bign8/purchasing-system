@@ -15,6 +15,7 @@ class User extends NG {
 			case 'addAddress':  $data = $obj->addAddress();  break;
 			case 'addContact':  $data = $obj->addContact();  break;
 			case 'addFirmCode': $data = $obj->addFirmCode(); break;
+			case 'softFirmCode':$data = $obj->softFirmCode();break;
 			case 'addUser':     $data = $obj->addUser();     break;
 			case 'checkEmail':  $data = $obj->checkEmail();  break;
 			case 'checkReset':  $data = $obj->checkReset();  break;
@@ -63,25 +64,43 @@ class User extends NG {
 
 	// Worker(settings/firmCode): adds firm membership to group
 	public function addFirmCode() {
-		// $data = $this->getPostData();
-		// $user = $this->requiresAuth();
-		// $existSTH = $this->db->prepare("SELECT * FROM `group` WHERE shortCode=?;"); // check code
-		// if (!$existSTH->execute( $data->code ) || $existSTH->rowCount() < 1) return $this->conflict('dne');
-		// $group = $existSTH->fetch( PDO::FETCH_ASSOC );
+		$data = $this->getPostData();
+		$user = $this->requiresAuth();
+		$existSTH = $this->db->prepare("SELECT * FROM `item` WHERE code=?;"); // check code
+		if (!$existSTH->execute( $data->code )) return $this->conflict();
+		$group = $existSTH->fetch();
+		if ($group == false || $group == null) return $this->conflict('dne');
 
-		// $checkSTH = $this->db->prepare("SELECT * FROM `member` WHERE firmID=? AND groupID=?;"); // do we have it?
-		// if (!$checkSTH->execute( $user['firmID'], $group['groupID'] ) || $checkSTH->rowCount() >= 1) return $this->conflict('dup');
+		$checkSTH = $this->db->prepare("SELECT * FROM `purchase` WHERE firmID=? AND itemID=?;"); // do we have it?
+		if (!$checkSTH->execute( $user['firmID'], $group['itemID'] ) || $checkSTH->fetch() != false) return $this->conflict('dup');
 
-		// $insSTH = $this->db->prepare("INSERT INTO `member` (firmID, groupID) VALUES (?, ?);"); // iff not add it
-		// if (!$insSTH->execute( $user['firmID'], $group['groupID'] )) return $this->conflict();
+		$insSTH = $this->db->prepare("INSERT INTO `purchase` (firmID,itemID,data,isMember) VALUES (?,?,?,?);"); // iff not add it
+		if (!$insSTH->execute( $user['firmID'], $group['itemID'], 'manual', 'true' )) return $this->conflict();
 
-		// $this->addFirmCodeEmail($group, $user);
-		// return $group;
+		$this->addFirmCodeEmail($group, $user);
+		return $group;
+	}
+	public function softFirmCode() { // same as above but without conflicts
+		$data = $this->getPostData();
+		$user = $this->requiresAuth();
+		$existSTH = $this->db->prepare("SELECT * FROM `item` WHERE code=?;"); // check code
+		if (!$existSTH->execute( $data->code )) return $this->conflict();
+		$group = $existSTH->fetch();
+		if ($group == false || $group == null) return 'dne';
+
+		$checkSTH = $this->db->prepare("SELECT * FROM `purchase` WHERE firmID=? AND itemID=?;"); // do we have it?
+		if (!$checkSTH->execute( $user['firmID'], $group['itemID'] ) || $checkSTH->fetch() != false) return 'dup';
+
+		$insSTH = $this->db->prepare("INSERT INTO `purchase` (firmID,itemID,data,isMember) VALUES (?,?,?,?);"); // iff not add it
+		if (!$insSTH->execute( $user['firmID'], $group['itemID'], 'manual', 'true' )) return $this->conflict();
+
+		$this->addFirmCodeEmail($group, $user);
+		return $group;
 	}
 	private function addFirmCodeEmail($group, $user) { // Helper: addFirmCode
 		$firmSTH = $this->db->prepare("SELECT * FROM `firm` WHERE `firmID`=?;");
 		$firmSTH->execute($user['firmID']);
-		$firm = $firmSTH->fetch( PDO::FETCH_ASSOC );
+		$firm = $firmSTH->fetch();
 
 		$html = <<<HTML
 			<p>The firm "{$firm['name']}" ({$firm['website']}) has been added to the group "{$group['name']}".</p>
@@ -100,10 +119,10 @@ HTML;
 
 	// Worker(settings/firmCode): returns firm membership data
 	public function getFirmMem() {
-		// $user = $this->requiresAuth();
-		// $memSTH = $this->db->prepare("SELECT g.* FROM `member` m LEFT JOIN `group` g ON m.groupID=g.groupID WHERE `firmID`=?;");
-		// if (!$memSTH->execute( $user['firmID'] )) return $this->conflict();
-		// return $memSTH->fetchAll( PDO::FETCH_ASSOC );
+		$user = $this->requiresAuth();
+		$memSTH = $this->db->prepare("SELECT i.* FROM purchase p LEFT JOIN item i ON p.itemID=i.itemID WHERE firmID=? AND isMember='true';");
+		if (!$memSTH->execute( $user['firmID'] )) return $this->conflict();
+		return $memSTH->fetchAll( PDO::FETCH_ASSOC );
 	}
 
 	// Helper(security): ensures user is authenticated
