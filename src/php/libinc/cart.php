@@ -343,17 +343,19 @@ class Cart extends NG {
 		$orderID = $this->db->lastInsertId();
 
 		// Store purchases and options
-		$itemSTH = $this->db->prepare("SELECT onFirm FROM item WHERE itemID=?;");
-		$purchaseSTH = $this->db->prepare("INSERT OR REPLACE INTO purchase(contactID,firmID,itemID,orderID,`data`) VALUES (?,?,?,?,?);");
+		$itemSTH = $this->db->prepare("SELECT onFirm, templateID FROM item WHERE itemID=?;");
+		$purchaseSTH = $this->db->prepare("INSERT OR REPLACE INTO purchase(contactID,firmID,itemID,orderID,`data`,isMember) VALUES (?,?,?,?,?,?);");
 		foreach ($cartIDs as $itemID) { // iterate over items
 			$option = isset($_SESSION['cart.options'][ $itemID ]) ? $_SESSION['cart.options'][ $itemID ] : array(); // get item's object
 
 			if (!$itemSTH->execute( $itemID )) return $this->conflict();
 
-			if ($itemSTH->fetchColumn() == 'true') {
-				if (!$purchaseSTH->execute(null, $user['firmID'], $itemID, $orderID, json_encode($option))) return $this->conflict();
+			$itemParams = $itemSTH->fetch();
+			$isMember = ($itemParams['templateID'] == 2) ? 'true' : 'false'; // memberships
+			if ($itemParams['onFirm'] == 'true') {
+				if (!$purchaseSTH->execute(null, $user['firmID'], $itemID, $orderID, json_encode($option), $isMember)) return $this->conflict();
 			} else {
-				if (!$purchaseSTH->execute($user['contactID'], null, $itemID, $orderID, json_encode($option))) return $this->conflict();
+				if (!$purchaseSTH->execute($user['contactID'], null, $itemID, $orderID, json_encode($option), $isMember)) return $this->conflict();
 			}
 		}
 		$this->emailCart($orderID);
