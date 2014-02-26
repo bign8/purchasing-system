@@ -95,33 +95,44 @@ module.exports = function(grunt) {
 				dest: '<%= activeDir %>/js-tpl.js'
 			}
 		},
-		connect: {
-			server: {
+		// connect: {
+		// 	server: {
+		// 		options: {
+		// 			port: 4001,
+		// 			base: 'build',
+		// 			hostname: '*',
+		// 			middleware: function(connect, options) { // https://gist.github.com/ssafejava/8704372
+		// 				var middlewares = [];
+		// 				if (!Array.isArray(options.base)) options.base = [options.base];
+		// 				var directory = options.directory || options.base[options.base.length - 1];
+		// 				options.base.forEach(function(base) {
+		// 					middlewares.push(connect.static(base));
+		// 				});
+		// 				middlewares.push(connect.directory(directory));
+		// 				middlewares.push(function(req, res){
+		// 					for(var file, i = 0; i < options.base.length; i++){
+		// 						file = options.base + "/index.html"; 
+		// 						if (grunt.file.exists(file)){
+		// 							require('fs').createReadStream(file).pipe(res);
+		// 							return; // we're done
+		// 						}
+		// 					}
+		// 					res.statusCode(404); // where's index.html?
+		// 					res.end();
+		// 				});
+		// 				return middlewares;
+		// 			}
+		// 		}
+		// 	}
+		// },
+		php: {
+			watch: {
 				options: {
-					port: 4001,
+					keepalive: true,
+					open: true,
 					base: 'build',
-					hostname: '*',
-					middleware: function(connect, options) { // https://gist.github.com/ssafejava/8704372
-						var middlewares = [];
-						if (!Array.isArray(options.base)) options.base = [options.base];
-						var directory = options.directory || options.base[options.base.length - 1];
-						options.base.forEach(function(base) {
-							middlewares.push(connect.static(base));
-						});
-						middlewares.push(connect.directory(directory));
-						middlewares.push(function(req, res){
-							for(var file, i = 0; i < options.base.length; i++){
-								file = options.base + "/index.html"; 
-								if (grunt.file.exists(file)){
-									require('fs').createReadStream(file).pipe(res);
-									return; // we're done
-								}
-							}
-							res.statusCode(404); // where's index.html?
-							res.end();
-						});
-						return middlewares;
-					}
+					port: '4001',
+					hostname: 'localhost',
 				}
 			}
 		}
@@ -164,10 +175,13 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks('grunt-ftp-deploy');
 	grunt.loadNpmTasks('grunt-html2js');
+	grunt.loadNpmTasks('grunt-php');
 
 	// Define task(s)
-	grunt.registerTask('default', ['connect', 'watch']);
-	grunt.registerTask('build',   ['setPath:build',   'process', 'ftp-deploy:php']);
+	grunt.registerTask('default', ['watch']);
+	grunt.registerTask('build',   ['setPath:build', 'process']);
+	// grunt.registerTask('default', ['connect', 'watch']);
+	// grunt.registerTask('build',   ['setPath:build',   'process', 'ftp-deploy:php']);
 	grunt.registerTask('release', ['setPath:release', 'process', 'ftp-deploy:app']);
 	grunt.registerTask('process', ['jshint:files', 'clean', 'uglify', 'copy', 'html2js']);
 };
