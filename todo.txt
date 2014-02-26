@@ -1,6 +1,3 @@
-ToDo Major Process re-design:
-- CLEAN UP CART PULLS AND CUSTOM INSERT FORM BASED ON CART CONVERSION FROM TEMPLATE TO OPTIONS
-
 ToDo: 
 - Account for all special cases
 	- classes and their recurring weirdness
@@ -43,7 +40,6 @@ Future releases
 - find a better deployment than 'ftp-deploy'
 - handle invoices
 - have `item` settings store raw data instead of json encoded data
-- Linked list for items, have pricing based on itemID, remove products from the equation (folder structure) (item would have to be labeled [folder or file])
 - periodically make calls back to server to check for additions to php cart
 - register user / select address for a list of firm addresses
 - sync with Luke's UAN member site

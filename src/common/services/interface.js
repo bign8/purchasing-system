@@ -12,7 +12,7 @@ factory('interface', ['$http', '$q', '$rootScope', '$timeout', function ($http, 
 			if (loading) {
 				activeTimeout = $timeout(function() {
 					$rootScope.loadWarn = true;
-				}, 20*1000);
+				}, 15*1000);
 			}
 		}
 	);
