@@ -103,15 +103,8 @@ controller('DiscountEditCtrl', ['$scope', 'discount', 'DiscountService', '$locat
 		if (newValue === oldValue) return; // don't execute on initialization
 		for (var i = 0; i < newValue.length; i++) {
 			if ( !angular.equals(newValue[i], oldValue[i]) ) {
-				if (newValue[i] === null) {
-					// fix re-init error
-				} else if (newValue[i].itemID) {
-					$scope.discount.itemID = newValue[i].itemID; // changed itemID
-				} else if (i > 0) {
-					$scope.discount.itemID = newValue[i-1].itemID; // cleared current item;
-				} else {
-					$scope.discount.itemID = null; // set to a global discount
-				}
+				if (newValue[i] !== null) // item changed : cleared : global
+					$scope.discount.itemID = newValue[i].itemID ? newValue[i].itemID : i > 0 ? newValue[i-1].itemID : null ;
 				i = newValue.length; // exit loop
 				initValues();
 			}
