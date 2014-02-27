@@ -7,6 +7,7 @@ class Admin {
 
 		$admins = array(
 			'discount',
+			'firm',
 		);
 
 		if (in_array($area, $admins)) {
