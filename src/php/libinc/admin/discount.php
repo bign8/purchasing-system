@@ -51,11 +51,11 @@ class Discount extends NG {
 	public function set() {
 		$d = $this->getPostData();
 		if (isset($d->discountID)) {
-			$STH = $this->db->prepare("UPDATE discount SET name=?,code=?,amount=?,itemID=? WHERE discountID=?;");
-			if (!$STH->execute($d->name, $d->code, $d->amount, $d->itemID, $d->discountID)) return $this->conflict();
+			$STH = $this->db->prepare("UPDATE discount SET name=?,code=?,amount=?,itemID=?,compound=? WHERE discountID=?;");
+			if (!$STH->execute($d->name, $d->code, $d->amount, $d->itemID, $d->compound, $d->discountID)) return $this->conflict();
 		} else {
-			$STH = $this->db->prepare("INSERT INTO `discount` (`itemID`,`name`,`code`,`amount`,`active`) VALUES (?,?,?,?,'yes');");
-			if (!$STH->execute($d->itemID, $d->name, $d->code, $d->amount)) return $this->conflict();
+			$STH = $this->db->prepare("INSERT INTO `discount` (`itemID`,`name`,`code`,`amount`,`active`,`compound`) VALUES (?,?,?,?,'yes',?);");
+			if (!$STH->execute($d->itemID, $d->name, $d->code, $d->amount, $d->compound)) return $this->conflict();
 			$d = (object) array_merge( (array)$d, array('discountID' => $this->db->lastInsertId()) );
 		}
 		return $d;

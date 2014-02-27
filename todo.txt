@@ -22,7 +22,6 @@ In a holding pattern:
 	- Groups
 	- Items
 	- Memberships
-	- Products
 	- Purchases
 - Explain setting up an account (your information, not person signing up for conference)
 
