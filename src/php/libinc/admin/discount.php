@@ -42,7 +42,7 @@ class Discount extends NG {
 	// removes discount from db
 	public function rem() {
 		$data = $this->getPostData();
-		$STH = $this->db->prepare("DELETE FROM discount WHERE discountID=? LIMIT 1;");
+		$STH = $this->db->prepare("DELETE FROM discount WHERE discountID=?;");
 		if (!$STH->execute($data->discountID)) return $this->conflict();
 		return $data;
 	}
@@ -54,7 +54,7 @@ class Discount extends NG {
 			$STH = $this->db->prepare("UPDATE discount SET name=?,code=?,amount=?,itemID=?,compound=? WHERE discountID=?;");
 			if (!$STH->execute($d->name, $d->code, $d->amount, $d->itemID, $d->compound, $d->discountID)) return $this->conflict();
 		} else {
-			$STH = $this->db->prepare("INSERT INTO `discount` (`itemID`,`name`,`code`,`amount`,`active`,`compound`) VALUES (?,?,?,?,'yes',?);");
+			$STH = $this->db->prepare("INSERT INTO `discount` (`itemID`,`name`,`code`,`amount`,`active`,`compound`) VALUES (?,?,?,?,'true',?);");
 			if (!$STH->execute($d->itemID, $d->name, $d->code, $d->amount, $d->compound)) return $this->conflict();
 			$d = (object) array_merge( (array)$d, array('discountID' => $this->db->lastInsertId()) );
 		}
