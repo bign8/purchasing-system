@@ -62,9 +62,9 @@ controller('DiscountEditCtrl', ['$scope', 'discount', 'DiscountService', '$locat
 	$scope.discount = angular.copy(discount);
 	
 	// Initilize items to be indexed by itemID
-	$scope.items = {};
+	$scope.items = DiscountService.items; var itemHash = {}; // for parent hunt
 	angular.forEach(DiscountService.items, function (item) {
-		$scope.items[item.itemID ? item.itemID : 0] = item;
+		itemHash[item.itemID ? item.itemID : 0] = item;
 	});
 
 	$scope.setGlobal = function() {
@@ -89,7 +89,7 @@ controller('DiscountEditCtrl', ['$scope', 'discount', 'DiscountService', '$locat
 
 			// hunt for parents (including self)
 			do {
-				nextItem = $scope.items[ activeID ];
+				nextItem = itemHash[ activeID ];
 				$scope.viewItems.unshift( nextItem );
 				activeID = nextItem.parentID;
 			} while ( activeID );
@@ -105,6 +105,7 @@ controller('DiscountEditCtrl', ['$scope', 'discount', 'DiscountService', '$locat
 			if ( !angular.equals(newValue[i], oldValue[i]) ) {
 				if (newValue[i] !== null) // item changed : cleared : global
 					$scope.discount.itemID = newValue[i].itemID ? newValue[i].itemID : i > 0 ? newValue[i-1].itemID : null ;
+				$scope.discount.itemName = $scope.discount.itemID ? itemHash[$scope.discount.itemID].name : null; // assign itemName
 				i = newValue.length; // exit loop
 				initValues();
 			}
@@ -130,16 +131,6 @@ controller('DiscountEditCtrl', ['$scope', 'discount', 'DiscountService', '$locat
 		});
 	};
 }]).
-
-filter('filterItem', function() {
-	return function(list, parentID) {
-		var result = [];
-		angular.forEach(list, function (item, key) {
-			if ( item.parentID == parentID || null ) result.push(item); // add item as necessary
-		});
-		return result;
-	};
-}).
 
 factory('DiscountService', ['interface', '$q', function (interface, $q) {
 	var myDiscounts = {};
@@ -171,7 +162,7 @@ factory('DiscountService', ['interface', '$q', function (interface, $q) {
 		getDiscount: function (discountID) {
 			if (discountID == 'new') {
 				return service.getList().then(function () { // load all
-					return service.blankDiscount;
+					return {itemID:null, parentID:null, itemName:null, compound:'false'}; // blank discount
 				});
 			} else {
 				return myDiscounts[discountID] || service.getList().then(function () { // allways load all
@@ -198,8 +189,7 @@ factory('DiscountService', ['interface', '$q', function (interface, $q) {
 		items: [],
 		blankItem: function (parentID) {
 			return {parentID:parentID, name:'--- Select an Item ---'};
-		},
-		blankDiscount:{itemID:null, parentID:null, itemName:null}
+		}
 	};
 	return service;
 }]);
