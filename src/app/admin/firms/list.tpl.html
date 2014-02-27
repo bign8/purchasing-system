@@ -1,42 +1,30 @@
-<script type="text/ng-template" id="discountConfirmDelete.tpl.html">
-	<div class="modal-header">
-		<h3>Are you sure?</h3>
-	</div>
-	<div class="modal-body">
-		<p>Delete "<b>{{discount.name}}</b>" (<code>{{discount.code}}</code>)?</p>
-		<p>This action cannot be reversed.</p>
-	</div>
-	<div class="modal-footer">
-		<button class="btn btn-warning" ng-click="yes()">Yes</button>
-		<button class="btn btn-primary" ng-click="no()">No</button>
-	</div>
-</script>
-
 <div class="row">
-	<div class="span6" style="max-height:600px;overflow-x:hidden;overflow-y:auto">
-		<!-- <a href="/admin/discounts/new" class="btn btn-success pull-right btn-mini">New Discount</a> -->
-		<!-- <p>Click a discount to modify, toggle it's active status with the checkbox on the left, or delete a discount with the "x" on the right.</p> -->
-		<table class="table table-hover">
-			<thead>
-				<tr>
-					<th>Name</th>
-					<th>Website</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr ng-repeat="firm in firms" ng-click="edit(firm)" ng-class="{true:'info'}[firm.isActive]">
-					<td>{{firm.name}}</td>
-					<td>
-						{{firm.website}}
-						<button class="close pull-right">&times;</button>
-						<!-- <button class="close pull-right" ng-click="rem($event, discount)">&times;</button> -->
-					</td>
-				</tr>
-			</tbody>
-		</table>
+	<div class="span6">
+		<h3>All Firms</h3>
+		<button type="button" class="btn btn-success pull-right btn-mini" ng-click="newFirm()">New Firm</button>
+		<p>Click a firm to modify, or delete a firm with the "x" on the right.</p>
+		<div style="max-height:600px;overflow-x:hidden;overflow-y:auto">
+			<table class="table table-hover">
+				<thead>
+					<tr>
+						<th>Name</th>
+						<th>Website</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="firm in firms" ng-click="edit(firm)" ng-class="{true:'info'}[firm.isActive]">
+						<td>{{firm.name}}</td>
+						<td>
+							{{firm.website}}
+							<button class="close pull-right" ng-click="rem($event, firm)">&times;</button>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
 	</div>
 
-	<div class="span6 form-horizontal" ng-show="active">
+	<form name="firm" class="span6 form-horizontal" ng-show="active">
 		<h3 style="margin-left:180px">Firm Details</h3>
 		<div class="control-group">
 			<label class="control-label" for="name">Name *</label>
@@ -63,20 +51,18 @@
 						<button type="button" class="btn btn-warning" ng-click="setAddr()">Edit</button>
 					</div>
 				</div>
-				<div class="help-block">** Address changes are instantaneous within the dialog</div>
+				<div class="help-block">** Address changes are instantaneous (no save required)</div>
 			</div>
 		</div>
 		<div class="form-actions">
-			<button type="submit" class="btn btn-primary">Save Firm</button>&nbsp;
-			<!-- <button type="submit" class="btn btn-primary" ng-click="register()" ng-disabled="registration.$invalid">Save Firm</button>&nbsp; -->
+			<button type="submit" class="btn btn-primary" ng-disabled="firm.$invalid || equals(origin, active)" ng-click="save()">Save Firm</button>&nbsp;
+			<button type="button" class="btn btn-warning" ng-disabled="equals(origin, active)" ng-click="reset()">Reset</button>&nbsp;
 			<button type="button" class="btn" ng-click="cancel()">Cancel</button>
 		</div>
-		<!-- START DEV -->
-		<pre>{{active | json}}</pre>
-		<!-- END DEV -->
-	</div>
+	</form>
 </div>
 
 <!-- START DEV -->
+<pre>{{active | json}}</pre>
 <!-- <pre>{{firms | json}}</pre> -->
 <!-- END DEV -->

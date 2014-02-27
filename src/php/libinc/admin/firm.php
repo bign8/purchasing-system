@@ -10,10 +10,9 @@ class Firm extends NG {
 	public static function process( $action, &$pass, &$data ) {
 		$obj = new self();
 		switch ( $action ) {
-			case 'init':   $data = $obj->init();   break;
-			// case 'rem':    $data = $obj->rem();    break;
-			// case 'set':    $data = $obj->set();    break;
-			// case 'active': $data = $obj->active(); break;
+			case 'init': $data = $obj->init(); break;
+			case 'rem':  $data = $obj->rem();  break;
+			case 'set':  $data = $obj->set();  break;
 			default: $pass = false;
 		}
 	}
@@ -39,33 +38,25 @@ class Firm extends NG {
 		return $value;
 	}
 
-	// assigns discont activness
-	// public function active() {
-	// 	// $data = $this->getPostData();
-	// 	// $STH = $this->db->prepare("UPDATE discount SET active=? WHERE discountID=?;");
-	// 	// if (!$STH->execute($data->active, $data->discountID)) return $this->conflict();
-	// 	// return $data;
-	// }
-
 	// removes discount from db
-	// public function rem() {
-	// 	// $data = $this->getPostData();
-	// 	// $STH = $this->db->prepare("DELETE FROM discount WHERE discountID=? LIMIT 1;");
-	// 	// if (!$STH->execute($data->discountID)) return $this->conflict();
-	// 	// return $data;
-	// }
+	public function rem() {
+		$data = $this->getPostData();
+		$STH = $this->db->prepare("DELETE FROM firm WHERE firmID=?;");
+		if (!$STH->execute($data->firmID)) return $this->conflict();
+		return $data;
+	}
 
 	// stores discount changes
-	// public function set() {
-	// 	// $d = $this->getPostData();
-	// 	// if (isset($d->discountID)) {
-	// 	// 	$STH = $this->db->prepare("UPDATE discount SET name=?,code=?,amount=?,itemID=?,compound=? WHERE discountID=?;");
-	// 	// 	if (!$STH->execute($d->name, $d->code, $d->amount, $d->itemID, $d->compound, $d->discountID)) return $this->conflict();
-	// 	// } else {
-	// 	// 	$STH = $this->db->prepare("INSERT INTO `discount` (`itemID`,`name`,`code`,`amount`,`active`,`compound`) VALUES (?,?,?,?,'yes',?);");
-	// 	// 	if (!$STH->execute($d->itemID, $d->name, $d->code, $d->amount, $d->compound)) return $this->conflict();
-	// 	// 	$d = (object) array_merge( (array)$d, array('discountID' => $this->db->lastInsertId()) );
-	// 	// }
-	// 	// return $d;
-	// }
+	public function set() {
+		$d = $this->getPostData();
+		if (isset($d->firmID)) {
+			$STH = $this->db->prepare("UPDATE firm SET name=?,website=? WHERE firmID=?;");
+			if (!$STH->execute($d->name, $d->website, $d->firmID)) return $this->conflict();
+		} else {
+			$STH = $this->db->prepare("INSERT INTO firm (name, website, addressID) VALUES (?,?,?);");
+			if (!$STH->execute($d->name, $d->website, $d->addr->addressID)) return $this->conflict();
+			$d = (object) array_merge( (array)$d, array('firmID' => $this->db->lastInsertId()) );
+		}
+		return $d;
+	}
 }
