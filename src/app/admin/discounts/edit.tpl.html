@@ -56,7 +56,7 @@
 							<span ng-switch-default>Child {{$index}}</span>
 						</label>
 						<div class="controls">
-							<select ng-model="viewItems[$index]" ng-options="value.name for (key, value) in (items|filterItem:item.parentID)">
+							<select ng-model="viewItems[$index]" ng-options="value.name for (key, value) in items | filter:{parentID:item.parentID}">
 							</select>&nbsp;&nbsp;
 							<button type="button" class="btn btn-danger btn-mini" ng-click="clearItem($index, item.parentID)">Clear</button>
 						</div>
