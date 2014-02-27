@@ -29,26 +29,23 @@
 		</div>
 		<div class="span6">
 			<div class="form-horizontal well">
-				<button type="button" class="btn pull-right" ng-click="setGlobal()" ng-class="{'btn-success':!(viewProd.productID||viewItem.itemID)}">Global Discount</button>
+				<button type="button" class="btn pull-right" ng-click="setGlobal()" ng-class="{'btn-success':!(discount.itemID)}">Global Discount</button>
 
 				<h3>Applies To...</h3>
-				<p>Global discount if both boxes are blank</p>
-				<div class="control-group">
-					<label class="control-label" for="product">Product</label>
-					<div class="controls">
-						<select ng-model="viewProd" id="product" name="product" ng-options="x.name for x in products"></select>
-						&nbsp;&nbsp;
-						<button type="button" class="btn btn-info btn-mini" ng-click="setGlobal()">Clear</button>
-					</div>
-				</div>
+				<p>Discount is "Global" if <code>Global Discount</code> button is <span class="label label-success">green</span><br/><br/></p>
 
-				<div class="control-group">
-					<label class="control-label" for="item">Item</label>
-					<div class="controls">
-						<select ng-model="viewItem" id="item" name="item" ng-disabled="viewProd.productID==null"
-							ng-options="x.name for x in (items|filterProductIDNull:viewProd)"></select>
-							&nbsp;&nbsp;
-						<button type="button" class="btn btn-info btn-mini" ng-click="clearItem()">Clear</button>
+				<div ng-repeat="item in viewItems" ng-switch="item">
+					<div ng-switch-when="null" style="text-align:center">No More Children</div>
+					<div ng-switch-default class="control-group">
+						<label class="control-label" ng-switch="$first">
+							<span ng-switch-when="true">Item</span>
+							<span ng-switch-default>Child {{$index}}</span>
+						</label>
+						<div class="controls">
+							<select ng-model="viewItems[$index]" ng-options="value.name for (key, value) in (items|filterItem:item.parentID)">
+							</select>&nbsp;&nbsp;
+							<button type="button" class="btn btn-danger btn-mini" ng-click="clearItem($index, item.parentID)">Clear</button>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -62,3 +59,9 @@
 	</div>
 	
 </form>
+
+<!-- START DEV -->
+<pre>{{discount | json}}</pre>
+<pre>{{viewItems | json}}</pre>
+<!-- <pre>{{items | json}}</pre> -->
+<!-- END DEV -->
