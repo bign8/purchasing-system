@@ -44,9 +44,12 @@ class User extends NG {
 			isset($data->password) &&
 			$STH->execute( $data->email, sha1($data->password . config::encryptSTR) )
 		) {
-			$user = $this->cleanUser($STH->fetch( PDO::FETCH_ASSOC ));
-			$updateSTH = $this->db->prepare( "UPDATE `contact` SET lastLogin=CURRENT_TIMESTAMP, `resetHash`=NULL, `resetExpires`=NULL WHERE `contactID`=?;" );
-			$updateSTH->execute( $user['contactID'] );
+			$user = $STH->fetch();
+			if (isset($user['contactID'])) {
+				$user = $this->cleanUser( $user );
+				$updateSTH = $this->db->prepare( "UPDATE `contact` SET lastLogin=CURRENT_TIMESTAMP, `resetHash`=NULL, `resetExpires`=NULL WHERE `contactID`=?;" );
+				$updateSTH->execute( $user['contactID'] );
+			}
 		}
 		return $user;
 	}
