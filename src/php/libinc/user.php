@@ -15,6 +15,7 @@ class User extends NG {
 			case 'addAddress':  $data = $obj->addAddress();  break;
 			case 'addContact':  $data = $obj->addContact();  break;
 			case 'addFirmCode': $data = $obj->addFirmCode(); break;
+			case 'softFirmCode':$data = $obj->softFirmCode();break;
 			case 'addUser':     $data = $obj->addUser();     break;
 			case 'checkEmail':  $data = $obj->checkEmail();  break;
 			case 'checkReset':  $data = $obj->checkReset();  break;
@@ -37,16 +38,23 @@ class User extends NG {
 	// Worker(security): Implements: returns database user object or null
 	protected function getUser( $data ) {
 		$user = NULL;
-		$STH = $this->db->prepare("SELECT * FROM `contact` WHERE `email`=? AND `pass`=ENCRYPT(?,?) LIMIT 1;");
-		if ( $STH->execute( $data->email, $data->password, config::encryptSTR ) && $STH->rowCount() > 0 ) {
-			$user = $this->cleanUser($STH->fetch( PDO::FETCH_ASSOC ));
-			$updateSTH = $this->db->prepare( "UPDATE `contact` SET lastLogin=NOW(), `resetHash`=NULL, `resetExpires`=NULL WHERE `contactID`=?;" );
-			$updateSTH->execute( $user['contactID'] );
+		$STH = $this->db->prepare("SELECT * FROM `contact` WHERE `email`=? AND `pass`=? LIMIT 1;");
+		if (
+			isset($data->email) &&
+			isset($data->password) &&
+			$STH->execute( $data->email, sha1($data->password . config::encryptSTR) )
+		) {
+			$user = $STH->fetch();
+			if (isset($user['contactID'])) {
+				$user = $this->cleanUser( $user );
+				$updateSTH = $this->db->prepare( "UPDATE `contact` SET lastLogin=CURRENT_TIMESTAMP, `resetHash`=NULL, `resetExpires`=NULL WHERE `contactID`=?;" );
+				$updateSTH->execute( $user['contactID'] );
+			}
 		}
 		return $user;
 	}
 	private function cleanUser( $user ) { // helper: getUser + resetPass
-		$user['admin'] = $user['isAdmin'] == 'yes';
+		$user['admin'] = $user['isAdmin'] == 'true';
 		unset( $user['pass'], $user['resetHash'], $user['resetExpires'], $user['isAdmin'] );
 		return $user;
 	}
@@ -65,15 +73,33 @@ class User extends NG {
 	public function addFirmCode() {
 		$data = $this->getPostData();
 		$user = $this->requiresAuth();
-		$existSTH = $this->db->prepare("SELECT * FROM `group` WHERE shortCode=?;"); // check code
-		if (!$existSTH->execute( $data->code ) || $existSTH->rowCount() < 1) return $this->conflict('dne');
-		$group = $existSTH->fetch( PDO::FETCH_ASSOC );
+		$existSTH = $this->db->prepare("SELECT * FROM `item` WHERE code=?;"); // check code
+		if (!$existSTH->execute( $data->code )) return $this->conflict();
+		$group = $existSTH->fetch();
+		if ($group == false || $group == null) return $this->conflict('dne');
 
-		$checkSTH = $this->db->prepare("SELECT * FROM `member` WHERE firmID=? AND groupID=?;"); // do we have it?
-		if (!$checkSTH->execute( $user['firmID'], $group['groupID'] ) || $checkSTH->rowCount() >= 1) return $this->conflict('dup');
+		$checkSTH = $this->db->prepare("SELECT * FROM `purchase` WHERE firmID=? AND itemID=?;"); // do we have it?
+		if (!$checkSTH->execute( $user['firmID'], $group['itemID'] ) || $checkSTH->fetch() != false) return $this->conflict('dup');
 
-		$insSTH = $this->db->prepare("INSERT INTO `member` (firmID, groupID) VALUES (?, ?);"); // iff not add it
-		if (!$insSTH->execute( $user['firmID'], $group['groupID'] )) return $this->conflict();
+		$insSTH = $this->db->prepare("INSERT INTO `purchase` (firmID,itemID,data,isMember) VALUES (?,?,?,?);"); // iff not add it
+		if (!$insSTH->execute( $user['firmID'], $group['itemID'], 'manual', 'true' )) return $this->conflict();
+
+		$this->addFirmCodeEmail($group, $user);
+		return $group;
+	}
+	public function softFirmCode() { // same as above but without conflicts
+		$data = $this->getPostData();
+		$user = $this->requiresAuth();
+		$existSTH = $this->db->prepare("SELECT * FROM `item` WHERE code=?;"); // check code
+		if (!$existSTH->execute( $data->code )) return $this->conflict();
+		$group = $existSTH->fetch();
+		if ($group == false || $group == null) return 'dne';
+
+		$checkSTH = $this->db->prepare("SELECT * FROM `purchase` WHERE firmID=? AND itemID=?;"); // do we have it?
+		if (!$checkSTH->execute( $user['firmID'], $group['itemID'] ) || $checkSTH->fetch() != false) return 'dup';
+
+		$insSTH = $this->db->prepare("INSERT INTO `purchase` (firmID,itemID,data,isMember) VALUES (?,?,?,?);"); // iff not add it
+		if (!$insSTH->execute( $user['firmID'], $group['itemID'], 'manual', 'true' )) return $this->conflict();
 
 		$this->addFirmCodeEmail($group, $user);
 		return $group;
@@ -81,7 +107,7 @@ class User extends NG {
 	private function addFirmCodeEmail($group, $user) { // Helper: addFirmCode
 		$firmSTH = $this->db->prepare("SELECT * FROM `firm` WHERE `firmID`=?;");
 		$firmSTH->execute($user['firmID']);
-		$firm = $firmSTH->fetch( PDO::FETCH_ASSOC );
+		$firm = $firmSTH->fetch();
 
 		$html = <<<HTML
 			<p>The firm "{$firm['name']}" ({$firm['website']}) has been added to the group "{$group['name']}".</p>
@@ -101,7 +127,7 @@ HTML;
 	// Worker(settings/firmCode): returns firm membership data
 	public function getFirmMem() {
 		$user = $this->requiresAuth();
-		$memSTH = $this->db->prepare("SELECT g.* FROM `member` m LEFT JOIN `group` g ON m.groupID=g.groupID WHERE `firmID`=?;");
+		$memSTH = $this->db->prepare("SELECT i.* FROM purchase p LEFT JOIN item i ON p.itemID=i.itemID WHERE firmID=? AND isMember='true';");
 		if (!$memSTH->execute( $user['firmID'] )) return $this->conflict();
 		return $memSTH->fetchAll( PDO::FETCH_ASSOC );
 	}
@@ -145,31 +171,32 @@ HTML;
 	// Worker(register): sees if email is in use
 	public function checkEmail() {
 		$data = $this->getPostData();
-		$STH = $this->db->prepare("SELECT * FROM `contact` WHERE `email`=?;");
-		if ( !$STH->execute($data->email) || $STH->rowCount() > 0 ) return $this->conflict('dup');
+		$STH = $this->db->prepare("SELECT count(*) FROM `contact` WHERE `email`=?;");
+		if ( !$STH->execute($data->email) ) return $this->conflict();
+		if ( $STH->fetchColumn() > 0 ) return $this->conflict('dup');
 		return 'good';
 	}
 
 	// Worker(reset): sends reset emails
 	public function reset() {
 		$data = $this->getPostData();
-		$getSTH = $this->db->prepare("SELECT *, SHA1(CONCAT(email, ?, NOW())) AS newHash FROM `contact` WHERE `email`=?;");
-		if (!$getSTH->execute( config::encryptSTR, $data->email ) || $getSTH->rowCount() < 1) return $this->conflict('no-email');
+		$getSTH = $this->db->prepare("SELECT * FROM `contact` WHERE `email`=?;");
+		if (!$getSTH->execute( $data->email )) return $this->conflict('no-email');
 		$user = $getSTH->fetch( PDO::FETCH_ASSOC );
-
-		$setSTH = $this->db->prepare("UPDATE `contact` SET `resetHash`=?, `resetExpires`=NOW() + INTERVAL 3 DAY WHERE `contactID`=?;");
-		if (!$setSTH->execute($user['newHash'], $user['contactID'] )) return $this->conflict();
+		$newHash = sha1( $data->email . config::encryptSTR . date('c') );
+		$setSTH = $this->db->prepare("UPDATE `contact` SET `resetHash`=?, `resetExpires`=date('now', '+3 DAYS') WHERE `contactID`=?;");
+		if (!$setSTH->execute($newHash, $user['contactID'] )) return $this->conflict();
 
 		$html = <<<HTML
 			<p>You requested that your payment.upstreamacademy.com account password be reset.  This notice tells you how to do exactly that.</p>
 			<p>
 				Please navigate to our 
-				<a href="http://payment.upstreamacademy.com/reset/{$user['newHash']}">password reset page</a> 
+				<a href="http://payment.upstreamacademy.com/reset/{$newHash}">password reset page</a> 
 				to assign yourself a new password.
 			</p>
 			<p>
 				If the above link does not work, try navigating to this address manually:
-				<b>http://payment.upstreamacademy.com/reset/{$user['newHash']}</b>
+				<b>http://payment.upstreamacademy.com/reset/{$newHash}</b>
 			</p>
 			<p>
 				You have <b>3</b> days to reset your password, after which time, 
@@ -184,19 +211,19 @@ HTML;
 	// Worker(reset): returns user object
 	public function checkReset() {
 		$data = $this->getPostData();
-		$STH = $this->db->prepare("SELECT * FROM `contact` WHERE `resetHash`=? AND `resetExpires` > NOW() LIMIT 0,1;");
+		$STH = $this->db->prepare("SELECT * FROM `contact` WHERE `resetHash`=? AND `resetExpires` > CURRENT_TIMESTAMP LIMIT 0,1;");
 		if (!$STH->execute($data->hash)) return $this->conflict();
-		return $STH->rowCount();
+		return count($STH->fetchAll());
 	}
 
 	// Worker(reset): updates password, and assigns user (logs in)
 	public function resetPass() {
 		$data = $this->getPostData();
-		$getSTH = $this->db->prepare("SELECT * FROM `contact` WHERE `resetHash`=? AND `resetExpires` > NOW() LIMIT 0,1;");
-		if (!$getSTH->execute($data->hash) || $getSTH->rowCount() < 1) return $this->conflict();
+		$getSTH = $this->db->prepare("SELECT * FROM `contact` WHERE `resetHash`=? AND `resetExpires` > CURRENT_TIMESTAMP LIMIT 0,1;");
+		if (!$getSTH->execute($data->hash)) die($this->conflict());
 		$user = $getSTH->fetch( PDO::FETCH_ASSOC );
-		$setSTH = $this->db->prepare("UPDATE `contact` SET `lastLogin`=NOW(),`pass`=ENCRYPT(?,?),`resetHash`=NULL,`resetExpires`=NULL WHERE `contactID`=?;");
-		if ( !$setSTH->execute( $data->password, config::encryptSTR, $user['contactID'] ) ) return $this->conflict();
+		$setSTH = $this->db->prepare("UPDATE `contact` SET `lastLogin`=CURRENT_TIMESTAMP,`pass`=?,`resetHash`=NULL,`resetExpires`=NULL WHERE `contactID`=?;");
+		if ( !$setSTH->execute( sha1($data->password . config::encryptSTR), $user['contactID'] ) ) die($this->conflict());
 		$_SESSION['user'] = $this->cleanUser($user);
 		return $_SESSION['user'];
 	}
@@ -234,7 +261,7 @@ HTML;
 		);
 	}
 	private function getFirmEmploy( $firmID ) { // Helper: return firms employees
-		$STH = $this->db->prepare("SELECT c.contactID, c.firmID, c.legalName, c.preName, c.title, c.email, c.phone, a.* FROM (SELECT * FROM `contact` WHERE `firmID`=?) c LEFT JOIN `address` a ON c.addressID=a.addressID;");
+		$STH = $this->db->prepare("SELECT * FROM (SELECT * FROM `contact` WHERE `firmID`=?) c LEFT JOIN `address` a ON c.addressID=a.addressID;");
 		if (!$STH->execute( $firmID )) return -1;
 		$ret = $STH->fetchAll( PDO::FETCH_ASSOC );
 		foreach ($ret as &$value) $this->cleanAddress( $value );
@@ -319,7 +346,7 @@ HTML;
 		// check to see if user is already in system (email)
 		$checkSTH = $this->db->prepare("SELECT * FROM `contact` WHERE email=?;");
 		if (!$checkSTH->execute($d->email)) return $this->conflict();
-		if ($checkSTH->rowCount() > 0) return $this->conflict('dup');
+		if (count($checkSTH->fetchAll()) > 0) return $this->conflict('dup');
 
 		// Add/modify firm
 		$editFirm = false;
@@ -337,8 +364,8 @@ HTML;
 			$firmID = $this->db->lastInsertId();
 		}
 		// Add Contact
-		$contSTH = $this->db->prepare("INSERT INTO `contact` (firmID, addressID, legalName, preName, title, email, phone, pass) VALUES (?,?,?,?,?,?,?,ENCRYPT(?,?));");
-		if (!$contSTH->execute( $firmID, $d->addr->addressID, $d->legalName, $d->preName, $d->title, $d->email, $d->phone, $d->password, config::encryptSTR )) return $this->conflict();
+		$contSTH = $this->db->prepare("INSERT INTO `contact` (firmID, addressID, legalName, preName, title, email, phone, pass) VALUES (?,?,?,?,?,?,?,?);");
+		if (!$contSTH->execute( $firmID, $d->addr->addressID, $d->legalName, $d->preName, $d->title, $d->email, $d->phone, sha1($d->password . config::encryptSTR) )) return $this->conflict();
 		$_SESSION['user'] = $this->getUser( $d );
 
 		if ($editFirm) {
@@ -367,10 +394,10 @@ HTML;
 	// Worker: returns full user object
 	public function getFullUser() {
 		$user = $this->requiresAuth();
-		$userSTH = $this->db->prepare("SELECT c.contactID, c.firmID, c.legalName, c.preName, c.title, c.email, c.phone, a.* FROM (SELECT * FROM `contact` WHERE `contactID`=?) c LEFT JOIN `address` a ON c.addressID=a.addressID;");
+		$userSTH = $this->db->prepare("SELECT contactID, firmID, legalName, preName, title, email, phone, a.* FROM (SELECT * FROM `contact` WHERE `contactID`=?) c LEFT JOIN `address` a ON c.addressID=a.addressID;");
 		if (!$userSTH->execute( $user['contactID'] )) return $this->conflict();
 		$userData = $this->cleanAddress( $userSTH->fetch( PDO::FETCH_ASSOC ) );
-		$firmSTH = $this->db->prepare("SELECT c.firmID, c.name, c.website, a.* FROM (SELECT * FROM `firm` WHERE `firmID`=?) c LEFT JOIN `address` a ON c.addressID=a.addressID;");
+		$firmSTH = $this->db->prepare("SELECT firmID, name, website, a.* FROM (SELECT * FROM `firm` WHERE `firmID`=?) c LEFT JOIN `address` a ON c.addressID=a.addressID;");
 		if (!$firmSTH->execute( $userData['firmID'] )) return $this->conflict();
 		$userData['firm'] = $this->cleanAddress( $firmSTH->fetch( PDO::FETCH_ASSOC ) );
 		return $userData;
@@ -384,14 +411,14 @@ HTML;
 		// check to see if user is already in system (email)
 		$checkSTH = $this->db->prepare("SELECT * FROM `contact` WHERE email=? AND contactID!=?;");
 		if (!$checkSTH->execute($d->email, $user['contactID'])) return $this->conflict();
-		if ($checkSTH->rowCount() > 0) return $this->conflict('dup');
+		if (count($checkSTH->fetchAll()) > 0) return $this->conflict('dup');
 
 		// Update Password
 		if (isset($d->oldPass) && $d->oldPass != '') {
-			$chkSTH = $this->db->prepare("SELECT * FROM `contact` WHERE `contactID`=? AND `pass`=ENCRYPT(?,?);");
-			if ( $chkSTH->execute( $user['contactID'], $d->oldPass, config::encryptSTR ) && $chkSTH->rowCount() > 0 ) {
-				$pasSTH = $this->db->prepare("UPDATE `contact` SET `pass`=ENCRYPT(?,?) WHERE `contactID`=?;");
-				if ( !$pasSTH->execute( $d->password, config::encryptSTR, $user['contactID'] ) ) return $this->conflict();
+			$chkSTH = $this->db->prepare("SELECT * FROM `contact` WHERE `contactID`=? AND `pass`=?;");
+			if ( $chkSTH->execute( $user['contactID'], sha1($d->oldPass . config::encryptSTR) ) && count($chkSTH->fetchAll()) > 0 ) {
+				$pasSTH = $this->db->prepare("UPDATE `contact` SET `pass`=? WHERE `contactID`=?;");
+				if ( !$pasSTH->execute( sha1($d->password . config::encryptSTR), $user['contactID'] ) ) return $this->conflict();
 			} else return $this->conflict('badPass');
 		}
 
@@ -422,10 +449,10 @@ HTML;
 		$STH = $this->db->prepare("SELECT * FROM `contact` WHERE `contactID`=? LIMIT 1;");
 		if ( $STH->execute( $user['contactID'] ) && $STH->rowCount() > 0 ) {
 			$newUser = $STH->fetch( PDO::FETCH_ASSOC );
-			$newUser['admin'] = $newUser['isAdmin'] == 'yes';
+			$newUser['admin'] = $newUser['isAdmin'] == 'true';
 			unset( $newUser['pass'], $newUser['resetHash'], $newUser['resetExpires'], $newUser['isAdmin'] );
 
-			$updateSTH = $this->db->prepare( "UPDATE `contact` SET lastLogin=NOW() WHERE `contactID`=?;" );
+			$updateSTH = $this->db->prepare( "UPDATE `contact` SET lastLogin=CURRENT_TIMESTAMP WHERE `contactID`=?;" );
 			$updateSTH->execute( $newUser['contactID'] );
 			$this->modifyUserEmail($_SESSION['user'], $newUser);
 			$_SESSION['user'] = $newUser;

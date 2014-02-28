@@ -129,7 +129,6 @@ controller('RegisterConferenceCtrl', ['$scope', 'myPage', 'interface', 'conferen
 
 	// Generic fields helper
 	$scope.temp = {};
-	var helpers = 
 	$scope.helpers = {
 		otherSelect: {
 			pre: function(arr) {

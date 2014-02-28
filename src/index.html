@@ -34,18 +34,19 @@
 
 							<ul class="nav">
 								<li ng-class="{active: breadcrumbs.onPage('Cart')}"><a href="/cart">Shopping Cart</a></li>
-								<li ng-class="{active: breadcrumbs.onPage('purchases')}" ng-show="security.isAuthenticated()"><a href="/purchases">Past Purchases</a></li>
+								<li ng-class="{active: breadcrumbs.onPage('Purchases')}" ng-show="security.isAuthenticated()"><a href="/purchases">Past Purchases</a></li>
 							</ul>
 
 							<ul class="nav pull-right">
 								<li ng-class="{active: breadcrumbs.onPage('Payment')}"><a href="/payment">Make A Payment</a></li>
-								<li class="dropdown" ng-class="{active:breadcrumbs.onPage('admin'), open:isAdminOpen}" ng-show="security.isAdmin()">
+								<li class="dropdown" ng-class="{active:breadcrumbs.onPage('Admin'), open:isAdminOpen}" ng-show="security.isAdmin()">
 									<a id="adminmenu" role="button" class="dropdown-toggle" ng-click="isAdminOpen=!isAdminOpen">
 										Admin<b class="caret"></b>
 									</a>
 									<ul class="dropdown-menu" role="menu" aria-labelledby="adminmenu">
 										<li><a tabindex="-1" href="/admin" ng-click="isAdminOpen=false"><b>Overview</b></a></li>
 										<li><a tabindex="-1" href="/admin/discounts" ng-click="isAdminOpen=false">Discounts</a></li>
+										<li><a tabindex="-1" href="/admin/firms" ng-click="isAdminOpen=false">Firms</a></li>
 									</ul>
 								</li>
 								<li><login-toolbar class="visible-desktop"></login-toolbar></li>
@@ -73,7 +74,7 @@
 				<div>
 					<img width="16" height="11" alt="..." src="data:image/gif;base64,R0lGODlhEAALAPQAAP///wAAANra2tDQ0Orq6gYGBgAAAC4uLoKCgmBgYLq6uiIiIkpKSoqKimRkZL6+viYmJgQEBE5OTubm5tjY2PT09Dg4ONzc3PLy8ra2tqCgoMrKyu7u7gAAAAAAAAAAACH+GkNyZWF0ZWQgd2l0aCBhamF4bG9hZC5pbmZvACH5BAALAAAAIf8LTkVUU0NBUEUyLjADAQAAACwAAAAAEAALAAAFLSAgjmRpnqSgCuLKAq5AEIM4zDVw03ve27ifDgfkEYe04kDIDC5zrtYKRa2WQgAh+QQACwABACwAAAAAEAALAAAFJGBhGAVgnqhpHIeRvsDawqns0qeN5+y967tYLyicBYE7EYkYAgAh+QQACwACACwAAAAAEAALAAAFNiAgjothLOOIJAkiGgxjpGKiKMkbz7SN6zIawJcDwIK9W/HISxGBzdHTuBNOmcJVCyoUlk7CEAAh+QQACwADACwAAAAAEAALAAAFNSAgjqQIRRFUAo3jNGIkSdHqPI8Tz3V55zuaDacDyIQ+YrBH+hWPzJFzOQQaeavWi7oqnVIhACH5BAALAAQALAAAAAAQAAsAAAUyICCOZGme1rJY5kRRk7hI0mJSVUXJtF3iOl7tltsBZsNfUegjAY3I5sgFY55KqdX1GgIAIfkEAAsABQAsAAAAABAACwAABTcgII5kaZ4kcV2EqLJipmnZhWGXaOOitm2aXQ4g7P2Ct2ER4AMul00kj5g0Al8tADY2y6C+4FIIACH5BAALAAYALAAAAAAQAAsAAAUvICCOZGme5ERRk6iy7qpyHCVStA3gNa/7txxwlwv2isSacYUc+l4tADQGQ1mvpBAAIfkEAAsABwAsAAAAABAACwAABS8gII5kaZ7kRFGTqLLuqnIcJVK0DeA1r/u3HHCXC/aKxJpxhRz6Xi0ANAZDWa+kEAA7AAAAAAAAAAAA" />
 					<p>Please wait</p>
-					<p ng-show="loadWarn" class="warn" style="display:none">
+					<p ng-show="loadWarn" class="warn ng-hide">
 						It appears to be taking longer than expected.<br/>
 						You can <a href="javascript:window.location.reload()">refresh</a> the page if you wish.
 					</p>

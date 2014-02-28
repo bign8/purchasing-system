@@ -24,11 +24,12 @@ controller('ResetPassCtrl', ['$scope', 'check', 'security', '$route', 'appString
 		$scope.processing = true;
 		if ($scope.user.passVerify != $scope.user.password) {
 			$scope.message = appStrings.reset.match();
+			$scope.processing = false;
 			return;
 		}
 		security.resetPass($scope.user.hash, $scope.user.password).catch(function() {
 			$scope.message = appStrings.reset.error();
-			processing = false;
+			$scope.processing = false;
 		});
 	};
 }]);

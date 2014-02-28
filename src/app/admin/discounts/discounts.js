@@ -40,7 +40,7 @@ controller('DiscountListCtrl', ['$scope', 'discounts', '$modal', '$location', 'D
 		$event.stopPropagation();
 		var modalInstance = $modal.open({
 			templateUrl: 'discountConfirmDelete.tpl.html',
-			controller: ['$scope', '$modalInstance', 'discount', function($scope, $modalInstance, discount) {
+			controller: ['$scope', '$modalInstance', 'discount', function ($scope, $modalInstance, discount) {
 				$scope.discount = discount;
 				$scope.yes = function() { $modalInstance.close(); };
 				$scope.no = function() { $modalInstance.dismiss(); };
@@ -60,43 +60,57 @@ controller('DiscountListCtrl', ['$scope', 'discounts', '$modal', '$location', 'D
 controller('DiscountEditCtrl', ['$scope', 'discount', 'DiscountService', '$location', function ($scope, discount, DiscountService, $location) {
 	$scope.orig = angular.copy(discount);
 	$scope.discount = angular.copy(discount);
-	$scope.items = DiscountService.items;
-	$scope.products = DiscountService.products;
+	
+	// Initilize items to be indexed by itemID
+	$scope.items = DiscountService.items; var itemHash = {}; // for parent hunt
+	angular.forEach(DiscountService.items, function (item) {
+		itemHash[item.itemID ? item.itemID : 0] = item;
+	});
 
 	$scope.setGlobal = function() {
-		$scope.viewProd = DiscountService.blankProd;
-		$scope.viewItem = DiscountService.blankItem;
+		$scope.discount.itemID = null;
+		initValues();
 	};
-	$scope.clearItem = function() {
-		$scope.viewItem = DiscountService.blankItem;
+	$scope.clearItem = function( index, parentID ) {
+		$scope.viewItems = $scope.viewItems.slice(0, index+1);
+		$scope.viewItems[index] = DiscountService.blankItem(parentID);
 	};
 	var initValues = function() {
-		if (discount.productID) {
-			$scope.clearItem();
-			angular.forEach($scope.products, function (product) { // find product
-				if (product.productID == discount.productID) $scope.viewProd = product;
+		$scope.viewItems = [];
+
+		if ($scope.discount.itemID) {
+			var activeID = $scope.discount.itemID, nextItem, hasMore = false;
+
+			// hunt for children
+			angular.forEach($scope.items, function (ele) {
+				if (ele.parentID == activeID) hasMore = true;
 			});
-		} else if (discount.itemID) {
-			angular.forEach($scope.items, function (item) { // find item
-				if (item.itemID == discount.itemID) $scope.viewItem = item;
-			});
-			angular.forEach($scope.products, function (product) { // find item's parent product
-				if (product.productID == $scope.viewItem.productID) $scope.viewProd = product;
-			});
+			$scope.viewItems.push( hasMore ? DiscountService.blankItem( activeID ) : null );
+
+			// hunt for parents (including self)
+			do {
+				nextItem = itemHash[ activeID ];
+				$scope.viewItems.unshift( nextItem );
+				activeID = nextItem.parentID;
+			} while ( activeID );
 		} else {
-			$scope.setGlobal();
+			$scope.viewItems.push( DiscountService.blankItem( null ) );
 		}
 	};
 	initValues();
 
-	$scope.$watch('viewProd', function (val) {
-		$scope.discount.productID = val.productID;
-		$scope.discount.productName = (val.productID) ? val.name : null;
-	});
-	$scope.$watch('viewItem', function (val) {
-		$scope.discount.itemID = val.itemID;
-		$scope.discount.itemName = (val.itemID) ? val.name : null;
-	});
+	$scope.$watch('viewItems', function (newValue, oldValue) {
+		if (newValue === oldValue) return; // don't execute on initialization
+		for (var i = 0; i < newValue.length; i++) {
+			if ( !angular.equals(newValue[i], oldValue[i]) ) {
+				if (newValue[i] !== null) // item changed : cleared : global
+					$scope.discount.itemID = newValue[i].itemID ? newValue[i].itemID : i > 0 ? newValue[i-1].itemID : null ;
+				$scope.discount.itemName = $scope.discount.itemID ? itemHash[$scope.discount.itemID].name : null; // assign itemName
+				i = newValue.length; // exit loop
+				initValues();
+			}
+		}
+	}, true);
 
 	$scope.$watch('discount.code', function (val) { // check for duplicate codes
 		var clean = true;
@@ -118,34 +132,22 @@ controller('DiscountEditCtrl', ['$scope', 'discount', 'DiscountService', '$locat
 	};
 }]).
 
-filter('filterProductIDNull', function() {
-	return function(list, prod) {
-		var result = [];
-		angular.forEach(list, function (item) {
-			if (item.productID == (prod||{}).productID || item.productID === null) result.push(item);
-		});
-		return result;
-	};
-}).
-
 factory('DiscountService', ['interface', '$q', function (interface, $q) {
-	var casheDiscounts = {};
+	var myDiscounts = {};
 	var service = {
 		getList: function () {
 			var ret = $q.defer();
-			if ( Object.keys(casheDiscounts).length > 0 ) {
+			if ( Object.keys(myDiscounts).length > 0 ) {
 				ret.resolve( service.theList() );
 				ret = ret.promise; // funky way to return a promise
 			} else {
-				ret = interface.admin('getDiscountData').then(function (data) {
+				ret = interface.admin('discount-init').then(function (data) {
 					service.items = data.items;
-					service.products = data.products;
-					service.items.unshift(service.blankItem);
-					service.products.unshift(service.blankProd);
+					// service.items.unshift(service.blankItem);
 
-					angular.forEach(data.discounts, function(discount) {
+					angular.forEach(data.discounts, function (discount) {
 						discount.amount = parseInt(discount.amount);
-						casheDiscounts[discount.discountID] = discount;
+						myDiscounts[discount.discountID] = discount;
 					});
 					return data.discounts;
 				});
@@ -154,41 +156,40 @@ factory('DiscountService', ['interface', '$q', function (interface, $q) {
 		},
 		theList: function () {
 			var arr = [];
-			for (var key in casheDiscounts) arr.push(casheDiscounts[key]);
+			for (var key in myDiscounts) arr.push(myDiscounts[key]);
 			return arr;
 		},
 		getDiscount: function (discountID) {
 			if (discountID == 'new') {
 				return service.getList().then(function () { // load all
-					return service.blankDiscount;
+					return {itemID:null, parentID:null, itemName:null, compound:'false'}; // blank discount
 				});
 			} else {
-				return casheDiscounts[discountID] || service.getList().then(function () { // allways load all
-					return casheDiscounts[discountID];
+				return myDiscounts[discountID] || service.getList().then(function () { // allways load all
+					return myDiscounts[discountID];
 				});
 			}
 		},
 		setActive: function (discount) {
-			return interface.admin('setDiscountActive', discount).then(function (res) {
-				casheDiscounts[res.discountID] = res;
+			return interface.admin('discount-active', discount).then(function (res) {
+				myDiscounts[res.discountID] = res;
 				return res;
 			});
 		},
 		rem: function (discount) {
-			return interface.admin('remDiscount', discount).then(function (res) {
-				delete casheDiscounts[discount.discountID];
+			return interface.admin('discount-rem', discount).then(function (res) {
+				delete myDiscounts[discount.discountID];
 			});
 		},
 		save: function (discount) {
-			return interface.admin('setDiscount', discount).then(function (res) {
-				casheDiscounts[res.discountID] = res;
+			return interface.admin('discount-set', discount).then(function (res) {
+				myDiscounts[res.discountID] = res;
 			});
 		},
 		items: [],
-		products: [],
-		blankItem: {itemID:null, productID:null, name:'--- Select an Item ---'},
-		blankProd: {productID:null, name:'--- Select a Product ---'},
-		blankDiscount:{itemID:null, productID:null, productName:null, itemName:null}
+		blankItem: function (parentID) {
+			return {parentID:parentID, name:'--- Select an Item ---'};
+		}
 	};
 	return service;
 }]);
