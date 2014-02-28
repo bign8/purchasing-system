@@ -166,17 +166,22 @@ factory('appStrings', function() {
 			dupCode: { // duplicate membership
 				pre:'Duplicate Membership!',
 				msg:'Your firm already has membership in this group.',
-				type:Error
+				type:ERROR
 			},
 			dneCode: { // membership does not exist
 				pre:'Does Not Exist!',
 				msg:'This firm code does not exist.',
-				type:Error
+				type:ERROR
 			},
 			errCode: {
 				pre:'Error!',
 				msg:'There was an unknown error checking you group access code.  Please try again or contact UpstreamAcademy for help.',
-				type:Error
+				type:ERROR
+			},
+			goodCode: {
+				pre:'Success!',
+				msg:'Your Firm membership has been approved and has been added to your account.',
+				type:SUCCESS
 			}
 		},
 		address: {

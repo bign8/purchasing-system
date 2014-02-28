@@ -39,6 +39,15 @@ class NG {
 		return strtr($message, $replace); // interpolate replacement values into the message
 	}
 
+	// Helper(app): returns interpolated item (see: http://bit.ly/198oCOP)
+	protected function interpolate2( $message, array $context = array()) {
+		$callback = function ($matches) use ($context) { // function that formats data as specified
+			$format = $matches[2] == '' ? '%s' : $matches[2] ; // default format
+			return (isset($context[$matches[1]])) ? sprintf($format, $context[$matches[1]]) : $matches[0];
+		};
+		return preg_replace_callback( '/{([^\|}]+)\|?([^}]*)}/', $callback, $message ); // replacement query
+	}
+
 	// Helper(cart->setOptions): converts stdObjects to array (see: http://bit.ly/1eJETYC)
 	protected function object_to_array($obj) {
 		$arrObj = is_object($obj) ? get_object_vars($obj) : $obj;
@@ -65,7 +74,9 @@ class NG {
 
 		if ( isset($q) ) {
 			$STH = $this->db->prepare( "SELECT $q=? LIMIT 1;" );
-			if ( $STH->execute( @$data->name ) && $STH->rowCount() > 0 ) $ret = $STH->fetchColumn();
+			$test = $STH->execute( @$data->name );
+			$value = $STH->fetchColumn();
+			if ( $test && $value !== false ) $ret = $value;
 		}
 		return $ret;
 	}

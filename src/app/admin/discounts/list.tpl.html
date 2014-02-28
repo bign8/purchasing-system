@@ -22,24 +22,28 @@
 					<th>Name</th>
 					<th>Items</th>
 					<th>Code</th>
+					<th>Compounds</th>
 					<th>Amount</th>
 				</tr>
 			</thead>
 			<tbody>
 				<tr ng-repeat="discount in discounts" ng-click="edit(discount)">
 					<td>
-						<input type="checkbox" ng-model="discount.active" ng-true-value="yes" ng-false-value="no" 
+						<input type="checkbox" ng-model="discount.active" ng-true-value="true" ng-false-value="false" 
 							title="Enable/Disable Code" ng-change="change(discount)" ng-click="clickCatch($event)" />
 						&nbsp;&nbsp;
 						{{discount.name}}
 					</td>
-					<td ng-switch="(discount.itemID==null)*2 + (discount.productID==null)">
-						<span ng-switch-when="1">Item: <em>{{discount.itemName}}</em> of Product: <em>{{discount.productName}}</em></span>
-						<span ng-switch-when="2">Product: <em>{{discount.productName}}</em></span>
-						<span ng-switch-when="3"><em>Global Discount</em></span>
-						<span ng-switch-default>What?</span>
+					<td ng-switch="discount.itemID">
+						<span ng-switch-when="null"><em>Global Discount</em></span>
+						<span ng-switch-default>Item: <em>{{discount.itemName}}</em></span>
 					</td>
 					<td><code>{{discount.code}}</code></td>
+					<td>
+						<span class="badge" ng-class="{'true':'badge-success', 'false':'badge-important'}[discount.compound]">
+							{{discount.compound == 'true' ? 'Yes' : 'No'}}
+						</span>
+					</td>
 					<td>
 						{{discount.amount | currency}}
 						<button class="close pull-right" ng-click="rem($event, discount)">&times;</button>
@@ -49,3 +53,7 @@
 		</table>
 	</div>
 </div>
+
+<!-- START DEV -->
+<pre>{{discounts | json}}</pre>
+<!-- END DEV -->

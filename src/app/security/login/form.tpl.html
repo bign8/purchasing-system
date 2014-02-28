@@ -19,17 +19,17 @@
 				<input id="login" name="login" type="email" ng-model="user.email" required autofocus class="input-block-level">
 				<div ng-show="isLogin">
 					<label for="pass">Password</label>
-					<input id="pass" name="pass" type="password" ng-model="user.password" ng-required="isLogin" class="input-block-level">
+					<input id="pass" name="pass" type="password" ng-model="user.password" class="input-block-level">
 				</div>
 
 				<div>
+					<span class="pull-right">&nbsp;<button type="button" class="btn btn-small clear" ng-click="clearForm()">Clear</button></span>
+
+					<button type="submit" class="btn btn-small btn-primary login pull-right" ng-click="login()" ng-disabled="processing" ng-show="isLogin" ng-disabled="processing || success">Sign in</button>
+					<button class="btn btn-small btn-primary reset pull-right" ng-click="reset()" ng-disabled="form.$invalid || processing || success" ng-hide="isLogin">Reset Password</button>
+
 					<button class="btn btn-small btn-info" ng-click="setIsLogin(false)" ng-show="isLogin">Forgot Password</button>
 					<button class="btn btn-small btn-info" ng-click="setIsLogin(true)" ng-hide="isLogin">Login</button>
-
-					<span class="pull-right">&nbsp;<button class="btn btn-small clear" ng-click="clearForm()">Clear</button></span>
-
-					<button class="btn btn-small btn-primary login pull-right" ng-click="login()" ng-disabled="processing" ng-show="isLogin">Sign in</button>
-					<button class="btn btn-small btn-primary reset pull-right" ng-click="reset()" ng-disabled="form.$invalid || processing || success" ng-hide="isLogin">Reset Password</button>
 				</div>
 			</div>
 			<div class="span5">
@@ -42,3 +42,7 @@
 		<button class="btn btn-warning cancel" ng-click="cancelLogin()">Cancel</button>
 	</div>
 </form>
+
+<!-- START DEV -->
+<pre>{{user}}</pre>
+<!-- END DEV -->
