@@ -19,7 +19,7 @@ var UACart = (function($){
 			type: 'GET',
 			dataType: 'json',
 			data: data,
-			url: 'http://payment.upstreamacademy.com/cb.php',
+			url: '/cb.php',
 			crossDomain: true,
 			xhrFields: { withCredentials: true },
 			success: function( json, status, xhr ) {
@@ -33,7 +33,7 @@ var UACart = (function($){
 		$.ajax({
 			type: 'GET',
 			dataType: 'json',
-			url: 'http://payment.upstreamacademy.com/cb.php',
+			url: '/cb.php',
 			data: {action:'get'},
 			crossDomain: true,
 			xhrFields: { withCredentials: true},
