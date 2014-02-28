@@ -16,7 +16,7 @@ require_once( __DIR__ . '/db.php' );
 require_once( __DIR__ . '/ng.php' );
 
 // Included classes
-require_once( __DIR__ . '/admin.php' );
+require_once( __DIR__ . '/admin/index.php' );
 require_once( __DIR__ . '/cart.php' );
 require_once( __DIR__ . '/mail.php' );
 require_once( __DIR__ . '/user.php' );
