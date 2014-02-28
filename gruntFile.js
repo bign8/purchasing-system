@@ -64,10 +64,10 @@ module.exports = function(grunt) {
 			},
 			dbOut: {
 				dest: 'bak/dev/ua-purchase.sqlite3',
-				src:  'build/libinc/ua-purchase.sqlite3'
+				src:  '<%= activeDir %>/libinc/ua-purchase.sqlite3'
 			},
 			dbIn: {
-				dest: 'build/libinc/ua-purchase.sqlite3',
+				dest: '<%= activeDir %>/libinc/ua-purchase.sqlite3',
 				src:  'bak/dev/ua-purchase.sqlite3'
 			}
 		},
@@ -113,7 +113,7 @@ module.exports = function(grunt) {
 	grunt.registerTask('setPath', function( arg1 ) {
 		grunt.config.set( 'activeDir', arg1 );
 		grunt.config.set( 'uglify.options.beautify', arg1 == 'build'); // set beautification link
-		if (arg1 == 'build') grunt.config('copy.vendor.files', []); // don't copy vendor on watch builds
+		// if (arg1 == 'build') grunt.config('copy.vendor.files', []); // don't copy vendor on watch builds
 		grunt.log.writeln('Setting build path to: ' + arg1 );
 	});
 
@@ -134,9 +134,9 @@ module.exports = function(grunt) {
 
 	// Define task(s)
 	grunt.registerTask('default', ['watch']);
-	grunt.registerTask('build',   ['setPath:build', 'copy:dbOut', 'process', 'copy:dbIn']);
-	grunt.registerTask('release', ['setPath:release', 'process', 'ftp-deploy:app']);
-	grunt.registerTask('process', ['jshint:files', 'clean', 'uglify', 'copy:main', 'html2js']);
+	grunt.registerTask('build',   ['setPath:build', 'process']);
+	grunt.registerTask('release', ['setPath:release', 'process', 'ftp-deploy']);
+	grunt.registerTask('process', ['copy:dbOut', 'jshint:files', 'clean', 'uglify', 'copy:main', 'html2js', 'copy:dbIn']);
 };
 
 // see https://github.com/gruntjs/grunt-contrib-watch#using-the-watch-event
