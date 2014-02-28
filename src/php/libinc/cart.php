@@ -188,7 +188,7 @@ class Cart extends NG {
 
 		if ($data->itemID == -1) { // wierd thing to make custom payments work
 			$data->cost = $data->cost->settings->cost; // clean cost
-			unset($data->hasOptions); // drop hasOptions
+			unset($data->hasOptions, $data->expired); // drop hasOptions
 
 			$_SESSION['cart'] = array_values( array_udiff($_SESSION['cart'], array( $this->object_to_array($data) ), function($a, $b) {
 				$tempA = json_encode($a);
