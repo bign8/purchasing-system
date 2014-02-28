@@ -1,8 +1,8 @@
 <?php
 
 // Handle cross site
-header('Access-Control-Allow-Origin: http://localhost');
-header('Access-Control-Allow-Credentials: true');
+// header('Access-Control-Allow-Origin: http://localhost:4001');
+// header('Access-Control-Allow-Credentials: true');
 
 // cross site callback
 require_once('./libinc/main_include.php');

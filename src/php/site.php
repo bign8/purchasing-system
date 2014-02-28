@@ -1,8 +1,9 @@
+<!-- START DEV -->
 <html>
 <head>
 	<title>Test</title>
 	<script src="//code.jquery.com/jquery-1.10.2.min.js" type="text/javascript"></script>
-	<script src="//payment.upstreamacademy.com/uacart.js" type="text/javascript"></script>
+	<script src="/uacart.js" type="text/javascript"></script>
 </head>
 <body>
 
@@ -50,3 +51,4 @@ echo $obj->printChildren();
 	<script src="http://127.0.0.1:1337/livereload.js"></script>
 </body>
 </html>
+<!-- END DEV -->
