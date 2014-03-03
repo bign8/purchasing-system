@@ -2969,7 +2969,7 @@ else //user is authorized - display the main application
 				echo "<br/>";
 				echo "<div class='confirm'>";
 				echo "<b>".$lang['query_used_'.$type]."</b><br/>";
-				echo "<span style='font-size:11px;white-space:pre'>".htmlencode($master[0]['sql'])."</span>";
+				echo "<span style='font-size:11px;white-space:pre'>".htmlencode($master[0]['sql'])."</span>"; // Nate-added!
 				echo "</div>";
 				echo "<br/>";
 				if(!isset($_GET['view']))
