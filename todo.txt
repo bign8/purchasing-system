@@ -19,7 +19,6 @@ In a holding pattern:
 - build administration section (see if user end is accepted)
 	- Downloads
 	- Firms (merge)
-	- Groups
 	- Items
 	- Memberships
 	- Purchases

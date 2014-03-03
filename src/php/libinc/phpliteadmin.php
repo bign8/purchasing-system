@@ -1,5 +1,4 @@
 <?php
-//	START DEV
 //	Project: phpLiteAdmin (http://phpliteadmin.googlecode.com)
 //	Version: 1.9.5
 //	Summary: PHP-based admin tool to manage SQLite2 and SQLite3 databases on the web

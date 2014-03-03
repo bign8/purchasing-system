@@ -16,9 +16,6 @@ class myPDO extends PDO
 			$dns = sprintf(config::db_dsn, config::db_host, config::db_name, config::db_user, config::db_pass);
 			parent::__construct( $dns, config::db_user, config::db_pass, config::$db_op );
 			$this->setAttribute( PDO::ATTR_STATEMENT_CLASS,  array('myPDOStatement') ); // Set Statement_Class
-			// START DEV
-			$this->exec( 'PRAGMA foreign_keys = ON;' ); // Nate-added!
-			// END DEV
 		} catch (PDOException $e) {
 			if( $_SERVER['REQUEST_URI'] != '/db404' ) { // to be implemented
 				die($e->getMessage());
