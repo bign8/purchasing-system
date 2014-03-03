@@ -1,5 +1,4 @@
 <?php 
-// START DEV
 // This is sample configuration file
 //
 // You can configure phpliteadmin in one of 2 ways:
