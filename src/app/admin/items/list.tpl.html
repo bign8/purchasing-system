@@ -47,6 +47,32 @@
 				<input type="text" id="desc" name="desc" placeholder="Descriptions" ng-model="active.desc" class="input-block-level" required>
 			</div>
 		</div>
+		<div class="control-group">
+			<label class="control-label">Applies To *</label>
+			<div class="controls">
+				<label class="radio inline">
+					<input type="radio" name="optionsRadios" ng-model="active.onFirm" value="true"> Firm
+				</label>
+				<label class="radio inline">
+					<input type="radio" name="optionsRadios" ng-model="active.onFirm" value="false"> User
+				</label>
+				<span class="help-block">Purchase is applied to this entity.</span>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label" for="code">Direct Code</label>
+			<div class="controls">
+				<input type="text" id="code" name="code" placeholder="Direct Code" ng-model="active.code" class="input-block-level">
+				<span class="help-block">For Direct Adding in "User" area</span>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label" for="image">Image</label>
+			<div class="controls">
+				<input type="text" id="image" name="image" placeholder="Image" ng-model="active.image" class="input-block-level">
+				<span class="help-block">Not Currently Implemented</span>
+			</div>
+		</div>
 		<div class="form-actions">
 			<button type="submit" class="btn btn-primary" ng-disabled="itemForm.$invalid || equals(origin, active)" ng-click="save()">Save Item</button>&nbsp;
 			<button type="button" class="btn btn-warning" ng-disabled="equals(origin, active)" ng-click="reset()">Reset</button>&nbsp;

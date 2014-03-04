@@ -17,7 +17,7 @@ config(['$routeProvider', 'securityAuthorizationProvider', function ($routeProvi
 	});
 }]).
 
-controller('ItemListCtrl', ['$scope', 'items', '$modal', '$location', 'ItemService', function ($scope, items, $modal, $location, ItemService){
+controller('ItemListCtrl', ['$scope', 'items', '$location', 'ItemService', function ($scope, items, $location, ItemService){
 	$scope.items = items.list;
 	$scope.myItem = items.item;
 	$scope.active = false; // holds copied new item for editing
@@ -60,14 +60,14 @@ controller('ItemListCtrl', ['$scope', 'items', '$modal', '$location', 'ItemServi
 		});
 	};
 	$scope.newItem = function() {
-		var parentID = $scope.myItem ? $scope.myItem.itemID : null ;
-		$scope.active = {
-			parentID: parentID,
-			settings: {}
-		};
-		$scope.origin = angular.copy($scope.active);
+		$scope.edit({
+			parentID: $scope.myItem ? $scope.myItem.itemID : null,
+			settings: {},
+			onFirm: 'true',
+			image: null,
+			code: null
+		});
 	};
-
 	$scope.rem = function ($event, item) {
 		$event.stopPropagation();
 		var check = confirm('Are you sure you want to delete: "'+item.name+'"\nThis action is permenent and cannot be undone.');
