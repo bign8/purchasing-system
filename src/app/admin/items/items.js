@@ -22,12 +22,15 @@ controller('ItemListCtrl', ['$scope', 'items', '$location', 'ItemService', funct
 	$scope.myItem = items.item;
 	$scope.active = false; // holds copied new item for editing
 	$scope.origin = false; // holds pointer to list item
+	$scope.tpls = ItemService.getTpls();
+
 	$scope.go = function (itemID) {
 		$scope.origin.isActive = false;
 		itemID = itemID ? itemID : '' ;
 		$location.path('/admin/items/' + itemID);
 	};
 	$scope.edit = function (item) {
+		// item.templateID = item.templateID || $scope.myItem.templateID; // pull from parent if not defined
 		var validEdit = function() {
 			$scope.origin.isActive = false;
 			$scope.origin = item;
@@ -79,7 +82,12 @@ controller('ItemListCtrl', ['$scope', 'items', '$location', 'ItemService', funct
 }]).
 
 factory('ItemService', ['interface', '$q', '$route', function (interface, $q, $route) {
-	var myItems = {};
+	var myItems  = {};
+	var myPrices = {};
+	var myTpls   = {};
+	var myFields = {};
+	var myTies   = {};
+
 	var service = {
 		getList: function (itemID) {
 			var ret = $q.defer();
@@ -88,9 +96,11 @@ factory('ItemService', ['interface', '$q', '$route', function (interface, $q, $r
 				ret = ret.promise; // funky way to return a promise
 			} else {
 				ret = interface.admin('item-init').then(function (data) {
-					angular.forEach(data, function (item) {
-						myItems[item.itemID] = item;
-					});
+					angular.forEach(data.items,  function (item)  { myItems  [ item.itemID    ] = item;  });
+					angular.forEach(data.prices, function (price) { myPrices [ price.priceID  ] = price; });
+					angular.forEach(data.tpls,   function (tpl)   { myTpls   [ tpl.templateID ] = tpl;   });
+					angular.forEach(data.fields, function (field) { myFields [ field.fieldID  ] = field; });
+					angular.forEach(data.ties,   function (tie)   { myTies   [ tie.tieID      ] = tie;   });
 					return service.theList(itemID);
 				});
 			}
@@ -101,6 +111,9 @@ factory('ItemService', ['interface', '$q', '$route', function (interface, $q, $r
 			for (var key in myItems) if (myItems[key].parentID == itemID) ret.list.push(myItems[key]);
 			if (itemID) ret.item = myItems[itemID];
 			return ret;
+		},
+		getTpls: function() {
+			return myTpls;
 		},
 		rem: function (item) {
 			return interface.admin('item-rem', item).then(function (res) {
