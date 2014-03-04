@@ -19,7 +19,7 @@ class Item extends NG {
 
 	// returns all items
 	public function init() {
-		$STH = $this->db->query("SELECT * FROM item;");
+		$STH = $this->db->query("SELECT i.*, count(j.itemID)AS count FROM item i LEFT JOIN item j ON i.itemID=j.parentID GROUP BY i.itemID;");
 		$ret = $STH->fetchAll();
 		foreach ($ret as &$value) $value['settings'] = json_decode($value['settings']);
 		return $ret;
