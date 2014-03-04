@@ -19,10 +19,28 @@ class Item extends NG {
 
 	// returns all items
 	public function init() {
-		$STH = $this->db->query("SELECT i.*, count(j.itemID)AS count FROM item i LEFT JOIN item j ON i.itemID=j.parentID GROUP BY i.itemID;");
-		$ret = $STH->fetchAll();
-		foreach ($ret as &$value) $value['settings'] = json_decode($value['settings']);
-		return $ret;
+		// Items (to convert)
+		$itemSTH = $this->db->query("SELECT i.*, count(j.itemID)AS count FROM item i LEFT JOIN item j ON i.itemID=j.parentID GROUP BY i.itemID;");
+		$items = $itemSTH->fetchAll();
+		foreach ($items as &$value) $value['settings'] = json_decode($value['settings']);
+
+		// Prices (to convert)
+		$priceSTH = $this->db->query("SELECT * FROM price;");
+		$prices = $itemSTH->fetchAll();
+		foreach ($prices as &$value) $value['settings'] = json_decode($value['settings']);
+		
+		// Others
+		$tplSTH   = $this->db->query("SELECT * FROM template;");
+		$fieldSTH = $this->db->query("SELECT * FROM field;");
+		$tieSTH   = $this->db->query("SELECT * FROM tie;");
+
+		return array(
+			'items'  => $items,
+			'prices' => $prices,
+			'tpls'   => $tplSTH->fetchAll(),
+			'fields' => $fieldSTH->fetchAll(),
+			'ties'   => $tieSTH->fetchAll(),
+		);
 	}
 
 	// removes discount from db

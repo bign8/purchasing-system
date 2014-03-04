@@ -1,5 +1,6 @@
 <div class="row">
-	<div class="span6">
+	<!-- Children List -->
+	<div class="span4">
 		<h3>
 			<span ng-show="myItem">{{myItem.name}}&nbsp;</span>
 			Items
@@ -11,20 +12,18 @@
 				<button type="button" class="btn btn-info btn-mini" ng-click="go(myItem.parentID)">Parent</button>&nbsp;
 			</span>
 		</div>
-		<p>Click an item to modify, Double Click to view children, or delete an item with the "x" on the right.</p>
+		<ul>
+			<li>Single Click an item to modify</li>
+			<li>Double Click to view children</li>
+			<li>Delete an item with the "x" on the right.</li>
+		</ul>
 		<div style="max-height:600px;overflow-x:hidden;overflow-y:auto">
 			<table class="table table-hover">
-				<thead>
-					<tr>
-						<th>Name</th>
-						<th>Description</th>
-					</tr>
-				</thead>
+				<thead><tr><th>Name</th></tr></thead>
 				<tbody>
 					<tr ng-repeat="item in items" ng-click="edit(item)" ng-dblclick="go(item.itemID)" ng-class="{true:'info'}[item.isActive]">
-						<td>{{item.name}}</td>
 						<td>
-							{{item.desc}}
+							{{item.name}}
 							<button class="close pull-right" ng-click="rem($event, item)">&times;</button>
 						</td>
 					</tr>
@@ -33,55 +32,73 @@
 		</div>
 	</div>
 
-	<form name="itemForm" class="span6 form-horizontal" ng-show="active">
-		<h3 style="margin-left:180px">Item Details</h3>
+	<!-- itemForm -->
+	<form name="itemForm" class="span4 form-horizontal" ng-show="active">
+		<h3>Details</h3>
 		<div class="control-group">
-			<label class="control-label" for="name">Name *</label>
-			<div class="controls">
-				<input type="text" id="name" placeholder="Name" ng-model="active.name" class="input-block-level" required>
-			</div>
+			<label for="name"><strong>Name *</strong></label>
+			<input type="text" id="name" placeholder="Name" ng-model="active.name" class="input-block-level" required>
 		</div>
 		<div class="control-group">
-			<label class="control-label" for="desc">Descriptions *</label>
-			<div class="controls">
-				<input type="text" id="desc" name="desc" placeholder="Descriptions" ng-model="active.desc" class="input-block-level" required>
-			</div>
+			<label for="desc"><strong>Description *</strong></label>
+			<input type="text" id="desc" name="desc" placeholder="Description" ng-model="active.desc" class="input-block-level" required>
 		</div>
 		<div class="control-group">
-			<label class="control-label">Applies To *</label>
-			<div class="controls">
-				<label class="radio inline">
-					<input type="radio" name="optionsRadios" ng-model="active.onFirm" value="true"> Firm
-				</label>
-				<label class="radio inline">
-					<input type="radio" name="optionsRadios" ng-model="active.onFirm" value="false"> User
-				</label>
-				<span class="help-block">Purchase is applied to this entity.</span>
-			</div>
+			<label><strong>Applies To *</strong></label>
+			<label class="radio inline">
+				<input type="radio" name="optionsRadios" ng-model="active.onFirm" value="true"> Firm
+			</label>
+			<label class="radio inline">
+				<input type="radio" name="optionsRadios" ng-model="active.onFirm" value="false"> User
+			</label>
+			<span class="help-block">Purchase is applied to this entity.</span>
 		</div>
 		<div class="control-group">
-			<label class="control-label" for="code">Direct Code</label>
-			<div class="controls">
-				<input type="text" id="code" name="code" placeholder="Direct Code" ng-model="active.code" class="input-block-level">
-				<span class="help-block">For Direct Adding in "User" area</span>
-			</div>
+			<label for="code"><strong>Direct Code</strong></label>
+			<input type="text" id="code" name="code" placeholder="Direct Code" ng-model="active.code" class="input-block-level">
+			<span class="help-block">For Direct Adding in "User" area</span>
 		</div>
 		<div class="control-group">
-			<label class="control-label" for="image">Image</label>
-			<div class="controls">
-				<input type="text" id="image" name="image" placeholder="Image" ng-model="active.image" class="input-block-level">
-				<span class="help-block">Not Currently Implemented</span>
-			</div>
+			<label for="image"><strong>Image</strong></label>
+			<input type="text" id="image" name="image" placeholder="Image" ng-model="active.image" class="input-block-level">
+			<span class="help-block">Not Currently Implemented</span>
 		</div>
-		<div class="form-actions">
+		<!-- <div class="well">
+			<div class="control-group">
+				<label for="tpl">Template</label>
+				<select ng-model="active.templateID" ng-options="key as value.name for (key, value) in tpls" class="input-block-level"></select>
+			</div>
+		</div> -->
+		<div>
 			<button type="submit" class="btn btn-primary" ng-disabled="itemForm.$invalid || equals(origin, active)" ng-click="save()">Save Item</button>&nbsp;
 			<button type="button" class="btn btn-warning" ng-disabled="equals(origin, active)" ng-click="reset()">Reset</button>&nbsp;
 			<button type="button" class="btn" ng-click="cancel()">Cancel</button>
 		</div>
 	</form>
+
+	<!-- Other things -->
+	<div class="span4" ng-show="active">
+		<h3>Prices</h3>
+		<div style="max-height:300px;overflow-x:hidden;overflow-y:auto">
+			<table class="table">
+				<!-- <tr ng-repeat="some expression"> -->
+					Sample <br/> Multi-line <br/> Data
+				<!-- </tr> -->
+			</table>
+		</div>
+		<h3>Fields</h3>
+		<div style="max-height:300px;overflow-x:hidden;overflow-y:auto">
+			<table class="table">
+				<!-- <tr ng-repeat="some expression"> -->
+					Sample <br/> Multi-line <br/> Data
+				<!-- </tr> -->
+			</table>
+		</div>
+	</div>
 </div>
 
 <!-- START DEV -->
+<pre>{{test | json}}</pre>
 <pre>{{active | json}}</pre>
 <pre>{{items | json}}</pre>
 <!-- END DEV -->
