@@ -1,0 +1,61 @@
+<div class="row">
+	<div class="span6">
+		<h3>
+			<span ng-show="myItem">{{myItem.name}}&nbsp;</span>
+			Items
+			<small ng-show="myItem">&nbsp;{{myItem.desc}}</small>
+		</h3>
+		<div>
+			<button type="button" class="btn btn-success pull-right btn-mini" ng-click="newItem()">New Item</button>
+			<span class="pull-right" ng-show="myItem">
+				<button type="button" class="btn btn-info btn-mini" ng-click="go(myItem.parentID)">Parent</button>&nbsp;
+			</span>
+		</div>
+		<p>Click an item to modify, Double Click to view children, or delete an item with the "x" on the right.</p>
+		<div style="max-height:600px;overflow-x:hidden;overflow-y:auto">
+			<table class="table table-hover">
+				<thead>
+					<tr>
+						<th>Name</th>
+						<th>Description</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="item in items" ng-click="edit(item)" ng-dblclick="go(item.itemID)" ng-class="{true:'info'}[item.isActive]">
+						<td>{{item.name}}</td>
+						<td>
+							{{item.desc}}
+							<button class="close pull-right" ng-click="rem($event, item)">&times;</button>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+	<form name="itemForm" class="span6 form-horizontal" ng-show="active">
+		<h3 style="margin-left:180px">Item Details</h3>
+		<div class="control-group">
+			<label class="control-label" for="name">Name *</label>
+			<div class="controls">
+				<input type="text" id="name" placeholder="Name" ng-model="active.name" class="input-block-level" required>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label" for="desc">Descriptions *</label>
+			<div class="controls">
+				<input type="text" id="desc" name="desc" placeholder="Descriptions" ng-model="active.desc" class="input-block-level" required>
+			</div>
+		</div>
+		<div class="form-actions">
+			<button type="submit" class="btn btn-primary" ng-disabled="itemForm.$invalid || equals(origin, active)" ng-click="save()">Save Item</button>&nbsp;
+			<button type="button" class="btn btn-warning" ng-disabled="equals(origin, active)" ng-click="reset()">Reset</button>&nbsp;
+			<button type="button" class="btn" ng-click="cancel()">Cancel</button>
+		</div>
+	</form>
+</div>
+
+<!-- START DEV -->
+<pre>{{active | json}}</pre>
+<pre>{{items | json}}</pre>
+<!-- END DEV -->
