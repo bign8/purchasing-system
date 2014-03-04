@@ -36,6 +36,7 @@ controller('ItemListCtrl', ['$scope', 'items', '$location', 'ItemService', funct
 			$scope.origin = item;
 			$scope.origin.isActive = true;
 			$scope.active = angular.copy(item);
+			$scope.myFields = ItemService.myFields(item.itemID);
 		};
 		if ($scope.active && !angular.equals( $scope.origin, $scope.active )) {
 			var check = confirm('The current item has been modified.\nAre you sure you want to change without saving?');
@@ -88,6 +89,16 @@ factory('ItemService', ['interface', '$q', '$route', function (interface, $q, $r
 	var myFields = {};
 	var myTies   = {};
 
+	// get list of parentID's (including self)
+	function getParents(itemID) {
+		var ret = [itemID], parent = myItems[itemID];
+		while (parent.parentID) {
+			parent = myItems[ parent.parentID ];
+			ret.push( parent.itemID );
+		}
+		return ret;
+	}
+
 	var service = {
 		getList: function (itemID) {
 			var ret = $q.defer();
@@ -110,6 +121,17 @@ factory('ItemService', ['interface', '$q', '$route', function (interface, $q, $r
 			var ret = {list: [], item: false}, itemID = $route.current.params.itemID || null;
 			for (var key in myItems) if (myItems[key].parentID == itemID) ret.list.push(myItems[key]);
 			if (itemID) ret.item = myItems[itemID];
+			return ret;
+		},
+		myFields: function (itemID) {
+			var ret = [], parents = getParents(itemID), ele;
+			for (var key in myTies) {
+				if ( parents.indexOf( myTies[key].itemID ) > -1 ) { // in parents array
+					ele = myFields[ myTies[key].fieldID ];
+					ele.exact = ( myTies[key].itemID == itemID ); // exact match
+					ret.push( ele );
+				}
+			}
 			return ret;
 		},
 		getTpls: function() {
