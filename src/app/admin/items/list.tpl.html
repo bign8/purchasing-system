@@ -53,6 +53,29 @@
 			</label>
 			<span class="help-block">Purchase is applied to this entity.</span>
 		</div>
+
+		<!-- template -->
+		<div class="well">
+			<div class="control-group">
+				<label for="tpl"><strong>Template *</strong></label>
+				<select ng-model="myTemplate" ng-options="value.name for (key, value) in tpls" class="input-block-level"></select>
+			</div>
+			<div ng-hide="active.count=='0'">This item appears to be a directory.<br/>Any aditional Item questions are not required.</div>
+			<div ng-repeat="question in myTemplate.itemReq" ng-switch="question" class="control-group">
+				<label for="tpl-{{question}}" style="text-transform: capitalize"><strong>{{question}}</strong></label>
+				<div ng-switch-when="date">
+					<input type="text" id="tpl-{{question}}" ng-model="active.settings[question]" class="input-block-level">
+					<span class="help-block">Format: MMM dd, yyyy (ie: Aug 19, 1991)</span>
+				</div>
+				<div ng-switch-when="file">
+					<input type="text" id="tpl-{{question}}" ng-model="active.settings[question]" class="input-block-level">
+					<span class="help-block">Relative to files directory<br/>(ie: "hw/con1.zip" for "/files/hw/conf.zip")</span>
+				</div>
+				<input ng-switch-default type="text" id="tpl-{{question}}" ng-model="active.settings[question]" class="input-block-level">
+			</div>
+		</div>
+		<!-- end template -->
+
 		<div class="control-group">
 			<label for="code"><strong>Direct Code</strong></label>
 			<input type="text" id="code" name="code" placeholder="Direct Code" ng-model="active.code" class="input-block-level">
@@ -63,12 +86,7 @@
 			<input type="text" id="image" name="image" placeholder="Image" ng-model="active.image" class="input-block-level">
 			<span class="help-block">Not Currently Implemented</span>
 		</div>
-		<!-- <div class="well">
-			<div class="control-group">
-				<label for="tpl">Template</label>
-				<select ng-model="active.templateID" ng-options="key as value.name for (key, value) in tpls" class="input-block-level"></select>
-			</div>
-		</div> -->
+
 		<div>
 			<button type="submit" class="btn btn-primary" ng-disabled="itemForm.$invalid || equals(origin, active)" ng-click="save()">Save Item</button>&nbsp;
 			<button type="button" class="btn btn-warning" ng-disabled="equals(origin, active)" ng-click="reset()">Reset</button>&nbsp;
@@ -78,6 +96,7 @@
 
 	<!-- Other things -->
 	<div class="span4" ng-show="active">
+
 		<h3>Prices</h3>
 		<div style="max-height:300px;overflow-x:hidden;overflow-y:auto">
 			<table class="table" style="margin-bottom:0">
@@ -90,6 +109,7 @@
 			<select class="span2" ng-model="addField" ng-options="field.name for (key, field) in fields"></select>
 		</div>
 
+		<!-- Fields -->
 		<h3>Fields</h3>
 		<p>
 			Items shown in red must be modified on parent<br/>
@@ -111,12 +131,12 @@
 				</tr>
 			</table>
 		</div>
+		<!-- End Fields -->
 	</div>
 </div>
 
 <!-- START DEV -->
-<pre>{{myFields | json}}</pre>
-<pre>{{fields | json}}</pre>
+<!-- <pre>{{myTemplate | json}}</pre> -->
 <pre>{{active | json}}</pre>
 <pre>{{items | json}}</pre>
 <!-- END DEV -->

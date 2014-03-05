@@ -25,6 +25,7 @@ controller('ItemListCtrl', ['$scope', 'items', '$location', 'ItemService', funct
 	$scope.tpls = ItemService.getTpls();
 	$scope.fields = ItemService.getFields();
 
+	// nav functions
 	$scope.go = function (itemID) {
 		$scope.origin.isActive = false;
 		itemID = itemID ? itemID : '' ;
@@ -37,6 +38,7 @@ controller('ItemListCtrl', ['$scope', 'items', '$location', 'ItemService', funct
 			$scope.origin.isActive = true;
 			$scope.active = angular.copy(item);
 			$scope.myFields = ItemService.itemFields(item.itemID);
+			$scope.myTemplate = ItemService.getTpl(item);
 		};
 		if ($scope.active && !angular.equals( $scope.origin, $scope.active )) {
 			var check = confirm('The current item has been modified.\nAre you sure you want to change without saving?');
@@ -45,6 +47,9 @@ controller('ItemListCtrl', ['$scope', 'items', '$location', 'ItemService', funct
 			validEdit();
 		}
 	};
+	if ($scope.items[0]) $scope.edit($scope.items[0]);
+
+	// Item Functions
 	$scope.cancel = function() {
 		$scope.origin.isActive = false;
 		$scope.active = false;
@@ -69,7 +74,8 @@ controller('ItemListCtrl', ['$scope', 'items', '$location', 'ItemService', funct
 			settings: {},
 			onFirm: 'true',
 			image: null,
-			code: null
+			code: null,
+			templateID: $scope.myItem.templateID
 		});
 	};
 	$scope.rem = function ($event, item) {
@@ -89,7 +95,7 @@ controller('ItemListCtrl', ['$scope', 'items', '$location', 'ItemService', funct
 			$scope.myFields.splice($scope.myFields.indexOf(field), 1);
 		});
 	};
-	$scope.$watch('addField', function(value) {
+	$scope.$watch('addField', function (value) {
 		if (!value) return;
 		var found = false;
 		for (var key in $scope.myFields) if ($scope.myFields[key].fieldID == value.fieldID) {
@@ -116,6 +122,22 @@ controller('ItemListCtrl', ['$scope', 'items', '$location', 'ItemService', funct
 			field.required = res.required;
 		});
 	};
+
+	// Template Function
+	$scope.$watch('myTemplate.templateID', function (value) {
+		if (!value) return;
+		var test = true;
+		if ($scope.active.templateID && value != $scope.active.templateID) 
+			test = confirm("Are you sure you want to change the template?\nThis will break all sub-assigned prices.");
+
+		if (test)
+			$scope.active.templateID = value;
+		else
+			$scope.myTemplate = $scope.tpls[$scope.active.templateID];
+	});
+
+	// Price Functions
+
 }]).
 
 factory('ItemService', ['interface', '$q', '$route', function (interface, $q, $route) {
@@ -127,6 +149,7 @@ factory('ItemService', ['interface', '$q', '$route', function (interface, $q, $r
 
 	// get list of parentID's (including self)
 	function getParents(itemID) {
+		if (!itemID) return [];
 		var ret = [itemID], parent = myItems[itemID];
 		while (parent.parentID) {
 			parent = myItems[ parent.parentID ];
@@ -145,9 +168,13 @@ factory('ItemService', ['interface', '$q', '$route', function (interface, $q, $r
 				ret = interface.admin('item-init').then(function (data) {
 					angular.forEach(data.items,  function (item)  { myItems  [ item.itemID    ] = item;  });
 					angular.forEach(data.prices, function (price) { myPrices [ price.priceID  ] = price; });
-					angular.forEach(data.tpls,   function (tpl)   { myTpls   [ tpl.templateID ] = tpl;   });
 					angular.forEach(data.fields, function (field) { myFields [ field.fieldID  ] = field; });
 					angular.forEach(data.ties,   function (tie)   { myTies   [ tie.tieID      ] = tie;   });
+					angular.forEach(data.tpls, function (tpl) {
+						tpl.itemReq = tpl.itemReq ? tpl.itemReq.split(',') : []; // convert requirement strings to arrays
+						tpl.costReq = tpl.costReq ? tpl.costReq.split(',') : [];
+						myTpls[ tpl.templateID ] = tpl;
+					});
 					return service.theList(itemID);
 				});
 			}
@@ -160,6 +187,7 @@ factory('ItemService', ['interface', '$q', '$route', function (interface, $q, $r
 			return ret;
 		},
 		itemFields: function (itemID) {
+			if (!itemID) return [];
 			var ret = [], parents = getParents(itemID), ele;
 			for (var key in myTies) {
 				if ( parents.indexOf( myTies[key].itemID ) > -1 ) { // in parents array
@@ -172,12 +200,8 @@ factory('ItemService', ['interface', '$q', '$route', function (interface, $q, $r
 			}
 			return ret;
 		},
-		getFields: function () {
-			return myFields;
-		},
-		getTpls: function() {
-			return myTpls;
-		},
+		getFields: function () { return myFields; },
+		getTpls: function() { return myTpls; },
 		rem: function(item) {
 			return interface.admin('item-rem', item).then(function (res) {
 				delete myItems[item.itemID];
@@ -217,6 +241,14 @@ factory('ItemService', ['interface', '$q', '$route', function (interface, $q, $r
 				myTies[field.tieID].required = res.required;
 				return res;
 			});
+		},
+		getTpl: function(item) {
+			var template = item.templateID;
+			while (!template && item.parentID) {
+				item = myItems[ item.parentID ];
+				template = item.templateID;
+			}
+			return template ? myTpls[ template ] : null;
 		}
 	};
 	return service;
