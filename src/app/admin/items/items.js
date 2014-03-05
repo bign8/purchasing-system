@@ -102,6 +102,15 @@ controller('ItemListCtrl', ['$scope', 'items', '$location', 'ItemService', funct
 			$scope.addField = undefined;
 		});
 	});
+	$scope.mvField = function(direction, field) {
+		var other;
+		for (var key in $scope.myFields) if ($scope.myFields[key].order == (field.order + direction)) other = $scope.myFields[key];
+		ItemService.mvField(field, other).then(function() {
+			var temp = field.order;
+			field.order = other.order;
+			other.order = temp;
+		});
+	};
 }]).
 
 factory('ItemService', ['interface', '$q', '$route', function (interface, $q, $route) {
@@ -151,6 +160,7 @@ factory('ItemService', ['interface', '$q', '$route', function (interface, $q, $r
 				if ( parents.indexOf( myTies[key].itemID ) > -1 ) { // in parents array
 					ele = angular.copy( myFields[ myTies[key].fieldID ] );
 					ele.tieID = key;
+					ele.order = parseInt( myTies[key].order );
 					ele.exact = ( myTies[key].itemID == itemID ); // exact match
 					ret.push( ele );
 				}
@@ -180,10 +190,21 @@ factory('ItemService', ['interface', '$q', '$route', function (interface, $q, $r
 			});
 		},
 		addField: function(field, item) {
+			field = angular.copy(field);
 			return interface.admin('item-addTie', {field: field, item: item}).then(function (res) {
-				field.tieID = res;
+				field.tieID = res.tieID;
+				field.order = parseInt( res.order );
 				field.exact = true;
 				return field;
+			});
+		},
+		mvField: function(src, dest) {
+			return interface.admin('item-mvTie', {src: src.tieID, dest: dest.tieID}).then(function (res) {
+				if (res) {
+					var temp = myTies[src.tieID].order;
+					myTies[src.tieID].order = myTies[dest.tieID].order;
+					myTies[dest.tieID].order = temp;
+				}
 			});
 		}
 	};

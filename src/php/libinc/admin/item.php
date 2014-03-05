@@ -12,6 +12,7 @@ class Item extends NG {
 		switch ( $action ) {
 			case 'addTie': $data = $obj->addTie(); break;
 			case 'init':   $data = $obj->init();   break;
+			case 'mvTie':  $data = $obj->mvTie();  break;
 			case 'rem':    $data = $obj->rem();    break;
 			case 'rmTie':  $data = $obj->rmTie();  break;
 			case 'set':    $data = $obj->set();    break;
@@ -78,9 +79,33 @@ class Item extends NG {
 	// adds tie between field and item
 	public function addTie() {
 		$d = $this->getPostData();
-		// INSERT INTO "tie" ("tieID","fieldID","itemID","order","required") VALUES (NULL,'3','16',(SELECT IFNULL(MAX("order")+1,1) FROM tie WHERE itemID='8'),'false')
-		$STH = $this->db->prepare("INSERT INTO tie(fieldID,itemID,\"order\",required) SELECT ?,?,IFNULL(MAX(\"order\")+1,1),? FROM tie WHERE itemID=?;");
-		if (!$STH->execute( $d->field->fieldID, $d->item->itemID, 'false', $d->item->itemID )) return $this->conflict();
-		return $this->db->lastInsertId();
+		$maxSTH = $this->db->prepare("SELECT IFNULL(MAX(\"order\")+1,1) as \"order\" FROM tie WHERE itemID=?;");
+		if (!$maxSTH->execute( $d->item->itemID )) return $this->conflict();
+		$order = $maxSTH->fetchColumn();
+
+		$STH = $this->db->prepare("INSERT INTO tie(fieldID,itemID,\"order\",required) VALUES (?,?,?,?);");
+		if (!$STH->execute( $d->field->fieldID, $d->item->itemID, $order, 'false' )) return $this->conflict();
+		return array(
+			'tieID' => $this->db->lastInsertId(),
+			'order' => $order
+		);
+	}
+
+	// swaps tie order
+	public function mvTie() {
+		$d = $this->getPostData();
+		$getSTH = $this->db->prepare("SELECT \"order\" FROM tie WHERE tieID=?;");
+		$setSTH = $this->db->prepare("UPDATE tie SET \"order\"=? WHERE tieID=?;");
+		$test = $getSTH->execute( $d->src );
+		if ($test) {
+			$src = $getSTH->fetchColumn();
+			$test = $getSTH->execute( $d->dest );
+		}
+		if ($test) {
+			$dest = $getSTH->fetchColumn();
+			$test = $setSTH->execute( $src, $d->dest );
+		}
+		if ($test) $test = $setSTH->execute( $dest, $d->src );
+		return $test;
 	}
 }
