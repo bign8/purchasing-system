@@ -10,9 +10,11 @@ class Item extends NG {
 	public static function process( $action, &$pass, &$data ) {
 		$obj = new self();
 		switch ( $action ) {
-			case 'init': $data = $obj->init(); break;
-			case 'rem':  $data = $obj->rem();  break;
-			case 'set':  $data = $obj->set();  break;
+			case 'addTie': $data = $obj->addTie(); break;
+			case 'init':   $data = $obj->init();   break;
+			case 'rem':    $data = $obj->rem();    break;
+			case 'rmTie':  $data = $obj->rmTie();  break;
+			case 'set':    $data = $obj->set();    break;
 			default: $pass = false;
 		}
 	}
@@ -31,7 +33,7 @@ class Item extends NG {
 		
 		// Others
 		$tplSTH   = $this->db->query("SELECT * FROM template;");
-		$fieldSTH = $this->db->query("SELECT * FROM field;");
+		$fieldSTH = $this->db->query("SELECT fieldID, name, type FROM field;");
 		$tieSTH   = $this->db->query("SELECT * FROM tie;");
 
 		return array(
@@ -63,5 +65,22 @@ class Item extends NG {
 			$d = (object) array_merge( (array)$d, array('itemID' => $this->db->lastInsertId()) );
 		}
 		return $d;
+	}
+
+	// removes field, item tie
+	public function rmTie() {
+		$data = $this->getPostData();
+		$STH = $this->db->prepare("DELETE FROM tie WHERE tieID=?;");
+		if (!$STH->execute($data->tieID)) return $this->conflict();
+		return $data;
+	}
+
+	// adds tie between field and item
+	public function addTie() {
+		$d = $this->getPostData();
+		// INSERT INTO "tie" ("tieID","fieldID","itemID","order","required") VALUES (NULL,'3','16',(SELECT IFNULL(MAX("order")+1,1) FROM tie WHERE itemID='8'),'false')
+		$STH = $this->db->prepare("INSERT INTO tie(fieldID,itemID,\"order\",required) SELECT ?,?,IFNULL(MAX(\"order\")+1,1),? FROM tie WHERE itemID=?;");
+		if (!$STH->execute( $d->field->fieldID, $d->item->itemID, 'false', $d->item->itemID )) return $this->conflict();
+		return $this->db->lastInsertId();
 	}
 }

@@ -84,7 +84,12 @@
 					Sample <br/> Multi-line <br/> Data
 			</table>
 		</div>
-		<button role="button" class="btn btn-success pull-right btn-mini">Add More?</button>
+		
+		<div class="pull-right input-prepend" style="margin-top:15px">
+			<span class="add-on">Add</span>
+			<select class="span2" ng-model="addField" ng-options="field.name for (key, field) in fields"></select>
+		</div>
+
 		<h3>Fields</h3>
 		<p>Items shown in red must be removed on parent</p>
 		<div style="max-height:300px;overflow-x:hidden;overflow-y:auto">
@@ -92,7 +97,7 @@
 				<tr ng-repeat="field in myFields" ng-class="{false:'error'}[field.exact]">
 					<td>
 						{{field.name}}
-						<button ng-show="field.exact" class="close pull-right" ng-click="test($event, item)">&times;</button>
+						<button ng-show="field.exact" class="close pull-right" ng-click="rmField($event, field)">&times;</button>
 					</td>
 				</tr>
 			</table>
@@ -102,6 +107,7 @@
 
 <!-- START DEV -->
 <pre>{{myFields | json}}</pre>
+<pre>{{fields | json}}</pre>
 <pre>{{active | json}}</pre>
 <pre>{{items | json}}</pre>
 <!-- END DEV -->

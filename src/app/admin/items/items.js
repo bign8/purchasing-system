@@ -23,6 +23,7 @@ controller('ItemListCtrl', ['$scope', 'items', '$location', 'ItemService', funct
 	$scope.active = false; // holds copied new item for editing
 	$scope.origin = false; // holds pointer to list item
 	$scope.tpls = ItemService.getTpls();
+	$scope.fields = ItemService.getFields();
 
 	$scope.go = function (itemID) {
 		$scope.origin.isActive = false;
@@ -30,13 +31,12 @@ controller('ItemListCtrl', ['$scope', 'items', '$location', 'ItemService', funct
 		$location.path('/admin/items/' + itemID);
 	};
 	$scope.edit = function (item) {
-		// item.templateID = item.templateID || $scope.myItem.templateID; // pull from parent if not defined
 		var validEdit = function() {
 			$scope.origin.isActive = false;
 			$scope.origin = item;
 			$scope.origin.isActive = true;
 			$scope.active = angular.copy(item);
-			$scope.myFields = ItemService.myFields(item.itemID);
+			$scope.myFields = ItemService.itemFields(item.itemID);
 		};
 		if ($scope.active && !angular.equals( $scope.origin, $scope.active )) {
 			var check = confirm('The current item has been modified.\nAre you sure you want to change without saving?');
@@ -80,6 +80,28 @@ controller('ItemListCtrl', ['$scope', 'items', '$location', 'ItemService', funct
 			$scope.active = false;
 		});
 	};
+
+	// Field Functions
+	$scope.rmField = function ($event, field) {
+		$event.stopPropagation();
+		var check = confirm('Are you sure you want to remove: "'+field.name+'"\nYou can add it back by selecting the "Add Field" button.');
+		if (check) ItemService.rmField(field).then(function() {
+			$scope.myFields.splice($scope.myFields.indexOf(field), 1);
+		});
+	};
+	$scope.$watch('addField', function(value) {
+		if (!value) return;
+		var found = false;
+		for (var key in $scope.myFields) if ($scope.myFields[key].fieldID == value.fieldID) {
+			alert('"' + value.name + '" has already been added to this item');
+			$scope.addField = undefined;
+			return;
+		}
+		ItemService.addField(value, $scope.active).then(function (field) {
+			$scope.myFields.push(field);
+			$scope.addField = undefined;
+		});
+	});
 }]).
 
 factory('ItemService', ['interface', '$q', '$route', function (interface, $q, $route) {
@@ -123,29 +145,45 @@ factory('ItemService', ['interface', '$q', '$route', function (interface, $q, $r
 			if (itemID) ret.item = myItems[itemID];
 			return ret;
 		},
-		myFields: function (itemID) {
+		itemFields: function (itemID) {
 			var ret = [], parents = getParents(itemID), ele;
 			for (var key in myTies) {
 				if ( parents.indexOf( myTies[key].itemID ) > -1 ) { // in parents array
-					ele = myFields[ myTies[key].fieldID ];
+					ele = angular.copy( myFields[ myTies[key].fieldID ] );
+					ele.tieID = key;
 					ele.exact = ( myTies[key].itemID == itemID ); // exact match
 					ret.push( ele );
 				}
 			}
 			return ret;
 		},
+		getFields: function () {
+			return myFields;
+		},
 		getTpls: function() {
 			return myTpls;
 		},
-		rem: function (item) {
+		rem: function(item) {
 			return interface.admin('item-rem', item).then(function (res) {
 				delete myItems[item.itemID];
 			});
 		},
-		save: function (item) {
+		save: function(item) {
 			return interface.admin('item-set', item).then(function (res) {
 				myItems[res.itemID] = res;
 				return res;
+			});
+		},
+		rmField: function(field) {
+			return interface.admin('item-rmTie', field).then(function (res) {
+				delete myTies[field.tieID];
+			});
+		},
+		addField: function(field, item) {
+			return interface.admin('item-addTie', {field: field, item: item}).then(function (res) {
+				field.tieID = res;
+				field.exact = true;
+				return field;
 			});
 		}
 	};
