@@ -34,7 +34,7 @@ class Item extends NG {
 		foreach ($prices as &$value) $value['settings'] = json_decode($value['settings']);
 		
 		// Others
-		$tplSTH   = $this->db->query("SELECT * FROM template;");
+		$tplSTH   = $this->db->query("SELECT templateID, name, costReq, itemReq FROM template;");
 		$fieldSTH = $this->db->query("SELECT fieldID, name, type FROM field;");
 		$tieSTH   = $this->db->query("SELECT * FROM tie;");
 
