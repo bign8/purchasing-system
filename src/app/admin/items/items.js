@@ -111,6 +111,11 @@ controller('ItemListCtrl', ['$scope', 'items', '$location', 'ItemService', funct
 			other.order = temp;
 		});
 	};
+	$scope.chgField = function(field) {
+		ItemService.chgField(field).then(function (res) {
+			field.required = res.required;
+		});
+	};
 }]).
 
 factory('ItemService', ['interface', '$q', '$route', function (interface, $q, $route) {
@@ -159,9 +164,9 @@ factory('ItemService', ['interface', '$q', '$route', function (interface, $q, $r
 			for (var key in myTies) {
 				if ( parents.indexOf( myTies[key].itemID ) > -1 ) { // in parents array
 					ele = angular.copy( myFields[ myTies[key].fieldID ] );
-					ele.tieID = key;
-					ele.order = parseInt( myTies[key].order );
 					ele.exact = ( myTies[key].itemID == itemID ); // exact match
+					angular.extend(ele, myTies[key]);             // overwrites itemID, not valid!
+					ele.order = parseInt( myTies[key].order );    // convert order to integer
 					ret.push( ele );
 				}
 			}
@@ -205,6 +210,12 @@ factory('ItemService', ['interface', '$q', '$route', function (interface, $q, $r
 					myTies[src.tieID].order = myTies[dest.tieID].order;
 					myTies[dest.tieID].order = temp;
 				}
+			});
+		},
+		chgField: function(field) {
+			return interface.admin('item-chgTie', field).then(function (res) {
+				myTies[field.tieID].required = res.required;
+				return res;
 			});
 		}
 	};

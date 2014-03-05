@@ -11,6 +11,7 @@ class Item extends NG {
 		$obj = new self();
 		switch ( $action ) {
 			case 'addTie': $data = $obj->addTie(); break;
+			case 'chgTie': $data = $obj->chgTie(); break;
 			case 'init':   $data = $obj->init();   break;
 			case 'mvTie':  $data = $obj->mvTie();  break;
 			case 'rem':    $data = $obj->rem();    break;
@@ -106,6 +107,15 @@ class Item extends NG {
 			$test = $setSTH->execute( $src, $d->dest );
 		}
 		if ($test) $test = $setSTH->execute( $dest, $d->src );
+		if (!$test) $this->conflict();
 		return $test;
+	}
+
+	// Change if field is required (by tie)
+	public function chgTie() {
+		$data = $this->getPostData();
+		$STH = $this->db->prepare("UPDATE tie SET required=? WHERE tieID=?;");
+		if (!$STH->execute( $data->required, $data->tieID )) $this->conflict();
+		return $data;
 	}
 }

@@ -91,15 +91,20 @@
 		</div>
 
 		<h3>Fields</h3>
-		<p>Items shown in red must be removed on parent</p>
+		<p>
+			Items shown in red must be modified on parent<br/>
+			Checkbox shows if item is required
+		</p>
 		<div style="max-height:300px;overflow-x:hidden;overflow-y:auto">
 			<table class="table" style="margin-bottom:0">
 				<tr ng-repeat="field in myFields | orderBy:'order'" ng-class="{false:'error'}[field.exact]">
 					<td>
-						{{field.name}} {{field.order}}
+						<input type="checkbox" ng-model="field.required" ng-true-value="true" ng-false-value="false" style="margin:0" ng-disabled="!field.exact" ng-change="chgField(field)">&nbsp;
+						{{field.name}}
 						<div class="pull-right" ng-show="field.exact">
 							<i class="icon-arrow-up" ng-click="mvField(-1, field)" ng-hide="$first"></i>
 							<i class="icon-arrow-down" ng-click="mvField(1, field)" ng-hide="$last"></i>
+							<i class="icon-" ng-show="$last"></i>
 							<button class="close" ng-click="rmField($event, field)">&times;</button>
 						</div>
 					</td>
