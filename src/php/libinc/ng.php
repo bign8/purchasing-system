@@ -71,6 +71,7 @@ class NG {
 
 		if ( preg_match('/\/conference\/.*/', @$data->path) && @$data->index == 1 ) $q = "`name` FROM `item` WHERE `itemID`";
 		if ( preg_match('/\/admin\/discounts\/.*/', @$data->path) && @$data->index == 2 ) $q = "`name` FROM `discount` WHERE `discountID`";
+		if ( preg_match('/\/admin\/items\/.*/', @$data->path) && @$data->index == 2 ) $q = "`name` FROM `item` WHERE `itemID`";
 
 		if ( isset($q) ) {
 			$STH = $this->db->prepare( "SELECT $q=? LIMIT 1;" );
