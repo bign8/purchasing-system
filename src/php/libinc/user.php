@@ -188,19 +188,41 @@ HTML;
 		if (!$setSTH->execute($newHash, $user['contactID'] )) return $this->conflict();
 
 		$html = <<<HTML
-			<p>You requested that your payment.upstreamacademy.com account password be reset.  This notice tells you how to do exactly that.</p>
 			<p>
-				Please navigate to our 
-				<a href="http://payment.upstreamacademy.com/reset/{$newHash}">password reset page</a> 
-				to assign yourself a new password.
+				You requested a reset to your Upstream Academy payment password. Please go to our
+				<a href="http://payment.upstreamacademy.com/reset/{$newHash}">password reset page</a>
+				to choose a new password.
 			</p>
 			<p>
 				If the above link does not work, try navigating to this address manually:
 				<b>http://payment.upstreamacademy.com/reset/{$newHash}</b>
 			</p>
 			<p>
-				You have <b>3</b> days to reset your password, after which time, 
-				this address becomes invalid and you must restart the password reset process.
+				If you do not reset your password within <b>three days,</b>
+				the link will expire and you will need to restart the password reset process.
+			</p>
+			<p>
+				If you have any questions or concerns, please feel free to contact me.
+			</p>
+			<p style='font-family:"Palatino Linotype","serif";font-variant:small-caps;'>
+				<span style='color:black;letter-spacing:1.1pt'>
+					<b style='color:navy'>Georgia Cummings</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					Director&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;
+					<b>Upstream Academy</b>
+				</span>
+				<br/>
+				<span style='font-size:10pt;color:gray;letter-spacing:.4pt'>
+					P. O. Box 1147&nbsp;&nbsp;828 Great Northern Blvd&nbsp;&nbsp;Helena, MT 59624-1147
+					<br/>
+					(P) 406-495-1850&nbsp;&nbsp;&nbsp;(F) 406-442-1100&nbsp;&nbsp;&nbsp;
+					<a href="mailto:georgiac@upstreamacademy.com" style='color:gray;'>georgiac@upstreamacademy.com</a>
+				</span>
+				<br/>
+				<span style='font-size:10.0pt;color:navy;color:navy;letter-spacing:1.1pt;text-align:justify'>
+					Guiding accounting firms to high performance
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					<a href="http://www.upstreamacademy.com/" style='color:#31849B;letter-spacing:1.0pt'>upstreamacademy.com</a>
+				</span>
 			</p>
 HTML;
 		$mail = new UAMail();
