@@ -24,6 +24,7 @@ controller('ItemListCtrl', ['$scope', 'items', '$location', 'ItemService', funct
 	$scope.origin = false; // holds pointer to list item
 	$scope.tpls = ItemService.getTpls();
 	$scope.fields = ItemService.getFields();
+	$scope.allItems = ItemService.allItems();
 
 	// nav functions
 	$scope.go = function (itemID) {
@@ -193,6 +194,9 @@ factory('ItemService', ['interface', '$q', '$route', function (interface, $q, $r
 			if (itemID) ret.item = myItems[itemID];
 			return ret;
 		},
+		allItems: function() {
+			return myItems;
+		},
 		itemFields: function (itemID) {
 			if (!itemID) return [];
 			var ret = [], parents = getParents(itemID), ele;
@@ -214,7 +218,7 @@ factory('ItemService', ['interface', '$q', '$route', function (interface, $q, $r
 				if ( parents.indexOf( myPrices[key].itemID) > -1 ) {
 					ele = angular.copy( myPrices[key] );
 					ele.exact = (ele.itemID == itemID);
-					ele.reason = ele.reasonID ? myItems[ ele.reasonID ] : false;
+					// ele.reason = ele.reasonID ? myItems[ ele.reasonID ] : false;
 					ele.costReq = myTpls[ ele.templateID ].costReq;
 					ret.push( ele );
 				}

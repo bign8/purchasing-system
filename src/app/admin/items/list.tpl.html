@@ -110,9 +110,18 @@
 			<table class="table" style="margin-bottom:0">
 				<tr ng-repeat="price in myPrices" ng-class="{false:'error'}[price.exact]" class="prices">
 					<td class="form-horizontal">
-						<pre>{{price | json}}</pre><br/>
-						
-						<div class="control-group" ng-show="price.reason">
+						<!-- <pre>{{price | json}}</pre><br/> -->
+
+						<div class="control-gorup">
+							<label class="control-label" for="reason-{{price.priceID}}"><strong>Reason</strong></label>
+							<div class="controls" ng-switch="price.reasonID">
+								<p ng-switch-when="null" style="padding-top:6px">Default Price</p>
+								<select id="reason-{{price.priceID}}" ng-switch-default ng-options="k as v.name for (k,v) in allItems" ng-model="price.reasonID" class="input-block-level">
+								</select>
+							</div>
+						</div>
+
+						<div class="control-group" ng-show="price.reasonID">
 							<div class="control-label" style="padding-top:0">
 								<input type="checkbox" ng-model="price.inCart" ng-true-value="true" ng-false-value="false" style="margin:0">
 							</div>
@@ -133,12 +142,13 @@
 			</table>
 		</div>
 		
+		<hr>
+		
+		<!-- Fields -->
 		<div class="pull-right input-prepend" style="margin-top:15px">
 			<span class="add-on">Add</span>
 			<select class="span2" ng-model="addField" ng-options="field.name for (key, field) in fields"></select>
 		</div>
-
-		<!-- Fields -->
 		<h3>Fields</h3>
 		<p>
 			Items shown in red must be modified on parent<br/>
