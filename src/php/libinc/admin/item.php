@@ -30,7 +30,7 @@ class Item extends NG {
 
 		// Prices (to convert)
 		$priceSTH = $this->db->query("SELECT * FROM price;");
-		$prices = $itemSTH->fetchAll();
+		$prices = $priceSTH->fetchAll();
 		foreach ($prices as &$value) $value['settings'] = json_decode($value['settings']);
 		
 		// Others
@@ -47,7 +47,7 @@ class Item extends NG {
 		);
 	}
 
-	// removes discount from db
+	// removes item from db
 	public function rem() {
 		$data = $this->getPostData();
 		$STH = $this->db->prepare("DELETE FROM item WHERE itemID=?;");
@@ -55,15 +55,19 @@ class Item extends NG {
 		return $data;
 	}
 
-	// stores discount changes
+	// stores item changes
 	public function set() {
 		$d = $this->getPostData();
 		if (isset($d->itemID)) {
-			$STH = $this->db->prepare("UPDATE item SET name=?,desc=? WHERE itemID=?;");
-			if (!$STH->execute($d->name, $d->desc, $d->itemID)) return $this->conflict();
+			$STH = $this->db->prepare("UPDATE item SET name=?,desc=?,templateID=?,code=?,image=?,onFirm=?,settings=? WHERE itemID=?;");
+			if (!$STH->execute(
+				$d->name, $d->desc, $d->templateID, $d->code, $d->image, $d->onFirm, json_encode($d->settings), $d->itemID
+			)) return $this->conflict();
 		} else {
-			$STH = $this->db->prepare("INSERT INTO item (parentID, name, desc, settings) VALUES (?,?,?,?);");
-			if (!$STH->execute($d->parentID, $d->name, $d->desc, json_encode($d->settings))) return $this->conflict();
+			$STH = $this->db->prepare("INSERT INTO item (parentID,name,desc,settings,templateID,code,image,onFirm) VALUES (?,?,?,?);");
+			if (!$STH->execute(
+				$d->parentID, $d->name, $d->desc, json_encode($d->settings), $d->templateID, $d->code, $d->image, $d->onFirm
+			)) return $this->conflict();
 			$d = (object) array_merge( (array)$d, array('itemID' => $this->db->lastInsertId()) );
 		}
 		return $d;

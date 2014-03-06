@@ -98,9 +98,38 @@
 	<div class="span4" ng-show="active">
 
 		<h3>Prices</h3>
-		<div style="max-height:300px;overflow-x:hidden;overflow-y:auto">
+		<p>
+			Items shown in red must be modified on parent<br/>
+			Checkbox shows if effective with reason in cart
+		</p>
+		<div style="max-height:500px;overflow-x:hidden;overflow-y:auto">
+			<style>
+				.prices .control-label { width: 50px; }
+				.prices .controls { margin-left:60px; }
+			</style>
 			<table class="table" style="margin-bottom:0">
-					Sample <br/> Multi-line <br/> Data
+				<tr ng-repeat="price in myPrices" ng-class="{false:'error'}[price.exact]" class="prices">
+					<td class="form-horizontal">
+						<pre>{{price | json}}</pre><br/>
+						
+						<div class="control-group" ng-show="price.reason">
+							<div class="control-label" style="padding-top:0">
+								<input type="checkbox" ng-model="price.inCart" ng-true-value="true" ng-false-value="false" style="margin:0">
+							</div>
+							<div class="controls">Allow if reason is in cart</div>
+						</div>
+
+						<!-- custom questions -->
+						<div ng-repeat="question in price.costReq" class="control-group">
+							<label for="price-{{question}}" style="text-transform:capitalize;" class="control-label">
+								<strong>{{question}}</strong>
+							</label>
+							<div class="controls">
+								<input type="text" id="price-{{question}}" ng-model="price.settings[question]" class="input-block-level">
+							</div>
+						</div>
+					</td>
+				</tr>
 			</table>
 		</div>
 		
@@ -115,7 +144,7 @@
 			Items shown in red must be modified on parent<br/>
 			Checkbox shows if item is required
 		</p>
-		<div style="max-height:300px;overflow-x:hidden;overflow-y:auto">
+		<div style="max-height:500px;overflow-x:hidden;overflow-y:auto">
 			<table class="table" style="margin-bottom:0">
 				<tr ng-repeat="field in myFields | orderBy:'order'" ng-class="{false:'error'}[field.exact]">
 					<td>
@@ -136,7 +165,7 @@
 </div>
 
 <!-- START DEV -->
-<!-- <pre>{{myTemplate | json}}</pre> -->
+<pre>{{myPrices | json}}</pre>
 <pre>{{active | json}}</pre>
 <pre>{{items | json}}</pre>
 <!-- END DEV -->

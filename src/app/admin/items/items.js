@@ -33,12 +33,19 @@ controller('ItemListCtrl', ['$scope', 'items', '$location', 'ItemService', funct
 	};
 	$scope.edit = function (item) {
 		var validEdit = function() {
+			// toggle reset
 			$scope.origin.isActive = false;
 			$scope.origin = item;
 			$scope.origin.isActive = true;
+
+			// Template data
+			$scope.myTemplate = ItemService.getTpl(item);
+			item.templateID = ($scope.myTemplate || {templateID:null}).templateID;
+
+			// Copy and setup fields + prices
 			$scope.active = angular.copy(item);
 			$scope.myFields = ItemService.itemFields(item.itemID);
-			$scope.myTemplate = ItemService.getTpl(item);
+			$scope.myPrices = ItemService.getPrices(item.itemID);
 		};
 		if ($scope.active && !angular.equals( $scope.origin, $scope.active )) {
 			var check = confirm('The current item has been modified.\nAre you sure you want to change without saving?');
@@ -195,6 +202,20 @@ factory('ItemService', ['interface', '$q', '$route', function (interface, $q, $r
 					ele.exact = ( myTies[key].itemID == itemID ); // exact match
 					angular.extend(ele, myTies[key]);             // overwrites itemID, not valid!
 					ele.order = parseInt( myTies[key].order );    // convert order to integer
+					ret.push( ele );
+				}
+			}
+			return ret;
+		},
+		getPrices: function (itemID) {
+			if (!itemID) return [];
+			var ret = [], parents = getParents(itemID), ele;
+			for (var key in myPrices) {
+				if ( parents.indexOf( myPrices[key].itemID) > -1 ) {
+					ele = angular.copy( myPrices[key] );
+					ele.exact = (ele.itemID == itemID);
+					ele.reason = ele.reasonID ? myItems[ ele.reasonID ] : false;
+					ele.costReq = myTpls[ ele.templateID ].costReq;
 					ret.push( ele );
 				}
 			}
