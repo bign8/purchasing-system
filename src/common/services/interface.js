@@ -27,9 +27,6 @@ factory('interface', ['$http', '$q', '$rootScope', '$timeout', function ($http, 
 		pendingPromisses++;
 
 		var args = {params:{c:myClass, a:myFn}};
-		// START DEV
-		if (localStorage.getItem('sessionID')) args.params.sessionID = localStorage.getItem('sessionID');
-		// END DEV
 		$http.post('/interface.php', myData, args).then(function (obj) {
 			deferred.resolve( formatData( obj.data ) );
 			pendingPromisses--;

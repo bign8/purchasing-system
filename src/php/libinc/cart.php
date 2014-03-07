@@ -40,9 +40,6 @@ class Cart extends NG {
 			case 'getFullCart':  $data = $obj->getFullCart();  break;
 			case 'getPurchases': $data = $obj->getPurchases(); break;
 			case 'save':         $data = $obj->save();         break;
-			// START DEV
-			case 'emailCart': $data = $obj->emailCart( 15 ); break;
-			// END DEV
 			default: $pass = false;
 		}
 	}
@@ -160,9 +157,6 @@ class Cart extends NG {
 			$row['cost'] = $leastRow;
 			if ($leastRow != $origRow) $row['cost']['full'] = (array)json_decode($origRow['settings']);
 		}
-		// START DEV
-		$row['cost2'] = $costRows; // debugging
-		// END DEV
 
 		// warn if item has already been purchased
 		$checkSTH = $this->db->prepare("SELECT * FROM purchase WHERE itemID=? AND (contactID=? OR firmID=?);"); // in progress
