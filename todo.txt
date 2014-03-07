@@ -5,8 +5,6 @@ ToDo:
 	- MP-past (hard-copy or digital) (Note about CPE credit cannot be applied) - download not currently available
 - Allow pretty crumb to be set by individual pages (can bind to form elements for changing crumbs)
 - Notify users of un-supported browsers
-- Service to controll account settings (single data pull) (clearing memberships on new firm creation)
-- store referrer for redirects back to site
 
 ToDo Directives:
 - address setting
@@ -19,14 +17,10 @@ In a holding pattern:
 - build administration section (see if user end is accepted)
 	- Downloads
 	- Firms (merge)
-	- Groups
-	- Items
-	- Memberships
-	- Purchases
+	- Purchases (manual add memberships)
 - Explain setting up an account (your information, not person signing up for conference)
 
 Notes:
-- Acquisition is per user / purchase is per firm
 - Add conference type product -> Force insert into tie_product_field
 - Add price to new products
 - Admin can drop attendees
@@ -43,6 +37,8 @@ Future releases
 - register user / select address for a list of firm addresses
 - sync with Luke's UAN member site
 - use key based paypal checkout
+- Service to controll account settings (single data pull) (clearing memberships on new firm creation)
+- store referrer for redirects back to site
 
 Git Commands:
 - git add -p

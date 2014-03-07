@@ -145,7 +145,24 @@ controller('ItemListCtrl', ['$scope', 'items', '$location', 'ItemService', funct
 	});
 
 	// Price Functions
-
+	$scope.priceDifferent = function (price) {
+		if (!price.orig) return false;
+		return !(
+			angular.equals(price.settings, price.orig.settings) &&
+			angular.equals(price.inCart,   price.orig.inCart  ) &&
+			angular.equals(price.reasonID, price.orig.reasonID)
+		);
+	};
+	$scope.priceReset = function (price) {
+		price.settings = angular.copy( price.orig.settings );
+		price.inCart   = angular.copy( price.orig.inCart   );
+		price.reasonID = angular.copy( price.orig.reasonID );
+	};
+	$scope.priceSave = function (price) {
+		ItemService.setPrice(price).then(function (res) {
+			console.log(res);
+		});
+	};
 }]).
 
 factory('ItemService', ['interface', '$q', '$route', function (interface, $q, $route) {
@@ -201,11 +218,11 @@ factory('ItemService', ['interface', '$q', '$route', function (interface, $q, $r
 			if (!itemID) return [];
 			var ret = [], parents = getParents(itemID), ele;
 			for (var key in myTies) {
-				if ( parents.indexOf( myTies[key].itemID ) > -1 ) { // in parents array
-					ele = angular.copy( myFields[ myTies[key].fieldID ] );
-					ele.exact = ( myTies[key].itemID == itemID ); // exact match
-					angular.extend(ele, myTies[key]);             // overwrites itemID, not valid!
-					ele.order = parseInt( myTies[key].order );    // convert order to integer
+				if ( parents.indexOf( myTies[key].itemID ) > -1 ) {        // in parents array
+					ele = angular.copy( myFields[ myTies[key].fieldID ] ); // copy from source
+					ele.exact = ( myTies[key].itemID == itemID );          // exact match
+					angular.extend(ele, myTies[key]);                      // overwrites itemID, not good!
+					ele.order = parseInt( myTies[key].order );             // convert order to integer
 					ret.push( ele );
 				}
 			}
@@ -215,11 +232,11 @@ factory('ItemService', ['interface', '$q', '$route', function (interface, $q, $r
 			if (!itemID) return [];
 			var ret = [], parents = getParents(itemID), ele;
 			for (var key in myPrices) {
-				if ( parents.indexOf( myPrices[key].itemID) > -1 ) {
-					ele = angular.copy( myPrices[key] );
-					ele.exact = (ele.itemID == itemID);
-					// ele.reason = ele.reasonID ? myItems[ ele.reasonID ] : false;
-					ele.costReq = myTpls[ ele.templateID ].costReq;
+				if ( parents.indexOf( myPrices[key].itemID) > -1 ) { // in parents array
+					ele = angular.copy( myPrices[key] );             // copy from source
+					ele.exact = (ele.itemID == itemID);              // exact match
+					ele.costReq = myTpls[ ele.templateID ].costReq;  // cost requirements
+					ele.orig = angular.copy( ele );                  // make copy of origional
 					ret.push( ele );
 				}
 			}
@@ -274,6 +291,14 @@ factory('ItemService', ['interface', '$q', '$route', function (interface, $q, $r
 				template = item.templateID;
 			}
 			return template ? myTpls[ template ] : null;
+		},
+		setPrice: function(price) {
+			delete price.orig;
+			return interface.admin('item-setPri', price).then(function (res) {
+				myPrices[res.priceID] = angular.copy( res );
+				res.orig = angular.copy( res );
+				return res;
+			});
 		}
 	};
 	return service;

@@ -17,6 +17,7 @@ class Item extends NG {
 			case 'rem':    $data = $obj->rem();    break;
 			case 'rmTie':  $data = $obj->rmTie();  break;
 			case 'set':    $data = $obj->set();    break;
+			case 'setPri': $data = $obj->setPri(); break;
 			default: $pass = false;
 		}
 	}
@@ -121,5 +122,24 @@ class Item extends NG {
 		$STH = $this->db->prepare("UPDATE tie SET required=? WHERE tieID=?;");
 		if (!$STH->execute( $data->required, $data->tieID )) $this->conflict();
 		return $data;
+	}
+
+
+	// set price
+	public function setPri() {
+		$d = $this->getPostData();
+		if (isset($d->priceID)) {
+			$STH = $this->db->prepare("UPDATE price SET reasonID=?,inCart=?,templateID=?,settings=? WHERE priceID=?;");
+			if (!$STH->execute(
+				$d->reasonID, $d->inCart, $d->templateID, json_encode($d->settings), $d->priceID
+			)) return $this->conflict();
+		} else {
+			// $STH = $this->db->prepare("INSERT INTO item (parentID,name,desc,settings,templateID,code,image,onFirm) VALUES (?,?,?,?);");
+			// if (!$STH->execute(
+			// 	$d->parentID, $d->name, $d->desc, json_encode($d->settings), $d->templateID, $d->code, $d->image, $d->onFirm
+			// )) return $this->conflict();
+			// $d = (object) array_merge( (array)$d, array('priceID' => $this->db->lastInsertId()) );
+		}
+		return $d;
 	}
 }
