@@ -97,14 +97,17 @@
 	<!-- Other things -->
 	<div class="span4" ng-show="active">
 
-		<h3>Prices</h3>
+		<h3>
+			<button class="btn btn-success pull-right btn-mini" style="margin-top:10px" ng-click="priceAdd()">Add</button>
+			Prices
+		</h3>
 		<p>
 			Items shown in red must be modified on parent
 		</p>
 		<div style="max-height:500px;overflow-x:hidden;overflow-y:auto">
 			<style>
-				.prices .control-label { width: 50px; }
-				.prices .controls { margin-left:60px; }
+				.prices .control-label { width: 65px; }
+				.prices .controls { margin-left:75px; }
 			</style>
 			<table class="table" style="margin-bottom:0">
 				<tr ng-repeat="price in myPrices" ng-class="{false:'error'}[price.exact]" class="prices">
@@ -112,7 +115,7 @@
 						<!-- <pre>{{price | json}}</pre><br/> -->
 
 						<div class="control-gorup">
-							<label class="control-label" for="reason-{{price.priceID}}"><strong>Reason</strong></label>
+							<label class="control-label" for="reason-{{price.priceID}}"><strong>Reason *</strong></label>
 							<div class="controls" ng-switch="price.reasonID">
 								<p ng-switch-when="null" style="padding-top:6px">Default</p>
 								<select id="reason-{{price.priceID}}" ng-switch-default ng-options="k as v.name for (k,v) in allItems" ng-model="price.reasonID" class="input-block-level">
@@ -130,7 +133,7 @@
 						<!-- custom questions -->
 						<div ng-repeat="question in price.costReq" class="control-group">
 							<label for="price-{{question}}" style="text-transform:capitalize;" class="control-label">
-								<strong>{{question}}</strong>
+								<strong>{{question}} *</strong>
 							</label>
 							<div class="controls">
 								<input type="text" id="price-{{question}}" ng-model="price.settings[question]" class="input-block-level">

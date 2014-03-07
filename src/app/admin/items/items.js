@@ -159,9 +159,25 @@ controller('ItemListCtrl', ['$scope', 'items', '$location', 'ItemService', funct
 		price.reasonID = angular.copy( price.orig.reasonID );
 	};
 	$scope.priceSave = function (price) {
+		delete price.orig;
 		ItemService.setPrice(price).then(function (res) {
-			console.log(res);
+			price.orig = angular.copy( res );
 		});
+	};
+	$scope.priceAdd = function () {
+		var obj = {
+			itemID: $scope.active.itemID,
+			reasonID: "-1",
+			inCart: 'true',
+			templateID: $scope.myTemplate.templateID,
+			costReq: $scope.myTemplate.costReq,
+			settings: {}
+		};
+		obj.orig = angular.copy( obj );
+		$scope.myPrices.unshift(obj);
+	};
+	$scope.priceRem = function (price) {
+		// TODO
 	};
 }]).
 
@@ -293,7 +309,6 @@ factory('ItemService', ['interface', '$q', '$route', function (interface, $q, $r
 			return template ? myTpls[ template ] : null;
 		},
 		setPrice: function(price) {
-			delete price.orig;
 			return interface.admin('item-setPri', price).then(function (res) {
 				myPrices[res.priceID] = angular.copy( res );
 				res.orig = angular.copy( res );
