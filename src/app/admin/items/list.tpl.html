@@ -102,7 +102,7 @@
 			Prices
 		</h3>
 		<p>
-			Items shown in red must be modified on parent
+			Items shown in red modified other items prices
 		</p>
 		<div style="max-height:500px;overflow-x:hidden;overflow-y:auto">
 			<style>
@@ -117,13 +117,17 @@
 						<div class="control-gorup">
 							<label class="control-label" for="reason-{{price.priceID}}"><strong>Reason *</strong></label>
 							<div class="controls" ng-switch="price.reasonID">
-								<p ng-switch-when="null" style="padding-top:6px">Default</p>
+								<p ng-switch-when="null" style="padding-top:6px">
+									<button class="close pull-right" ng-click="priceRem(price)">&times;</button>
+									Default
+								</p>
 								<select id="reason-{{price.priceID}}" ng-switch-default ng-options="k as v.name for (k,v) in allItems" ng-model="price.reasonID" class="input-block-level">
 								</select>
 							</div>
 						</div>
 
 						<div class="control-group" ng-show="price.reasonID">
+							<button class="close pull-right" ng-click="priceRem(price)">&times;</button>
 							<div class="control-label" style="padding-top:0">
 								<input type="checkbox" ng-model="price.inCart" ng-true-value="true" ng-false-value="false" style="margin:0">
 							</div>

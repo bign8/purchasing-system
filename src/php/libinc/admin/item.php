@@ -15,6 +15,7 @@ class Item extends NG {
 			case 'init':   $data = $obj->init();   break;
 			case 'mvTie':  $data = $obj->mvTie();  break;
 			case 'rem':    $data = $obj->rem();    break;
+			case 'rmPri':  $data = $obj->rmPri();  break;
 			case 'rmTie':  $data = $obj->rmTie();  break;
 			case 'set':    $data = $obj->set();    break;
 			case 'setPri': $data = $obj->setPri(); break;
@@ -124,7 +125,6 @@ class Item extends NG {
 		return $data;
 	}
 
-
 	// set price
 	public function setPri() {
 		$d = $this->getPostData();
@@ -141,5 +141,13 @@ class Item extends NG {
 			$d = (object) array_merge( (array)$d, array('priceID' => $this->db->lastInsertId()) );
 		}
 		return $d;
+	}
+
+	// remove price
+	public function rmPri() {
+		$data = $this->getPostData();
+		$STH = $this->db->prepare("DELETE FROM price WHERE priceID=?;");
+		if (!$STH->execute($data->priceID)) return $this->conflict();
+		return $data;
 	}
 }
