@@ -99,8 +99,7 @@
 
 		<h3>Prices</h3>
 		<p>
-			Items shown in red must be modified on parent<br/>
-			Checkbox shows if effective with reason in cart
+			Items shown in red must be modified on parent
 		</p>
 		<div style="max-height:500px;overflow-x:hidden;overflow-y:auto">
 			<style>
@@ -115,7 +114,7 @@
 						<div class="control-gorup">
 							<label class="control-label" for="reason-{{price.priceID}}"><strong>Reason</strong></label>
 							<div class="controls" ng-switch="price.reasonID">
-								<p ng-switch-when="null" style="padding-top:6px">Default Price</p>
+								<p ng-switch-when="null" style="padding-top:6px">Default</p>
 								<select id="reason-{{price.priceID}}" ng-switch-default ng-options="k as v.name for (k,v) in allItems" ng-model="price.reasonID" class="input-block-level">
 								</select>
 							</div>
@@ -137,6 +136,11 @@
 								<input type="text" id="price-{{question}}" ng-model="price.settings[question]" class="input-block-level">
 							</div>
 						</div>
+
+						<div ng-show="priceDifferent(price)">
+							<button class="btn btn-success btn-mini" ng-click="priceSave(price)">Save</button>&nbsp;
+							<button class="btn btn-warning btn-mini" ng-click="priceReset(price)">Reset</button>
+						</div>
 					</td>
 				</tr>
 			</table>
@@ -145,7 +149,7 @@
 		<hr>
 		
 		<!-- Fields -->
-		<div class="pull-right input-prepend" style="margin-top:15px">
+		<div class="pull-right input-prepend" style="margin:5px 0 0">
 			<span class="add-on">Add</span>
 			<select class="span2" ng-model="addField" ng-options="field.name for (key, field) in fields"></select>
 		</div>
