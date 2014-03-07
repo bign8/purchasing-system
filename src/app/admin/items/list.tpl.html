@@ -1,0 +1,197 @@
+<div class="row">
+	<!-- Children List -->
+	<div class="span4">
+		<h3>
+			<span ng-show="myItem">{{myItem.name}}&nbsp;</span>
+			Items
+			<small ng-show="myItem">&nbsp;{{myItem.desc}}</small>
+		</h3>
+		<div>
+			<button type="button" class="btn btn-success pull-right btn-mini" ng-click="newItem()">New Item</button>
+			<span class="pull-right" ng-show="myItem">
+				<button type="button" class="btn btn-info btn-mini" ng-click="go(myItem.parentID)">Parent</button>&nbsp;
+			</span>
+		</div>
+		<ul>
+			<li>Single Click an item to modify</li>
+			<li>Double Click to view children</li>
+			<li>Delete an item with the "x" on the right.</li>
+		</ul>
+		<div style="max-height:600px;overflow-x:hidden;overflow-y:auto">
+			<table class="table table-hover" style="margin-bottom:0">
+				<thead><tr><th>Name</th></tr></thead>
+				<tbody>
+					<tr ng-repeat="item in items" ng-click="edit(item)" ng-dblclick="go(item.itemID)" ng-class="{true:'info'}[item.isActive]">
+						<td>
+							{{item.name}}
+							<button class="close pull-right" ng-click="rem($event, item)">&times;</button>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+	<!-- itemForm -->
+	<form name="itemForm" class="span4 form-horizontal" ng-show="active">
+		<h3>Details</h3>
+		<div class="control-group">
+			<label for="name"><strong>Name *</strong></label>
+			<input type="text" id="name" placeholder="Name" ng-model="active.name" class="input-block-level" required>
+		</div>
+		<div class="control-group">
+			<label for="desc"><strong>Description *</strong></label>
+			<input type="text" id="desc" name="desc" placeholder="Description" ng-model="active.desc" class="input-block-level" required>
+		</div>
+		<div class="control-group">
+			<label><strong>Applies To *</strong></label>
+			<label class="radio inline">
+				<input type="radio" name="optionsRadios" ng-model="active.onFirm" value="true"> Firm
+			</label>
+			<label class="radio inline">
+				<input type="radio" name="optionsRadios" ng-model="active.onFirm" value="false"> User
+			</label>
+			<span class="help-block">Purchase is applied to this entity.</span>
+		</div>
+
+		<!-- template -->
+		<div class="well">
+			<div class="control-group">
+				<label for="tpl"><strong>Template *</strong></label>
+				<select ng-model="myTemplate" ng-options="value.name for (key, value) in tpls" class="input-block-level"></select>
+			</div>
+			<div ng-hide="active.count=='0'">This item appears to be a directory.<br/>Any aditional Item questions are not required.</div>
+			<div ng-repeat="question in myTemplate.itemReq" ng-switch="question" class="control-group">
+				<label for="tpl-{{question}}" style="text-transform: capitalize"><strong>{{question}}</strong></label>
+				<div ng-switch-when="date">
+					<input type="text" id="tpl-{{question}}" ng-model="active.settings[question]" class="input-block-level">
+					<span class="help-block">Format: MMM dd, yyyy (ie: Aug 19, 1991)</span>
+				</div>
+				<div ng-switch-when="file">
+					<input type="text" id="tpl-{{question}}" ng-model="active.settings[question]" class="input-block-level">
+					<span class="help-block">Relative to files directory<br/>(ie: "hw/con1.zip" for "/files/hw/conf.zip")</span>
+				</div>
+				<input ng-switch-default type="text" id="tpl-{{question}}" ng-model="active.settings[question]" class="input-block-level">
+			</div>
+		</div>
+		<!-- end template -->
+
+		<div class="control-group">
+			<label for="code"><strong>Direct Code</strong></label>
+			<input type="text" id="code" name="code" placeholder="Direct Code" ng-model="active.code" class="input-block-level">
+			<span class="help-block">For Direct Adding in "User" area</span>
+		</div>
+		<div class="control-group">
+			<label for="image"><strong>Image</strong></label>
+			<input type="text" id="image" name="image" placeholder="Image" ng-model="active.image" class="input-block-level">
+			<span class="help-block">Not Currently Implemented</span>
+		</div>
+
+		<div>
+			<button type="submit" class="btn btn-primary" ng-disabled="itemForm.$invalid || equals(origin, active)" ng-click="save()">Save Item</button>&nbsp;
+			<button type="button" class="btn btn-warning" ng-disabled="equals(origin, active)" ng-click="reset()">Reset</button>&nbsp;
+			<button type="button" class="btn" ng-click="cancel()">Cancel</button>
+		</div>
+	</form>
+
+	<!-- Other things -->
+	<div class="span4" ng-show="active">
+		<h3>Cart Links</h3>
+		<p>
+			For links that use ajax, make sure you include <a href="/uacart.js">uacart.js</a> along with <a href="//code.jquery.com/jquery-1.10.2.min.js">jQuery</a> and have the following within your link tag<br/>
+			<code> href="#" class="cartAdd" data-item-id="{{active.itemID}}"</code><br/><br/>
+			For direct links (like registering) use this link<br/>
+			<code>//payment.upstreamacademy.com/conference/{{active.itemID}}</code><br/><br/>
+			It is not reccomended to do this for folders.
+		</p>
+
+		<hr/>
+
+		<h3>
+			<button class="btn btn-success pull-right btn-mini" style="margin-top:10px" ng-click="priceAdd()">Add</button>
+			Prices
+		</h3>
+		<p>
+			Items shown in red modified other items prices
+		</p>
+		<div style="max-height:500px;overflow-x:hidden;overflow-y:auto">
+			<style>
+				.prices .control-label { width: 65px; }
+				.prices .controls { margin-left:75px; }
+			</style>
+			<table class="table" style="margin-bottom:0">
+				<tr ng-repeat="price in myPrices" ng-class="{false:'error'}[price.exact]" class="prices">
+					<td class="form-horizontal">
+						<!-- <pre>{{price | json}}</pre><br/> -->
+
+						<div class="control-gorup">
+							<label class="control-label" for="reason-{{price.priceID}}"><strong>Reason *</strong></label>
+							<div class="controls" ng-switch="price.reasonID">
+								<p ng-switch-when="null" style="padding-top:6px">
+									<button class="close pull-right" ng-click="priceRem(price)">&times;</button>
+									Default
+								</p>
+								<select id="reason-{{price.priceID}}" ng-switch-default ng-options="k as v.name for (k,v) in allItems" ng-model="price.reasonID" class="input-block-level">
+								</select>
+							</div>
+						</div>
+
+						<div class="control-group" ng-show="price.reasonID">
+							<button class="close pull-right" ng-click="priceRem(price)">&times;</button>
+							<div class="control-label" style="padding-top:0">
+								<input type="checkbox" ng-model="price.inCart" ng-true-value="true" ng-false-value="false" style="margin:0">
+							</div>
+							<div class="controls">Allow if reason is in cart</div>
+						</div>
+
+						<!-- custom questions -->
+						<div ng-repeat="question in price.costReq" class="control-group">
+							<label for="price-{{question}}" style="text-transform:capitalize;" class="control-label">
+								<strong>{{question}} *</strong>
+							</label>
+							<div class="controls">
+								<input type="text" id="price-{{question}}" ng-model="price.settings[question]" class="input-block-level">
+							</div>
+						</div>
+
+						<div ng-show="priceDifferent(price)">
+							<button class="btn btn-success btn-mini" ng-click="priceSave(price)">Save</button>&nbsp;
+							<button class="btn btn-warning btn-mini" ng-click="priceReset(price)">Reset</button>
+						</div>
+					</td>
+				</tr>
+			</table>
+		</div>
+		
+		<hr>
+		
+		<!-- Fields -->
+		<div class="pull-right input-prepend" style="margin:5px 0 0">
+			<span class="add-on">Add</span>
+			<select class="span2" ng-model="addField" ng-options="field.name for (key, field) in fields"></select>
+		</div>
+		<h3>Fields</h3>
+		<p>
+			Items shown in red must be modified on parent<br/>
+			Checkbox shows if item is required
+		</p>
+		<div style="max-height:500px;overflow-x:hidden;overflow-y:auto">
+			<table class="table" style="margin-bottom:0">
+				<tr ng-repeat="field in myFields | orderBy:'order'" ng-class="{false:'error'}[field.exact]">
+					<td>
+						<input type="checkbox" ng-model="field.required" ng-true-value="true" ng-false-value="false" style="margin:0" ng-disabled="!field.exact" ng-change="chgField(field)">&nbsp;
+						{{field.name}}
+						<div class="pull-right" ng-show="field.exact">
+							<i class="icon-arrow-up" ng-click="mvField(-1, field)" ng-hide="$first"></i>
+							<i class="icon-arrow-down" ng-click="mvField(1, field)" ng-hide="$last"></i>
+							<i class="icon-" ng-show="$last"></i>
+							<button class="close" ng-click="rmField($event, field)">&times;</button>
+						</div>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<!-- End Fields -->
+	</div>
+</div>
+
