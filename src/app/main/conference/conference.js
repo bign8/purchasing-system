@@ -286,7 +286,7 @@ directive('uaMagicFormatter', ['$filter', function ($filter) {
 controller('ContactModalCtrl', ['$scope', '$modalInstance', 'contact', 'prep', 'interface', '$modal', 'opt', '$filter', 'appStrings', function ($scope, $modalInstance, contact, prep, interface, $modal, opt, $filter, appStrings) {
 	var blankAddr = {addressID:null, addr2:null};
 	var oldUserAddr = ( contact && contact.addr.addressID != prep.add.addressID ) ? contact.addr : blankAddr ; // null address handler
-	$scope.contact = contact || {addr:blankAddr}; // null contact handler
+	$scope.contact = contact || {addr:blankAddr,preName:'',phone:''}; // null contact handler
 
 	// filter list on `opt` (remove already added people)
 	$scope.firmEmploy = $filter('filter')(prep.emp, function(item) { // filter here not on template

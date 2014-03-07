@@ -10,6 +10,10 @@ class UAMail extends PHPMailer {
 	}
 
 	public function notify($subject, $html) {
+
+		// Add Custom Footer to messages
+		$html .= file_get_contents(__DIR__ . '/foot.html');
+
 		$this->addAddress(config::notifyEmail, config::notifyName);
 		$this->Subject = $subject;
 		$this->Body    = $html;
@@ -17,7 +21,11 @@ class UAMail extends PHPMailer {
 		return $this->send();
 	}
 
-	public function sendMsg($subject, $html, $to, $name = '') {
+	public function sendMsg($subject, $html, $to, $name = '', $hasFoot = true) {
+
+		// Add Custom Footer to messages
+		if ($hasFoot) $html .= file_get_contents(__DIR__ . '/foot.html');
+
 		$this->addAddress($to, $name);
 		$this->Subject = $subject;
 		$this->Body    = $html;
