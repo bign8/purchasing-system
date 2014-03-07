@@ -60,6 +60,7 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function ($root
 
 	var processCart = function() {
 		total = 0;
+		var now = new Date();
 		angular.forEach(service.cart, function (item) {
 			processItem(item, 'settings');
 			if (item.cost.reasonID) processItem(item, 'full');
@@ -67,8 +68,8 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function ($root
 			item.expired = (
 				item.hasOwnProperty('settings') && 
 				!!item.settings &&
-				item.settings.hasOwnProperty('eventDate') &&
-				(item.settings.eventDate < (new Date()).getTime())
+				item.settings.hasOwnProperty('date') &&
+				(new Date(item.settings.date) < now)
 			);
 			total += item.cost.value;
 		});
