@@ -54,7 +54,6 @@ controller('FirmListCtrl', ['$scope', 'firms', '$modal', '$location', 'FirmServi
 		});
 	};
 	$scope.newFirm = function() {
-		console.log('new firm');
 		$scope.active = {};
 		$scope.origin = {};
 	};
