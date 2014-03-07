@@ -134,11 +134,11 @@ class Item extends NG {
 				$d->reasonID, $d->inCart, $d->templateID, json_encode($d->settings), $d->priceID
 			)) return $this->conflict();
 		} else {
-			// $STH = $this->db->prepare("INSERT INTO item (parentID,name,desc,settings,templateID,code,image,onFirm) VALUES (?,?,?,?);");
-			// if (!$STH->execute(
-			// 	$d->parentID, $d->name, $d->desc, json_encode($d->settings), $d->templateID, $d->code, $d->image, $d->onFirm
-			// )) return $this->conflict();
-			// $d = (object) array_merge( (array)$d, array('priceID' => $this->db->lastInsertId()) );
+			$STH = $this->db->prepare("INSERT INTO price (itemID,reasonID,inCart,templateID,settings) VALUES (?,?,?,?,?);");
+			if (!$STH->execute(
+				$d->itemID, $d->reasonID, $d->inCart, $d->templateID, json_encode($d->settings)
+			)) return $this->conflict();
+			$d = (object) array_merge( (array)$d, array('priceID' => $this->db->lastInsertId()) );
 		}
 		return $d;
 	}
