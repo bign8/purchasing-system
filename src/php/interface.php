@@ -16,12 +16,6 @@ require_once('./libinc/main_include.php');
 if (!isset($_REQUEST['a'])) $_REQUEST['a'] = 'nope'; // catch not assigned
 if (!isset($_REQUEST['c'])) $_REQUEST['c'] = 'nope'; // catch not assigned
 
-// START DEV
-if ($_REQUEST['c'] != 'test' && $_REQUEST['a'] != 'getSession' && isset($_REQUEST['sessionID'])) {
-	session_id($_REQUEST['sessionID']);
-	session_start();
-}
-// END DEV
 
 $pass = true; // determine response type
 $data = array(); // return json data array
@@ -32,33 +26,6 @@ switch ($_REQUEST['c']) {
 	case 'user' :  User::process( $_REQUEST['a'], $pass, $data ); break;
 	case 'app'  :    NG::process( $_REQUEST['a'], $pass, $data ); break;
 	case 'admin': Admin::process( $_REQUEST['a'], $pass, $data ); break;
-	// START DEV
-	case 'test' :
-		switch ($_REQUEST['a']) {
-			case 'info': phpinfo(); break;
-			case 'db':
-				$cmd = sprintf(
-					'mysqldump --host=%s -u %s -p%s %s -d --skip-opt',
-					config::db_server,
-					config::db_user,
-					config::db_pass,
-					config::db_name
-				);
-				die(system($cmd));
-				break;
-			case 'getSession':
-				session_start();
-				die(session_id());
-				break;
-			case 'session':
-				echo '<pre>';
-				session_start();
-				print_r($_SESSION);
-				echo '</pre>';
-			default: $pass = false;
-		}
-		break;
-	// END DEV
 	default: $pass = false; break;
 }
 

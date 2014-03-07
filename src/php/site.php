@@ -1,4 +1,3 @@
-<!-- START DEV -->
 <html>
 <head>
 	<title>Test</title>
@@ -51,4 +50,3 @@ echo $obj->printChildren();
 	<script src="http://127.0.0.1:1337/livereload.js"></script>
 </body>
 </html>
-<!-- END DEV -->

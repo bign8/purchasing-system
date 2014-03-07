@@ -188,19 +188,21 @@ HTML;
 		if (!$setSTH->execute($newHash, $user['contactID'] )) return $this->conflict();
 
 		$html = <<<HTML
-			<p>You requested that your payment.upstreamacademy.com account password be reset.  This notice tells you how to do exactly that.</p>
 			<p>
-				Please navigate to our 
-				<a href="http://payment.upstreamacademy.com/reset/{$newHash}">password reset page</a> 
-				to assign yourself a new password.
+				You requested a reset to your Upstream Academy payment password. Please go to our
+				<a href="http://payment.upstreamacademy.com/reset/{$newHash}">password reset page</a>
+				to choose a new password.
 			</p>
 			<p>
 				If the above link does not work, try navigating to this address manually:
 				<b>http://payment.upstreamacademy.com/reset/{$newHash}</b>
 			</p>
 			<p>
-				You have <b>3</b> days to reset your password, after which time, 
-				this address becomes invalid and you must restart the password reset process.
+				If you do not reset your password within <b>three days,</b>
+				the link will expire and you will need to restart the password reset process.
+			</p>
+			<p>
+				If you have any questions or concerns, please feel free to contact me.
 			</p>
 HTML;
 		$mail = new UAMail();
@@ -232,10 +234,10 @@ HTML;
 	public function listFirms() {
 		$STH = $this->db->query("SELECT f.firmID, f.name, f.website, a.* FROM `firm` f JOIN `address` a ON f.addressID=a.addressID;");
 		$ret = $STH->fetchAll( PDO::FETCH_ASSOC );
-		foreach ($ret as &$value) $this->cleanAddress( $value );
+		foreach ($ret as &$value) $value = $this->cleanAddress( $value );
 		return $ret;
 	}
-	private function cleanAddress( &$value ) { // Helper (listFirms+getFirmEmploy+getFullUser): formats address for app
+	private function cleanAddress( $value ) { // Helper (listFirms+getFirmEmploy+getFullUser): formats address for app
 		$value['addr'] = array(
 			'addressID' => $value['addressID'],
 			'addrName' => $value['addrName'],
@@ -264,7 +266,7 @@ HTML;
 		$STH = $this->db->prepare("SELECT * FROM (SELECT * FROM `contact` WHERE `firmID`=?) c LEFT JOIN `address` a ON c.addressID=a.addressID;");
 		if (!$STH->execute( $firmID )) return -1;
 		$ret = $STH->fetchAll( PDO::FETCH_ASSOC );
-		foreach ($ret as &$value) $this->cleanAddress( $value );
+		foreach ($ret as &$value) $value = $this->cleanAddress( $value );
 		return $ret;
 	}
 	private function getFirmAddr( $firmID ) { // Helper: return firms address
