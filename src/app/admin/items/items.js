@@ -177,7 +177,10 @@ controller('ItemListCtrl', ['$scope', 'items', '$location', 'ItemService', funct
 		$scope.myPrices.unshift(obj);
 	};
 	$scope.priceRem = function (price) {
-		// TODO
+		var check = confirm('Are you sure you want to delete this price?\nYou can add it back by selecting the "Add" button.');
+		if (check) ItemService.rmPrice(price).then(function () {
+			$scope.myPrices.splice($scope.myPrices.indexOf(price), 1);
+		});
 	};
 }]).
 
@@ -313,6 +316,11 @@ factory('ItemService', ['interface', '$q', '$route', function (interface, $q, $r
 				myPrices[res.priceID] = angular.copy( res );
 				res.orig = angular.copy( res );
 				return res;
+			});
+		},
+		rmPrice: function(price) {
+			return interface.admin('item-rmPri', price).then(function () {
+				delete myPrices[price.priceID];
 			});
 		}
 	};
