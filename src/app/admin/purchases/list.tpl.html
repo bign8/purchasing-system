@@ -1,0 +1,100 @@
+<div class="row">
+
+	<!-- Firms List -->
+	<div class="span6">
+		<h3>Firms</h3>
+		<p>Single Click a firm to view purchases</p>
+		<div style="max-height:400px;overflow-x:hidden;overflow-y:auto">
+			<table class="table table-hover" style="margin-bottom:0">
+				<thead>
+					<tr>
+						<th>Name</th>
+						<th>Website</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="(key, value) in service.firms" ng-click="select('firms', key)" ng-class="{true:'info'}[value == active]">
+						<td>{{value.name}}</td>
+						<td>{{value.website}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+	<!-- Users List -->
+	<div class="span6">
+		<h3>Users</h3>
+		<p>Single Click a user to view purchases</p>
+		<div style="max-height:400px;overflow-x:hidden;overflow-y:auto">
+			<table class="table table-hover" style="margin-bottom:0">
+				<thead>
+					<tr>
+						<th>Name</th>
+						<th>Title</th>
+						<th>Info</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="(key, value) in service.contacts" ng-click="select('contacts', key)" ng-class="{true:'info'}[value == active]">
+						<td>
+							{{value.legalName}}
+							<span ng-show="value.preName" class="muted"><br/>{{value.preName}}</span>
+						</td>
+						<td>{{value.title}}</td>
+						<td>{{value.email}}<br/>{{value.phone}}</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+
+<div class="row">
+
+	
+	<!-- Purchases List -->
+	<div class="span6">
+		<h3>Purchases</h3>
+		<p>Delete a purchase with the "x" on the right.</p>
+		<div style="max-height:600px;overflow-x:hidden;overflow-y:auto" ng-switch="list">
+			<p ng-switch-when="false" class="muted">No purchases for this item!</p>
+			<table class="table table-hover" style="margin-bottom:0" ng-switch-default>
+				<thead>
+					<tr>
+						<th>Name</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="item in list">
+						<td>
+							<button class="close pull-right" ng-click="rem(item)">&times;</button>
+							{{item.item.name}}
+							<span class="muted" ng-show="item.item.desc"><br/>{{item.item.desc}}</span>
+							<!-- <br/><pre>{{item | json}}</pre> -->
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+	
+	<!-- Children List -->
+	<div class="span6" ng-show="active">
+		<h3>Add Item</h3>
+		<form name="addItemForm" class="form-horizontal">
+			<div class="control-group">
+				<label class="control-label" for="inputItem">Item</label>
+				<div class="controls">
+					<select id="inputItem" ng-options="value.name for (key,value) in service.items" ng-model="addItem" required></select>
+				</div>
+			</div>
+			<div class="control-group">
+				<div class="controls">
+					<button type="submit" class="btn btn-success" ng-click="add()" ng-disabled="!addItem">Add</button>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+

@@ -20,8 +20,8 @@ class Purchase extends NG {
 	// returns all purchases / contacts / firms / items
 	public function init() {
 		$itemSTH     = $this->db->query("SELECT * FROM item;");
-		$purchaseSTH = $this->db->query("SELECT * FROM purchase p LEFT JOIN 'order' o ON o.orderID = p.orderID;");
-		$contactSTH  = $this->db->query("SELECT legalName, preName, title, email, phone FROM contact;");
+		$purchaseSTH = $this->db->query("SELECT *, p.contactID FROM purchase p LEFT JOIN 'order' o ON o.orderID = p.orderID;");
+		$contactSTH  = $this->db->query("SELECT contactID, legalName, preName, title, email, phone FROM contact;");
 		$firmSTH     = $this->db->query("SELECT * FROM firm;");
 
 		return array(
@@ -45,6 +45,10 @@ class Purchase extends NG {
 		$d = $this->getPostData();
 		$STH = $this->db->prepare("INSERT INTO purchase (contactID,firmID,itemID,orderID,isMember,data) VALUES (?,?,?,?,?,?);");
 		if (!$STH->execute( $d->contactID, $d->firmID, $d->itemID, null, $d->isMember, 'manual' )) return $this->conflict();
-		return (object) array_merge( (array)$d, array('priceID' => $this->db->lastInsertId()) );
+
+		$STH2 = $this->db->prepare("SELECT *, p.contactID as contactID FROM purchase p LEFT JOIN 'order' o ON o.orderID = p.orderID WHERE p.purchaseID=?;");
+		if (!$STH2->execute( $this->db->lastInsertId() )) return $this->conflict();
+
+		return $STH2->fetch();
 	}
 }
