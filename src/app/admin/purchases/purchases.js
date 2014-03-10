@@ -1,6 +1,5 @@
 angular.module('myApp.admin.purchases', [
 	'myApp.common.services',
-	'ui.bootstrap'
 ]).
 
 config(['$routeProvider', 'securityAuthorizationProvider', function ($routeProvider, securityAuthorizationProvider) {
