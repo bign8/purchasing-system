@@ -1,0 +1,180 @@
+<div class="row">
+	<div class="span10 offset1">
+		<h3>Something</h3>
+		
+		<table class="table" style="margin-bottom:0">
+			<thead>
+				<tr>
+					<th>Field</th>
+					<th>Firm 1</th>
+					<th>Firm 2</th>
+					<th>Merged</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>Find a Firm:</td>
+					<td>
+						<select ng-options="value as value.name for (key, value) in firms" ng-model="firm1"></select>
+					</td>
+					<td>
+						<select ng-options="value as value.name for (key, value) in firms" ng-model="firm2"></select>
+					</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td>Name:</td>
+					<td>
+						<div class="input-append">
+							<span class="uneditable-input">{{firm1.name}}</span>
+							<button class="btn" type="button" ng-click="merge.name = firm1.name" ng-disabled="merge.name == firm1.name">+</button>
+						</div>
+					</td>
+					<td>
+						<div class="input-append">
+							<span class="uneditable-input">{{firm2.name}}</span>
+							<button class="btn" type="button" ng-click="merge.name = firm2.name" ng-disabled="merge.name == firm2.name">+</button>
+						</div>
+					</td>
+					<td>
+						<input type="text" ng-model="merge.name">
+					</td>
+				</tr>
+				<tr>
+					<td>Website:</td>
+					<td>
+						<div class="input-append">
+							<span class="uneditable-input">{{firm1.website}}</span>
+							<button class="btn" type="button" ng-click="merge.website = firm1.website" ng-disabled="merge.website == firm1.website">+</button>
+						</div>
+					</td>
+					<td>
+						<div class="input-append">
+							<span class="uneditable-input">{{firm2.website}}</span>
+							<button class="btn" type="button" ng-click="merge.website = firm2.website" ng-disabled="merge.website == firm2.website">+</button>
+						</div>
+					</td>
+					<td>
+						<input type="text" ng-model="merge.website">
+					</td>
+				</tr>
+				<tr>
+					<td>Address Name:</td>
+					<td>
+						<div class="input-append">
+							<span class="uneditable-input">{{firm1.addrName}}</span>
+							<button class="btn" type="button" ng-click="merge.addrName = firm1.addrName" ng-disabled="merge.addrName == firm1.addrName">+</button>
+						</div>
+					</td>
+					<td>
+						<div class="input-append">
+							<span class="uneditable-input">{{firm2.addrName}}</span>
+							<button class="btn" type="button" ng-click="merge.addrName = firm2.addrName" ng-disabled="merge.addrName == firm2.addrName">+</button>
+						</div>
+					</td>
+					<td>
+						<input type="text" ng-model="merge.addrName">
+					</td>
+				</tr>
+				<tr>
+					<td>Address 1:</td>
+					<td>
+						<div class="input-append">
+							<span class="uneditable-input">{{firm1.addr1}}</span>
+							<button class="btn" type="button" ng-click="merge.addr1 = firm1.addr1" ng-disabled="merge.addr1 == firm1.addr1">+</button>
+						</div>
+					</td>
+					<td>
+						<div class="input-append">
+							<span class="uneditable-input">{{firm2.addr1}}</span>
+							<button class="btn" type="button" ng-click="merge.addr1 = firm2.addr1" ng-disabled="merge.addr1 == firm2.addr1">+</button>
+						</div>
+					</td>
+					<td>
+						<input type="text" ng-model="merge.addr1">
+					</td>
+				</tr>
+				<tr>
+					<td>Address 2:</td>
+					<td>
+						<div class="input-append">
+							<span class="uneditable-input">{{firm1.addr2}}</span>
+							<button class="btn" type="button" ng-click="merge.addr2 = firm1.addr2" ng-disabled="merge.addr2 == firm1.addr2">+</button>
+						</div>
+					</td>
+					<td>
+						<div class="input-append">
+							<span class="uneditable-input">{{firm2.addr2}}</span>
+							<button class="btn" type="button" ng-click="merge.addr2 = firm2.addr2" ng-disabled="merge.addr2 == firm2.addr2">+</button>
+						</div>
+					</td>
+					<td>
+						<input type="text" ng-model="merge.addr2">
+					</td>
+				</tr>
+				<tr>
+					<td>City:</td>
+					<td>
+						<div class="input-append">
+							<span class="uneditable-input">{{firm1.city}}</span>
+							<button class="btn" type="button" ng-click="merge.city = firm1.city" ng-disabled="merge.city == firm1.city">+</button>
+						</div>
+					</td>
+					<td>
+						<div class="input-append">
+							<span class="uneditable-input">{{firm2.city}}</span>
+							<button class="btn" type="button" ng-click="merge.city = firm2.city" ng-disabled="merge.city == firm2.city">+</button>
+						</div>
+					</td>
+					<td>
+						<input type="text" ng-model="merge.city">
+					</td>
+				</tr>
+				<tr>
+					<td>State:</td>
+					<td>
+						<div class="input-append">
+							<span class="uneditable-input">{{firm1.state}}</span>
+							<button class="btn" type="button" ng-click="merge.state = firm1.state" ng-disabled="merge.state == firm1.state">+</button>
+						</div>
+					</td>
+					<td>
+						<div class="input-append">
+							<span class="uneditable-input">{{firm2.state}}</span>
+							<button class="btn" type="button" ng-click="merge.state = firm2.state" ng-disabled="merge.state == firm2.state">+</button>
+						</div>
+					</td>
+					<td>
+						<input type="text" ng-model="merge.state">
+					</td>
+				</tr>
+				<tr>
+					<td>Zip:</td>
+					<td>
+						<div class="input-append">
+							<span class="uneditable-input">{{firm1.zip}}</span>
+							<button class="btn" type="button" ng-click="merge.zip = firm1.zip" ng-disabled="merge.zip == firm1.zip">+</button>
+						</div>
+					</td>
+					<td>
+						<div class="input-append">
+							<span class="uneditable-input">{{firm2.zip}}</span>
+							<button class="btn" type="button" ng-click="merge.zip = firm2.zip" ng-disabled="merge.zip == firm2.zip">+</button>
+						</div>
+					</td>
+					<td>
+						<input type="text" ng-model="merge.zip">
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+</div>
+
+<!-- START DEV -->
+<pre>{{firm1 | json}}</pre>
+<pre>{{firm2 | json}}</pre>
+<!-- <pre>{{active | json}}</pre> -->
+<!-- <pre>{{items | json}}</pre> -->
+<!-- END DEV -->
