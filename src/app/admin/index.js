@@ -3,6 +3,7 @@ angular.module('myApp.admin', [
 	'myApp.admin.discounts',
 	'myApp.admin.firms',
 	'myApp.admin.items',
+	'myApp.admin.purchases',
 ]).
 
 config(['$routeProvider', 'securityAuthorizationProvider', function($routeProvider, securityAuthorizationProvider) {
