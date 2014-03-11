@@ -22,18 +22,29 @@ controller('MergeListCtrl', ['$scope', 'MergeService', function ($scope, MergeSe
 	$scope.firm2 = false;
 	$scope.merge = {};
 
+	// An on-change event
 	$scope.$watchCollection('[firm1, firm2]', function (newValues) {
 		if (!newValues[0] || !newValues[1]) return;
-		var index = ['name', 'website', 'addrName', 'addr1', 'addr2', 'city', 'state', 'zip'];
-		for (var i in index) {
-			i = index[i];
+		angular.forEach(['name', 'website', 'addrName', 'addr1', 'addr2', 'city', 'state', 'zip'], function (i) {
 			$scope.merge[i] = (newValues[0][i] == newValues[1][i]) ? newValues[0][i] : '';
-		}
+		});
 	});
 
+	// Handle resetting + saving
+	$scope.reset = function() {
+		$scope.firm1 = false;
+		$scope.firm2 = false;
+		$scope.merge = {};
+	};
+	$scope.save = function() {
+		MergeService.save($scope.merge, $scope.firm1.firmID, $scope.firm2.firmID).then(function () {
+			alert('Changes saved successfully!');
+			$scope.reset();
+		});
+	};
 }]).
 
-factory('MergeService', ['interface', '$q', '$route', function (interface, $q, $route) {
+factory('MergeService', ['interface', '$q', function (interface, $q) {
 	var service = {
 		firms: {},
 		getList: function (mergeID) {
@@ -50,9 +61,14 @@ factory('MergeService', ['interface', '$q', '$route', function (interface, $q, $
 			return ret;
 		},
 		
-		save: function(merge) {
-			return interface.admin('merge-set', merge).then(function (res) {
-				myMerges[res.mergeID] = res;
+		save: function(merge, destID, srcID) {
+			return interface.admin('merge-set', {
+				merge: merge,
+				destID: destID,
+				srcID: srcID
+			}).then(function (res) {
+				service.firms[ destID ] = res;
+				delete service.firms[ srcID ];
 				return res;
 			});
 		}
