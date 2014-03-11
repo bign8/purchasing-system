@@ -1,29 +1,26 @@
+<style type="text/css">
+	select, input[type="text"], .input-append {
+		margin-bottom: 0;
+	}
+</style>
+
 <div class="row">
-	<div class="span10 offset1">
-		<h3>Something</h3>
+	<form name="merge" class="span10 offset1">
+		<h3>Firm Merging</h3>
+		<p>Choose two different firms and merge them into one.</p>
 		
 		<table class="table" style="margin-bottom:0">
 			<thead>
 				<tr>
 					<th>Field</th>
-					<th>Firm 1</th>
-					<th>Firm 2</th>
+					<th><select ng-options="value as value.name for (key, value) in firms" ng-model="firm1"></select></th>
+					<th><select ng-options="value as value.name for (key, value) in firms" ng-model="firm2"></select></th>
 					<th>Merged</th>
 				</tr>
 			</thead>
 			<tbody>
 				<tr>
-					<td>Find a Firm:</td>
-					<td>
-						<select ng-options="value as value.name for (key, value) in firms" ng-model="firm1"></select>
-					</td>
-					<td>
-						<select ng-options="value as value.name for (key, value) in firms" ng-model="firm2"></select>
-					</td>
-					<td></td>
-				</tr>
-				<tr>
-					<td>Name:</td>
+					<td>Name *:</td>
 					<td>
 						<div class="input-append">
 							<span class="uneditable-input">{{firm1.name}}</span>
@@ -37,11 +34,11 @@
 						</div>
 					</td>
 					<td>
-						<input type="text" ng-model="merge.name">
+						<input type="text" ng-model="merge.name" required>
 					</td>
 				</tr>
 				<tr>
-					<td>Website:</td>
+					<td>Website *:</td>
 					<td>
 						<div class="input-append">
 							<span class="uneditable-input">{{firm1.website}}</span>
@@ -55,11 +52,11 @@
 						</div>
 					</td>
 					<td>
-						<input type="text" ng-model="merge.website">
+						<input type="text" ng-model="merge.website" required>
 					</td>
 				</tr>
 				<tr>
-					<td>Address Name:</td>
+					<td>Address Name *:</td>
 					<td>
 						<div class="input-append">
 							<span class="uneditable-input">{{firm1.addrName}}</span>
@@ -73,11 +70,11 @@
 						</div>
 					</td>
 					<td>
-						<input type="text" ng-model="merge.addrName">
+						<input type="text" ng-model="merge.addrName" required>
 					</td>
 				</tr>
 				<tr>
-					<td>Address 1:</td>
+					<td>Address 1 *:</td>
 					<td>
 						<div class="input-append">
 							<span class="uneditable-input">{{firm1.addr1}}</span>
@@ -91,7 +88,7 @@
 						</div>
 					</td>
 					<td>
-						<input type="text" ng-model="merge.addr1">
+						<input type="text" ng-model="merge.addr1" required>
 					</td>
 				</tr>
 				<tr>
@@ -113,7 +110,7 @@
 					</td>
 				</tr>
 				<tr>
-					<td>City:</td>
+					<td>City *:</td>
 					<td>
 						<div class="input-append">
 							<span class="uneditable-input">{{firm1.city}}</span>
@@ -127,11 +124,11 @@
 						</div>
 					</td>
 					<td>
-						<input type="text" ng-model="merge.city">
+						<input type="text" ng-model="merge.city" required>
 					</td>
 				</tr>
 				<tr>
-					<td>State:</td>
+					<td>State *:</td>
 					<td>
 						<div class="input-append">
 							<span class="uneditable-input">{{firm1.state}}</span>
@@ -145,11 +142,11 @@
 						</div>
 					</td>
 					<td>
-						<input type="text" ng-model="merge.state">
+						<input type="text" ng-model="merge.state" required>
 					</td>
 				</tr>
 				<tr>
-					<td>Zip:</td>
+					<td>Zip *:</td>
 					<td>
 						<div class="input-append">
 							<span class="uneditable-input">{{firm1.zip}}</span>
@@ -163,18 +160,21 @@
 						</div>
 					</td>
 					<td>
-						<input type="text" ng-model="merge.zip">
+						<input type="text" ng-model="merge.zip" required>
 					</td>
 				</tr>
 			</tbody>
 		</table>
-	</div>
-
-</div>
+		<div class="form-actions">
+			<button type="submit" class="btn btn-primary" ng-click="save()" ng-disabled="merge.$invalid">Save changes</button>&nbsp;
+			<button type="button" class="btn" ng-click="reset()">Cancel</button>
+		</div>
+	</form> <!-- span + offset -->
+</div><!-- row -->
 
 <!-- START DEV -->
-<pre>{{firm1 | json}}</pre>
-<pre>{{firm2 | json}}</pre>
+<pre>{{merge | json}}</pre>
+<!-- <pre>{{firm2 | json}}</pre> -->
 <!-- <pre>{{active | json}}</pre> -->
 <!-- <pre>{{items | json}}</pre> -->
 <!-- END DEV -->
