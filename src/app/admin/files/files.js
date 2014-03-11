@@ -50,6 +50,31 @@ controller('FileListCtrl', ['$scope', 'FileService', function ($scope, FileServi
 			alert('If you moved your file to a new location, please refresh your brower.');
 		});
 	};
+
+	// Upload
+	$scope.$watch('myFile', function (value) {
+		if (value) $scope.myName = value.name;
+	});
+	$scope.upload = function (file, name) {
+		FileService.upload(file, name).then(function ( res ) {
+			$scope.list.push(res);
+		});
+	};
+}]).
+
+directive('fileModel', ['$parse', function ($parse) {
+	return {
+		restrict: 'A',
+		link: function (scope, element, attrs) {
+			var model = $parse(attrs.fileModel);
+			var modelSetter = model.assign;
+			element.bind('change', function() {
+				scope.$apply(function() {
+					modelSetter(scope, element[0].files[0]);
+				});
+			});
+		}
+	};
 }]).
 
 factory('FileService', ['interface', '$q', function (interface, $q) {
@@ -87,6 +112,48 @@ factory('FileService', ['interface', '$q', function (interface, $q) {
 				file.name = newName;
 			});
 		},
+
+		upload: function(file, name) {
+			var ret = $q.defer();
+
+			var fd = new FormData();
+			fd.append('file', file);
+			fd.append('name', name);
+
+			function uploadProgress(evt) {
+				var msg = evt.lengthComputable ? Math.round(evt.loaded * 100 / evt.total) : 'unable to compute';
+				console.log(msg);
+				// $scope.$apply();
+			}
+			function uploadComplete(evt) {
+				console.log(evt);
+				ret.resolve({
+					name: name,
+					children: false,
+					size: '??'
+				});
+				// $scope.image = evt.target.responseText.substring(1);
+				// $scope.$apply();
+			}
+			function uploadFailed(evt) {
+				alert("There was an error attempting to upload the file.");
+			}
+			function uploadCanceled(evt) {
+				// $scope.progressVisible = false;
+				// $scope.$apply();
+				alert("The upload has been canceled by the user or the browser dropped the connection.");
+			}
+
+			var xhr = new XMLHttpRequest();
+			xhr.upload.addEventListener("progress", uploadProgress, false);
+			xhr.addEventListener("load", uploadComplete, false);
+			xhr.addEventListener("error", uploadFailed, false);
+			xhr.addEventListener("abort", uploadCanceled, false);
+			xhr.open("POST", "/interface.php?c=admin&a=file-upload");
+			xhr.send(fd);
+			
+			return ret.promise;
+		}
 	};
 	return service;
 }]);

@@ -10,10 +10,10 @@ class File extends NG {
 	public static function process( $action, &$pass, &$data ) {
 		$obj = new self();
 		switch ( $action ) {
-			case 'edit': $data = $obj->edit(); break;
-			case 'init': $data = $obj->init(); break;
-			case 'rem':  $data = $obj->rem();  break;
-			// case 'set':  $data = $obj->set();  break;
+			case 'edit':    $data = $obj->edit();    break;
+			case 'init':    $data = $obj->init();    break;
+			case 'rem':     $data = $obj->rem();     break;
+			case 'upload':  $data = $obj->upload();  break;
 			default: $pass = false;
 		}
 	}
@@ -62,31 +62,10 @@ class File extends NG {
 	}
 
 	// stores discount changes
-	public function set() {
-		$d = $this->getPostData();
-
-		// // Purchases
-		// $purchaseSTH = $this->db->prepare("UPDATE purchase SET firmID=? WHERE firmID=?;");
-		// if (!$purchaseSTH->execute($d->destID, $d->srcID)) return $this->conflict();
-
-		// // Contact
-		// $contactSTH = $this->db->prepare("UPDATE contact SET firmID=? WHERE firmID=?;");
-		// if (!$contactSTH->execute($d->destID, $d->srcID)) return $this->conflict();
-
-		// // Set Address
-		// $addressSTH = $this->db->prepare("INSERT INTO address (addrName,addr1,addr2,city,state,zip) VALUES (?,?,?,?,?,?);");
-		// if (!$addressSTH->execute(
-		// 	$d->merge->addrName, $d->merge->addr1, $d->merge->addr2, $d->merge->city, $d->merge->state, $d->merge->zip
-		// )) return $this->conflict();
-
-		// // Set Firm
-		// $firmSTH = $this->db->prepare("UPDATE firm SET addressID=?, name=?, website=? WHERE firmID=?;");
-		// if (!$firmSTH->execute( $this->db->lastInsertId(), $d->merge->name, $d->merge->website, $d->destID )) return $this->conflict();
-
-		// // Remove Firm
-		// $rmSTH = $this->db->prepare("DELETE FROM firm WHERE firmID=?;");
-		// if (!$rmSTH->execute( $d->srcID )) return $this->conflict();
+	public function upload() {
+		print_r($_REQUEST);
+		print_r($_FILES);
 		
-		return $d;
+		// return $d;
 	}
 }
