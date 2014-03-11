@@ -10,8 +10,10 @@ class File extends NG {
 	public static function process( $action, &$pass, &$data ) {
 		$obj = new self();
 		switch ( $action ) {
+			case 'edit': $data = $obj->edit(); break;
 			case 'init': $data = $obj->init(); break;
-			case 'set':  $data = $obj->set();  break;
+			case 'rem':  $data = $obj->rem();  break;
+			// case 'set':  $data = $obj->set();  break;
 			default: $pass = false;
 		}
 	}
@@ -39,6 +41,24 @@ class File extends NG {
 		}
 		$fileData = fillArrayWithFileNodes( new DirectoryIterator( $_SERVER['DOCUMENT_ROOT'] . '\\files' ) );
 		return $fileData;
+	}
+
+	// deletes a file
+	public function rem() {
+		$d = $this->getPostData();
+		$path = $_SERVER['DOCUMENT_ROOT'] . DIRECTORY_SEPARATOR . 'files' . DIRECTORY_SEPARATOR . $d->file;
+		if (!@unlink( $path )) if (!@rmdir( $path )) return $this->conflict();
+		return $d;
+	}
+
+	// changes the name of a file (can move files too...be carefull!)
+	public function edit() {
+		$d = $this->getPostData();
+		$path = str_replace("/", DIRECTORY_SEPARATOR, $d->path);
+		$newName = str_replace("/", DIRECTORY_SEPARATOR, $d->newName);
+		$base = $_SERVER['DOCUMENT_ROOT'] . DIRECTORY_SEPARATOR . 'files' . DIRECTORY_SEPARATOR . $path;
+		if (!@rename( $base . $d->file, $base . $newName )) return $this->conflict();
+		return $d;
 	}
 
 	// stores discount changes
