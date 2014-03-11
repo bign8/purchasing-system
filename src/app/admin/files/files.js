@@ -17,37 +17,39 @@ config(['$routeProvider', 'securityAuthorizationProvider', function ($routeProvi
 }]).
 
 controller('FileListCtrl', ['$scope', 'FileService', function ($scope, FileService){
-	$scope.files = FileService.files;
-	// $scope.firm1 = false;
-	// $scope.firm2 = false;
-	// $scope.merge = {};
 
-	$scope.list = angular.copy( $scope.files );
-	$scope.path = '/';
+	// Global Variables
+	$scope.list = FileService.files ;
+	$scope.path = '';
 	$scope.parent = [];
-	$scope.arrPath = [];
+
+	// Navigation
+	var arrPath = [];
 	$scope.drill = function (folder) {
+		if (!folder.children) return;
+		arrPath.push(folder.name);
 		$scope.parent.push($scope.list);
-		$scope.arrPath.push(folder.name);
-		$scope.list = angular.copy( folder.children );
+		$scope.list = folder.children;
+		$scope.path = arrPath.join('/') + (arrPath.length ? '/' : '') ;
 	};
 	$scope.back = function () {
+		arrPath.pop();
 		$scope.list = $scope.parent.pop();
-		$scope.arrPath.pop();
+		$scope.path = arrPath.join('/') + (arrPath.length ? '/' : '') ;
 	};
 
-	// // Handle resetting + saving
-	// $scope.reset = function() {
-	// 	$scope.firm1 = false;
-	// 	$scope.firm2 = false;
-	// 	$scope.merge = {};
-	// };
-	// $scope.save = function() {
-	// 	FileService.save($scope.merge, $scope.firm1.firmID, $scope.firm2.firmID).then(function () {
-	// 		alert('Changes saved successfully!');
-	// 		$scope.reset();
-	// 	});
-	// };
+	// Editing
+	$scope.rem = function ($event, file) {
+		$event.stopPropagation();
+		FileService.rem($scope.path, file, $scope.list);
+	};
+	$scope.edit = function ($event, file) {
+		$event.stopPropagation();
+		var newName = prompt("Enter new file location:", file.name);
+		if (newName !== null) FileService.edit($scope.path, file, newName, $scope.list).then(function () {
+			alert('If you moved your file to a new location, please refresh your brower.');
+		});
+	};
 }]).
 
 factory('FileService', ['interface', '$q', function (interface, $q) {
@@ -62,24 +64,29 @@ factory('FileService', ['interface', '$q', function (interface, $q) {
 			} else {
 				ret = interface.admin('file-init').then(function (data) {
 					service.files = data;
-					// angular.forEach(data.files, function (file) { service.files.push( file ); });
 					return service.files;
 				});
 			}
 			return ret;
 		},
 		
-		save: function(merge, destID, srcID) {
-			return interface.admin('file-set', {
-				merge: merge,
-				destID: destID,
-				srcID: srcID
+		rem: function(path, file, list) {
+			return interface.admin('file-rem', {
+				file: path + file.name
 			}).then(function (res) {
-				service.firms[ destID ] = res;
-				delete service.firms[ srcID ];
-				return res;
+				list.splice( list.indexOf(file), 1 );
 			});
-		}
+		},
+
+		edit: function(path, file, newName, list) {
+			return interface.admin('file-edit', {
+				path: path,
+				file: file.name,
+				newName: newName
+			}).then(function (res) {
+				file.name = newName;
+			});
+		},
 	};
 	return service;
 }]);
