@@ -1,0 +1,35 @@
+<div class="row">
+	<div class="span6">
+		<h3>Files on server</h3>
+		<button type="button" class="btn btn-info pull-right btn-mini" ng-click="back()" ng-show="parent.length">Parent Folder</button>
+		<p>To add use the upload form, or delete a file with the "x" on the right.</p>
+		<code>{{ '/' + arrPath.join('/') }}</code>
+		<div style="max-height:600px;overflow-x:hidden;overflow-y:auto">
+			<table class="table table-hover">
+				<thead>
+					<tr>
+						<th>Name</th>
+						<th>Size</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="file in list | orderBy:['-children','name']" ng-click="drill(file)">
+						<td>
+							<i class="icon-folder-close" ng-show="file.children"></i>&nbsp;
+							{{file.name}}
+						</td>
+						<td>
+							<span ng-show="file.size !== false">{{file.size}}</span>
+							<button class="close pull-right" ng-click="rem($event, firm)">&times;</button>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+
+<!-- START DEV -->
+<pre>{{files | json}}</pre>
+<!-- <pre>{{firms | json}}</pre> -->
+<!-- END DEV -->
