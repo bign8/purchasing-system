@@ -10,6 +10,7 @@ class Admin {
 			'firm',
 			'item',
 			'purchase',
+			'merge',
 		);
 
 		if (in_array($area, $admins)) {

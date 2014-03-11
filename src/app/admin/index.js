@@ -4,6 +4,7 @@ angular.module('myApp.admin', [
 	'myApp.admin.firms',
 	'myApp.admin.items',
 	'myApp.admin.purchases',
+	'myApp.admin.merge',
 ]).
 
 config(['$routeProvider', 'securityAuthorizationProvider', function($routeProvider, securityAuthorizationProvider) {
