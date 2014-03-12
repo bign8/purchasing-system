@@ -9,7 +9,7 @@
 				<thead>
 					<tr>
 						<th>Name</th>
-						<th>Path <small>Used for item options</small></th>
+						<th>Path <small class="muted">Used for item options</small></th>
 						<th>Size</th>
 					</tr>
 				</thead>
@@ -23,7 +23,7 @@
 							<code ng-hide="file.children">{{path}}{{file.name}}</code>
 						</td>
 						<td>
-							<span ng-show="file.size !== false">{{file.size}}</span>
+							<span ng-show="file.size !== false">{{file.size | bytes}}</span>
 							<div class="pull-right">
 								<i class="icon-edit" ng-click="edit($event, file)"></i>&nbsp;
 								<button class="close" ng-click="rem($event, file)" ng-hide="file.children.length">&times;</button>
@@ -48,5 +48,4 @@
 
 <!-- START DEV -->
 <pre>{{list | json}}</pre>
-<!-- <pre>{{firms | json}}</pre> -->
 <!-- END DEV -->

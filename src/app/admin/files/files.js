@@ -56,14 +56,17 @@ controller('FileListCtrl', ['$scope', 'FileService', function ($scope, FileServi
 		if (value) $scope.myName = value.name;
 	});
 	$scope.upload = function (file, name) {
-		FileService.upload(file, name).then(function ( res ) {
+		FileService.upload(file, name, $scope.path).then(function ( res ) {
 			$scope.list.push(res);
+			$scope.myFile = null;
+			$scope.myName = '';
+			$scope.uploadForm.$setPristine(true);
 		});
 	};
 }]).
 
 directive('fileModel', ['$parse', function ($parse) {
-	return {
+	return { // http://uncorkedstudios.com/blog/multipartformdata-file-upload-with-angularjs
 		restrict: 'A',
 		link: function (scope, element, attrs) {
 			var model = $parse(attrs.fileModel);
@@ -76,6 +79,16 @@ directive('fileModel', ['$parse', function ($parse) {
 		}
 	};
 }]).
+
+filter('bytes', function() { // https://gist.github.com/thomseddon/3511330
+	return function(bytes, precision) {
+		if (isNaN(parseFloat(bytes)) || !isFinite(bytes) || bytes == '0') return '-';
+		if (typeof precision === 'undefined') precision = 1;
+		var units = ['bytes', 'kB', 'MB', 'GB', 'TB', 'PB'],
+			number = Math.floor(Math.log(bytes) / Math.log(1024));
+		return (bytes / Math.pow(1024, Math.floor(number))).toFixed(precision) +  ' ' + units[number];
+	};
+}).
 
 factory('FileService', ['interface', '$q', function (interface, $q) {
 	var service = {
@@ -113,34 +126,29 @@ factory('FileService', ['interface', '$q', function (interface, $q) {
 			});
 		},
 
-		upload: function(file, name) {
+		upload: function(file, name, path) {
 			var ret = $q.defer();
 
 			var fd = new FormData();
 			fd.append('file', file);
 			fd.append('name', name);
+			fd.append('path', path);
 
 			function uploadProgress(evt) {
 				var msg = evt.lengthComputable ? Math.round(evt.loaded * 100 / evt.total) : 'unable to compute';
 				console.log(msg);
-				// $scope.$apply();
 			}
 			function uploadComplete(evt) {
-				console.log(evt);
 				ret.resolve({
 					name: name,
 					children: false,
-					size: '??'
+					size: evt.target.response.substring(6)
 				});
-				// $scope.image = evt.target.responseText.substring(1);
-				// $scope.$apply();
 			}
 			function uploadFailed(evt) {
 				alert("There was an error attempting to upload the file.");
 			}
 			function uploadCanceled(evt) {
-				// $scope.progressVisible = false;
-				// $scope.$apply();
 				alert("The upload has been canceled by the user or the browser dropped the connection.");
 			}
 
