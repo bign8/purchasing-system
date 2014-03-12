@@ -15,13 +15,13 @@
 <form name="optionsForm" id="optionsForm">
 
 	<div class="row" ng-switch="noFields">
-		<div class="offset2 span8 well" ng-switch-when="true">
+		<div class="col-md-offset-2 col-md-8 well" ng-switch-when="true">
 			<h2>{{con.item.name}} has no options.</h2>
 			<p>Please <a href="http://upstreamacademy.com/">continue shopping</a> or <a href="/">checkout</a>.</p>
 		</div>
 
 		<div ng-switch-default>
-			<div class="span6" ng-class="{offset3: !attID}">
+			<div class="col-md-6" ng-class="{'col-md-offset-3': !attID}">
 				<div class="form-horizontal css-form well">
 					<h3>Questions</h3>
 					<p>Please fill in as much of the following information as possible</p>
@@ -99,9 +99,9 @@
 
 					</div>
 				</div><!-- .well -->
-			</div><!-- .span6 -->
+			</div><!-- .col-md-6 -->
 
-			<div class="span6" ng-show="attID">
+			<div class="col-md-6" ng-show="attID">
 				<div class="well">
 					<h3>Event Attendees</h3>
 					<p>Choose and modify the attendees to this event here.<br/>Pricing: <span>{{con.item.cost.text}}</span>.</p>
@@ -147,14 +147,14 @@
 					<button type="button" class="btn btn-success" ng-click="add()">Add {{con.options[attID].length?'another ':''}}Attendee</button>
 					<button type="button" class="btn btn-danger pull-right" ng-click="clr()" ng-show="con.options[attID].length">Clear</button>
 				</div><!-- .well -->
-			</div><!-- .span6 -->
+			</div><!-- .col-md-6 -->
 			
 		</div><!-- ng-switch-default -->
 
 	</div>
 
 	<div class="row">
-		<div class="span8 offset2">
+		<div class="col-md-8 col-md-offset-2">
 			<notify message="message"></notify>
 		</div>
 	</div>

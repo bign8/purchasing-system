@@ -7,7 +7,7 @@
 
 <form class="form-horizontal css-form" name="settings">
 	<div class="row">
-		<div class="span6">
+		<div class="col-md-6">
 			<fieldset>
 				<legend>Firm Information</legend>
 
@@ -15,34 +15,38 @@
 
 				<div class="well" style="padding: 20px 0 1px;">
 
-					<div class="control-group">
-						<label class="control-label" for="firmName">Firm Name</label>
-						<div class="controls">
-							<input type="text" id="firmName" ng-model="user.firm.name" placeholder="Firm Name" required>
+					<div class="form-group">
+						<label class="control-label col-sm-3" for="firmName">Firm Name</label>
+						<div class="col-sm-9">
+							<input type="text" class="form-control" id="firmName" ng-model="user.firm.name" placeholder="Firm Name" required>
 						</div>
 					</div>
 
-					<div class="control-group">
-						<label class="control-label" for="firmWeb">Firm Website</label>
-						<div class="controls">
-							<input type="url" id="firmWeb" ng-model="user.firm.website" placeholder="Firm Website" required>
+					<div class="form-group">
+						<label class="control-label col-sm-3" for="firmWeb">Firm Website</label>
+						<div class="col-sm-9">
+							<input type="url" class="form-control" id="firmWeb" ng-model="user.firm.website" placeholder="Firm Website" required>
 							<span class="help-inline">http://www.UpstreamAcademy.com/</span>
 						</div>
 					</div>
 
-					<div class="control-group">
-						<label class="control-label" for="firmName">Firm Address</label>
-						<div class="controls">
-							<div class="input-append" ng-switch="user.firm.addr.addressID">
+					<div class="form-group">
+						<label class="control-label col-sm-3" for="firmName">Firm Address</label>
+						<div class="col-sm-9">
+							<div ng-switch="user.firm.addr.addressID">
 
-								<div ng-switch-when="undefined">
-									<span class="input-medium uneditable-input">Click 'set' to assign</span>
-									<button type="button" class="btn btn-info" ng-click="setAddr('firm')">Set</button>
+								<div ng-switch-when="undefined" class="input-group">
+									<input class="form-control" type="text" value="Click 'set' to assign" disabled />
+									<div class="input-group-btn">
+										<button type="button" class="btn btn-info" ng-click="setAddr('firm')">Set</button>
+									</div>
 								</div>
 
-								<div ng-switch-default>
-									<span class="input-medium uneditable-input">{{user.firm.addr.addrName}}</span>
-									<button type="button" class="btn btn-warning" ng-click="setAddr('firm')">Edit</button>
+								<div ng-switch-default class="input-group">
+									<input class="form-control" type="text" value="{{user.firm.addr.addrName}}" disabled />
+									<div class="input-group-btn">
+										<button type="button" class="btn btn-warning" ng-click="setAddr('firm')">Edit</button>
+									</div>
 								</div>
 
 							</div>
@@ -53,15 +57,15 @@
 
 				<p class="ctr"><strong>Find</strong> or <strong>Create</strong> your new firm</p>
 
-				<div class="control-group well">
+				<div class="form-group well">
 
 					<div class="well-overlay" ng-hide="enableFirm">
-						<button type="button" class="btn btn-warning well-clear-btn btn-large" ng-click="modifyFirm()">Change Firm</button>
+						<button type="button" class="btn btn-warning well-clear-btn btn-lg" ng-click="modifyFirm()">Change Firm</button>
 					</div>
 
-					<label class="control-label" for="firmFind">Type your Firm Name</label>
-					<div class="controls">
-						<input type="text" id="firmFind" ng-model="firmNew" typeahead="firm as firm.name for firm in firms | filter:{name:$viewValue} | limitTo:8" placeholder="Firm Search" typeahead-template-url="registerFirmTypeAheadTPL.html" typeahead-on-select="selectFirm()">
+					<label class="control-label col-sm-3" for="firmFind">Type your Firm Name</label>
+					<div class="col-sm-9">
+						<input type="text" class="form-control" id="firmFind" ng-model="firmNew" typeahead="firm as firm.name for firm in firms | filter:{name:$viewValue} | limitTo:8" placeholder="Firm Search" typeahead-template-url="registerFirmTypeAheadTPL.html" typeahead-on-select="selectFirm()">
 						&nbsp;&nbsp;
 						<button type="button" class="btn btn-info" ng-click="newFirm()">Create Firm</button>
 					</div>
@@ -71,9 +75,11 @@
 			<fieldset>
 				<legend>Add a Firm Membership</legend>
 
-				<div class="input-append input-block-level" style="padding-right:50px;">
-					<input type="text" name="firmCode" class="input-block-level" ng-model="firmCode" placeholder="Firm Access Code">
-					<button type="submit" class="btn btn-success" ng-click="addFirmCode()" ng-disabled="(firmCode.length || 0) < 3">Add</button>
+				<div class="input-group" style="padding-right:50px;">
+					<input type="text" name="firmCode" class="form-control" ng-model="firmCode" placeholder="Firm Access Code">
+					<span class="input-group-btn">
+						<button type="submit" class="btn btn-success" ng-click="addFirmCode()" ng-disabled="(firmCode.length || 0) < 3">Add</button>
+					</span>
 				</div>
 
 				<table class="table table-striped" style="margin:0" ng-show="groups.length > 0">
@@ -89,59 +95,63 @@
 			</fieldset>
 		</div>
 
-		<fieldset class="span6">
+		<fieldset class="col-md-6">
 			<legend>User Information</legend>
 
-			<div class="control-group">
-				<label class="control-label" for="legalName">Legal Name</label>
-				<div class="controls">
-					<input type="text" id="legalName" ng-model="user.legalName" placeholder="Legal Name" required>
+			<div class="form-group">
+				<label class="control-label col-sm-3" for="legalName">Legal Name</label>
+				<div class="col-sm-9">
+					<input type="text" class="form-control" id="legalName" ng-model="user.legalName" placeholder="Legal Name" required>
 				</div>
 			</div>
 
-			<div class="control-group">
-				<label class="control-label" for="preName">Preferred Name</label>
-				<div class="controls">
-					<input type="text" id="preName" ng-model="user.preName" placeholder="Preferred Name">
+			<div class="form-group">
+				<label class="control-label col-sm-3" for="preName">Preferred Name</label>
+				<div class="col-sm-9">
+					<input type="text" class="form-control" id="preName" ng-model="user.preName" placeholder="Preferred Name">
 					<span class="help-inline">(i.e., Bill instead of William, etc.)</span>
 				</div>
 			</div>
 
-			<div class="control-group">
-				<label class="control-label" for="title">Title / Position</label>
-				<div class="controls">
-					<input type="text" id="title" ng-model="user.title" placeholder="Title / Position" required>
+			<div class="form-group">
+				<label class="control-label col-sm-3" for="title">Title / Position</label>
+				<div class="col-sm-9">
+					<input type="text" class="form-control" id="title" ng-model="user.title" placeholder="Title / Position" required>
 				</div>
 			</div>
 
-			<div class="control-group">
-				<label class="control-label" for="phone">Phone</label>
-				<div class="controls">
-					<input type="text" id="phone" ng-model="user.phone" placeholder="Phone" name="phone" ua-phone required>
+			<div class="form-group">
+				<label class="control-label col-sm-3" for="phone">Phone</label>
+				<div class="col-sm-9">
+					<input type="text" class="form-control" id="phone" ng-model="user.phone" placeholder="Phone" name="phone" ua-phone required>
 					<span class="help-inline">(xxx) xxx-xxxx</span>
 				</div>
 			</div>
 
-			<div class="control-group">
-				<label class="control-label" for="email">Email Address</label>
-				<div class="controls">
-					<input type="email" id="email" ng-model="user.email" placeholder="Email Address" required>
+			<div class="form-group">
+				<label class="control-label col-sm-3" for="email">Email Address</label>
+				<div class="col-sm-9">
+					<input type="email" class="form-control" id="email" ng-model="user.email" placeholder="Email Address" required>
 				</div>
 			</div>
 
-			<div class="control-group">
-				<label class="control-label">Address</label>
-				<div class="controls">
-					<div class="input-append" ng-switch="user.addr.addressID">
+			<div class="form-group">
+				<label class="control-label col-sm-3">Address</label>
+				<div class="col-sm-9">
+					<div ng-switch="user.addr.addressID">
 
-						<div ng-switch-when="undefined">
-							<span class="input-medium uneditable-input">Click 'set' to assign</span>
-							<button type="button" class="btn btn-info" ng-click="setAddr('addr')" ng-disabled="same">Set</button>
+						<div ng-switch-when="undefined" class="input-group">
+							<input class="form-control" type="text" value="Click 'set' to assign" disabled />
+							<div class="input-group-btn">
+								<button type="button" class="btn btn-info" ng-click="setAddr('addr')" ng-disabled="same">Set</button>
+							</div>
 						</div>
 
-						<div ng-switch-default>
-							<span class="input-medium uneditable-input">{{user.addr.addrName}}</span>
-							<button type="button" class="btn btn-warning" ng-click="setAddr('addr')"  ng-disabled="same">Edit</button>
+						<div ng-switch-default class="input-group">
+							<input class="form-control" type="text" value="{{user.addr.addrName}}" disabled />
+							<div class="input-group-btn">
+								<button type="button" class="btn btn-warning" ng-click="setAddr('addr')"  ng-disabled="same">Edit</button>
+							</div>
 						</div>
 
 					</div>
@@ -151,10 +161,10 @@
 
 			<div class="well">
 
-				<div class="control-group">
-					<label class="control-label" for="inputPassword">Current Password</label>
-					<div class="controls">
-						<input type="password" id="inputPassword" ng-model="user.oldPass" placeholder="Current Password" ua-blank>
+				<div class="form-group">
+					<label class="control-label col-sm-3" for="inputPassword">Current Password</label>
+					<div class="col-sm-9">
+						<input type="password" class="form-control" id="inputPassword" ng-model="user.oldPass" placeholder="Current Password" ua-blank>
 					</div>
 				</div>
 
@@ -166,17 +176,17 @@
 					</ul>
 				</div>
 
-				<div class="control-group">
-					<label class="control-label" for="inputPassword">New Password</label>
-					<div class="controls">
-						<input type="password" id="inputPassword" name="inputPassword" ng-model="user.password" placeholder="New Password" ua-pass-validate>
+				<div class="form-group">
+					<label class="control-label col-sm-3" for="inputPassword">New Password</label>
+					<div class="col-sm-9">
+						<input type="password" class="form-control" id="inputPassword" name="inputPassword" ng-model="user.password" placeholder="New Password" ua-pass-validate>
 					</div>
 				</div>
 
-				<div class="control-group">
-					<label class="control-label" for="inputPassword">Re-type New Password</label>
-					<div class="controls">
-						<input type="password" id="inputPassword" ng-model="passVerify" placeholder="New Password">
+				<div class="form-group">
+					<label class="control-label col-sm-3" for="inputPassword">Re-type New Password</label>
+					<div class="col-sm-9">
+						<input type="password" class="form-control" id="inputPassword" ng-model="passVerify" placeholder="New Password">
 					</div>
 				</div>
 
