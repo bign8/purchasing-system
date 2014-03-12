@@ -1,15 +1,15 @@
 <div class="row">
 	<!-- Children List -->
-	<div class="span4">
+	<div class="col-md-4">
 		<h3>
 			<span ng-show="myItem">{{myItem.name}}&nbsp;</span>
 			Items
 			<small ng-show="myItem">&nbsp;{{myItem.desc}}</small>
 		</h3>
 		<div>
-			<button type="button" class="btn btn-success pull-right btn-mini" ng-click="newItem()">New Item</button>
+			<button type="button" class="btn btn-success pull-right btn-xs" ng-click="newItem()">New Item</button>
 			<span class="pull-right" ng-show="myItem">
-				<button type="button" class="btn btn-info btn-mini" ng-click="go(myItem.parentID)">Parent</button>&nbsp;
+				<button type="button" class="btn btn-info btn-xs" ng-click="go(myItem.parentID)">Parent</button>&nbsp;
 			</span>
 		</div>
 		<ul>
@@ -33,7 +33,7 @@
 	</div>
 
 	<!-- itemForm -->
-	<form name="itemForm" class="span4 form-horizontal" ng-show="active">
+	<form name="itemForm" class="col-md-4 form-horizontal" ng-show="active">
 		<h3>Details</h3>
 		<div class="control-group">
 			<label for="name"><strong>Name *</strong></label>
@@ -95,7 +95,7 @@
 	</form>
 
 	<!-- Other things -->
-	<div class="span4" ng-show="active">
+	<div class="col-md-4" ng-show="active">
 		<h3>Cart Links</h3>
 		<p>
 			For links that use ajax, make sure you include <a href="/uacart.js">uacart.js</a> along with <a href="//code.jquery.com/jquery-1.10.2.min.js">jQuery</a> and have the following within your link tag<br/>
@@ -108,7 +108,7 @@
 		<hr/>
 
 		<h3>
-			<button class="btn btn-success pull-right btn-mini" style="margin-top:10px" ng-click="priceAdd()">Add</button>
+			<button class="btn btn-success pull-right btn-xs" style="margin-top:10px" ng-click="priceAdd()">Add</button>
 			Prices
 		</h3>
 		<p>
@@ -155,8 +155,8 @@
 						</div>
 
 						<div ng-show="priceDifferent(price)">
-							<button class="btn btn-success btn-mini" ng-click="priceSave(price)">Save</button>&nbsp;
-							<button class="btn btn-warning btn-mini" ng-click="priceReset(price)">Reset</button>
+							<button class="btn btn-success btn-xs" ng-click="priceSave(price)">Save</button>&nbsp;
+							<button class="btn btn-warning btn-xs" ng-click="priceReset(price)">Reset</button>
 						</div>
 					</td>
 				</tr>
@@ -166,9 +166,9 @@
 		<hr>
 		
 		<!-- Fields -->
-		<div class="pull-right input-prepend" style="margin:5px 0 0">
+		<div class="pull-right input-group" style="margin:5px 0 0">
 			<span class="add-on">Add</span>
-			<select class="span2" ng-model="addField" ng-options="field.name for (key, field) in fields"></select>
+			<select class="col-md-2" ng-model="addField" ng-options="field.name for (key, field) in fields"></select>
 		</div>
 		<h3>Fields</h3>
 		<p>
@@ -182,9 +182,8 @@
 						<input type="checkbox" ng-model="field.required" ng-true-value="true" ng-false-value="false" style="margin:0" ng-disabled="!field.exact" ng-change="chgField(field)">&nbsp;
 						{{field.name}}
 						<div class="pull-right" ng-show="field.exact">
-							<i class="icon-arrow-up" ng-click="mvField(-1, field)" ng-hide="$first"></i>
-							<i class="icon-arrow-down" ng-click="mvField(1, field)" ng-hide="$last"></i>
-							<i class="icon-" ng-show="$last"></i>
+							<i class="glyphicon glyphicon-chevron-up" ng-click="mvField(-1, field)" ng-hide="$first"></i>
+							<i class="glyphicon glyphicon-chevron-down" ng-click="mvField(1, field)" ng-hide="$last"></i>
 							<button class="close" ng-click="rmField($event, field)">&times;</button>
 						</div>
 					</td>

@@ -1,5 +1,5 @@
 <div class="row">
-	<div class="offset0 span12" ng-switch="theCart.len()">
+	<div class="col-md-12" ng-switch="theCart.len()">
 
 		<div style="text-align:center" ng-switch-when="">
 			<a href="http://upstreamacademy.com/" class="btn btn-primary btn-lg" role="button">Cart is Empty - Go Shop!</a>
@@ -35,8 +35,8 @@
 							</div>
 							<div ng-switch="item.template" ng-show="item.hasOptions">
 								<div ng-switch-when="conference" ng-switch="item.cost.set">
-									<a href="/conference/{{item.itemID}}" ng-switch-when="false" class="btn btn-warning btn-mini">Select Attendees</a>
-									<a href="/conference/{{item.itemID}}" ng-switch-default class="btn btn-info btn-mini">Edit Attendees</a>
+									<a href="/conference/{{item.itemID}}" ng-switch-when="false" class="btn btn-warning btn-xs">Select Attendees</a>
+									<a href="/conference/{{item.itemID}}" ng-switch-default class="btn btn-info btn-xs">Edit Attendees</a>
 								</div>
 								<div ng-switch-when="download">
 									<label for="hardcopy">
@@ -45,8 +45,8 @@
 									</label>
 								</div>
 								<div ng-switch-default ng-switch="item.cost.set">
-									<a href="/conference/{{item.itemID}}" ng-switch-when="false" class="btn btn-warning btn-mini">Set Options</a>
-									<a href="/conference/{{item.itemID}}" ng-switch-default class="btn btn-info btn-mini">Edit Options</a>
+									<a href="/conference/{{item.itemID}}" ng-switch-when="false" class="btn btn-warning btn-xs">Set Options</a>
+									<a href="/conference/{{item.itemID}}" ng-switch-default class="btn btn-info btn-xs">Edit Options</a>
 								</div>
 							</div>
 						</td>
@@ -65,9 +65,9 @@
 				</tfoot>
 			</table>
 
-			<div class="row-fluid"> <!-- discount + chekcout area -->
+			<div class="row"> <!-- discount + chekcout area -->
 
-				<div class="span6 well"> <!-- checkout + totals -->
+				<div class="col-md-6 well"> <!-- checkout + totals -->
 					<h4 style="margin-top:0">Checkout</h4>
 
 					<table class="table">
@@ -89,32 +89,33 @@
 
 					<notify message="submitMsg"></notify>
 
-					<div class="fluid-row">
-						<button ng-click="saveCart('online')" class="btn btn-primary btn-lg span6" role="button">
+					<div class="row">
+						<button ng-click="saveCart('online')" class="btn btn-primary btn-lg col-md-6" role="button">
 							via Credit Card 
 							<span class="badge">{{theCart.fullTotal() | currency}}</span>
 						</button>
-						<button ng-click="saveCart('check')" class="btn btn-lg span6" role="button">
+						<button ng-click="saveCart('check')" class="btn btn-lg col-md-6" role="button">
 							via Check 
 							<span class="badge">{{theCart.fullTotal() | currency}}</span>
 						</button>
 					</div>
-					<br/>
-					<div class="fluid-row" style="margin-top: 20px">
-						<a href="http://upstreamacademy.com/" class="span12 btn btn-warning btn-lg">
+					<div class="row" style="margin-top: 20px">
+						<a href="http://upstreamacademy.com/" class="col-md-12 btn btn-warning btn-lg">
 							Return to 
 							<span class="badge">UpstreamAcademy.com</span>
 						</a>
 					</div>
 				</div>
 
-				<div class="span6 well"> <!-- discounts -->
+				<div class="col-md-6 well"> <!-- discounts -->
 					<h4 style="margin-top:0">Discounts</h4>
 
 					<form class="form-search" style="margin:0">
-						<div class="input-append input-block-level" style="padding-right:50px;">
-							<input type="text" id="code" class="search-query input-block-level" ng-model="discountCode" placeholder="Discount Code">
-							<button type="submit" class="btn btn-success" ng-click="addDiscount(discountCode);discountCode=''">Add</button>
+						<div class="input-group" style="padding-right:50px;">
+							<input type="text" id="code" class="search-query form-control" ng-model="discountCode" placeholder="Discount Code">
+							<span class="input-group-btn">
+								<button type="submit" class="btn btn-success" ng-click="addDiscount(discountCode);discountCode=''">Add</button>
+							</span>
 						</div>
 					</form>
 

@@ -1,7 +1,7 @@
 <div class="row">
-	<div class="span6">
+	<div class="col-md-6">
 		<h3>All Firms</h3>
-		<button type="button" class="btn btn-success pull-right btn-mini" ng-click="newFirm()">New Firm</button>
+		<button type="button" class="btn btn-success pull-right btn-xs" ng-click="newFirm()">New Firm</button>
 		<p>Click a firm to modify, or delete a firm with the "x" on the right.</p>
 		<div style="max-height:600px;overflow-x:hidden;overflow-y:auto">
 			<table class="table table-hover">
@@ -24,7 +24,7 @@
 		</div>
 	</div>
 
-	<form name="firm" class="span6 form-horizontal" ng-show="active">
+	<form name="firm" class="col-md-6 form-horizontal" ng-show="active">
 		<h3 style="margin-left:180px">Firm Details</h3>
 		<div class="control-group">
 			<label class="control-label" for="name">Name *</label>
@@ -41,7 +41,7 @@
 		<div class="control-group">
 			<label class="control-label" for="firmName">Address *</label>
 			<div class="controls">
-				<div class="input-append" ng-switch="active.addr.addressID">
+				<div class="input-group" ng-switch="active.addr.addressID">
 					<div ng-switch-when="undefined">
 						<span class="uneditable-input">Click 'set' to enter an address</span>
 						<button type="button" class="btn btn-info" ng-click="setAddr()">Set</button>

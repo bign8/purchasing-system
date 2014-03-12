@@ -1,5 +1,5 @@
 <div class="row" ng-show="recipt.medium == 'check'">
-	<div class="offset1 span10">
+	<div class="col-md-offset-1 col-md-10">
 		<p>Please make checks payable to <strong>Upstream Academy</strong> and send them to the following address.</p>
 		<address>
 			<strong>Upstream Academy</strong><br>
@@ -10,7 +10,7 @@
 </div>
 
 <div class="row">
-	<div class="offset0 span12">
+	<div class="col-md-12">
 		<a class="btn" href="/purchases">View Purchases</a>
 		<a class="btn pull-right" href="javascript:window.print()">Print</a>
 
@@ -39,7 +39,7 @@
 					</td>
 					<td ng-switch="item.template">
 						<span ng-switch-when="download">
-							<a ng-href="/files/{{item.settings.file}}" class="btn btn-info btn-mini" target="_Blank">Download</a>
+							<a ng-href="/files/{{item.settings.file}}" class="btn btn-info btn-xs" target="_Blank">Download</a>
 						</span>
 						<span ng-switch-default>n/a</span>
 					</td>

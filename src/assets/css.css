@@ -61,7 +61,7 @@ th.nowrap, td.nowrap {
 	z-index: 5;
 	border-radius: inherit;
 }
-.well .well-overlay .well-clear-btn.btn-large {
+.well .well-overlay .well-clear-btn.btn-lg {
 	position: absolute;
 	top: 50%;
 	left: 50%;

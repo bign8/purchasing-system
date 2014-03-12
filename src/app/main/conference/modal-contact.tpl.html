@@ -11,56 +11,60 @@
 
 	<form class="form-horizontal css-form" name="registration" ng-show="addNew">
 
-		<div class="control-group">
-			<label class="control-label" for="legalName">Legal Name *</label>
-			<div class="controls">
-				<input type="text" id="legalName" ng-model="contact.legalName" placeholder="Legal Name" required>
+		<div class="form-group">
+			<label class="col-sm-3" for="legalName">Legal Name *</label>
+			<div class="col-sm-9">
+				<input class="form-control" type="text" id="legalName" ng-model="contact.legalName" placeholder="Legal Name" required>
 			</div>
 		</div>
 
-		<div class="control-group">
-			<label class="control-label" for="preName">Preferred Name</label>
-			<div class="controls">
-				<input type="text" id="preName" ng-model="contact.preName" placeholder="Preferred Name">
+		<div class="form-group">
+			<label class="col-sm-3" for="preName">Preferred Name</label>
+			<div class="col-sm-9">
+				<input class="form-control" type="text" id="preName" ng-model="contact.preName" placeholder="Preferred Name">
 				<span class="help-inline">(i.e., Bill instead of William, etc.)</span>
 			</div>
 		</div>
 
-		<div class="control-group">
-			<label class="control-label" for="title">Title / Position *</label>
-			<div class="controls">
-				<input type="text" id="title" ng-model="contact.title" placeholder="Title / Position" required>
+		<div class="form-group">
+			<label class="col-sm-3" for="title">Title / Position *</label>
+			<div class="col-sm-9">
+				<input class="form-control" type="text" id="title" ng-model="contact.title" placeholder="Title / Position" required>
 			</div>
 		</div>
 
-		<div class="control-group">
-			<label class="control-label" for="phone">Phone</label>
-			<div class="controls">
-				<input type="text" id="phone" ng-model="contact.phone" placeholder="Phone" name="phone" ua-phone>
+		<div class="form-group">
+			<label class="col-sm-3" for="phone">Phone</label>
+			<div class="col-sm-9">
+				<input class="form-control" type="text" id="phone" ng-model="contact.phone" placeholder="Phone" name="phone" ua-phone>
 				<span class="help-inline">(xxx) xxx-xxxx</span>
 			</div>
 		</div>
 
-		<div class="control-group">
-			<label class="control-label" for="email">Email Address *</label>
-			<div class="controls">
-				<input type="email" id="email" ng-model="contact.email" placeholder="Email Address" required>
+		<div class="form-group">
+			<label class="col-sm-3" for="email">Email Address *</label>
+			<div class="col-sm-9">
+				<input class="form-control" type="email" id="email" ng-model="contact.email" placeholder="Email Address" required>
 			</div>
 		</div>
 
-		<div class="control-group">
-			<label class="control-label">Address *</label>
-			<div class="controls">
-				<div class="input-append" ng-switch="contact.addr.addressID">
+		<div class="form-group">
+			<label class="col-sm-3">Address *</label>
+			<div class="col-sm-9">
+				<div ng-switch="contact.addr.addressID">
 
-					<div ng-switch-when="null">
-						<span class="input-medium uneditable-input">Click 'set' to assign</span>
-						<button type="button" class="btn btn-info" ng-click="setAddr()" ng-disabled="sameAddr">Set</button>
+					<div ng-switch-when="null" class="input-group">
+						<input class="form-control" type="text" value="Click 'set' to assign" disabled />
+						<span class="input-group-btn">
+							<button type="button" class="btn btn-info" ng-click="setAddr()" ng-disabled="sameAddr">Set</button>
+						</span>
 					</div>
 
-					<div ng-switch-default>
-						<span class="input-medium uneditable-input">{{contact.addr.addrName}}</span>
-						<button type="button" class="btn btn-warning" ng-click="setAddr()" ng-disabled="sameAddr">Edit</button>
+					<div ng-switch-default class="input-group">
+						<input class="form-control" type="text" value="{{contact.addr.addrName}}" disabled />
+						<span class="input-group-btn">
+							<button type="button" class="btn btn-warning" ng-click="setAddr()" ng-disabled="sameAddr">Edit</button>
+						</span>
 					</div>
 
 				</div>
@@ -92,7 +96,7 @@
 						{{person.addr.addr1}}<br/>
 						<span ng-show="person.addr.addr2">{{person.addr.addr2}}<br/></span>
 						{{person.addr.city}} {{person.addr.state}}, {{person.addr.zip}}
-						<button class="btn btn-primary btn-mini pull-right" ng-click="choose(person, $event)">choose</button>
+						<button class="btn btn-primary btn-xs pull-right" ng-click="choose(person, $event)">choose</button>
 					</td>
 				</tr>
 			</tbody>

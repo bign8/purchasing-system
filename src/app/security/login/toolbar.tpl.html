@@ -1,16 +1,5 @@
-<ul class="nav pull-right">
-	<li class="divider-vertical"></li>
-	<li ng-show="isAuthenticated()">
-			<a href="/user">{{currentUser.legalName}}</a>
-	</li>
-	<li ng-show="isAuthenticated()" class="logout">
-			<form class="navbar-form">
-					<button class="btn logout" ng-click="logout()">Log out</button>
-			</form>
-	</li>
-	<li ng-hide="isAuthenticated()" class="login">
-			<form class="navbar-form">
-					<button class="btn login" ng-click="login()">Log in</button>
-			</form>
-	</li>
-</ul>
+<form class="navbar-form">
+	<a href="/user" ng-show="isAuthenticated()" class="navbar-link">{{currentUser.legalName}}</a>
+	<button class="btn logout navbar-btn" ng-click="logout()" ng-show="isAuthenticated()" style="margin:0 0 0 1em">Log out</button>
+	<button class="btn login navbar-btn" ng-click="login()" ng-hide="isAuthenticated()" style="margin:0 0 0 1em">Log in</button>
+</form>
