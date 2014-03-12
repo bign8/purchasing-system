@@ -14,17 +14,10 @@ ToDo Directives:
 - phone validator (register/xx > add attendee > add employee)
 
 In a holding pattern:
-- build administration section (see if user end is accepted)
-	- Downloads
-	- Firms (merge)
-	- Purchases (manual add memberships)
 - Explain setting up an account (your information, not person signing up for conference)
 
 Notes:
-- Add conference type product -> Force insert into tie_product_field
-- Add price to new products
 - Admin can drop attendees
-- Classes (HPF + ELA) just register for first class (others will be invoiced)
 
 Future releases
 - assign status to orders (processing, confirmed, etc)
