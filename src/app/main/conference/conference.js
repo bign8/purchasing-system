@@ -212,7 +212,7 @@ directive('uaImageUpload', [function() {
 			$scope.uploadFile = function() {
 				var fd = new FormData();
 				for (var i in $scope.files) fd.append("uploadedFile", $scope.files[i]);
-					var xhr = new XMLHttpRequest();
+				var xhr = new XMLHttpRequest();
 				xhr.upload.addEventListener("progress", uploadProgress, false);
 				xhr.addEventListener("load", uploadComplete, false);
 				xhr.addEventListener("error", uploadFailed, false);
