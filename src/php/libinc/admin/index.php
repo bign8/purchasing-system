@@ -11,6 +11,7 @@ class Admin {
 			'item',
 			'purchase',
 			'merge',
+			'file',
 		);
 
 		if (in_array($area, $admins)) {
