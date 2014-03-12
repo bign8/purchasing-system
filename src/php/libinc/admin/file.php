@@ -63,9 +63,34 @@ class File extends NG {
 
 	// stores discount changes
 	public function upload() {
-		print_r($_REQUEST);
-		print_r($_FILES);
-		
-		// return $d;
+		try {
+			$fieldName = 'file';
+			
+			// Undefined | Multiple Files | $_FILES Corruption Attack, treat it invalid.
+			if ( !isset($_FILES[ $fieldName ]['error']) || is_array($_FILES[ $fieldName ]['error']) )
+				throw new RuntimeException('Invalid parameters.');
+
+			// Check $_FILES[ $fieldName ]['error'] value.
+			switch ($_FILES[ $fieldName ]['error']) {
+				case UPLOAD_ERR_OK: break;
+				case UPLOAD_ERR_NO_FILE: throw new RuntimeException('No file sent.');
+				case UPLOAD_ERR_INI_SIZE:
+				case UPLOAD_ERR_FORM_SIZE: throw new RuntimeException('Exceeded filesize limit.');
+				default: throw new RuntimeException('Unknown errors.');
+			}
+
+			// You should also check filesize here. 
+			if ($_FILES[ $fieldName ]['size'] > 1000000) throw new RuntimeException('Exceeded filesize limit.');
+
+			// Naming file as desired
+			$fileName = $_SERVER['DOCUMENT_ROOT'] . DIRECTORY_SEPARATOR . 'files' . DIRECTORY_SEPARATOR . $_REQUEST['path'] . $_REQUEST['name'];
+			$fileName = str_replace("/", DIRECTORY_SEPARATOR, $fileName);
+			if (!move_uploaded_file( $_FILES[ $fieldName ]['tmp_name'], $fileName )) throw new RuntimeException('Failed to move uploaded file.');
+
+			return $_FILES[ $fieldName ]['size'];
+
+		} catch (RuntimeException $e) {
+			return $this->conflict( $e->getMessage() );
+		}
 	}
 }
