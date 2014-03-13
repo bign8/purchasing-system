@@ -1,5 +1,6 @@
 <?php
-
+// session_start();
+// unset($_SESSION['cart']);
 // Handle cross site
 // header('Access-Control-Allow-Origin: http://localhost:4001');
 // header('Access-Control-Allow-Credentials: true');
