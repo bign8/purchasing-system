@@ -27,11 +27,11 @@
 						</td>
 						<td>{{item.legalName || '-'}}</td>
 						<td class="nowrap">{{(item.stamp | date:'MMM d, y') || '-'}}</td>
-						<td ng-switch="item.template">
-							<span ng-switch-when="download">
+						<td ng-switch="item.template.name">
+							<span ng-switch-when="Download">
 								<a ng-href="/files/{{item.settings.file}}" class="btn btn-info btn-mini" target="_Blank">Download</a>
 							</span>
-							<span ng-switch-when="conference" ng-show="item.hasOptions">
+							<span ng-switch-when="Conference">
 								<button class="btn btn-mini" ng-click="showAttendees(item)">Attendees</button>
 							</span>
 							<span ng-switch-default>-</span>
