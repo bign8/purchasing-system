@@ -206,7 +206,7 @@ factory('appStrings', function() {
 		conference: {
 			attendee: { // Passwords Match
 				pre:'Whose coming?',
-				msg:'Please add at least one Attendee to the conference.',
+				msg:'Please add at least one Attendee.',
 				type:ERROR
 			},
 			error: { // some server error
