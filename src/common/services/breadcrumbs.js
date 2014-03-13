@@ -58,6 +58,7 @@ factory('breadcrumbs', ['$rootScope', '$location', 'interface', function ($rootS
 			return breadcrumbs[0] || {};
 		},
 		onPage: function( crumb ) {
+			if (crumb === '' && breadcrumbs.length === 0) return true;
 			return crumb == (breadcrumbs[breadcrumbs.length-1] || {name:'undefined'}).name;
 		}
 	};
