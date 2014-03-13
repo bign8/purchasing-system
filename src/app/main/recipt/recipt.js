@@ -1,10 +1,10 @@
-angular.module('myApp.main.recipt', [
+angular.module('myApp.main.receipt', [
 	'security'
 ]).
 
 config(['$routeProvider', 'securityAuthorizationProvider', function( $routeProvider, securityAuthorizationProvider ){
-	$routeProvider.when('/recipt', {
-		title: "Recipt",
+	$routeProvider.when('/receipt', {
+		title: "Receipt",
 		subTitle: "from last purchase",
 		templateUrl: 'app/main/recipt/recipt.tpl.html',
 		controller: 'ReciptCtrl',
@@ -15,5 +15,5 @@ config(['$routeProvider', 'securityAuthorizationProvider', function( $routeProvi
 }]).
 
 controller('ReciptCtrl', ['$scope', function ($scope) {
-	$scope.recipt = JSON.parse(localStorage.getItem('UA-recipt'));
+	$scope.recipt = JSON.parse(localStorage.getItem('UA-receipt'));
 }]);
