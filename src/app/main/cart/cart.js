@@ -8,6 +8,7 @@ config(['$routeProvider', 'securityAuthorizationProvider', function ( $routeProv
 		controller: 'CartCtrl',
 		resolve: {
 			preLoad: ['theCart', function (theCart) {
+				theCart.setDirty();
 				return theCart.load(); // won't use data, will pre-fetch data
 			}],
 			user: securityAuthorizationProvider.requireAuthenticatedUser
