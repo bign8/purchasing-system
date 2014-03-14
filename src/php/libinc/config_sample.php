@@ -17,4 +17,5 @@ class config {
 	
 	// Misc use
 	const encryptSTR   = '***randomString***'; // try: random.org/strings
+	const phpLitePass  = '***phpLite Pass***'; // password for phpLiteAdmin (used in phpLiteAdmin.config.php)
 }
