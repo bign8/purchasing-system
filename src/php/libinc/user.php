@@ -1,5 +1,6 @@
 <?php
 
+require_once( __DIR__ . '/password_hash.php' );
 class User extends NG {
 
 	// Constructor: Initialize session and db connections
@@ -38,14 +39,10 @@ class User extends NG {
 	// Worker(security): Implements: returns database user object or null
 	protected function getUser( $data ) {
 		$user = NULL;
-		$STH = $this->db->prepare("SELECT * FROM `contact` WHERE `email`=? AND `pass`=? LIMIT 1;");
-		if (
-			isset($data->email) &&
-			isset($data->password) &&
-			$STH->execute( $data->email, sha1($data->password . config::encryptSTR) )
-		) {
+		$STH = $this->db->prepare("SELECT * FROM `contact` WHERE `email`=? LIMIT 1;");
+		if ( isset($data->email) && isset($data->password) && $STH->execute($data->email) ) {
 			$user = $STH->fetch();
-			if (isset($user['contactID'])) {
+			if (isset($user['contactID']) && isset($user['pass']) && validate_password($data->password, $user['pass'])) {
 				$user = $this->cleanUser( $user );
 				$updateSTH = $this->db->prepare( "UPDATE `contact` SET lastLogin=CURRENT_TIMESTAMP, `resetHash`=NULL, `resetExpires`=NULL WHERE `contactID`=?;" );
 				$updateSTH->execute( $user['contactID'] );
@@ -206,7 +203,7 @@ HTML;
 			</p>
 HTML;
 		$mail = new UAMail();
-		if (!$mail->sendMsg('Password Reset Instructions (payment.upstreamacademy.com)', $html, $user['email'], $user['legalName'])) $this->conflict('mail');
+		if (!$mail->sendMsg('Password Reset Instructions (payment.upstreamacademy.com)', $html, $user['email'], $user['legalName'])) return $this->conflict('mail');
 		return 'sent';
 	}
 
@@ -225,7 +222,7 @@ HTML;
 		if (!$getSTH->execute($data->hash)) die($this->conflict());
 		$user = $getSTH->fetch( PDO::FETCH_ASSOC );
 		$setSTH = $this->db->prepare("UPDATE `contact` SET `lastLogin`=CURRENT_TIMESTAMP,`pass`=?,`resetHash`=NULL,`resetExpires`=NULL WHERE `contactID`=?;");
-		if ( !$setSTH->execute( sha1($data->password . config::encryptSTR), $user['contactID'] ) ) die($this->conflict());
+		if ( !$setSTH->execute( create_hash($data->password), $user['contactID'] ) ) die($this->conflict());
 		$_SESSION['user'] = $this->cleanUser($user);
 		return $_SESSION['user'];
 	}
@@ -367,7 +364,7 @@ HTML;
 		}
 		// Add Contact
 		$contSTH = $this->db->prepare("INSERT INTO `contact` (firmID, addressID, legalName, preName, title, email, phone, pass) VALUES (?,?,?,?,?,?,?,?);");
-		if (!$contSTH->execute( $firmID, $d->addr->addressID, $d->legalName, $d->preName, $d->title, $d->email, $d->phone, sha1($d->password . config::encryptSTR) )) return $this->conflict();
+		if (!$contSTH->execute( $firmID, $d->addr->addressID, $d->legalName, $d->preName, $d->title, $d->email, $d->phone, create_hash($d->password) )) return $this->conflict();
 		$_SESSION['user'] = $this->getUser( $d );
 
 		if ($editFirm) {
@@ -417,10 +414,10 @@ HTML;
 
 		// Update Password
 		if (isset($d->oldPass) && $d->oldPass != '') {
-			$chkSTH = $this->db->prepare("SELECT * FROM `contact` WHERE `contactID`=? AND `pass`=?;");
-			if ( $chkSTH->execute( $user['contactID'], sha1($d->oldPass . config::encryptSTR) ) && count($chkSTH->fetchAll()) > 0 ) {
+			$chkSTH = $this->db->prepare("SELECT pass FROM `contact` WHERE `contactID`=?;");
+			if ( $chkSTH->execute( $user['contactID']) && validate_password($d->oldPass, $chkSTH->fetchColumn()) ) {
 				$pasSTH = $this->db->prepare("UPDATE `contact` SET `pass`=? WHERE `contactID`=?;");
-				if ( !$pasSTH->execute( sha1($d->password . config::encryptSTR), $user['contactID'] ) ) return $this->conflict();
+				if ( !$pasSTH->execute( create_hash($d->password), $user['contactID'] ) ) return $this->conflict();
 			} else return $this->conflict('badPass');
 		}
 
