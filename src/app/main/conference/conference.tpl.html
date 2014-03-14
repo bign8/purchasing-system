@@ -59,7 +59,12 @@
 						<div ng-switch-when="radioboxes">
 							<label class="control-label">{{field.name}} <span ng-show="field.required">*</span></label>
 							<div class="controls" ng-repeat="option in field.settings">
-								<label><input type="radio" name="optionsRadios" ng-model="con.options[field.fieldID]" value="{{option}}" ng-required="field.required">&nbsp;{{option}}</label>
+								<label ng-switch="$first">
+									<input checked="checked" ng-switch-when="true" type="radio" name="optionsRadios" ng-model="con.options[field.fieldID]" value="{{option}}" ng-required="field.required">
+									<input ng-switch-default type="radio" name="optionsRadios" ng-model="con.options[field.fieldID]" value="{{option}}" ng-required="field.required">
+
+									&nbsp;{{option}}
+								</label>
 							</div>
 						</div>
 
@@ -167,3 +172,4 @@
 
 </form>
 
+<pre>{{con | json}}</pre>
