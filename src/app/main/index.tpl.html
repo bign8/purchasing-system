@@ -8,7 +8,7 @@
 </div>
 
 
-<div class="row" ng-switch="theCart.get().length">
+<div class="row" ng-switch="theCart.cart.length">
 	<div class="span12" ng-switch-when="0">
 		<div class="alert alert-error">
 			<strong>Empty Cart</strong> Go <a href="http://upstreamacademy.com/">shopping</a> or <a href="/payment">make a payment</a>
@@ -19,32 +19,35 @@
 		<thead>
 			<tr>
 				<th>Name</th>
-				<th>Description</th>
 				<th>Cost</th>
 			</tr>
 		</thead>
 		<tbody>
 			<tr ng-repeat="item in theCart.cart" ng-class="{true:'error', false:''}[item.warn]">
 				<td ng-switch="!item.url">
+					<div ng-switch="item.cost.name" ng-show="item.hasOptions" class="pull-right">
+						<div ng-switch-when="Conference" ng-switch="item.cost.set">
+							<a href="/conference/{{item.itemID}}" ng-switch-when="false" class="btn btn-warning btn-mini">Select Attendees</a>
+							<a href="/conference/{{item.itemID}}" ng-switch-default class="btn btn-info btn-mini">Edit Attendees</a>
+						</div>
+						<div ng-switch-when="Hardcopy">
+							<label for="hardcopy">
+								<input type="checkbox" ng-model="item.options" name="hardcopy" id="hardcopy" ng-change="theCart.setOption(item.itemID, item.options);" />
+								&nbsp;Add a hard copy for an additional $50?
+							</label>
+						</div>
+						<div ng-switch-default ng-switch="item.cost.set">
+							<a href="/conference/{{item.itemID}}" ng-switch-when="false" class="btn btn-warning btn-mini">Set Options</a>
+							<a href="/conference/{{item.itemID}}" ng-switch-default class="btn btn-info btn-mini">Edit Options</a>
+						</div>
+						<!-- <pre>{{item.cost.name}}</pre> -->
+					</div>
+
 					<span ng-show="item.expired" class="text-error">Expired:&nbsp;</span>
 					<span ng-switch-when="true">{{item.name}}</span>
 					<a ng-switch-default ng-href="{{item.url}}">{{item.name}}</a>
-				</td>
-				<td>
-					<div ng-switch="item.template" ng-show="item.hasOptions">
-						<div ng-switch-when="download" class="pull-right">
-							<label for="hardcopy">
-								<input type="checkbox" ng-model="item.options" name="hardcopy" id="hardcopy" ng-change="theCart.setOption(item.itemID, item.options);" />
-								&nbsp;&nbsp;Hardcopy?
-							</label>
-						</div>
-						<div ng-switch-default ng-switch="item.cost.set" class="pull-right">
-							<a href="/conference/{{item.itemID}}" ng-switch-when="false" class="btn btn-warning btn-mini">Set</a>
-							<a href="/conference/{{item.itemID}}" ng-switch-default class="btn btn-info btn-mini">Edit</a>
-						</div>
-					</div>
-					
-					<span>{{item.desc}}</span>
+
+					<span ng-show="item.desc" class="muted"><br/>{{item.desc}}</span>
 				</td>
 				<td>
 					<span>{{item.cost.value | currency}}</span>
@@ -58,11 +61,13 @@
 		</tbody>
 		<tfoot>
 			<tr>
-				<th></th>
-				<th><span class="pull-right">Sub-Total:</span></th>
+				<th><span class="pull-right">Total:</span></th>
 				<th><span>{{theCart.total() | currency}}</span></th>
 			</tr>
 		</tfoot>
 	</table>
 </div>
 
+<!-- START DEV -->
+<pre>{{theCart.cart | json}}</pre>
+<!-- END DEV -->
