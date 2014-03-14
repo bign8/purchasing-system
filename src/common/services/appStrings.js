@@ -206,7 +206,7 @@ factory('appStrings', function() {
 		conference: {
 			attendee: { // Passwords Match
 				pre:'Whose coming?',
-				msg:'Please add at least one Attendee to the conference.',
+				msg:'Please add at least one Attendee.',
 				type:ERROR
 			},
 			error: { // some server error
@@ -216,7 +216,7 @@ factory('appStrings', function() {
 			},
 			immutable: {
 				pre:'Heads up!',
-				msg:'Previously purchased attendees are visable in this view.  They cannot be removed and they will not be added twoard your total.',
+				msg:'Previously purchased attendees are visible in this view.  They cannot be removed and they will not be added toward your total.',
 				type:INFO, delay: 60
 			}
 		}
