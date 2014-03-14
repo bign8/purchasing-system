@@ -1,5 +1,5 @@
 <form class="navbar-form">
 	<a href="/user" ng-show="isAuthenticated()" class="navbar-link">{{currentUser.legalName}}</a>
-	<button class="btn logout navbar-btn" ng-click="logout()" ng-show="isAuthenticated()" style="margin:0 0 0 1em">Log out</button>
-	<button class="btn login navbar-btn" ng-click="login()" ng-hide="isAuthenticated()" style="margin:0 0 0 1em">Log in</button>
+	<button class="btn logout navbar-btn btn-default" ng-click="logout()" ng-show="isAuthenticated()" style="margin:0 0 0 1em">Log out</button>
+	<button class="btn login navbar-btn btn-default" ng-click="login()" ng-hide="isAuthenticated()" style="margin:0 0 0 1em">Log in</button>
 </form>
