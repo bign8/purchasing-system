@@ -17,6 +17,7 @@ config(['$routeProvider', function ( $routeProvider ){
 		controller: 'IndexCtrl',
 		resolve: {
 			fullCart: ['theCart', function (theCart) {
+				theCart.setDirty();
 				return theCart.load();
 			}]
 		}
