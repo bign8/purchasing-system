@@ -66,84 +66,93 @@
 			</table>
 
 			<div class="row"> <!-- discount + chekcout area -->
+				<div class="col-md-6"> <!-- checkout + totals -->
+					<div class="well">
+						<h4 style="margin-top:0">Checkout</h4>
 
-				<div class="col-md-6 well"> <!-- checkout + totals -->
-					<h4 style="margin-top:0">Checkout</h4>
+						<table class="table">
+							<tbody>
+								<tr>
+									<td><strong class="pull-right">Sub-Total:</strong></td>
+									<td>{{theCart.total() | currency}}</td>
+								</tr>
+								<tr>
+									<td><strong class="pull-right">Discounts:</strong></td>
+									<td>{{theCart.totDiscount() | currency}}</td>
+								</tr>
+								<tr>
+									<td><strong class="pull-right">Cart Total:</strong></td>
+									<td>{{theCart.fullTotal() | currency}}</td>
+								</tr>
+							</tbody>
+						</table>
 
-					<table class="table">
-						<tbody>
-							<tr>
-								<td><strong class="pull-right">Sub-Total:</strong></td>
-								<td>{{theCart.total() | currency}}</td>
-							</tr>
-							<tr>
-								<td><strong class="pull-right">Discounts:</strong></td>
-								<td>{{theCart.totDiscount() | currency}}</td>
-							</tr>
-							<tr>
-								<td><strong class="pull-right">Cart Total:</strong></td>
-								<td>{{theCart.fullTotal() | currency}}</td>
-							</tr>
-						</tbody>
-					</table>
+						<notify message="submitMsg"></notify>
 
-					<notify message="submitMsg"></notify>
-
-					<div class="row">
-						<button ng-click="saveCart('online')" class="btn btn-primary btn-lg col-md-6" role="button">
-							via Credit Card 
-							<span class="badge">{{theCart.fullTotal() | currency}}</span>
-						</button>
-						<button ng-click="saveCart('check')" class="btn btn-lg col-md-6" role="button">
-							via Check 
-							<span class="badge">{{theCart.fullTotal() | currency}}</span>
-						</button>
-					</div>
-					<div class="row" style="margin-top: 20px">
-						<a href="http://upstreamacademy.com/" class="col-md-12 btn btn-warning btn-lg">
-							Return to 
-							<span class="badge">UpstreamAcademy.com</span>
-						</a>
+						<div class="row">
+							<div class="col-md-6">
+								<button ng-click="saveCart('online')" class="btn btn-primary" role="button" style="width:100%">
+									via Credit Card 
+									<span class="badge">{{theCart.fullTotal() | currency}}</span>
+								</button>
+							</div>
+							<div class="col-md-6">
+								<button ng-click="saveCart('check')" class="btn btn-default" role="button" style="width:100%">
+									via Check 
+									<span class="badge">{{theCart.fullTotal() | currency}}</span>
+								</button>
+							</div>
+						</div>
+						<div class="row" style="margin-top: 20px">
+							<div class="col-md-12">
+								<a href="http://upstreamacademy.com/" class="btn btn-warning" style="width:100%">
+									Return to 
+									<span class="badge">UpstreamAcademy.com</span>
+								</a>
+							</div>
+						</div>
 					</div>
 				</div>
 
-				<div class="col-md-6 well"> <!-- discounts -->
-					<h4 style="margin-top:0">Discounts</h4>
+				<div class="col-md-6"> <!-- discounts -->
+					<div class="well">
+						<h4 style="margin-top:0">Discounts</h4>
 
-					<form class="form-search" style="margin:0">
-						<div class="input-group" style="padding-right:50px;">
-							<input type="text" id="code" class="search-query form-control" ng-model="discountCode" placeholder="Discount Code">
-							<span class="input-group-btn">
-								<button type="submit" class="btn btn-success" ng-click="addDiscount(discountCode);discountCode=''">Add</button>
-							</span>
-						</div>
-					</form>
+						<form class="form-search" style="margin:0">
+							<div class="input-group">
+								<input type="text" id="code" class="search-query form-control" ng-model="discountCode" placeholder="Discount Code">
+								<span class="input-group-btn">
+									<button type="submit" class="btn btn-success" ng-click="addDiscount(discountCode);discountCode=''">Add</button>
+								</span>
+							</div>
+						</form>
 
-					<notify message="discountMsg" style="margin-top:20px;"></notify>
+						<notify message="discountMsg" style="margin-top:20px;"></notify>
 
-					<table class="table table-striped table-hover" style="margin:0" ng-show="theCart.discounts.length > 0">
-						<thead>
-							<tr>
-								<th>Descripiton</th>
-								<th>Amount</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr ng-repeat="discount in theCart.discounts">
-								<td>{{discount.name}}</td>
-								<td>
-									{{discount.amount | currency}}
-									<a href ng-click="theCart.remDiscount(discount)" role="button" class="close">&times;</a>
-								</td>
-							</tr>
-						</tbody>
-						<tfoot>
-							<tr>
-								<th><span class="pull-right">Discount Total:</span></th>
-								<th>{{theCart.totDiscount() | currency}}</th>
-							</tr>
-						</tfoot>
-					</table>
+						<table class="table table-striped table-hover" style="margin:0" ng-show="theCart.discounts.length > 0">
+							<thead>
+								<tr>
+									<th>Descripiton</th>
+									<th>Amount</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr ng-repeat="discount in theCart.discounts">
+									<td>{{discount.name}}</td>
+									<td>
+										{{discount.amount | currency}}
+										<a href ng-click="theCart.remDiscount(discount)" role="button" class="close">&times;</a>
+									</td>
+								</tr>
+							</tbody>
+							<tfoot>
+								<tr>
+									<th><span class="pull-right">Discount Total:</span></th>
+									<th>{{theCart.totDiscount() | currency}}</th>
+								</tr>
+							</tfoot>
+						</table>
+					</div>
 				</div>
 			</div>
 		</div>
