@@ -235,6 +235,7 @@ class Cart extends NG {
 
 	// Worker: return conference options
 	public function getOption() {
+		$this->usr->requiresAuth();
 		$data = $this->getPostData();
 
 		$this->addItem($data->itemID);
