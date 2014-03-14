@@ -33,8 +33,12 @@ controller('RegisterConferenceCtrl', ['$scope', 'myPage', 'interface', 'conferen
 		$scope.con.options.attID = attID;
 		if (attID) $scope.con.options[attID] = $scope.con.options[attID] || []; // set empty attendee array
 
-		if ($scope.con.item.oldData && $scope.con.item.oldData.hasOwnProperty(attID)) { // add old immutable attendees
-			angular.forEach($scope.con.item.oldData[attID], function (person) {
+		if ($scope.con.item.oldData && $scope.con.item.oldData.hasOwnProperty(attID)) {
+			angular.forEach($scope.con.item.oldData, function (value, key) {
+				if (key !== attID) $scope.con.options[key] = value;
+			});
+
+			angular.forEach($scope.con.item.oldData[attID], function (person) { // add old immutable attendees
 				var found = false;
 				angular.forEach($scope.con.options[attID], function (checkPerson) { // search for same user (re-edit)
 					if (checkPerson.contactID == person.contactID) found = true;
@@ -212,7 +216,7 @@ directive('uaImageUpload', [function() {
 			$scope.uploadFile = function() {
 				var fd = new FormData();
 				for (var i in $scope.files) fd.append("uploadedFile", $scope.files[i]);
-					var xhr = new XMLHttpRequest();
+				var xhr = new XMLHttpRequest();
 				xhr.upload.addEventListener("progress", uploadProgress, false);
 				xhr.addEventListener("load", uploadComplete, false);
 				xhr.addEventListener("error", uploadFailed, false);

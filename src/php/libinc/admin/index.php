@@ -8,7 +8,10 @@ class Admin {
 		$admins = array(
 			'discount',
 			'firm',
-			'item'
+			'item',
+			'purchase',
+			'merge',
+			'file',
 		);
 
 		if (in_array($area, $admins)) {

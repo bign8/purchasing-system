@@ -8,6 +8,7 @@ config(['$routeProvider', 'securityAuthorizationProvider', function ( $routeProv
 		controller: 'CartCtrl',
 		resolve: {
 			preLoad: ['theCart', function (theCart) {
+				theCart.setDirty();
 				return theCart.load(); // won't use data, will pre-fetch data
 			}],
 			user: securityAuthorizationProvider.requireAuthenticatedUser
@@ -67,14 +68,14 @@ controller('CartCtrl', ['$scope', '$modal', 'interface', '$location', 'theCart',
 				total: theCart.fullTotal(),
 				medium: medium
 			};
-			localStorage.setItem('UA-recipt', JSON.stringify( cart )); // store off cart
+			localStorage.setItem('UA-receipt', JSON.stringify( cart )); // store off cart
 
 			if (medium == 'online') { // direct accordingly
 				var obj = appStrings.paypal.uri;
 				obj[appStrings.paypal.totalParam] = cart.total;
 				document.location = appStrings.paypal.url + '?' + $.param(obj);
 			} else {
-				$location.path('/recipt'); // go to checkout page
+				$location.path('/receipt'); // go to checkout page
 			}
 			theCart.setDirty(); // make sure empty cart gets loaded into the system
 		});

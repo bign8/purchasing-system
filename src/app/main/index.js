@@ -3,7 +3,7 @@ angular.module('myApp.main', [
 	'myApp.main.conference',
 	'myApp.main.payment',
 	'myApp.main.purchases',
-	'myApp.main.recipt',
+	'myApp.main.receipt',
 	'myApp.main.register',
 	'myApp.main.reset',
 	'myApp.main.user',
