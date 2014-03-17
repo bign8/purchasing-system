@@ -139,6 +139,9 @@ th.nowrap, td.nowrap {
 .ctr {
 	text-align: center;
 }
+.well > .form-group:last-child {
+	margin-bottom: 0;
+}
 
 /* Sticky footer styles  */
 html, body {

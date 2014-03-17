@@ -65,12 +65,9 @@
 
 				<ul class="breadcrumb" ng-hide="breadcrumbs.getAll().length < 1">
 					<li><a  href="/">Home</a></li>
-					<li ng-repeat="breadcrumb in breadcrumbs.getAll()">
-						<span class="divider">/</span>  
-						<ng-switch on="$last">
-							<span ng-switch-when="true" ng-bind="breadcrumb.name"></span>
-							<span ng-switch-default><a ng-href="{{breadcrumb.path}}" ng-bind="breadcrumb.name"></a></span>
-						</ng-switch>
+					<li ng-repeat="breadcrumb in breadcrumbs.getAll()" ng-switch="$last">
+						<span ng-switch-when="true" ng-bind="breadcrumb.name"></span>
+						<span ng-switch-default><a ng-href="{{breadcrumb.path}}" ng-bind="breadcrumb.name"></a></span>
 					</li>
 				</ul>
 			</div>
