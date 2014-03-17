@@ -153,6 +153,9 @@ html, body {
 #push, #footer {
 	height: 60px;
 }
+#push {
+	margin-top: 10px; /* ensure spacing above footer */
+}
 #footer {
 	background-color: #f5f5f5;
 }
