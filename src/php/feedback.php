@@ -116,7 +116,7 @@ if (!isset($_REQUEST['submit'])) {
 	</div>
 	<div id="footer">
 		<div class="container">
-			<p class="muted credit">Copyright &copy; <script type="text/javascript">document.write(new Date().getFullYear())</script> <a href="http://upstreamacademy.com">UpstreamAcademy</a>.</p>
+			<p class="text-muted credit">Copyright &copy; <script type="text/javascript">document.write(new Date().getFullYear())</script> <a href="http://upstreamacademy.com">UpstreamAcademy</a>.</p>
 		</div>
 	</div>
 </body>
