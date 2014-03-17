@@ -20,14 +20,14 @@
 							<span ng-show="item.expired" class="text-error">Expired:&nbsp;</span>
 							<span ng-switch-when="true">{{item.name}}</span>
 							<a ng-switch-default ng-href="{{item.url}}">{{item.name}}</a>
-							<span ng-show="item.desc" class="muted"><br/>{{item.desc}}</span>
+							<span ng-show="item.desc" class="text-muted"><br/>{{item.desc}}</span>
 						</td>
 						<td>
 							<div>
 								<span>{{item.cost.value | currency}}</span>
 								<span ng-show="item.cost.fullValue">&nbsp;&nbsp;
 									<del class="text-error">&nbsp;{{item.cost.fullValue | currency}}&nbsp;</del>&nbsp;
-									<span class="muted">{{item.cost.reason}} Pricing</span>
+									<span class="text-muted">{{item.cost.reason}} Pricing</span>
 								</span>
 							</div>
 							<div ng-switch="item.cost.name" ng-show="item.hasOptions">

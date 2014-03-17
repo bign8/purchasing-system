@@ -36,23 +36,6 @@ th.nowrap, td.nowrap {
 	background-color: #78FA89;
 }
 
-/* alert styles
-.alert.no-x {
-	padding-right: 14px;
-}
-.alert a {
-	color: #f09800;
-}
-.alert a:hover, .alert a:focus {
-	color: #7f6943;
-}
-.alert.alert-error a {
-	color: #dd2724;
-}
-.alert.alert-error a:hover, .alert.alert-error a:focus {
-	color: #8a2423;
-} */
-
 /* well features (register) */
 .well {
 	position: relative;
