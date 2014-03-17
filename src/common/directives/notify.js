@@ -5,7 +5,7 @@ directive('notify', ['$timeout', '$sce', function($timeout, $sce) { // extending
 		restrict:'EA',
 		replace: true,
 		template: '<div ng-show="localMessage">'+
-			'	<alert type="localMessage.type" close="clearMessage()" class="alert-block">' +
+			'	<alert type="localMessage.type" close="clearMessage()">' +
 			'		<h4 ng-show="localMessage.pre">{{localMessage.pre}}</h4>' + 
 			'		<span ng-bind-html="cleanHTML"></span>' +
 			'	</alert>'+

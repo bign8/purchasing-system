@@ -53,7 +53,7 @@ if (!isset($_REQUEST['submit'])) {
 			</div>
 
 			<div class="row">
-				<div class="offset2 span8">
+				<div class="col-md-offset-2 col-md-8">
 					<?php switch($sent): case 0: // Bad Email ?>
 					<div class="alert alert-block">
 						<h4>Invalid Email</h4>
@@ -116,7 +116,7 @@ if (!isset($_REQUEST['submit'])) {
 	</div>
 	<div id="footer">
 		<div class="container">
-			<p class="muted credit">Copyright &copy; <script type="text/javascript">document.write(new Date().getFullYear())</script> <a href="http://upstreamacademy.com">UpstreamAcademy</a>.</p>
+			<p class="text-muted credit">Copyright &copy; <script type="text/javascript">document.write(new Date().getFullYear())</script> <a href="http://upstreamacademy.com">UpstreamAcademy</a>.</p>
 		</div>
 	</div>
 </body>

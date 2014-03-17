@@ -1,5 +1,5 @@
 <div class="row">
-	<div class="offset0 span12" ng-switch="theCart.len()">
+	<div class="col-md-12" ng-switch="theCart.len()">
 
 		<div style="text-align:center" ng-switch-when="">
 			<a href="http://upstreamacademy.com/" class="btn btn-primary btn-lg" role="button">Cart is Empty - Go Shop!</a>
@@ -20,20 +20,20 @@
 							<span ng-show="item.expired" class="text-error">Expired:&nbsp;</span>
 							<span ng-switch-when="true">{{item.name}}</span>
 							<a ng-switch-default ng-href="{{item.url}}">{{item.name}}</a>
-							<span ng-show="item.desc" class="muted"><br/>{{item.desc}}</span>
+							<span ng-show="item.desc" class="text-muted"><br/>{{item.desc}}</span>
 						</td>
 						<td>
 							<div>
 								<span>{{item.cost.value | currency}}</span>
 								<span ng-show="item.cost.fullValue">&nbsp;&nbsp;
 									<del class="text-error">&nbsp;{{item.cost.fullValue | currency}}&nbsp;</del>&nbsp;
-									<span class="muted">{{item.cost.reason}} Pricing</span>
+									<span class="text-muted">{{item.cost.reason}} Pricing</span>
 								</span>
 							</div>
 							<div ng-switch="item.cost.name" ng-show="item.hasOptions">
 								<div ng-switch-when="Conference" ng-switch="item.cost.set">
-									<a href="/conference/{{item.itemID}}" ng-switch-when="false" class="btn btn-warning btn-mini">Select Attendees</a>
-									<a href="/conference/{{item.itemID}}" ng-switch-default class="btn btn-info btn-mini">Edit Attendees</a>
+									<a href="/conference/{{item.itemID}}" ng-switch-when="false" class="btn btn-warning btn-xs">Select Attendees</a>
+									<a href="/conference/{{item.itemID}}" ng-switch-default class="btn btn-info btn-xs">Edit Attendees</a>
 								</div>
 								<div ng-switch-when="Hardcopy">
 									<label for="hardcopy">
@@ -42,8 +42,8 @@
 									</label>
 								</div>
 								<div ng-switch-default ng-switch="item.cost.set">
-									<a href="/conference/{{item.itemID}}" ng-switch-when="false" class="btn btn-warning btn-mini">Set Options</a>
-									<a href="/conference/{{item.itemID}}" ng-switch-default class="btn btn-info btn-mini">Edit Options</a>
+									<a href="/conference/{{item.itemID}}" ng-switch-when="false" class="btn btn-warning btn-xs">Set Options</a>
+									<a href="/conference/{{item.itemID}}" ng-switch-default class="btn btn-info btn-xs">Edit Options</a>
 								</div>
 								<!-- <pre>{{item.cost.name}}</pre> -->
 							</div>
@@ -62,84 +62,94 @@
 				</tfoot>
 			</table>
 
-			<div class="row-fluid"> <!-- discount + chekcout area -->
+			<div class="row"> <!-- discount + chekcout area -->
+				<div class="col-md-6"> <!-- checkout + totals -->
+					<div class="well">
+						<h4 style="margin-top:0">Checkout</h4>
 
-				<div class="span6 well"> <!-- checkout + totals -->
-					<h4 style="margin-top:0">Checkout</h4>
+						<table class="table">
+							<tbody>
+								<tr>
+									<td><strong class="pull-right">Sub-Total:</strong></td>
+									<td>{{theCart.total() | currency}}</td>
+								</tr>
+								<tr>
+									<td><strong class="pull-right">Discounts:</strong></td>
+									<td>{{theCart.totDiscount() | currency}}</td>
+								</tr>
+								<tr>
+									<td><strong class="pull-right">Cart Total:</strong></td>
+									<td>{{theCart.fullTotal() | currency}}</td>
+								</tr>
+							</tbody>
+						</table>
 
-					<table class="table">
-						<tbody>
-							<tr>
-								<td><strong class="pull-right">Sub-Total:</strong></td>
-								<td>{{theCart.total() | currency}}</td>
-							</tr>
-							<tr>
-								<td><strong class="pull-right">Discounts:</strong></td>
-								<td>{{theCart.totDiscount() | currency}}</td>
-							</tr>
-							<tr>
-								<td><strong class="pull-right">Cart Total:</strong></td>
-								<td>{{theCart.fullTotal() | currency}}</td>
-							</tr>
-						</tbody>
-					</table>
+						<notify message="submitMsg"></notify>
 
-					<notify message="submitMsg"></notify>
-
-					<div class="fluid-row">
-						<button ng-click="saveCart('online')" class="btn btn-primary btn-lg span6" role="button">
-							via Credit Card 
-							<span class="badge">{{theCart.fullTotal() | currency}}</span>
-						</button>
-						<button ng-click="saveCart('check')" class="btn btn-lg span6" role="button">
-							via Check 
-							<span class="badge">{{theCart.fullTotal() | currency}}</span>
-						</button>
-					</div>
-					<br/>
-					<div class="fluid-row" style="margin-top: 20px">
-						<a href="http://upstreamacademy.com/" class="span12 btn btn-warning btn-lg">
-							Return to 
-							<span class="badge">UpstreamAcademy.com</span>
-						</a>
+						<div class="row">
+							<div class="col-md-6">
+								<button ng-click="saveCart('online')" class="btn btn-primary" role="button" style="width:100%">
+									via Credit Card 
+									<span class="badge">{{theCart.fullTotal() | currency}}</span>
+								</button>
+							</div>
+							<div class="col-md-6">
+								<button ng-click="saveCart('check')" class="btn btn-default" role="button" style="width:100%">
+									via Check 
+									<span class="badge">{{theCart.fullTotal() | currency}}</span>
+								</button>
+							</div>
+						</div>
+						<div class="row" style="margin-top: 20px">
+							<div class="col-md-12">
+								<a href="http://upstreamacademy.com/" class="btn btn-warning" style="width:100%">
+									Return to 
+									<span class="badge">UpstreamAcademy.com</span>
+								</a>
+							</div>
+						</div>
 					</div>
 				</div>
 
-				<div class="span6 well"> <!-- discounts -->
-					<h4 style="margin-top:0">Discounts</h4>
+				<div class="col-md-6"> <!-- discounts -->
+					<div class="well">
+						<h4 style="margin-top:0">Discounts</h4>
 
-					<form class="form-search" style="margin:0">
-						<div class="input-append input-block-level" style="padding-right:50px;">
-							<input type="text" id="code" class="search-query input-block-level" ng-model="discountCode" placeholder="Discount Code">
-							<button type="submit" class="btn btn-success" ng-click="addDiscount(discountCode);discountCode=''">Add</button>
-						</div>
-					</form>
+						<form class="form-search" style="margin:0">
+							<div class="input-group">
+								<input type="text" id="code" class="search-query form-control" ng-model="discountCode" placeholder="Discount Code">
+								<span class="input-group-btn">
+									<button type="submit" class="btn btn-success" ng-click="addDiscount(discountCode);discountCode=''">Add</button>
+								</span>
+							</div>
+						</form>
 
-					<notify message="discountMsg" style="margin-top:20px;"></notify>
+						<notify message="discountMsg" style="margin-top:20px;"></notify>
 
-					<table class="table table-striped table-hover" style="margin:0" ng-show="theCart.discounts.length > 0">
-						<thead>
-							<tr>
-								<th>Descripiton</th>
-								<th>Amount</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr ng-repeat="discount in theCart.discounts">
-								<td>{{discount.name}}</td>
-								<td>
-									{{discount.amount | currency}}
-									<a href ng-click="theCart.remDiscount(discount)" role="button" class="close">&times;</a>
-								</td>
-							</tr>
-						</tbody>
-						<tfoot>
-							<tr>
-								<th><span class="pull-right">Discount Total:</span></th>
-								<th>{{theCart.totDiscount() | currency}}</th>
-							</tr>
-						</tfoot>
-					</table>
+						<table class="table table-striped table-hover" style="margin:0" ng-show="theCart.discounts.length > 0">
+							<thead>
+								<tr>
+									<th>Descripiton</th>
+									<th>Amount</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr ng-repeat="discount in theCart.discounts">
+									<td>{{discount.name}}</td>
+									<td>
+										{{discount.amount | currency}}
+										<a href ng-click="theCart.remDiscount(discount)" role="button" class="close">&times;</a>
+									</td>
+								</tr>
+							</tbody>
+							<tfoot>
+								<tr>
+									<th><span class="pull-right">Discount Total:</span></th>
+									<th>{{theCart.totDiscount() | currency}}</th>
+								</tr>
+							</tfoot>
+						</table>
+					</div>
 				</div>
 			</div>
 		</div>

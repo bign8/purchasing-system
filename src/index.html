@@ -6,9 +6,9 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link type="text/plain" rel="author" href="/humans.txt" />
 	<link href="/favicon.ico" rel="icon" type="image/x-icon" />
-	<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet" />
-	<!-- <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet" />
-	http://stackoverflow.com/a/18069643/3220865 -->
+	<!-- <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet" /> -->
+	<link href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet" />
+	<!-- http://stackoverflow.com/a/18069643/3220865 -->
 	<link rel="stylesheet" href="/css.css">
 </head>
 <body>
@@ -21,25 +21,26 @@
 					<h1 ng-bind-html="myPage.getHTML()">UA Cart</h1>
 				</div>
 
-				<div class="navbar" role="navigation">
-					<div class="navbar-inner">
-						<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-							<span class="icon-bar"></span>
-							<span class="icon-bar"></span>
-							<span class="icon-bar"></span>
-						</a>
-						<a class="brand" href="/" ng-class="{active: breadcrumbs.onPage('Cart') || breadcrumbs.onPage('')}">UA Cart</a>
+				<nav class="navbar navbar-default" role="navigation">
+					<div class="container-fluid">
+						<div class="navbar-header">
+							<a class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+								<span class="icon-bar"></span>
+								<span class="icon-bar"></span>
+								<span class="icon-bar"></span>
+							</a>
+							<a class="navbar-brand" href="/" ng-class="{active: breadcrumbs.onPage('Cart') || breadcrumbs.onPage('')}">UA Cart</a>
+						</div>
 
 						<!-- Everything you want hidden at 940px or less, place within here -->
-						<div class="nav-collapse collapse navbar-responsive-collapse">
+						<div class="collapse navbar-collapse">
 							<!-- .nav, .navbar-search, .navbar-form, etc -->
-
-							<ul class="nav">
-								<!-- <li ng-class="{active: breadcrumbs.onPage('Cart')}"><a href="/cart">Shopping Cart</a></li> -->
+							
+							<ul class="nav navbar-nav">
 								<li ng-class="{active: breadcrumbs.onPage('Purchases')}" ng-show="security.isAuthenticated()"><a href="/purchases">Past Purchases</a></li>
 							</ul>
 
-							<ul class="nav pull-right">
+							<ul class="nav navbar-nav navbar-right">
 								<li ng-class="{active: breadcrumbs.onPage('Payment')}"><a href="/payment">Make A Payment</a></li>
 								<li class="dropdown" ng-class="{active:breadcrumbs.onPage('Admin'), open:isAdminOpen}" ng-show="security.isAdmin()">
 									<a id="adminmenu" role="button" class="dropdown-toggle" ng-click="isAdminOpen=!isAdminOpen">
@@ -58,18 +59,15 @@
 								<li><login-toolbar class="visible-desktop"></login-toolbar></li>
 							</ul>
 
-						</div>
-					</div>
-				</div>
+						</div><!-- /.navbar-collapse -->
+					</div><!-- /.container-fluid -->
+				</nav>
 
 				<ul class="breadcrumb" ng-hide="breadcrumbs.getAll().length < 1">
 					<li><a  href="/">Home</a></li>
-					<li ng-repeat="breadcrumb in breadcrumbs.getAll()">
-						<span class="divider">/</span>  
-						<ng-switch on="$last">
-							<span ng-switch-when="true" ng-bind="breadcrumb.name"></span>
-							<span ng-switch-default><a ng-href="{{breadcrumb.path}}" ng-bind="breadcrumb.name"></a></span>
-						</ng-switch>
+					<li ng-repeat="breadcrumb in breadcrumbs.getAll()" ng-switch="$last" ng-class="{true:'active'}[$last]">
+						<span ng-switch-when="true" ng-bind="breadcrumb.name"></span>
+						<a ng-switch-default ng-href="{{breadcrumb.path}}" ng-bind="breadcrumb.name"></a>
 					</li>
 				</ul>
 			</div>
@@ -96,7 +94,7 @@
 				<a href="/site.php" target="_top">Simulated Site</a>&nbsp;&nbsp;
 				<a href="/feedback.php" target="_top"><em>Feedback</em></a>
 			</p>
-			<p class="muted credit">Copyright &copy; <script type="text/javascript">document.write(new Date().getFullYear())</script> <a href="http://upstreamacademy.com">UpstreamAcademy</a>.</p>
+			<p class="text-muted credit">Copyright &copy; <script type="text/javascript">document.write(new Date().getFullYear())</script> <a href="http://upstreamacademy.com">UpstreamAcademy</a>.</p>
 		</div>
 	</div>
 
@@ -106,5 +104,8 @@
 	<script src="//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.10.0/ui-bootstrap-tpls.min.js"></script>
 	<script src="/js-tpl.js"></script>
 	<script src="/js.js"></script>
+	<!-- start dev -->
+	<script src="//localhost:1337/livereload.js"></script>
+	<!-- end dev -->
 </body>
 </html>

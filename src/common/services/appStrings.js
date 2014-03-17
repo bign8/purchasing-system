@@ -1,7 +1,7 @@
 angular.module('myApp.common.services.appStrings', []).
 
 factory('appStrings', function() {
-	var ERROR = 'error', SUCCESS = 'success', INFO = 'info';
+	var ERROR = 'danger', SUCCESS = 'success', INFO = 'info';
 
 	// Notify strings (need to be functionalized)
 	var STRINGS = {

@@ -1,7 +1,7 @@
 <div class="row">
 
 	<!-- Firms List -->
-	<div class="span6">
+	<div class="col-md-6">
 		<h3>Firms</h3>
 		<p>Single Click a firm to view purchases</p>
 		<div style="max-height:400px;overflow-x:hidden;overflow-y:auto">
@@ -23,7 +23,7 @@
 	</div>
 
 	<!-- Users List -->
-	<div class="span6">
+	<div class="col-md-6">
 		<h3>Users</h3>
 		<p>Single Click a user to view purchases</p>
 		<div style="max-height:400px;overflow-x:hidden;overflow-y:auto">
@@ -39,7 +39,7 @@
 					<tr ng-repeat="(key, value) in service.contacts" ng-click="select('contacts', key)" ng-class="{true:'info'}[value == active]">
 						<td>
 							{{value.legalName}}
-							<span ng-show="value.preName" class="muted"><br/>{{value.preName}}</span>
+							<span ng-show="value.preName" class="text-muted"><br/>{{value.preName}}</span>
 						</td>
 						<td>{{value.title}}</td>
 						<td>{{value.email}}<br/>{{value.phone}}</td>
@@ -53,11 +53,11 @@
 <div class="row">
 	
 	<!-- Purchases List -->
-	<div class="span6">
+	<div class="col-md-6">
 		<h3>Purchases</h3>
 		<p>Delete a purchase with the "x" on the right.</p>
 		<div style="max-height:600px;overflow-x:hidden;overflow-y:auto" ng-switch="list">
-			<p ng-switch-when="false" class="muted">No purchases for this item!</p>
+			<p ng-switch-when="false" class="text-muted">No purchases for this item!</p>
 			<table class="table table-hover" style="margin-bottom:0" ng-switch-default>
 				<thead>
 					<tr>
@@ -69,7 +69,7 @@
 						<td>
 							<button class="close pull-right" ng-click="rem(item)">&times;</button>
 							{{item.item.name}}
-							<span class="muted" ng-show="item.item.desc"><br/>{{item.item.desc}}</span>
+							<span class="text-muted" ng-show="item.item.desc"><br/>{{item.item.desc}}</span>
 							<!-- <br/><pre>{{item | json}}</pre> -->
 						</td>
 					</tr>
@@ -79,17 +79,17 @@
 	</div>
 	
 	<!-- Children List -->
-	<div class="span6" ng-show="active">
+	<div class="col-md-6" ng-show="active">
 		<h3>Add Item</h3>
 		<form name="addItemForm" class="form-horizontal">
-			<div class="control-group">
-				<label class="control-label" for="inputItem">Item</label>
-				<div class="controls">
-					<select id="inputItem" ng-options="value.name for (key,value) in service.items" ng-model="addItem" required></select>
+			<div class="form-group">
+				<label class="control-label col-md-3" for="inputItem">Item</label>
+				<div class="col-md-9">
+					<select id="inputItem" ng-options="value.name for (key,value) in service.items" ng-model="addItem" class="form-control" required></select>
 				</div>
 			</div>
-			<div class="control-group">
-				<div class="controls">
+			<div class="form-group">
+				<div class="col-md-offset-3 col-md-9">
 					<button type="submit" class="btn btn-success" ng-click="add()" ng-disabled="!addItem">Add</button>
 				</div>
 			</div>
