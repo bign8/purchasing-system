@@ -33,7 +33,7 @@ factory('breadcrumbs', ['$rootScope', '$location', 'interface', function ($rootS
 			return f + str.substr(1);
 		}
 
-		if (pathElements[1] !== '') { // remove empty navigation to home
+		if (pathElements[1] !== '' && pathElements[1] !== 'cart') { // remove empty navigation to home
 			pathElements.shift();
 
 			for (i=0; i<pathElements.length; i++) {
@@ -58,6 +58,7 @@ factory('breadcrumbs', ['$rootScope', '$location', 'interface', function ($rootS
 			return breadcrumbs[0] || {};
 		},
 		onPage: function( crumb ) {
+			if (crumb === '' && breadcrumbs.length === 0) return true;
 			return crumb == (breadcrumbs[breadcrumbs.length-1] || {name:'undefined'}).name;
 		}
 	};

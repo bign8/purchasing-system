@@ -235,6 +235,7 @@ class Cart extends NG {
 
 	// Worker: return conference options
 	public function getOption() {
+		$this->usr->requiresAuth();
 		$data = $this->getPostData();
 
 		$this->addItem($data->itemID);
@@ -361,7 +362,7 @@ class Cart extends NG {
 	public function getPurchases() {
 		$user = $this->usr->requiresAuth();
 
-		$itemSTH = $this->db->prepare("SELECT * FROM (SELECT * FROM purchase WHERE contactID=? OR firmID=?) p LEFT JOIN item i ON p.itemID=i.itemID LEFT JOIN 'order' o ON p.orderID=o.orderID;");
+		$itemSTH = $this->db->prepare("SELECT p.*, i.*, o.*, c.legalName as legalName FROM (SELECT * FROM purchase WHERE contactID=? OR firmID=?) p LEFT JOIN item i ON p.itemID=i.itemID LEFT JOIN 'order' o ON p.orderID=o.orderID LEFT JOIN contact c on o.contactID=c.contactID;");
 		$itemSTH->execute( $user['contactID'], $user['firmID'] );
 
 		$retData = $itemSTH->fetchAll();

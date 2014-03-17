@@ -15,7 +15,7 @@
 				<thead>
 					<tr>
 						<th>Name</th>
-						<th>Description</th>
+						<th>Buyer</th>
 						<th>When</th>
 						<th>Options</th>
 					</tr>
@@ -25,17 +25,18 @@
 						<td ng-switch="!item.url">
 							<span ng-switch-when="true">{{item.name}}</span>
 							<a ng-switch-default ng-href="{{item.url}}">{{item.name}}</a>
+							<span ng-show="item.desc" class="muted"><br />{{item.desc}}</span>
 						</td>
-						<td>{{item.desc}}</td>
-						<td class="nowrap">{{item.stamp | date:'MMM d, y'}}</td>
-						<td ng-switch="item.template">
-							<span ng-switch-when="download">
+						<td>{{item.legalName || '-'}}</td>
+						<td class="nowrap">{{(item.stamp | date:'MMM d, y') || '-'}}</td>
+						<td ng-switch="item.template.name">
+							<span ng-switch-when="Download">
 								<a ng-href="/files/{{item.settings.file}}" class="btn btn-info btn-xs" target="_Blank">Download</a>
 							</span>
-							<span ng-switch-when="conference" ng-show="item.hasOptions">
+							<span ng-switch-when="Conference">
 								<button class="btn btn-xs" ng-click="showAttendees(item)">Attendees</button>
 							</span>
-							<span ng-switch-default>n/a</span>
+							<span ng-switch-default>-</span>
 						</td>
 					</tr>
 				</tbody>
@@ -43,7 +44,7 @@
 					<tr>
 						<th></th>
 						<th></th>
-						<th>Total:</th>
+						<th><span class="pull-right">Item count:</span></th>
 						<th>{{filtered.length}}<span ng-hide="items.length == filtered.length">&nbsp;of {{items.length}}</span></th>
 					</tr>
 				</tfoot>
@@ -51,3 +52,7 @@
 		</div>
 	</div>
 </div>
+
+<!-- START DEV -->
+<pre>{{items | json}}</pre>
+<!-- END DEV -->

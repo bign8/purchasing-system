@@ -9,7 +9,8 @@
 // Please see http://code.google.com/p/phpliteadmin/wiki/Configuration for more details
 
 //password to gain access
-$password = 'nate';
+require_once( __DIR__ . '/config.php' );
+$password = config::phpLitePass;
 
 //directory relative to this file to search for databases (if false, manually list databases in the $databases variable)
 $directory = '.';
