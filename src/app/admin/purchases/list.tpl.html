@@ -82,14 +82,14 @@
 	<div class="col-md-6" ng-show="active">
 		<h3>Add Item</h3>
 		<form name="addItemForm" class="form-horizontal">
-			<div class="control-group">
-				<label class="control-label" for="inputItem">Item</label>
-				<div class="controls">
-					<select id="inputItem" ng-options="value.name for (key,value) in service.items" ng-model="addItem" required></select>
+			<div class="form-group">
+				<label class="control-label col-md-3" for="inputItem">Item</label>
+				<div class="col-md-9">
+					<select id="inputItem" ng-options="value.name for (key,value) in service.items" ng-model="addItem" class="form-control" required></select>
 				</div>
 			</div>
-			<div class="control-group">
-				<div class="controls">
+			<div class="form-group">
+				<div class="col-md-offset-3 col-md-9">
 					<button type="submit" class="btn btn-success" ng-click="add()" ng-disabled="!addItem">Add</button>
 				</div>
 			</div>
