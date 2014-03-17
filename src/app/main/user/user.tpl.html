@@ -13,7 +13,7 @@
 
 				<p class="ctr">Modify <strong>Current</strong> Firm Information</p>
 
-				<div class="well" style="padding: 20px 0 1px;">
+				<div class="well">
 
 					<div class="form-group">
 						<label class="control-label col-sm-3" for="firmName">Firm Name</label>
@@ -57,17 +57,19 @@
 
 				<p class="ctr"><strong>Find</strong> or <strong>Create</strong> your new firm</p>
 
-				<div class="form-group well">
-
+				<div class="well">
 					<div class="well-overlay" ng-hide="enableFirm">
 						<button type="button" class="btn btn-warning well-clear-btn btn-lg" ng-click="modifyFirm()">Change Firm</button>
 					</div>
+					<div class="form-group" style="margin-bottom: 0">
 
-					<label class="control-label col-sm-3" for="firmFind">Type your Firm Name</label>
-					<div class="col-sm-9">
-						<input type="text" class="form-control" id="firmFind" ng-model="firmNew" typeahead="firm as firm.name for firm in firms | filter:{name:$viewValue} | limitTo:8" placeholder="Firm Search" typeahead-template-url="registerFirmTypeAheadTPL.html" typeahead-on-select="selectFirm()">
-						&nbsp;&nbsp;
-						<button type="button" class="btn btn-info" ng-click="newFirm()">Create Firm</button>
+						<div class="col-sm-4">
+							<label class="control-label" for="firmFind">Type your Firm Name</label>
+							<button type="button" class="btn btn-info" ng-click="newFirm()" style="margin-top:0.5em">Create Firm</button>
+						</div>
+						<div class="col-sm-8">
+							<input type="text" class="form-control" id="firmFind" ng-model="firmNew" typeahead="firm as firm.name for firm in firms | filter:{name:$viewValue} | limitTo:8" placeholder="Firm Search" typeahead-template-url="registerFirmTypeAheadTPL.html" typeahead-on-select="selectFirm()">
+						</div>
 					</div>
 				</div>
 			</fieldset>
@@ -75,7 +77,7 @@
 			<fieldset>
 				<legend>Add a Firm Membership</legend>
 
-				<div class="input-group" style="padding-right:50px;">
+				<div class="input-group">
 					<input type="text" name="firmCode" class="form-control" ng-model="firmCode" placeholder="Firm Access Code">
 					<span class="input-group-btn">
 						<button type="submit" class="btn btn-success" ng-click="addFirmCode()" ng-disabled="(firmCode.length || 0) < 3">Add</button>
