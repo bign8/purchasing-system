@@ -39,7 +39,7 @@
 					<tr ng-repeat="(key, value) in service.contacts" ng-click="select('contacts', key)" ng-class="{true:'info'}[value == active]">
 						<td>
 							{{value.legalName}}
-							<span ng-show="value.preName" class="muted"><br/>{{value.preName}}</span>
+							<span ng-show="value.preName" class="text-muted"><br/>{{value.preName}}</span>
 						</td>
 						<td>{{value.title}}</td>
 						<td>{{value.email}}<br/>{{value.phone}}</td>
@@ -57,7 +57,7 @@
 		<h3>Purchases</h3>
 		<p>Delete a purchase with the "x" on the right.</p>
 		<div style="max-height:600px;overflow-x:hidden;overflow-y:auto" ng-switch="list">
-			<p ng-switch-when="false" class="muted">No purchases for this item!</p>
+			<p ng-switch-when="false" class="text-muted">No purchases for this item!</p>
 			<table class="table table-hover" style="margin-bottom:0" ng-switch-default>
 				<thead>
 					<tr>
@@ -69,7 +69,7 @@
 						<td>
 							<button class="close pull-right" ng-click="rem(item)">&times;</button>
 							{{item.item.name}}
-							<span class="muted" ng-show="item.item.desc"><br/>{{item.item.desc}}</span>
+							<span class="text-muted" ng-show="item.item.desc"><br/>{{item.item.desc}}</span>
 							<!-- <br/><pre>{{item | json}}</pre> -->
 						</td>
 					</tr>

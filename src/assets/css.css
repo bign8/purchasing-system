@@ -77,9 +77,8 @@ th.nowrap, td.nowrap {
 }
 
 /* modal styled */
-.modal.login {
+.modal.login .modal-dialog {
 	width: 660px;
-	margin-left: -330px;
 }
 
 /* loader styles */
