@@ -70,7 +70,7 @@ controller('ItemListCtrl', ['$scope', 'items', '$location', 'ItemService', funct
 	$scope.equals = function (a,b) { return angular.equals(a,b); };
 	$scope.save = function() {
 		ItemService.save($scope.active).then(function (res) {
-			$scope.active = res;
+			$scope.active = angular.copy( res );
 			$scope.origin = res;
 			$scope.items = ItemService.theList().list;
 			$scope.origin.isActive = true;

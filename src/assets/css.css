@@ -12,6 +12,12 @@
 	right: 7px;
 }
 
+/* nav */
+.navbar-brand.active {
+	color: #555;
+	background-color: #e7e7e7;
+}
+
 /* don't wrap on specific th fields */
 th.nowrap, td.nowrap {
 	white-space: nowrap;
@@ -30,7 +36,7 @@ th.nowrap, td.nowrap {
 	background-color: #78FA89;
 }
 
-/* alert styles */
+/* alert styles
 .alert.no-x {
 	padding-right: 14px;
 }
@@ -45,7 +51,7 @@ th.nowrap, td.nowrap {
 }
 .alert.alert-error a:hover, .alert.alert-error a:focus {
 	color: #8a2423;
-}
+} */
 
 /* well features (register) */
 .well {

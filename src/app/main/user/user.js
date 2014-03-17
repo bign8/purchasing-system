@@ -74,7 +74,7 @@ controller('UserCtrl', ['$scope', 'myPage', '$modal', 'interface', 'security', '
 			if (err == 'dup') {
 				$scope.message = appStrings.user.dupEmail();
 			} else if (err == 'badPass') {
-				$socpe.message = appStrings.user.badPass();
+				$scope.message = appStrings.user.badPass();
 			} else {
 				$scope.message = appStrings.user.failure();
 			}

@@ -3,7 +3,7 @@ angular.module('myApp.main', [
 	'myApp.main.conference',
 	'myApp.main.payment',
 	'myApp.main.purchases',
-	'myApp.main.recipt',
+	'myApp.main.receipt',
 	'myApp.main.register',
 	'myApp.main.reset',
 	'myApp.main.user',
@@ -17,6 +17,7 @@ config(['$routeProvider', function ( $routeProvider ){
 		controller: 'IndexCtrl',
 		resolve: {
 			fullCart: ['theCart', function (theCart) {
+				theCart.setDirty();
 				return theCart.load();
 			}]
 		}
