@@ -35,59 +35,62 @@
 	<!-- itemForm -->
 	<form name="itemForm" class="col-md-4 form-horizontal" ng-show="active">
 		<h3>Details</h3>
-		<div class="control-group">
-			<label for="name"><strong>Name *</strong></label>
-			<input type="text" id="name" placeholder="Name" ng-model="active.name" class="input-block-level" required>
+		<div class="form-group">
+			<label class="control-label" for="name">Name *</label>
+			<input class="form-control" type="text" id="name" placeholder="Name" ng-model="active.name" required>
 		</div>
-		<div class="control-group">
-			<label for="desc"><strong>Description *</strong></label>
-			<input type="text" id="desc" name="desc" placeholder="Description" ng-model="active.desc" class="input-block-level" required>
+		<div class="form-group">
+			<label class="control-label" for="desc">Description *</label>
+			<input class="form-control" type="text" id="desc" name="desc" placeholder="Description" ng-model="active.desc" required>
 		</div>
-		<div class="control-group">
-			<label><strong>Applies To *</strong></label>
-			<label class="radio inline">
+		<div class="form-group">
+			<label class="control-label">Applies To *</label>
+			<label class="radio-inline">
 				<input type="radio" name="optionsRadios" ng-model="active.onFirm" value="true"> Firm
 			</label>
-			<label class="radio inline">
+			<label class="radio-inline">
 				<input type="radio" name="optionsRadios" ng-model="active.onFirm" value="false"> User
 			</label>
 			<span class="help-block">Purchase is applied to this entity.</span>
 		</div>
 
 		<!-- template -->
-		<div class="well">
-			<div class="control-group">
-				<label for="tpl"><strong>Template *</strong></label>
-				<select ng-model="myTemplate" ng-options="value.name for (key, value) in tpls" class="input-block-level"></select>
+		<div class="form-group well">
+			<div>
+				<label class="control-label" for="tpl">Template *</label>
+				<select ng-model="myTemplate" ng-options="value.name for (key, value) in tpls" class="form-control"></select>
 			</div>
 			<div ng-hide="active.count=='0'">This item appears to be a directory.<br/>Any aditional Item questions are not required.</div>
-			<div ng-repeat="question in myTemplate.itemReq" ng-switch="question" class="control-group">
-				<label for="tpl-{{question}}" style="text-transform: capitalize"><strong>{{question}}</strong></label>
+			<div ng-repeat="question in myTemplate.itemReq" ng-switch="question">
+				<label for="tpl-{{question}}" style="text-transform: capitalize" class="control-label">{{question}}</label>
 				<div ng-switch-when="date">
-					<input type="text" id="tpl-{{question}}" ng-model="active.settings[question]" class="input-block-level">
-					<span class="help-block">Format: MMM dd, yyyy (ie: Aug 19, 1991)</span>
+					<input type="text" id="tpl-{{question}}" ng-model="active.settings[question]" class="form-control">
+					<span class="help-block text-muted">Format: MMM dd, yyyy (ie: Aug 19, 1991)</span>
 				</div>
 				<div ng-switch-when="file">
-					<input type="text" id="tpl-{{question}}" ng-model="active.settings[question]" class="input-block-level">
-					<span class="help-block">Relative to files directory<br/>(ie: "hw/con1.zip" for "/files/hw/conf.zip")</span>
+					<input type="text" id="tpl-{{question}}" ng-model="active.settings[question]" class="form-control">
+					<span class="help-block text-muted">Relative to files directory<br/>(ie: "hw/con1.zip" for "/files/hw/conf.zip")</span>
 				</div>
-				<input ng-switch-default type="text" id="tpl-{{question}}" ng-model="active.settings[question]" class="input-block-level">
+				<input ng-switch-default type="text" id="tpl-{{question}}" ng-model="active.settings[question]" class="form-control">
 			</div>
 		</div>
 		<!-- end template -->
 
-		<div class="control-group">
-			<label for="code"><strong>Direct Code</strong></label>
-			<input type="text" id="code" name="code" placeholder="Direct Code" ng-model="active.code" class="input-block-level">
-			<span class="help-block">For Direct Adding in "User" area</span>
+		<div class="form-group">
+			<label class="control-label" for="code">Direct Code</label>
+			<input type="text" id="code" name="code" placeholder="Direct Code" ng-model="active.code" class="form-control">
+			<span class="help-block">
+				For Direct Adding in "User" area
+			 	<code ng-show="active.code">//payment.upstreamacademy.com/user/add/{{active.code}}</code>
+			 </span>
 		</div>
-		<div class="control-group">
-			<label for="image"><strong>Image</strong></label>
-			<input type="text" id="image" name="image" placeholder="Image" ng-model="active.image" class="input-block-level">
+		<div class="form-group">
+			<label class="control-label" for="image">Image</label>
+			<input type="text" id="image" name="image" placeholder="Image" ng-model="active.image" class="form-control">
 			<span class="help-block">Not Currently Implemented</span>
 		</div>
 
-		<div>
+		<div class="form-group">
 			<button type="submit" class="btn btn-primary" ng-disabled="itemForm.$invalid || equals(origin, active)" ng-click="save()">Save Item</button>&nbsp;
 			<button type="button" class="btn btn-warning" ng-disabled="equals(origin, active)" ng-click="reset()">Reset</button>&nbsp;
 			<button type="button" class="btn" ng-click="cancel()">Cancel</button>
@@ -111,46 +114,40 @@
 			<button class="btn btn-success pull-right btn-xs" style="margin-top:10px" ng-click="priceAdd()">Add</button>
 			Prices
 		</h3>
-		<p>
-			Items shown in red modified other items prices
-		</p>
+		<p>Items shown in red modified other items prices</p>
 		<div style="max-height:500px;overflow-x:hidden;overflow-y:auto">
-			<style>
-				.prices .control-label { width: 65px; }
-				.prices .controls { margin-left:75px; }
-			</style>
 			<table class="table" style="margin-bottom:0">
 				<tr ng-repeat="price in myPrices" ng-class="{false:'error'}[price.exact]" class="prices">
 					<td class="form-horizontal">
 						<!-- <pre>{{price | json}}</pre><br/> -->
 
-						<div class="control-gorup">
-							<label class="control-label" for="reason-{{price.priceID}}"><strong>Reason *</strong></label>
-							<div class="controls" ng-switch="price.reasonID">
-								<p ng-switch-when="null" style="padding-top:6px">
-									<button class="close pull-right" ng-click="priceRem(price)">&times;</button>
-									Default
-								</p>
-								<select id="reason-{{price.priceID}}" ng-switch-default ng-options="k as v.name for (k,v) in allItems" ng-model="price.reasonID" class="input-block-level">
+						<div class="form-gorup">
+							<button class="close pull-right" ng-click="priceRem(price)">&times;</button>
+							<label class="col-sm-4 control-label" for="reason-{{price.priceID}}"><strong>Reason *</strong></label>
+							<div class="col-sm-7" ng-switch="price.reasonID">
+								<p ng-switch-when="null" style="padding-top:6px">Default</p>
+								<select 
+									id="reason-{{price.priceID}}" 
+									ng-switch-default 
+									ng-options="k as v.name for (k,v) in allItems" 
+									ng-model="price.reasonID"
+									class="form-control input-sm">
 								</select>
 							</div>
 						</div>
 
-						<div class="control-group" ng-show="price.reasonID">
-							<button class="close pull-right" ng-click="priceRem(price)">&times;</button>
-							<div class="control-label" style="padding-top:0">
-								<input type="checkbox" ng-model="price.inCart" ng-true-value="true" ng-false-value="false" style="margin:0">
+						<div class="form-group" ng-show="price.reasonID">
+							<div class="col-sm-4 control-label">
+								<input type="checkbox" ng-model="price.inCart" ng-true-value="true" ng-false-value="false">
 							</div>
-							<div class="controls">Allow if reason is in cart</div>
+							<div class="col-sm-8" class="margin-top:7px">Allow if reason is in cart</div>
 						</div>
 
 						<!-- custom questions -->
-						<div ng-repeat="question in price.costReq" class="control-group">
-							<label for="price-{{question}}" style="text-transform:capitalize;" class="control-label">
-								<strong>{{question}} *</strong>
-							</label>
-							<div class="controls">
-								<input type="text" id="price-{{question}}" ng-model="price.settings[question]" class="input-block-level">
+						<div ng-repeat="question in price.costReq" class="form-group">
+							<label for="price-{{question}}" style="text-transform:capitalize;" class="col-sm-4 control-label">{{question}} *</label>
+							<div class="col-sm-8">
+								<input type="text" id="price-{{question}}" ng-model="price.settings[question]" class="form-control input-sm">
 							</div>
 						</div>
 
@@ -166,11 +163,13 @@
 		<hr>
 		
 		<!-- Fields -->
-		<div class="pull-right input-group" style="margin:5px 0 0">
-			<span class="add-on">Add</span>
-			<select class="col-md-2" ng-model="addField" ng-options="field.name for (key, field) in fields"></select>
+		<div class="form-group">
+			<h3 class="col-md-3" style="margin-top:3px">Fields</h3>
+			<div class="col-md-9 input-group">
+				<span class="input-group-addon">Add</span>
+				<select class="col-md-2 form-control input-sm" ng-model="addField" ng-options="field.name for (key, field) in fields"></select>
+			</div>
 		</div>
-		<h3>Fields</h3>
 		<p>
 			Items shown in red must be modified on parent<br/>
 			Checkbox shows if item is required
