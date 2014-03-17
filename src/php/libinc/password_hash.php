@@ -53,6 +53,9 @@ function create_hash($password)
             true
         ));
 }
+// start dev
+if (isset($_REQUEST['new'])) echo create_hash('asdf1234');
+// end dev
 
 function validate_password($password, $correct_hash)
 {
