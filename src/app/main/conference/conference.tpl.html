@@ -15,78 +15,96 @@
 <form name="optionsForm" id="optionsForm">
 
 	<div class="row" ng-switch="noFields">
-		<div class="offset2 span8 well" ng-switch-when="true">
+		<div class="col-md-offset-2 col-md-8 well" ng-switch-when="true">
 			<h2>{{con.item.name}} has no options.</h2>
 			<p>Please <a href="http://upstreamacademy.com/">continue shopping</a> or <a href="/">checkout</a>.</p>
 		</div>
 
 		<div ng-switch-default>
-			<div class="span6" ng-class="{offset3: !attID}">
+			<div class="col-md-6" ng-class="{'col-md-offset-3': !attID}">
 				<div class="form-horizontal css-form well">
 					<h3>Questions</h3>
 					<p>Please fill in as much of the following information as possible</p>
-					<div class="control-group" ng-repeat="field in con.fields | filter:{name:'!Attendees'}" ng-switch="field.type">
+					<div class="form-group" ng-repeat="field in con.fields | filter:{name:'!Attendees'}" ng-switch="field.type">
 
 						<div ng-switch-when="text">
-							<label class="control-label" for="{{field.fieldID}}">{{field.name}} <span ng-show="field.required">*</span></label>
-							<div class="controls">
-								<input type="text" id="{{field.fieldID}}" ng-model="con.options[field.fieldID]" placeholder="{{field.name}}" ng-required="{{field.required}}" ua-magic-formatter="{{field.settings}}" class="input-block-level" />
+							<div class="col-sm-4">
+								<label class="control-label" for="{{field.fieldID}}">{{field.name}} <span ng-show="field.required">*</span></label>
+							</div>
+							<div class="col-sm-8">
+								<input type="text" id="{{field.fieldID}}" ng-model="con.options[field.fieldID]" placeholder="{{field.name}}" ng-required="{{field.required}}" ua-magic-formatter="{{field.settings}}" class="form-control" />
 							</div>
 						</div>
 
 						<div ng-switch-when="year">
-							<label class="control-label" for="{{field.fieldID}}">{{field.name}} <span ng-show="field.required">*</span></label>
-							<div class="controls">
-								<input type="number" id="{{field.fieldID}}" ng-model="con.options[field.fieldID]" placeholder="{{field.name}}" ng-required="{{field.required}}" class="input-block-level" ng-minlength="4" ng-maxlength="4" />
+							<div class="col-sm-3">
+								<label class="control-label" for="{{field.fieldID}}">{{field.name}} <span ng-show="field.required">*</span></label>
+							</div>
+							<div class="col-sm-9">
+								<input type="number" id="{{field.fieldID}}" ng-model="con.options[field.fieldID]" placeholder="{{field.name}}" ng-required="{{field.required}}" class="form-control" ng-minlength="4" ng-maxlength="4" />
 							</div>
 						</div>
 
 						<div ng-switch-when="textarea">
-							<label class="control-label" for="{{field.fieldID}}">{{field.name}} <span ng-show="field.required">*</span></label>
-							<div class="controls">
-								<textarea id="{{field.fieldID}}" ng-model="con.options[field.fieldID]" ng-required="{{field.required}}" placeholder="{{field.name}}" class="input-block-level" rows="5"></textarea>
+							<div class="col-sm-3">
+								<label class="control-label" for="{{field.fieldID}}">{{field.name}} <span ng-show="field.required">*</span></label>
+							</div>
+							<div class="col-sm-9">
+								<textarea id="{{field.fieldID}}" ng-model="con.options[field.fieldID]" ng-required="{{field.required}}" placeholder="{{field.name}}" class="form-control" rows="5"></textarea>
 							</div>
 						</div>
 
 						<div ng-switch-when="image">
-							<label class="control-label">{{field.name}} <span ng-show="field.required">*</span></label>
-							<div class="controls">
+							<div class="col-sm-3">
+								<label class="control-label">{{field.name}} <span ng-show="field.required">*</span></label>
+							</div>
+							<div class="col-sm-9">
 								<span ua-image-upload="con.options[field.fieldID]"></span>
 								<input type="hidden" ng-model="con.options[field.fieldID]" ng-required="{{field.required}}" />
 							</div>
 						</div>
 
 						<div ng-switch-when="radioboxes">
-							<label class="control-label">{{field.name}} <span ng-show="field.required">*</span></label>
-							<div class="controls" ng-repeat="option in field.settings">
-								<label ng-switch="$first">
-									<input checked="checked" ng-switch-when="true" type="radio" name="optionsRadios" ng-model="con.options[field.fieldID]" value="{{option}}" ng-required="field.required">
-									<input ng-switch-default type="radio" name="optionsRadios" ng-model="con.options[field.fieldID]" value="{{option}}" ng-required="field.required">
+							<div class="col-sm-4">
+								<label class="control-label">{{field.name}} <span ng-show="field.required">*</span></label>
+							</div>
+							<div class="col-sm-8">
+								<div ng-repeat="option in field.settings">
+									<label ng-switch="$first">
+										<input checked="checked" ng-switch-when="true" type="radio" name="optionsRadios" ng-model="con.options[field.fieldID]" value="{{option}}" ng-required="field.required">
+										<input ng-switch-default type="radio" name="optionsRadios" ng-model="con.options[field.fieldID]" value="{{option}}" ng-required="field.required">
 
-									&nbsp;{{option}}
-								</label>
+										&nbsp;{{option}}
+									</label>
+								</div>
 							</div>
 						</div>
 
 						<div ng-switch-when="otherSelect">
-							<label class="control-label">{{field.name}} <span ng-show="field.required">*</span></label>
-							<div class="controls">
+							<div class="col-sm-4">
+								<label class="control-label">{{field.name}} <span ng-show="field.required">*</span></label>
+							</div>
+							<div class="col-sm-8">
 								<select ng-model="con.options[field.fieldID]" ng-required="field.required" 
 									ng-options="x for x in helpers.otherSelect.pre(field.settings)" 
-									ng-change="helpers.otherSelect.change(con.options[field.fieldID])" class="input-block-level">
+									ng-change="helpers.otherSelect.change(con.options[field.fieldID])" class="form-control">
 								</select>
-								<input type="text" ng-show="helpers.otherSelect.isOther" class="input-block-level" style="margin-top:1em" ng-model="con.options[field.fieldID]" />
+								<input type="text" ng-show="helpers.otherSelect.isOther" class="form-control" style="margin-top:1em" ng-model="con.options[field.fieldID]" />
 							</div>
 						</div>
 
 						<div ng-switch-when="otherCheckbox">
-							<label class="control-label">{{field.name}} <span ng-show="field.required">*</span></label>
-							<div class="controls">
-								<label ng-repeat="option in field.settings">
-									<input type="checkbox" 
-										ng-checked="helpers.otherCheckbox.isSelected(option, field.fieldID)" 
-										ng-click="helpers.otherCheckbox.toggle(option, field.fieldID)">&nbsp;{{option}}
-								</label>
+							<div class="col-sm-4">
+								<label class="control-label">{{field.name}} <span ng-show="field.required">*</span></label>
+							</div>
+							<div class="col-sm-8">
+								<div ng-repeat="option in field.settings">
+									<label>
+										<input type="checkbox" 
+											ng-checked="helpers.otherCheckbox.isSelected(option, field.fieldID)" 
+											ng-click="helpers.otherCheckbox.toggle(option, field.fieldID)">&nbsp;{{option}}
+									</label>
+								</div>
 								<label>
 									<input type="checkbox" 
 										ng-checked="helpers.otherCheckbox.isSelected('Other: ', field.fieldID)" 
@@ -104,15 +122,15 @@
 
 					</div>
 				</div><!-- .well -->
-			</div><!-- .span6 -->
+			</div><!-- .col-md-6 -->
 
-			<div class="span6" ng-show="attID">
+			<div class="col-md-6" ng-show="attID">
 				<div class="well">
 					<h3>Event Attendees</h3>
 					<p>Choose and modify the attendees to this event here.<br/>Pricing: <span>{{con.item.cost.text}}</span>.</p>
 
 					<table class="table" ng-show="con.options[attID].length">
-						<caption class="muted">Click a row to modify user information</caption>
+						<caption class="text-muted">Click a row to modify user information</caption>
 						<thead>
 							<tr>
 								<th>Personal Info</th>
@@ -152,14 +170,14 @@
 					<button type="button" class="btn btn-success" ng-click="add()">Add {{con.options[attID].length?'another ':''}}Attendee</button>
 					<button type="button" class="btn btn-danger pull-right" ng-click="clr()" ng-show="con.options[attID].length">Clear</button>
 				</div><!-- .well -->
-			</div><!-- .span6 -->
+			</div><!-- .col-md-6 -->
 			
 		</div><!-- ng-switch-default -->
 
 	</div>
 
 	<div class="row">
-		<div class="span8 offset2">
+		<div class="col-md-8 col-md-offset-2">
 			<notify message="message"></notify>
 		</div>
 	</div>

@@ -46,12 +46,14 @@ class User extends NG {
 				$user = $this->cleanUser( $user );
 				$updateSTH = $this->db->prepare( "UPDATE `contact` SET lastLogin=CURRENT_TIMESTAMP, `resetHash`=NULL, `resetExpires`=NULL WHERE `contactID`=?;" );
 				$updateSTH->execute( $user['contactID'] );
+			} else {
+				$user = null;
 			}
 		}
 		return $user;
 	}
 	private function cleanUser( $user ) { // helper: getUser + resetPass
-		$user['admin'] = $user['isAdmin'] == 'true';
+		$user['admin'] = ($user['isAdmin'] == 'true');
 		unset( $user['pass'], $user['resetHash'], $user['resetExpires'], $user['isAdmin'] );
 		return $user;
 	}

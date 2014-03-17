@@ -1,21 +1,20 @@
 <div class="row">
-	<div class="span12">
-		<div class="alert">
-			<button type="button" class="close" data-dismiss="alert">&times;</button>
-			<strong>Welcome!</strong> Please <a href="/cart">sign in</a> to <a href="/cart">check out</a>
+	<div class="col-md-12">
+		<div class="alert alert-warning alert-dismissable">
+			<strong>Welcome!</strong> Please <a class="alert-link" href="/cart">sign in</a> to <a class="alert-link" href="/cart">check out</a>
 		</div>
 	</div>
 </div>
 
 
 <div class="row" ng-switch="theCart.cart.length">
-	<div class="span12" ng-switch-when="0">
-		<div class="alert alert-error">
-			<strong>Empty Cart</strong> Go <a href="http://upstreamacademy.com/">shopping</a> or <a href="/payment">make a payment</a>
+	<div class="col-md-12" ng-switch-when="0">
+		<div class="alert alert-danger">
+			<strong>Empty Cart</strong> Go <a class="alert-link" href="http://upstreamacademy.com/">shopping</a> or <a class="alert-link" href="/payment">make a payment</a>
 		</div>
 	</div>
 
-	<table class="table table-striped table-hover span12" ng-switch-default>
+	<table class="table table-striped table-hover col-md-12" ng-switch-default>
 		<thead>
 			<tr>
 				<th>Name</th>
@@ -23,12 +22,12 @@
 			</tr>
 		</thead>
 		<tbody>
-			<tr ng-repeat="item in theCart.cart" ng-class="{true:'error', false:''}[item.warn]">
+			<tr ng-repeat="item in theCart.cart" ng-class="{true:'danger', false:''}[item.warn]">
 				<td ng-switch="!item.url">
 					<div ng-switch="item.cost.name" ng-show="item.hasOptions" class="pull-right">
 						<div ng-switch-when="Conference" ng-switch="item.cost.set">
-							<a href="/conference/{{item.itemID}}" ng-switch-when="false" class="btn btn-warning btn-mini">Select Attendees</a>
-							<a href="/conference/{{item.itemID}}" ng-switch-default class="btn btn-info btn-mini">Edit Attendees</a>
+							<a href="/conference/{{item.itemID}}" ng-switch-when="false" class="btn btn-warning btn-xs">Select Attendees</a>
+							<a href="/conference/{{item.itemID}}" ng-switch-default class="btn btn-info btn-xs">Edit Attendees</a>
 						</div>
 						<div ng-switch-when="Hardcopy">
 							<label for="hardcopy">
@@ -37,8 +36,8 @@
 							</label>
 						</div>
 						<div ng-switch-default ng-switch="item.cost.set">
-							<a href="/conference/{{item.itemID}}" ng-switch-when="false" class="btn btn-warning btn-mini">Set Options</a>
-							<a href="/conference/{{item.itemID}}" ng-switch-default class="btn btn-info btn-mini">Edit Options</a>
+							<a href="/conference/{{item.itemID}}" ng-switch-when="false" class="btn btn-warning btn-xs">Set</a>
+							<a href="/conference/{{item.itemID}}" ng-switch-default class="btn btn-info btn-xs">Edit</a>
 						</div>
 						<!-- <pre>{{item.cost.name}}</pre> -->
 					</div>
@@ -47,13 +46,13 @@
 					<span ng-switch-when="true">{{item.name}}</span>
 					<a ng-switch-default ng-href="{{item.url}}">{{item.name}}</a>
 
-					<span ng-show="item.desc" class="muted"><br/>{{item.desc}}</span>
+					<span ng-show="item.desc" class="text-muted"><br/>{{item.desc}}</span>
 				</td>
 				<td>
 					<span>{{item.cost.value | currency}}</span>
 					<span ng-show="item.cost.fullValue">&nbsp;&nbsp;
 						<del class="text-error">&nbsp;{{item.cost.fullValue | currency}}&nbsp;</del>&nbsp;
-						<span class="muted">{{item.cost.reason}} Pricing</span>
+						<span class="text-muted">{{item.cost.reason}} Pricing</span>
 					</span>
 					<a href ng-click="theCart.rem(item)" role="button" class="close">&times;</a>
 				</td>
