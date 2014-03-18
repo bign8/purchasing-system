@@ -12,7 +12,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr ng-repeat="firm in firms" ng-click="edit(firm)" ng-class="{true:'info'}[firm.isActive]">
+					<tr ng-repeat="firm in firms" ng-click="edit(firm)" ng-class="{info: firm.isActive}">
 						<td>{{firm.name}}</td>
 						<td>
 							{{firm.website}}

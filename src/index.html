@@ -63,7 +63,7 @@
 
 				<ul class="breadcrumb" ng-hide="breadcrumbs.getAll().length < 1">
 					<li><a  href="/">Home</a></li>
-					<li ng-repeat="breadcrumb in breadcrumbs.getAll()" ng-switch="$last" ng-class="{true:'active'}[$last]">
+					<li ng-repeat="breadcrumb in breadcrumbs.getAll()" ng-switch="$last" ng-class="{active: $last}">
 						<span ng-switch-when="true" ng-bind="breadcrumb.name"></span>
 						<a ng-switch-default ng-href="{{breadcrumb.path}}" ng-bind="breadcrumb.name"></a>
 					</li>

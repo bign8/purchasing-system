@@ -55,18 +55,18 @@ if (!isset($_REQUEST['submit'])) {
 			<div class="row">
 				<div class="col-md-offset-2 col-md-8">
 					<?php switch($sent): case 0: // Bad Email ?>
-					<div class="alert alert-block">
+					<div class="alert alert-warning">
 						<h4>Invalid Email</h4>
 						If you would like to send the form anyway, just click submit again.<br/>
 						We will not be able to communicate with you without a valid email.
 					</div>
 					<?php break; case 1: // Bad server ?>
-					<div class="alert alert-error alert-block">
+					<div class="alert alert-danger">
 						<h4>Server Error</h4>
 						Your response has been <strong>NOT</strong> been submitted to our team.  Please contact us directly at <a href="tel:4064951850">(406) 495-1850</a>
 					</div>
 					<?php break; case 2: // All Good ?>
-					<div class="alert alert-success alert-block">
+					<div class="alert alert-success">
 						<h4>Success</h4>
 						Your response has been submitted to our team.  Thank you for you feedback.
 					</div>
