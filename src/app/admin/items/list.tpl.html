@@ -21,7 +21,7 @@
 			<table class="table table-hover" style="margin-bottom:0">
 				<thead><tr><th>Name</th></tr></thead>
 				<tbody>
-					<tr ng-repeat="item in items" ng-click="edit(item)" ng-dblclick="go(item.itemID)" ng-class="{true:'info'}[item.isActive]">
+					<tr ng-repeat="item in items" ng-click="edit(item)" ng-dblclick="go(item.itemID)" ng-class="{info: item.isActive}">
 						<td>
 							{{item.name}}
 							<button class="close pull-right" ng-click="rem($event, item)">&times;</button>
@@ -117,7 +117,7 @@
 		<p>Items shown in red modified other items prices</p>
 		<div style="max-height:500px;overflow-x:hidden;overflow-y:auto">
 			<table class="table" style="margin-bottom:0">
-				<tr ng-repeat="price in myPrices" ng-class="{false:'error'}[price.exact]" class="prices">
+				<tr ng-repeat="price in myPrices" ng-class="{danger:!price.exact}" class="prices">
 					<td class="form-horizontal">
 						<!-- <pre>{{price | json}}</pre><br/> -->
 
@@ -176,7 +176,7 @@
 		</p>
 		<div style="max-height:500px;overflow-x:hidden;overflow-y:auto">
 			<table class="table" style="margin-bottom:0">
-				<tr ng-repeat="field in myFields | orderBy:'order'" ng-class="{false:'error'}[field.exact]">
+				<tr ng-repeat="field in myFields | orderBy:'order'" ng-class="{danger: !field.exact}">
 					<td>
 						<input type="checkbox" ng-model="field.required" ng-true-value="true" ng-false-value="false" style="margin:0" ng-disabled="!field.exact" ng-change="chgField(field)">&nbsp;
 						{{field.name}}

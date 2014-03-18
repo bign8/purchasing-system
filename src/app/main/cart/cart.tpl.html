@@ -15,9 +15,9 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr ng-repeat="item in theCart.cart" ng-class="{true:'error', false:''}[item.warn]">
+					<tr ng-repeat="item in theCart.cart" ng-class="{danger:item.warn}">
 						<td ng-switch="!item.url">
-							<span ng-show="item.expired" class="text-error">Expired:&nbsp;</span>
+							<span ng-show="item.expired" class="text-danger">Expired:&nbsp;</span>
 							<span ng-switch-when="true">{{item.name}}</span>
 							<a ng-switch-default ng-href="{{item.url}}">{{item.name}}</a>
 							<span ng-show="item.desc" class="text-muted"><br/>{{item.desc}}</span>
@@ -26,7 +26,7 @@
 							<div>
 								<span>{{item.cost.value | currency}}</span>
 								<span ng-show="item.cost.fullValue">&nbsp;&nbsp;
-									<del class="text-error">&nbsp;{{item.cost.fullValue | currency}}&nbsp;</del>&nbsp;
+									<del class="text-danger">&nbsp;{{item.cost.fullValue | currency}}&nbsp;</del>&nbsp;
 									<span class="text-muted">{{item.cost.reason}} Pricing</span>
 								</span>
 							</div>
