@@ -57,6 +57,7 @@ class File extends NG {
 		$path = str_replace("/", DIRECTORY_SEPARATOR, $d->path);
 		$newName = str_replace("/", DIRECTORY_SEPARATOR, $d->newName);
 		$base = $_SERVER['DOCUMENT_ROOT'] . DIRECTORY_SEPARATOR . 'files' . DIRECTORY_SEPARATOR . $path;
+		if (!$this->makeDirectory( $base . $newName )) return $this->conflict('no-dir');
 		if (!@rename( $base . $d->file, $base . $newName )) return $this->conflict();
 		return $d;
 	}
@@ -85,6 +86,7 @@ class File extends NG {
 			// Naming file as desired
 			$fileName = $_SERVER['DOCUMENT_ROOT'] . DIRECTORY_SEPARATOR . 'files' . DIRECTORY_SEPARATOR . $_REQUEST['path'] . $_REQUEST['name'];
 			$fileName = str_replace("/", DIRECTORY_SEPARATOR, $fileName);
+			if (!$this->makeDirectory( $fileName )) return $this->conflict('no-dir');
 			if (!move_uploaded_file( $_FILES[ $fieldName ]['tmp_name'], $fileName )) throw new RuntimeException('Failed to move uploaded file.');
 
 			return $_FILES[ $fieldName ]['size'];
@@ -92,5 +94,12 @@ class File extends NG {
 		} catch (RuntimeException $e) {
 			return $this->conflict( $e->getMessage() );
 		}
+	}
+
+	// make a directory according to where a file is being moved
+	private function makeDirectory($filePath) {
+		$filePath = substr($filePath, 0, strrpos($filePath, DIRECTORY_SEPARATOR) );
+		if (!file_exists($filePath)) return mkdir($filePath, 0777, true);
+		return true;
 	}
 }

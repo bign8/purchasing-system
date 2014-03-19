@@ -1,7 +1,7 @@
 <div class="row">
-	<div class="span6">
+	<div class="col-md-6">
 		<h3>All Firms</h3>
-		<button type="button" class="btn btn-success pull-right btn-mini" ng-click="newFirm()">New Firm</button>
+		<button type="button" class="btn btn-success pull-right btn-xs" ng-click="newFirm()">New Firm</button>
 		<p>Click a firm to modify, or delete a firm with the "x" on the right.</p>
 		<div style="max-height:600px;overflow-x:hidden;overflow-y:auto">
 			<table class="table table-hover">
@@ -12,7 +12,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr ng-repeat="firm in firms" ng-click="edit(firm)" ng-class="{true:'info'}[firm.isActive]">
+					<tr ng-repeat="firm in firms" ng-click="edit(firm)" ng-class="{info: firm.isActive}">
 						<td>{{firm.name}}</td>
 						<td>
 							{{firm.website}}
@@ -24,31 +24,35 @@
 		</div>
 	</div>
 
-	<form name="firm" class="span6 form-horizontal" ng-show="active">
+	<form name="firm" class="col-md-6 form-horizontal" ng-show="active">
 		<h3 style="margin-left:180px">Firm Details</h3>
-		<div class="control-group">
-			<label class="control-label" for="name">Name *</label>
-			<div class="controls">
-				<input type="text" id="name" placeholder="Name" ng-model="active.name" class="input-block-level" required>
+		<div class="form-group">
+			<label class="col-sm-3 control-label" for="name">Name *</label>
+			<div class="col-sm-9">
+				<input class="form-control" type="text" id="name" placeholder="Name" ng-model="active.name" required>
 			</div>
 		</div>
-		<div class="control-group">
-			<label class="control-label" for="sebsite">Website *</label>
-			<div class="controls">
-				<input type="text" id="sebsite" name="sebsite" placeholder="Website" ng-model="active.website" class="input-block-level" required>
+		<div class="form-group">
+			<label class="col-sm-3 control-label" for="sebsite">Website *</label>
+			<div class="col-sm-9">
+				<input class="form-control" type="text" id="sebsite" name="sebsite" placeholder="Website" ng-model="active.website" required>
 			</div>
 		</div>
-		<div class="control-group">
-			<label class="control-label" for="firmName">Address *</label>
-			<div class="controls">
-				<div class="input-append" ng-switch="active.addr.addressID">
-					<div ng-switch-when="undefined">
-						<span class="uneditable-input">Click 'set' to enter an address</span>
-						<button type="button" class="btn btn-info" ng-click="setAddr()">Set</button>
+		<div class="form-group">
+			<label class="col-sm-3 control-label" for="firmName">Address *</label>
+			<div class="col-sm-9">
+				<div ng-switch="active.addr.addressID">
+					<div ng-switch-when="undefined" class="input-group">
+						<input type="text" class="form-control" value="Click 'set' to enter an address" disabled>
+						<span class="input-group-btn">
+							<button type="button" class="btn btn-info" ng-click="setAddr()">Set</button>
+						</span>
 					</div>
-					<div ng-switch-default>
-						<span class="uneditable-input">{{active.addr.addrName}}</span>
-						<button type="button" class="btn btn-warning" ng-click="setAddr()">Edit</button>
+					<div ng-switch-default class="input-group">
+						<input type="text" class="form-control" value="{{active.addr.addrName}}" disabled>
+						<span class="input-group-btn">
+							<button type="button" class="btn btn-warning" ng-click="setAddr()">Edit</button>
+						</span>
 					</div>
 				</div>
 				<div class="help-block">** Address changes are instantaneous (no save required)</div>
