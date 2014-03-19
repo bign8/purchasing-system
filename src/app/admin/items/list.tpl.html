@@ -60,7 +60,7 @@
 				<label class="control-label" for="tpl">Template *</label>
 				<select ng-model="myTemplate" ng-options="value.name for (key, value) in tpls" class="form-control"></select>
 			</div>
-			<div ng-hide="active.count=='0'">This item appears to be a directory.<br/>Any aditional Item questions are not required.</div>
+			<div ng-hide="active.count=='0'" class="text-danger">This item appears to be a directory.<br/>Any aditional Item questions are not required.</div>
 			<div ng-repeat="question in myTemplate.itemReq" ng-switch="question">
 				<label for="tpl-{{question}}" style="text-transform: capitalize" class="control-label">{{question}}</label>
 				<div ng-switch-when="date">
@@ -100,7 +100,7 @@
 	<!-- Other things -->
 	<div class="col-md-4" ng-show="active">
 		<h3>Cart Links</h3>
-		<p>
+		<p class="well">
 			For links that use ajax, make sure you include <a href="/uacart.js">uacart.js</a> along with <a href="//code.jquery.com/jquery-1.10.2.min.js">jQuery</a> and have the following within your link tag<br/>
 			<code> href="#" class="cartAdd" data-item-id="{{active.itemID}}"</code><br/><br/>
 			For direct links (like registering) use this link<br/>
@@ -115,7 +115,7 @@
 			Prices
 		</h3>
 		<p>Items shown in red modified other items prices</p>
-		<div style="max-height:500px;overflow-x:hidden;overflow-y:auto">
+		<div class="well" style="max-height:500px;overflow-x:hidden;overflow-y:auto" ng-show="myPrices">
 			<table class="table" style="margin-bottom:0">
 				<tr ng-repeat="price in myPrices" ng-class="{danger:!price.exact}" class="prices">
 					<td class="form-horizontal">
@@ -174,7 +174,7 @@
 			Items shown in red must be modified on parent<br/>
 			Checkbox shows if item is required
 		</p>
-		<div style="max-height:500px;overflow-x:hidden;overflow-y:auto">
+		<div class="well" style="max-height:500px;overflow-x:hidden;overflow-y:auto" ng-show="myFields">
 			<table class="table" style="margin-bottom:0">
 				<tr ng-repeat="field in myFields | orderBy:'order'" ng-class="{danger: !field.exact}">
 					<td>
@@ -194,7 +194,7 @@
 </div>
 
 <!-- START DEV -->
-<pre>{{myPrices | json}}</pre>
-<pre>{{active | json}}</pre>
+<!-- <pre>{{myItem | json}}</pre> -->
+<!-- <pre>{{active | json}}</pre> -->
 <pre>{{items | json}}</pre>
 <!-- END DEV -->
