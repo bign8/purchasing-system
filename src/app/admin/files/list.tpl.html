@@ -20,7 +20,7 @@
 							{{file.name}}
 						</td>
 						<td>
-							<code ng-hide="file.children">{{path}}{{file.name}}</code>
+							<code ng-show="file.size !== false">{{path}}{{file.name}}</code>
 						</td>
 						<td>
 							<span ng-show="file.size !== false">{{file.size | bytes}}</span>

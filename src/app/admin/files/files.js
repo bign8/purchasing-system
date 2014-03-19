@@ -19,23 +19,24 @@ config(['$routeProvider', 'securityAuthorizationProvider', function ($routeProvi
 controller('FileListCtrl', ['$scope', 'FileService', function ($scope, FileService){
 
 	// Global Variables
-	$scope.list = FileService.files ;
+	$scope.list = FileService.files;
 	$scope.path = '';
 	$scope.parent = [];
 
 	// Navigation
 	var arrPath = [];
+	function render_path() { $scope.path = arrPath.join('/') + (arrPath.length ? '/' : '') ; }
 	$scope.drill = function (folder) {
 		if (!folder.children) return;
 		arrPath.push(folder.name);
 		$scope.parent.push($scope.list);
 		$scope.list = folder.children;
-		$scope.path = arrPath.join('/') + (arrPath.length ? '/' : '') ;
+		render_path();
 	};
 	$scope.back = function () {
 		arrPath.pop();
 		$scope.list = $scope.parent.pop();
-		$scope.path = arrPath.join('/') + (arrPath.length ? '/' : '') ;
+		render_path();
 	};
 
 	// Editing
@@ -47,7 +48,30 @@ controller('FileListCtrl', ['$scope', 'FileService', function ($scope, FileServi
 		$event.stopPropagation();
 		var newName = prompt("Enter new file location:", file.name);
 		if (newName !== null) FileService.edit($scope.path, file, newName, $scope.list).then(function () {
-			alert('If you moved your file to a new location, please refresh your brower.');
+
+			// Store reset data structures
+			$scope.parent = [];
+			FileService.files = [];
+
+			// re-fetch (big pull)
+			FileService.getList().then(function (new_list) {
+				$scope.list = new_list;
+
+				// re-drill for each element in `arrPath`
+				for (var i = 0; i < arrPath.length; i++) {
+					for (var j = 0; j < $scope.list.length; j++) {
+
+						// find element and `drill`
+						if (arrPath[i] == $scope.list[j].name) {
+							$scope.parent.push( $scope.list );
+							$scope.list = $scope.list[j].children;
+							break;
+						}
+					}
+				}
+			}, function () {
+				// error!
+			});
 		});
 	};
 
@@ -122,7 +146,7 @@ factory('FileService', ['interface', '$q', function (interface, $q) {
 				file: file.name,
 				newName: newName
 			}).then(function (res) {
-				file.name = newName;
+				// file.name = newName;
 			});
 		},
 
