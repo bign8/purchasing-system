@@ -13,13 +13,9 @@
 }
 
 /* nav */
-.brand.active {
-	color: #555555;
-	text-decoration: none;
-	background-color: #e5e5e5;
-	-webkit-box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.125);
-	-moz-box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.125);
-	box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.125);
+.navbar-brand.active {
+	color: #555;
+	background-color: #e7e7e7;
 }
 
 /* don't wrap on specific th fields */
@@ -40,23 +36,6 @@ th.nowrap, td.nowrap {
 	background-color: #78FA89;
 }
 
-/* alert styles */
-.alert.no-x {
-	padding-right: 14px;
-}
-.alert a {
-	color: #f09800;
-}
-.alert a:hover, .alert a:focus {
-	color: #7f6943;
-}
-.alert.alert-error a {
-	color: #dd2724;
-}
-.alert.alert-error a:hover, .alert.alert-error a:focus {
-	color: #8a2423;
-}
-
 /* well features (register) */
 .well {
 	position: relative;
@@ -71,7 +50,7 @@ th.nowrap, td.nowrap {
 	z-index: 5;
 	border-radius: inherit;
 }
-.well .well-overlay .well-clear-btn.btn-large {
+.well .well-overlay .well-clear-btn.btn-lg {
 	position: absolute;
 	top: 50%;
 	left: 50%;
@@ -81,9 +60,8 @@ th.nowrap, td.nowrap {
 }
 
 /* modal styled */
-.modal.login {
+.modal.login .modal-dialog {
 	width: 660px;
-	margin-left: -330px;
 }
 
 /* loader styles */
@@ -113,8 +91,6 @@ th.nowrap, td.nowrap {
 	background-color: white;
 	padding: 10px;
 	margin: -25px 0 0 -55px; /* add 1/2 padding */
-	height: 40px;
-	width: 100px;
 
 	-webkit-border-radius: 20px;
 	-moz-border-radius: 20px;
@@ -127,6 +103,9 @@ th.nowrap, td.nowrap {
 	-ms-box-shadow: #444444 0 0 20px;
 	-o-box-shadow: #444444 0 0 20px;
 	box-shadow: #444444 0 0 20px;
+}
+.loader div p {
+	margin-bottom: 0;
 }
 .loader.active {
 	opacity: 1;
@@ -161,6 +140,12 @@ th.nowrap, td.nowrap {
 .ctr {
 	text-align: center;
 }
+.well > .form-group:last-child {
+	margin-bottom: 0;
+}
+.form-actions{padding:19px 20px 20px;margin-top:20px;margin-bottom:20px;background-color:#f5f5f5;border-top:1px solid #e5e5e5;*zoom:1;}
+.form-actions:before,.form-actions:after{display:table;content:"";line-height:0;}
+.form-actions:after{clear:both;}
 
 /* Sticky footer styles  */
 html, body {
@@ -174,6 +159,9 @@ html, body {
 }
 #push, #footer {
 	height: 60px;
+}
+#push {
+	margin-top: 10px; /* ensure spacing above footer */
 }
 #footer {
 	background-color: #f5f5f5;

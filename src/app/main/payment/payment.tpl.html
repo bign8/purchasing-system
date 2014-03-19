@@ -1,34 +1,32 @@
 <div class="row">
-	<form name="customForm" class="form-horizontal span8 offset2">
+	<form name="customForm" class="form-horizontal col-md-8 col-md-offset-2">
 		<fieldset>
 			<legend>Custom Payment Form</legend>
 
 			<notify message="message"></notify>
 
-			<div class="control-group">
-				<label class="control-label" for="desc">Invoice # / Description</label>
-				<div class="controls">
-					<input class="input-block-level" type="text" id="desc" ng-model="item.desc" placeholder="Invoice # / Description" required>
+			<div class="form-group">
+				<label class="control-label col-sm-3" for="desc">Invoice # / Description</label>
+				<div class="col-sm-9">
+					<input class="form-control" type="text" id="desc" ng-model="item.desc" placeholder="Invoice # / Description" required>
 				</div>
 			</div>
 
-			<div class="control-group">
-				<label class="control-label" for="cost">Amount (US Dollars)</label>
-				<div class="controls">
-					<div class="input-prepend input-append">
-						<span class="add-on">$</span>
-						<input type="number" id="cost" placeholder="Amount (US Dollars)" min="0" ng-model="item.cost" required>
-						<span class="add-on">.00</span>
+			<div class="form-group">
+				<label class="control-label col-sm-3" for="cost">Amount (US Dollars)</label>
+				<div class="col-sm-9">
+					<div class="input-group">
+						<span class="input-group-addon">$</span>
+						<input type="number" id="cost" placeholder="Amount (US Dollars)" min="0" ng-model="item.cost" required class="form-control">
+						<span class="input-group-addon">.00</span>
 					</div>
 				</div>
 			</div>
 
-			<div class="control-grou">
-				<div class="controls">
-					<button type="submit" class="btn btn-primary" ng-click="add()" ng-disabled="customForm.$invalid">Add Payment to Cart</button>
-					&nbsp;&nbsp;
-					<button type="reset" class="btn">Clear</button>
-				</div>
+			<div class="form-actions">
+				<button type="submit" class="btn btn-primary pull-right" ng-click="add()" ng-disabled="customForm.$invalid">Add Payment to Cart</button>
+				&nbsp;&nbsp;
+				<button type="reset" class="btn">Clear</button>
 			</div>
 
 		</fieldset>

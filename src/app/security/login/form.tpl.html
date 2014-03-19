@@ -10,29 +10,33 @@
 		</h4>
 	</div>
 	<div class="modal-body">
-		<div class="row-fluid">
-			<div class="span7 well well-small" style="margin-bottom:0">
-				<div class="alert alert-warning no-x" ng-show="authReason">{{authReason}}</div>
-				<div class="alert alert-error no-x" ng-show="authError">{{authError}}</div>
-				<div class="alert alert-info no-x" ng-show="isLogin">If you have previously registered on this site, please enter you login details.</div>
-				<label for="login">E-mail</label>
-				<input id="login" name="login" type="email" ng-model="user.email" required autofocus class="input-block-level">
-				<div ng-show="isLogin">
-					<label for="pass">Password</label>
-					<input id="pass" name="pass" type="password" ng-model="user.password" class="input-block-level">
-				</div>
+		<div class="row">
+			<div class="col-md-7" style="margin-bottom:0">
+				<div class="well well-sm">
+					<div class="alert alert-warning" ng-show="authReason">{{authReason}}</div>
+					<div class="alert alert-danger" ng-show="authError">{{authError}}</div>
+					<div class="alert alert-info" ng-show="isLogin">If you have previously registered on this site, please enter you login details.</div>
+					<div class="form-group">
+						<label for="login">E-mail</label>
+						<input id="login" name="login" type="email" ng-model="user.email" required autofocus class="form-control">
+					</div>
+					<div ng-show="isLogin" class="form-group">
+						<label for="pass">Password</label>
+						<input id="pass" name="pass" type="password" ng-model="user.password" class="form-control">
+					</div>
 
-				<div>
-					<span class="pull-right">&nbsp;<button type="button" class="btn btn-small clear" ng-click="clearForm()">Clear</button></span>
+					<div>
+						<span class="pull-right">&nbsp;<button type="button" class="btn btn-sm clear" ng-click="clearForm()">Clear</button></span>
 
-					<button type="submit" class="btn btn-small btn-primary login pull-right" ng-click="login()" ng-disabled="processing" ng-show="isLogin" ng-disabled="processing || success">Sign in</button>
-					<button class="btn btn-small btn-primary reset pull-right" ng-click="reset()" ng-disabled="form.$invalid || processing || success" ng-hide="isLogin">Reset Password</button>
+						<button type="submit" class="btn btn-sm btn-primary login pull-right" ng-click="login()" ng-disabled="processing" ng-show="isLogin" ng-disabled="processing || success">Sign in</button>
+						<button class="btn btn-sm btn-primary reset pull-right" ng-click="reset()" ng-disabled="form.$invalid || processing || success" ng-hide="isLogin">Reset Password</button>
 
-					<button class="btn btn-small btn-info" ng-click="setIsLogin(false)" ng-show="isLogin">Forgot Password</button>
-					<button class="btn btn-small btn-info" ng-click="setIsLogin(true)" ng-hide="isLogin">Login</button>
+						<button class="btn btn-sm btn-info" ng-click="setIsLogin(false)" ng-show="isLogin">Forgot Password</button>
+						<button class="btn btn-sm btn-info" ng-click="setIsLogin(true)" ng-hide="isLogin">Login</button>
+					</div>
 				</div>
 			</div>
-			<div class="span5">
+			<div class="col-md-5">
 				<div class="alert alert-info ctr no-x">If you have not yet<br/>signed up for an account,<br/>please register.</div>
 				<button style="margin-left:auto;margin-right:auto;display:block" type="button" class="btn btn-primary" ng-click="register()">Register</button>
 			</div>
