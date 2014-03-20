@@ -24,7 +24,15 @@
 
 	<!-- Users List -->
 	<div class="col-md-6">
-		<h3>Users</h3>
+		<div class="row">
+			<h3 class="col-sm-4" style="margin-top:0">Users</h3>
+			<div class="col-sm-8">
+				<div class="input-group">
+					<label class="input-group-addon" for="user_search">Search</label>
+					<input id="user_search" type="text" class="form-control pull-right input-sm" ng-model="user_search_data"/>
+				</div>
+			</div>
+		</div>
 		<p>Single Click a user to view purchases</p>
 		<div style="max-height:400px;overflow-x:hidden;overflow-y:auto">
 			<table class="table table-hover" style="margin-bottom:0">
@@ -36,7 +44,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr ng-repeat="(key, value) in service.contacts" ng-click="select('contacts', key)" ng-class="{info: value == active}">
+					<tr ng-repeat="(key, value) in (service.contacts | userObjFilter:user_search_data)" ng-click="select('contacts', key)" ng-class="{info: value == active}">
 						<td>
 							{{value.legalName}}
 							<span ng-show="value.preName" class="text-muted"><br/>{{value.preName}}</span>
