@@ -106,7 +106,7 @@ if (!isset($_REQUEST['submit'])) {
 							<input type="hidden" name="email" />
 							<input type="hidden" name="invalid" value="<?php echo $_REQUEST['invalid']; ?>" />
 							<button type="submit" class="btn btn-primary" name="submit" value="yep" <?php if ($sent == 2) echo "disabled='disabled'"; ?>>Send Feedback</button>
-							<a class="btn" href="feedback.php">Clear</a>
+							<a class="btn btn-default" href="feedback.php">Clear</a>
 						</div>
 					</form>
 				</div>
