@@ -172,7 +172,8 @@ controller('ItemListCtrl', ['$scope', 'items', '$location', 'ItemService', funct
 			inCart: 'true',
 			templateID: $scope.myTemplate.templateID,
 			costReq: $scope.myTemplate.costReq,
-			settings: {}
+			settings: {},
+			exact: true,
 		};
 		obj.orig = angular.copy( obj );
 		$scope.myPrices.unshift(obj);
