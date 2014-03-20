@@ -81,6 +81,7 @@ controller('ItemListCtrl', ['$scope', 'items', '$location', 'ItemService', funct
 			parentID: $scope.myItem ? $scope.myItem.itemID : null,
 			settings: {},
 			onFirm: 'true',
+			count: '0',
 			image: null,
 			code: null,
 			templateID: $scope.myItem.templateID
