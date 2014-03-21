@@ -53,29 +53,6 @@ controller('PurchaseListCtrl', ['$scope', 'PurchaseService', function ($scope, P
 	};
 }]).
 
-filter('userObjFilter', function(){
-	var compare = function (haystack, needle) {
-		haystack = haystack.toLowerCase();
-		needle = needle.toLowerCase();
-		return (haystack.indexOf(needle) !== -1);
-	};
-
-	return function (input, query){
-		if(!query) return input;
-		var result = {};
-
-		angular.forEach(input, function (value, key){
-			var found = false;
-			angular.forEach(value, function (ele, id) {
-				if (id == 'contactID') return;
-				if (compare(ele, query)) found = true;
-			});
-			if(found) result[key] = value;
-		});
-		return result;
-	};
-}).
-
 factory('PurchaseService', ['interface', '$q', '$route', function (interface, $q, $route) {
 	var service = {
 		purchases: {},
