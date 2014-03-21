@@ -8,11 +8,11 @@
 				<tr>
 					<th>Field</th>
 					<th>
-						<select class="form-control input-sm" ng-options="value as value.name for (key, value) in firms" ng-model="firm1">
+						<select class="form-control input-sm" ng-options="firm.name for firm in firms | obj2arr | orderBy:'name'" ng-model="firm1">
 						</select>
 					</th>
 					<th>
-						<select class="form-control input-sm" ng-options="value as value.name for (key, value) in firms" ng-model="firm2">
+						<select class="form-control input-sm" ng-options="firm.name for firm in firms | obj2arr | orderBy:'name'" ng-model="firm2">
 						</select>
 					</th>
 					<th>Merged</th>
