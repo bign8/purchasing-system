@@ -13,7 +13,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr ng-repeat="(key, value) in service.firms" ng-click="select('firms', key)" ng-class="{info: value == active}">
+					<tr ng-repeat="value in service.firms | obj2arr | orderBy:'name'" ng-click="select('firms', value.$key)" ng-class="{info: value == active}">
 						<td>{{value.name}}</td>
 						<td>{{value.website}}</td>
 					</tr>

@@ -22,7 +22,7 @@ class Purchase extends NG {
 		$itemSTH     = $this->db->query("SELECT * FROM item;");
 		$purchaseSTH = $this->db->query("SELECT *, p.contactID FROM purchase p LEFT JOIN 'order' o ON o.orderID = p.orderID;");
 		$contactSTH  = $this->db->query("SELECT contactID, legalName, preName, title, email, phone FROM contact;");
-		$firmSTH     = $this->db->query("SELECT * FROM firm;");
+		$firmSTH     = $this->db->query("SELECT * FROM firm ORDER BY name;");
 
 		return array(
 			'items'     => $itemSTH->fetchAll(),
