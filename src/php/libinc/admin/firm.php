@@ -22,6 +22,13 @@ class Firm extends NG {
 		$STH = $this->db->query("SELECT * FROM firm f JOIN address a ON f.addressID = a.addressID;");
 		$ret = $STH->fetchAll();
 		foreach ($ret as &$value) $this->cleanAddress( $value );
+
+		// Testing for error in encoding
+		// foreach ($ret as $value) {
+		// 	json_encode($value);
+		// 	if (json_last_error()) print_r($value);
+		// }
+
 		return $ret;
 	}
 	private function cleanAddress( &$value ) { // Helper: formats address for app
