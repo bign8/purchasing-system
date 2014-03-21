@@ -12,11 +12,12 @@ class Admin {
 		$area = strtolower( $area );
 		$admins = array(
 			'discount',
+			'field',
+			'file',
 			'firm',
 			'item',
-			'purchase',
 			'merge',
-			'file',
+			'purchase',
 		);
 
 		// Execute if acceptable area
