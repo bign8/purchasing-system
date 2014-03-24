@@ -62,6 +62,7 @@ controller('FieldListCtrl', ['$scope', 'fields', 'FieldService', function ($scop
 	$scope.save = function () {
 		FieldService.save($scope.editing).then(function (res) {
 			$scope.editing.fieldID = angular.copy( res.fieldID ); // get new firmID if it's a new item
+			$scope.active.settings = angular.copy( res.settings );
 		});
 	};
 }]).
