@@ -34,21 +34,20 @@ if (!isset($_REQUEST['submit'])) {
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link type="text/plain" rel="author" href="/humans.txt" />
 	<link href="/favicon.ico" rel="icon" type="image/x-icon" />
-	<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet" />
+	<link href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet" />
 	<link rel="stylesheet" href="/css.css">
-	<script src="http://127.0.0.1:1337/livereload.js"></script>
 </head>
 <body>
 	<div id="wrap">
 		<div class="container">
 			<div class="header">
 				<div class="page-header">
-					<h1>UpstreamAcademy Payment <small>Feedback</small></h1>
+					<h1>Upstream Academy Payment <small>Feedback</small></h1>
 				</div>
 
 				<ul class="breadcrumb">
 					<li><a href="/">Home</a></li>
-					<li><span class="divider">/</span> Feedback</li>
+					<li>Feedback</li>
 				</ul>
 			</div>
 
@@ -73,22 +72,22 @@ if (!isset($_REQUEST['submit'])) {
 					<?php break; endswitch; ?>
 
 					<form class="form-horizontal" method="post">
-						<div class="control-group">
-							<label class="control-label" for="inputName">Name</label>
-							<div class="controls">
-								<input type="text" id="inputName" placeholder="Name" class="input-xlarge" name="name" value="<?php echo $_REQUEST['name']; ?>">
+						<div class="form-group">
+							<label class="control-label col-md-3" for="inputName">Name</label>
+							<div class="col-md-9">
+								<input type="text" id="inputName" placeholder="Name" class="form-control" name="name" value="<?php echo $_REQUEST['name']; ?>">
 							</div>
 						</div>
-						<div class="control-group">
-							<label class="control-label" for="inputEmail">Email</label>
-							<div class="controls">
-								<input type="text" id="inputEmail" placeholder="Email" class="input-xlarge" name="crazyField" value="<?php echo $_REQUEST['crazyField']; ?>">
+						<div class="form-group">
+							<label class="control-label col-md-3" for="inputEmail">Email</label>
+							<div class="col-md-9">
+								<input type="email" id="inputEmail" placeholder="Email" class="form-control" name="crazyField" value="<?php echo $_REQUEST['crazyField']; ?>">
 							</div>
 						</div>
-						<div class="control-group">
-							<label class="control-label" for="inputFeedbackType">Type</label>
-							<div class="controls">
-								<select id="inputFeedbackType" class="input-xlarge" name="type">
+						<div class="form-group">
+							<label class="control-label col-md-3" for="inputFeedbackType">Type</label>
+							<div class="col-md-9">
+								<select id="inputFeedbackType" class="form-control" name="type">
 									<option <?php if ($_REQUEST['type'][0] == 'Q') echo 'selected="selected"'; ?>>Question</option>
 									<option <?php if ($_REQUEST['type'][0] == 'C') echo 'selected="selected"'; ?>>Comment</option>
 									<option <?php if ($_REQUEST['type'][0] == 'B') echo 'selected="selected"'; ?>>Bug / Issue</option>
@@ -96,16 +95,16 @@ if (!isset($_REQUEST['submit'])) {
 								</select>
 							</div>
 						</div>
-						<div class="control-group">
-							<label class="control-label" for="inputFeedback">Feedback</label>
-							<div class="controls">
-								<textarea rows="5" id="inputFeedback" class="input-block-level" name="feedback"><?php echo $_REQUEST['feedback']; ?></textarea>
+						<div class="form-group">
+							<label class="control-label col-md-3" for="inputFeedback">Feedback</label>
+							<div class="col-md-9">
+								<textarea rows="5" id="inputFeedback" class="form-control" name="feedback"><?php echo $_REQUEST['feedback']; ?></textarea>
 							</div>
 						</div>
-						<div class="form-actions">
+						<div class="form-actions navbar navbar-default">
 							<input type="hidden" name="email" />
 							<input type="hidden" name="invalid" value="<?php echo $_REQUEST['invalid']; ?>" />
-							<button type="submit" class="btn btn-primary" name="submit" value="yep" <?php if ($sent == 2) echo "disabled='disabled'"; ?>>Send Feedback</button>
+							<button type="submit" class="btn btn-primary pull-right" name="submit" value="yep" <?php if ($sent == 2) echo "disabled='disabled'"; ?>>Send Feedback</button>
 							<a class="btn btn-default" href="feedback.php">Clear</a>
 						</div>
 					</form>
@@ -114,7 +113,7 @@ if (!isset($_REQUEST['submit'])) {
 		</div> <!-- container -->
 		<div id="push"></div>
 	</div>
-	<div id="footer">
+	<div id="footer" class="navbar navbar-default">
 		<div class="container">
 			<p class="text-muted credit">Copyright &copy; <script type="text/javascript">document.write(new Date().getFullYear())</script> <a href="http://upstreamacademy.com">UpstreamAcademy</a>.</p>
 		</div>
