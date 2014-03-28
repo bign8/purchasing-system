@@ -66,7 +66,7 @@ class Item extends NG {
 				$d->name, $d->desc, $d->templateID, $d->code, $d->image, $d->onFirm, json_encode($d->settings), $d->itemID
 			)) return $this->conflict();
 		} else {
-			$STH = $this->db->prepare("INSERT INTO item (parentID,name,desc,settings,templateID,code,image,onFirm) VALUES (?,?,?,?);");
+			$STH = $this->db->prepare("INSERT INTO item (parentID,name,desc,settings,templateID,code,image,onFirm) VALUES (?,?,?,?,?,?,?,?);");
 			if (!$STH->execute(
 				$d->parentID, $d->name, $d->desc, json_encode($d->settings), $d->templateID, $d->code, $d->image, $d->onFirm
 			)) return $this->conflict();

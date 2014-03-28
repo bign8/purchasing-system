@@ -81,6 +81,7 @@ controller('ItemListCtrl', ['$scope', 'items', '$location', 'ItemService', funct
 			parentID: $scope.myItem ? $scope.myItem.itemID : null,
 			settings: {},
 			onFirm: 'true',
+			count: '0',
 			image: null,
 			code: null,
 			templateID: $scope.myItem.templateID
@@ -171,7 +172,8 @@ controller('ItemListCtrl', ['$scope', 'items', '$location', 'ItemService', funct
 			inCart: 'true',
 			templateID: $scope.myTemplate.templateID,
 			costReq: $scope.myTemplate.costReq,
-			settings: {}
+			settings: {},
+			exact: true,
 		};
 		obj.orig = angular.copy( obj );
 		$scope.myPrices.unshift(obj);
