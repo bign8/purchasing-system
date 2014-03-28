@@ -13,10 +13,14 @@
 	<div id="wrap">
 		<div class="container">
 			<div class="header" ng-controller="HeadCtrl">
-				<div class="pull-right"><a href="/cart">Cart <span class="badge" ng-bind="theCart.len()"></span></a></div>
+				<div class="pull-right cart-link"><a href="/cart">Cart <span class="badge" ng-bind="theCart.len()"></span></a></div>
 
-				<div class="page-header">
-					<h1 ng-bind-html="myPage.getHTML()">UA Cart</h1>
+				<div class="page-header clearfix">
+					<div class="col-xs-3">
+						<img src="/UAlogo.png" alt="Upstream Academy" class="img-responsive" />
+						<!-- <img src="UAlogo.gif" alt="Upstream Academy" class="img-responsive" /> -->
+					</div>
+					<h1 ng-bind-html="myPage.getHTML()" class="col-xs-9">UA Cart</h1>
 				</div>
 
 				<nav class="navbar navbar-default" role="navigation">
@@ -47,6 +51,7 @@
 									<ul class="dropdown-menu" role="menu" aria-labelledby="adminmenu">
 										<li><a tabindex="-1" href="/admin" ng-click="isAdminOpen=false"><b>Overview</b></a></li>
 										<li><a tabindex="-1" href="/admin/discounts" ng-click="isAdminOpen=false">Discounts</a></li>
+										<li><a tabindex="-1" href="/admin/fields" ng-click="isAdminOpen=false">Fields</a></li>
 										<li><a tabindex="-1" href="/admin/files" ng-click="isAdminOpen=false">Files</a></li>
 										<li><a tabindex="-1" href="/admin/firms" ng-click="isAdminOpen=false">Firms</a></li>
 										<li><a tabindex="-1" href="/admin/merge" ng-click="isAdminOpen=false">Firm Merge</a></li>
@@ -86,13 +91,13 @@
 		</div> <!-- container -->
 		<div id="push"></div>
 	</div>
-	<div id="footer">
+	<div id="footer" class="navbar navbar-default">
 		<div class="container">
 			<p class="pull-right credit feedback">
 				<a href="/site.php" target="_top">Simulated Site</a>&nbsp;&nbsp;
 				<a href="/feedback.php" target="_top"><em>Feedback</em></a>
 			</p>
-			<p class="text-muted credit">Copyright &copy; <script type="text/javascript">document.write(new Date().getFullYear())</script> <a href="http://upstreamacademy.com">UpstreamAcademy</a>.</p>
+			<p class="text-muted credit">Copyright &copy; <script type="text/javascript">document.write(new Date().getFullYear())</script> <a href="http://upstreamacademy.com">Upstream Academy</a>.</p>
 		</div>
 	</div>
 

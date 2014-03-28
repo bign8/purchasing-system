@@ -39,7 +39,7 @@ class File extends NG {
 			}
 			return $data;
 		}
-		$fileData = fillArrayWithFileNodes( new DirectoryIterator( $_SERVER['DOCUMENT_ROOT'] . '\\files' ) );
+		$fileData = fillArrayWithFileNodes( new DirectoryIterator( $_SERVER['DOCUMENT_ROOT'] . DIRECTORY_SEPARATOR . 'files' ) );
 		return $fileData;
 	}
 

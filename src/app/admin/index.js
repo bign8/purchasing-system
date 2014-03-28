@@ -1,6 +1,7 @@
 angular.module('myApp.admin', [
 	'security',
 	'myApp.admin.discounts',
+	'myApp.admin.fields',
 	'myApp.admin.files',
 	'myApp.admin.firms',
 	'myApp.admin.items',

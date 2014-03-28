@@ -370,6 +370,7 @@ class Cart extends NG {
 			$item['template'] = $this->getItemTemplate( $item['itemID'] );
 			$item['settings'] = json_decode($item['settings']);
 			$item['data'] = json_decode($item['data']);
+			if (!is_null($item['stamp'])) $item['stamp'] = date('r', strtotime($item['stamp']));
 		}
 		return $retData;
 	}
