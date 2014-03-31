@@ -181,16 +181,11 @@ html, body {
 
 /* style that header */
 .page-header {
-	/*background-color: #FECD8A;*/
 	padding: 20px;
 	border-bottom: 5px solid #B6CFD3;
 	border-radius: 10px 10px 0 0;
-	background:
-		linear-gradient(-45deg, #FAD98C 25%, transparent 25%, transparent 75%, #FECD8A 75%, #FECD8A) 0 0,
-		linear-gradient(-45deg, #FECD8B 25%, transparent 25%, transparent 75%, #FAD98C 75%, #FECD8B) 1em 1em,
-		linear-gradient(45deg, #FECD8A 17%, transparent 17%, transparent 25%, #FECD8A 25%, #FECD8A 36%, transparent 36%, transparent 64%, #FECD8A 64%, #FECD8A 75%, transparent 75%, transparent 83%, #FECD8A 83%) 1em 1em;
 	background-color: #FAD98C;
-	background-size: 2em 2em;
+	background-image: url(/top_bkg_payment.png);
 }
 .cart-link {
 	padding: 20px 20px 0 0;
