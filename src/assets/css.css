@@ -181,12 +181,20 @@ html, body {
 
 /* style that header */
 .page-header {
-	padding: 20px;
+	position: relative;
+	padding: 0 20px;
 	border-bottom: 5px solid #B6CFD3;
 	border-radius: 10px 10px 0 0;
 	background-color: #FAD98C;
 	background-image: url(/top_bkg_payment.png);
 }
+.page-header img {
+	position: absolute;
+	bottom: -20px;
+}
+.page-header h2 {
+	margin-left: 160px;
+}
 .cart-link {
-	padding: 20px 20px 0 0;
+	padding-top: 20px;
 }
