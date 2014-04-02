@@ -1,34 +1,35 @@
 <?php
-// session_start();
-// unset($_SESSION['cart']);
-// Handle cross site
-// header('Access-Control-Allow-Origin: http://localhost:4001');
-// header('Access-Control-Allow-Credentials: true');
 
 // cross site callback
 require_once('./libinc/main_include.php');
 
 // Initialize session
+$data = array();
 $cart = new Cart();
 
 if (!isset($_REQUEST['action'])) $_REQUEST['action'] = 'empty';
-
 switch ($_REQUEST['action']) {
 	case 'add':
 		if (isset($_REQUEST['itemId'])) {
 			$cart->addItem($_REQUEST['itemId']);
 
-			echo json_encode(array(
+			$data = array(
 				'items' => sizeof($_SESSION['cart']),
 				'cart' => array_values($_SESSION['cart'])
-			));
+			);
 		}
 		break;
 	
 	case 'get':
-		echo json_encode(array_values($_SESSION['cart']));
+		$data = array_values($_SESSION['cart']);
 		break;
 }
+
+// JSONP stuff
+$callback = isset($_GET['callback']) ? preg_replace('/[^a-zA-Z0-9$_.]/s', '', $_GET['callback']) : false;
+header('Content-Type: ' . ($callback ? 'application/javascript' : 'application/json') . ';charset=UTF-8');
+header('Access-Control-Allow-Origin: *');
+echo ($callback ? $callback . '(' : '') . json_encode($data) . ($callback ? ')' : '');
 
 /*
 Snippet for website on other side

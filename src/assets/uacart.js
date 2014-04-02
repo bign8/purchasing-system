@@ -1,4 +1,6 @@
 var UACart = (function($){
+	var url = 'http://payment.upstreamacademy.com/cb.php';
+
 	var setHandle = function(ele, has) {
 		ele.unbind('click');
 		if (has) {
@@ -12,17 +14,20 @@ var UACart = (function($){
 		}
 	};
 	var addTo = function(e) {
+
+		while (!$(e.target).hasClass('cartAdd')) {
+			e.target = $(e.target).parent()[0];
+		}
+
 		var target = $(e.target).unbind('click'), data = target.data();
 		data.action = 'add';
 
 		$.ajax({
 			type: 'GET',
-			dataType: 'json',
+			dataType: 'jsonp',
 			data: data,
-			url: '/cb.php',
-			crossDomain: true,
-			xhrFields: { withCredentials: true },
-			success: function( json, status, xhr ) {
+			url: url,
+			success: function( json ) {
 				setHandle(target, true);
 				$('.ua-cart-items').html(json.items);
 			}
@@ -32,12 +37,10 @@ var UACart = (function($){
 	var checkCart = function() {
 		$.ajax({
 			type: 'GET',
-			dataType: 'json',
-			url: '/cb.php',
+			dataType: 'jsonp',
+			url: url,
 			data: {action:'get'},
-			crossDomain: true,
-			xhrFields: { withCredentials: true},
-			success: function( json, status, xhr ) {
+			success: function( json ) {
 				$('.ua-cart-items').html(json.length);
 				$('a.cartAdd').each(function() {
 					var ele = $(this);
