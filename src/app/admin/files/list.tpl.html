@@ -47,7 +47,8 @@
 				<label for="name">Name on Server</label>
 				<input id="name" type="text" ng-model="myName" class="form-control" required placeholder="Name on Server" />
 			</div>
-			<button class="btn btn-default" ng-click="upload(myFile, myName)" ng-disabled="uploadForm.$invalid">Upload</button>
+			<button class="btn btn-default" ng-click="upload(myFile, myName)" ng-disabled="uploadForm.$invalid" ng-hide="percent">Upload</button>
+			<button class="btn btn-default" ng-show="percent" disabled>{{percent}}</button>
 		</form>
 	</div>
 </div>

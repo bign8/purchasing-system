@@ -67,9 +67,13 @@ class File extends NG {
 		try {
 			$fieldName = 'file';
 			
+			ini_set('upload_max_filesize', '100M');
+			ini_set('post_max_size', '100M');
+			ini_set('max_execution_time', 300);
+
 			// Undefined | Multiple Files | $_FILES Corruption Attack, treat it invalid.
 			if ( !isset($_FILES[ $fieldName ]['error']) || is_array($_FILES[ $fieldName ]['error']) )
-				throw new RuntimeException('Invalid parameters.');
+				throw new RuntimeException('Invalid parameters. ' . print_r($_FILES, true));
 
 			// Check $_FILES[ $fieldName ]['error'] value.
 			switch ($_FILES[ $fieldName ]['error']) {

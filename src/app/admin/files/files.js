@@ -80,13 +80,23 @@ controller('FileListCtrl', ['$scope', 'FileService', function ($scope, FileServi
 		if (value) $scope.myName = value.name;
 	});
 	$scope.upload = function (file, name) {
-		FileService.upload(file, name, $scope.path).then(function ( res ) {
+		$scope.percent = true;
+		FileService.upload(file, name, $scope.path, function (percent) {
+			$scope.percent = percent;
+			$scope.$apply();
+		}).then(function ( res ) {
 			$scope.list.push(res);
 			$scope.myFile = null;
 			$scope.myName = '';
 			$scope.uploadForm.$setPristine(true);
+		}, function ( res ) {
+			alert('There was an error uploading your file!');
+			console.log(res);
+		})['finally'](function () {
+			$scope.percent = false;
 		});
 	};
+	$scope.percent = false;
 }]).
 
 directive('fileModel', ['$parse', function ($parse) {
@@ -150,7 +160,7 @@ factory('FileService', ['interface', '$q', function (interface, $q) {
 			});
 		},
 
-		upload: function(file, name, path) {
+		upload: function(file, name, path, cb) {
 			var ret = $q.defer();
 
 			var fd = new FormData();
@@ -159,15 +169,17 @@ factory('FileService', ['interface', '$q', function (interface, $q) {
 			fd.append('path', path);
 
 			function uploadProgress(evt) {
-				var msg = evt.lengthComputable ? Math.round(evt.loaded * 100 / evt.total) : 'unable to compute';
-				console.log(msg);
+				var msg = evt.lengthComputable ? Math.round(evt.loaded * 100 / evt.total) : '---';
+				cb(msg + '%');
 			}
 			function uploadComplete(evt) {
-				ret.resolve({
-					name: name,
-					children: false,
-					size: evt.target.response.substring(6)
-				});
+				if (evt.target.status == '200')
+					ret.resolve({
+						name: name,
+						children: false,
+						size: evt.target.response.substring(6)
+					});
+				else ret.reject(evt.target.response);
 			}
 			function uploadFailed(evt) {
 				alert("There was an error attempting to upload the file.");
