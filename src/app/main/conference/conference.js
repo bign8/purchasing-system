@@ -16,7 +16,7 @@ config(['$routeProvider', 'securityAuthorizationProvider', function ( $routeProv
 	});
 }]).
 
-controller('RegisterConferenceCtrl', ['$scope', 'myPage', 'interface', 'conference', '$modal', 'theCart', 'appStrings', '$location', function ($scope, myPage, interface, conference, $modal, theCart, appStrings, $location) {
+controller('RegisterConferenceCtrl', ['$scope', 'myPage', 'interface', 'conference', '$modal', 'theCart', 'appStrings', '$location', '$sce', function ($scope, myPage, interface, conference, $modal, theCart, appStrings, $location, $sce) {
 	$scope.con = conference;
 	$scope.message = false;
 
@@ -53,6 +53,25 @@ controller('RegisterConferenceCtrl', ['$scope', 'myPage', 'interface', 'conferen
 		return attID;
 	}
 	$scope.attID = processAttendees();
+
+	function processOptions() {
+		angular.forEach($scope.con.fields, function (value, index) {
+			switch (value.type) {
+
+				// Default options
+				case 'radioboxes':
+					$scope.con.options[ value.fieldID ] = value.settings[ value.settings.length - 1 ];
+					break;
+			}
+		});
+		console.log($scope.con.fields);
+	}
+	processOptions();
+
+	// Helper for line-breaks
+	$scope.trustHTML = function (value) {
+		return $sce.trustAsHtml(value);
+	};
 
 	$scope.orig = angular.copy( $scope.con.options );
 

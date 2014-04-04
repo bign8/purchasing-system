@@ -12,11 +12,8 @@ class Field extends NG {
 		
 		switch ( $action ) {
 			// Discount Functions
-			case 'init':   $data = $obj->init();   break;
-			// case 'rem':    $data = $obj->rem();    break;
-			case 'set':    $data = $obj->set();    break;
-			// case 'active': $data = $obj->active(); break;
-
+			case 'init': $data = $obj->init(); break;
+			case 'set':  $data = $obj->set();  break;
 			default: $pass = false;
 		}
 	}
@@ -29,31 +26,15 @@ class Field extends NG {
 		return $fields;
 	}
 
-	// // assigns discont activness
-	// public function active() {
-	// 	$data = $this->getPostData();
-	// 	$STH = $this->db->prepare("UPDATE discount SET active=? WHERE discountID=?;");
-	// 	if (!$STH->execute($data->active, $data->discountID)) return $this->conflict();
-	// 	return $data;
-	// }
-
-	// // removes discount from db
-	// public function rem() {
-	// 	$data = $this->getPostData();
-	// 	$STH = $this->db->prepare("DELETE FROM discount WHERE discountID=?;");
-	// 	if (!$STH->execute($data->discountID)) return $this->conflict();
-	// 	return $data;
-	// }
-
 	// stores discount changes
 	public function set() {
 		$d = $this->getPostData();
 		if (isset($d->fieldID)) {
-			$STH = $this->db->prepare("UPDATE field SET name=?,type=?,toStore=?,settings=? WHERE fieldID=?;");
-			if (!$STH->execute($d->name, $d->type, $d->toStore, json_encode($d->settings), $d->fieldID)) return $this->conflict();
+			$STH = $this->db->prepare("UPDATE field SET name=?,type=?,toStore=?,help=?,settings=? WHERE fieldID=?;");
+			if (!$STH->execute($d->name, $d->type, $d->toStore, $d->help, json_encode($d->settings), $d->fieldID)) return $this->conflict();
 		} else {
-			$STH = $this->db->prepare("INSERT INTO `field` (`fieldID`,`name`,`type`,`toStore`,`settings`) VALUES (?,?,?,?,?);");
-			if (!$STH->execute($d->name, $d->type, $d->toStore, json_encode($d->settings))) return $this->conflict();
+			$STH = $this->db->prepare("INSERT INTO `field` (`fieldID`,`name`,`type`,`toStore`,`help`,`settings`) VALUES (?,?,?,?,?);");
+			if (!$STH->execute($d->name, $d->type, $d->toStore, $d->help, json_encode($d->settings))) return $this->conflict();
 			$d = (object) array_merge( (array)$d, array('firmID' => $this->db->lastInsertId()) );
 		}
 		return $d;
