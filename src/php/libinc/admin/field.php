@@ -33,7 +33,7 @@ class Field extends NG {
 			$STH = $this->db->prepare("UPDATE field SET name=?,type=?,toStore=?,help=?,settings=? WHERE fieldID=?;");
 			if (!$STH->execute($d->name, $d->type, $d->toStore, $d->help, json_encode($d->settings), $d->fieldID)) return $this->conflict();
 		} else {
-			$STH = $this->db->prepare("INSERT INTO `field` (`fieldID`,`name`,`type`,`toStore`,`help`,`settings`) VALUES (?,?,?,?,?);");
+			$STH = $this->db->prepare("INSERT INTO `field` (`name`,`type`,`toStore`,`help`,`settings`) VALUES (?,?,?,?,?);");
 			if (!$STH->execute($d->name, $d->type, $d->toStore, $d->help, json_encode($d->settings))) return $this->conflict();
 			$d = (object) array_merge( (array)$d, array('firmID' => $this->db->lastInsertId()) );
 		}
