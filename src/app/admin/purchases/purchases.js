@@ -46,8 +46,6 @@ controller('PurchaseListCtrl', ['$scope', 'PurchaseService', function ($scope, P
 			firmID: $scope.active.firmID || null,
 			isMember: $scope.addItem.templateID == '2'
 		}, $scope.addItem.itemID).then(function (res) {
-			index = res.contactID ? ('c' + res.contactID) : ('f' + res.firmID) ;
-			$scope.list = PurchaseService.purchases[ index ]; // in case it was false
 			$scope.addItem = false;
 		});
 	};

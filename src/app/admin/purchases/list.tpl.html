@@ -101,7 +101,7 @@
 			<div class="form-group">
 				<label class="control-label col-md-3" for="inputItem">Item</label>
 				<div class="col-md-9">
-					<select id="inputItem" ng-options="value.name for (key,value) in service.items" ng-model="addItem" class="form-control" required></select>
+					<select id="inputItem" ng-options="value.name for value in (service.items | obj2arr) | orderBy:'name' " ng-model="addItem" class="form-control" required></select>
 				</div>
 			</div>
 			<div class="form-group">
