@@ -1,12 +1,21 @@
-<div class="row" ng-show="recipt.medium == 'check'">
+<div class="row">
 	<div class="col-md-offset-1 col-md-10">
 		<h1>Receipt <small>Stop and print this!</small></h1>
-		<p>Please make checks payable to <strong>Upstream Academy</strong> and send them to the following address.</p>
-		<address>
-			<strong>Upstream Academy</strong><br>
-			P.O. Box 1147<br>
-			Helena, MT 59624
-		</address>
+		<div ng-show="recipt.medium == 'check'">
+			<p>Please make checks payable to <strong>Upstream Academy</strong> and send them to the following address.</p>
+			<address>
+				<strong>Upstream Academy</strong><br>
+				P.O. Box 1147<br>
+				Helena, MT 59624
+			</address>
+		</div>
+		<p>
+			Thank you for using Upstream Academy's payment website.<br/>
+			You will receive a confirmation email from Upstream Academy shortly, but please be advised business hours are 7:30am-4:00pm Mountain Time.
+		</p>
+		<p>
+			Please direct any comments or questions to <a href="mailto:info@upstreamacademy.com">info@upstreamacademy.com</a> or <a href="tel:4064951850">406-495-1850</a>.
+		</p>
 	</div>
 </div>
 
