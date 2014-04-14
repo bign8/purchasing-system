@@ -4,7 +4,7 @@ angular.module('myApp.main.purchases', [
 
 config(['$routeProvider', 'securityAuthorizationProvider', function ($routeProvider, securityAuthorizationProvider){
 	$routeProvider.when('/purchases', {
-		title: "Previous Purchases",
+		title: "&nbsp;",
 		templateUrl: 'app/main/purchases/purchases.tpl.html',
 		controller: 'ListPurchasesCtrl',
 		resolve: {
