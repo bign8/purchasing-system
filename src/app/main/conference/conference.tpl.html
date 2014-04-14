@@ -108,6 +108,20 @@
 							</div>
 						</div>
 
+						<div ng-switch-when="checkboxes">
+							<label class="col-sm-4 control-label">{{field.name}} <span ng-show="field.required">*</span></label>
+							<div class="col-sm-8">
+								<div ng-repeat="option in field.settings">
+									<label>
+										<input type="checkbox" 
+											ng-checked="helpers.otherCheckbox.isSelected(option, field.fieldID)" 
+											ng-click="helpers.otherCheckbox.toggle(option, field.fieldID)">&nbsp;{{option}}
+									</label>
+								</div>
+								<p class="help-block" ng-if="field.help" ng-bind-html="trustHTML(field.help)"></p>
+							</div>
+						</div>
+
 						<hr ng-switch-when="divider" style="margin:0" />
 						<p ng-switch-when="helptext" style="margin:0 10px 10px;" ng-bind-html="trustHTML(field.help)"></p>
 

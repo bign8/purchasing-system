@@ -64,7 +64,6 @@ controller('RegisterConferenceCtrl', ['$scope', 'myPage', 'interface', 'conferen
 					break;
 			}
 		});
-		console.log($scope.con.fields);
 	}
 	processOptions();
 
