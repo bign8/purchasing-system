@@ -197,6 +197,13 @@
 							<i class="glyphicon glyphicon-chevron-down" ng-click="mvField(1, field)" ng-hide="$last"></i>
 							<button class="close" ng-click="rmField($event, field)">&times;</button>
 						</div>
+						<br/>
+						<label class="radio-inline">
+							<input type="radio" ng-model="field.onUser" value="true" ng-change="chgField(field)"> On User
+						</label>
+						<label class="radio-inline">
+							<input type="radio" ng-model="field.onUser" value="false" ng-change="chgField(field)"> On Firm
+						</label>
 					</td>
 				</tr>
 			</table>

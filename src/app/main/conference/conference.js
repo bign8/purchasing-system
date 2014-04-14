@@ -16,14 +16,13 @@ config(['$routeProvider', 'securityAuthorizationProvider', function ( $routeProv
 	});
 }]).
 
-controller('RegisterConferenceCtrl', ['$scope', 'myPage', 'interface', 'conference', '$modal', 'theCart', 'appStrings', '$location', '$sce', function ($scope, myPage, interface, conference, $modal, theCart, appStrings, $location, $sce) {
+controller('RegisterConferenceCtrl', ['$scope', 'myPage', 'interface', 'conference', '$modal', 'theCart', 'appStrings', '$location', function ($scope, myPage, interface, conference, $modal, theCart, appStrings, $location) {
 	$scope.con = conference;
 	$scope.message = false;
 
 	// Data, pre-processing
 	var title = ($scope.con.item.template == 'conference') ? "Register" : "Options" ;
 	myPage.setTitle(title, "for " + $scope.con.item.name);
-
 	$scope.noFields = ($scope.con.fields.length === 0); // ensure item has quesitions
 	if ($scope.noFields) return $location.path('/cart'); // no need to do any further processing if there are no options
 	
@@ -53,24 +52,6 @@ controller('RegisterConferenceCtrl', ['$scope', 'myPage', 'interface', 'conferen
 		return attID;
 	}
 	$scope.attID = processAttendees();
-
-	function processOptions() {
-		angular.forEach($scope.con.fields, function (value, index) {
-			switch (value.type) {
-
-				// Default options
-				case 'radioboxes':
-					$scope.con.options[ value.fieldID ] = value.settings[ value.settings.length - 1 ];
-					break;
-			}
-		});
-	}
-	processOptions();
-
-	// Helper for line-breaks
-	$scope.trustHTML = function (value) {
-		return $sce.trustAsHtml(value);
-	};
 
 	$scope.orig = angular.copy( $scope.con.options );
 
@@ -110,7 +91,8 @@ controller('RegisterConferenceCtrl', ['$scope', 'myPage', 'interface', 'conferen
 			resolve: {
 				contact: function() { return angular.copy( contact ); },
 				prep: ['interface', function(interface) { return interface.user('prepAtten'); }],
-				opt: function() { return angular.copy( o ); }
+				opt: function() { return angular.copy( o ); },
+				con: function() { return $scope.con; },
 			}
 		});
 		modalInstance.result.then(function (modContact) {
@@ -121,20 +103,21 @@ controller('RegisterConferenceCtrl', ['$scope', 'myPage', 'interface', 'conferen
 			} else {
 				o[index] = modContact;
 			}
+			$scope.save(true);
 		});
 	};
 	$scope.equal = function(x,y) { return angular.equals(x,y);};
 	$scope.reset = function() { $scope.con.options = angular.copy( $scope.orig ); };
 
 	// Overall Controlls
-	$scope.save = function() {
+	$scope.save = function(reload) {
 		if ($scope.attID && $scope.con.options[ $scope.attID ].length === 0) {
 			$scope.message = appStrings.conference.attendee();
 			return;
 		}
 		interface.cart('setOption', $scope.con).then(function() {
 			theCart.setDirty();
-			$modal.open({
+			if (!reload) $modal.open({
 				templateUrl: 'registerConfNextActionTPL.html',
 				controller: ['$scope', '$modalInstance', '$location', function ($scope, $modalInstance, $location) {
 					$scope.cart = function () {
@@ -147,50 +130,6 @@ controller('RegisterConferenceCtrl', ['$scope', 'myPage', 'interface', 'conferen
 		}, function() {
 			$scope.message = appStrings.conference.error();
 		});
-	};
-
-	// Generic fields helper
-	$scope.temp = {};
-	$scope.helpers = {
-		otherSelect: {
-			pre: function(arr) {
-				arr = angular.copy( arr );
-				arr.push('Other');
-				return arr;
-			},
-			change: function(elem) {
-				$scope.helpers.otherSelect.isOther = (elem == 'Other');
-			},
-			isOther: false
-		},
-		otherCheckbox: {
-			toggle: function(item, fieldID) {
-				var arr = [];
-				if ($scope.con.options[fieldID]) arr = $scope.con.options[fieldID].split(', ');
-				var idx = arr.indexOf(item);
-				if (idx > -1) {
-					arr.splice(idx, 1);
-				} else {
-					arr.push(item);
-				}
-				$scope.con.options[fieldID] = arr.join(', ');
-			},
-			isSelected: function(item, fieldID) {
-				return ($scope.con.options[fieldID] || '').indexOf(item) > -1;
-			},
-			other: function(fieldID) {
-				var arr = [];
-				if ($scope.con.options[fieldID]) arr = $scope.con.options[fieldID].split(', ');
-				for (var i=0; i<arr.length; i++)
-					if (arr[i].substring(0, 7) == 'Other: ')
-						arr[i] = 'Other: ' + $scope.temp[fieldID];
-				$scope.con.options[fieldID] = arr.join(', ');
-			},
-			oToggle: function(fieldID) {
-				$scope.temp[fieldID] = $scope.temp[fieldID] || '';
-				$scope.helpers.otherCheckbox.toggle('Other: ' + $scope.temp[fieldID], fieldID);
-			}
-		}
 	};
 }]).
 
@@ -305,10 +244,12 @@ directive('uaMagicFormatter', ['$filter', function ($filter) {
 	};
 }]).
 
-controller('ContactModalCtrl', ['$scope', '$modalInstance', 'contact', 'prep', 'interface', '$modal', 'opt', '$filter', 'appStrings', function ($scope, $modalInstance, contact, prep, interface, $modal, opt, $filter, appStrings) {
+controller('ContactModalCtrl', ['$scope', '$modalInstance', 'contact', 'prep', 'interface', '$modal', 'opt', '$filter', 'appStrings', 'con', function ($scope, $modalInstance, contact, prep, interface, $modal, opt, $filter, appStrings, con) {
 	var blankAddr = {addressID:null, addr2:null};
 	var oldUserAddr = ( contact && contact.addr.addressID != prep.add.addressID ) ? contact.addr : blankAddr ; // null address handler
 	$scope.contact = contact || {addr:blankAddr,preName:'',phone:''}; // null contact handler
+	$scope.con = con;
+	if (!$scope.contact.options) $scope.contact.options = {};
 
 	// filter list on `opt` (remove already added people)
 	$scope.firmEmploy = $filter('filter')(prep.emp, function(item) { // filter here not on template
@@ -341,6 +282,8 @@ controller('ContactModalCtrl', ['$scope', '$modalInstance', 'contact', 'prep', '
 		tmpAddrID = user.addr.addressID;
 		$scope.sameAddr = (tmpAddrID == prep.add.addressID); // check if same address
 		oldUserAddr = $scope.sameAddr ? blankAddr : user.addr ; // clear or assign last
+		if (!$scope.contact.options) $scope.contact.options = {};
+		$scope.forceUpdate = !$scope.forceUpdate;
 	};
 	$scope.choose = function (user, $event) { // chooses a specific user
 		$event.preventDefault();
@@ -352,7 +295,7 @@ controller('ContactModalCtrl', ['$scope', '$modalInstance', 'contact', 'prep', '
 			return;
 		}
 		var query = ($scope.contact.contactID === undefined) ? 'add' : 'edit'; // change add or edit based on existence of contactID
-		interface.user(query + 'Contact', $scope.contact).then(function(res) {
+		interface.user(query + 'Contact', $scope.contact).then(function (res) {
 			$scope.contact.contactID = JSON.parse(res);
 			$modalInstance.close( $scope.contact );
 		}, function (err) {
@@ -365,6 +308,84 @@ controller('ContactModalCtrl', ['$scope', '$modalInstance', 'contact', 'prep', '
 			controller: 'ModalAddressCtrl',
 			resolve: { address: function() { return angular.copy( $scope.contact.addr ); } }
 		});
-		modalInstance.result.then(function(address) { $scope.contact.addr = address; });
+		modalInstance.result.then(function (address) { $scope.contact.addr = address; });
+	};
+}]).
+
+directive('dbQuestions', ['$sce', function ($sce) {
+	return {
+		scope: {
+			fields: '=',
+			options: '=',
+			onUser: '=',
+			forceUpdate: '=',
+		},
+		templateUrl: 'app/main/conference/questions.tpl.html',
+		link: function ($scope, element, attrs) {
+
+			// Prepare fields
+			function prepareFields() {
+				angular.forEach($scope.fields, function (value, index) {
+					switch (value.type) {
+
+						// Default options
+						case 'radioboxes':
+							$scope.options[ value.fieldID ] = value.settings[ value.settings.length - 1 ];
+							break;
+					}
+				});
+			}
+			$scope.$watch('fields', prepareFields);
+			$scope.$watch('forceUpdate', prepareFields);
+
+			// Helper for line-breaks
+			$scope.trustHTML = function (value) {
+				return $sce.trustAsHtml(value);
+			};
+
+			// Generic fields helper
+			$scope.temp = {};
+			$scope.helpers = {
+				otherSelect: {
+					pre: function(arr) {
+						arr = angular.copy( arr );
+						arr.push('Other');
+						return arr;
+					},
+					change: function(elem) {
+						$scope.helpers.otherSelect.isOther = (elem == 'Other');
+					},
+					isOther: false
+				},
+				otherCheckbox: {
+					toggle: function(item, fieldID) {
+						var arr = [];
+						if ($scope.options[fieldID]) arr = $scope.options[fieldID].split(', ');
+						var idx = arr.indexOf(item);
+						if (idx > -1) {
+							arr.splice(idx, 1);
+						} else {
+							arr.push(item);
+						}
+						$scope.options[fieldID] = arr.join(', ');
+					},
+					isSelected: function(item, fieldID) {
+						return ($scope.options[fieldID] || '').indexOf(item) > -1;
+					},
+					other: function(fieldID) {
+						var arr = [];
+						if ($scope.options[fieldID]) arr = $scope.options[fieldID].split(', ');
+						for (var i=0; i<arr.length; i++)
+							if (arr[i].substring(0, 7) == 'Other: ')
+								arr[i] = 'Other: ' + $scope.temp[fieldID];
+						$scope.options[fieldID] = arr.join(', ');
+					},
+					oToggle: function(fieldID) {
+						$scope.temp[fieldID] = $scope.temp[fieldID] || '';
+						$scope.helpers.otherCheckbox.toggle('Other: ' + $scope.temp[fieldID], fieldID);
+					}
+				}
+			};
+		}
 	};
 }]);

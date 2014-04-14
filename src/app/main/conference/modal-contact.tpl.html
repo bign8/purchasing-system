@@ -71,6 +71,9 @@
 				<label class="checkbox"><input type="checkbox" ng-model="$parent.sameAddr" />Same as Firm</label>
 			</div>
 		</div>
+
+		<span db-questions fields="con.fields" options="contact.options" on-user="true" force-update="forceUpdate"></span>
+
 		<p>* Required field</p>
 	</form>
 
@@ -99,7 +102,7 @@
 						{{person.addr.addr1}}<br/>
 						<span ng-show="person.addr.addr2">{{person.addr.addr2}}<br/></span>
 						{{person.addr.city}} {{person.addr.state}}, {{person.addr.zip}}
-						<button class="btn btn-primary btn-xs pull-right" ng-click="choose(person, $event)">Choose</button>
+						<!-- <button class="btn btn-primary btn-xs pull-right" ng-click="choose(person, $event)">Choose</button> -->
 					</td>
 				</tr>
 			</tbody>

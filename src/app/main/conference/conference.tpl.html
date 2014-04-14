@@ -25,111 +25,7 @@
 				<div class="form-horizontal css-form well">
 					<h3>Questions</h3>
 					<p>Please fill in as much of the following information as possible</p>
-					<div class="form-group" ng-repeat="field in con.fields | filter:{name:'!Attendees'}" ng-switch="field.type">
-
-						<div ng-switch-when="text">
-							<label class="col-sm-4 control-label" for="{{field.fieldID}}">{{field.name}} <span ng-show="field.required">*</span></label>
-							<div class="col-sm-8">
-								<input type="text" id="{{field.fieldID}}" ng-model="con.options[field.fieldID]" placeholder="{{field.name}}" ng-required="{{field.required}}" ua-magic-formatter="{{field.settings}}" class="form-control" />
-								<p class="help-block" ng-if="field.help" ng-bind-html="trustHTML(field.help)"></p>
-							</div>
-						</div>
-
-						<div ng-switch-when="year">
-							<label class="col-sm-3 control-label" for="{{field.fieldID}}">{{field.name}} <span ng-show="field.required">*</span></label>
-							<div class="col-sm-9">
-								<input type="number" id="{{field.fieldID}}" ng-model="con.options[field.fieldID]" placeholder="{{field.name}}" ng-required="{{field.required}}" class="form-control" ng-minlength="4" ng-maxlength="4" />
-								<p class="help-block" ng-if="field.help" ng-bind-html="trustHTML(field.help)"></p>
-							</div>
-						</div>
-
-						<div ng-switch-when="textarea">
-							<label class="col-sm-3 control-label" for="{{field.fieldID}}">{{field.name}} <span ng-show="field.required">*</span></label>
-							<div class="col-sm-9">
-								<textarea id="{{field.fieldID}}" ng-model="con.options[field.fieldID]" ng-required="{{field.required}}" placeholder="{{field.name}}" class="form-control" rows="5"></textarea>
-								<p class="help-block" ng-if="field.help" ng-bind-html="trustHTML(field.help)"></p>
-							</div>
-						</div>
-
-						<div ng-switch-when="image">
-							<label class="col-sm-3 control-label">{{field.name}} <span ng-show="field.required">*</span></label>
-							<div class="col-sm-9">
-								<span ua-image-upload="con.options[field.fieldID]"></span>
-								<input type="hidden" ng-model="con.options[field.fieldID]" ng-required="{{field.required}}" />
-								<p class="help-block" ng-if="field.help" ng-bind-html="trustHTML(field.help)"></p>
-							</div>
-						</div>
-
-						<div ng-switch-when="radioboxes">
-							<label class="col-sm-4 control-label">{{field.name}} <span ng-show="field.required">*</span></label>
-							<div class="col-sm-8">
-								<div ng-repeat="option in field.settings">
-									<label>
-										<input type="radio" name="optionsRadios" ng-model="con.options[field.fieldID]" value="{{option}}" ng-required="field.required" style="float:left">
-										&nbsp;
-										<div ng-bind-html="trustHTML(option)" style="float:left;margin-left:5px"></div>
-									</label>
-								</div>
-								<p class="help-block" ng-if="field.help" ng-bind-html="trustHTML(field.help)"></p>
-							</div>
-						</div>
-
-						<div ng-switch-when="otherSelect">
-							<label class="col-sm-4 control-label">{{field.name}} <span ng-show="field.required">*</span></label>
-							<div class="col-sm-8">
-								<select ng-model="con.options[field.fieldID]" ng-required="field.required" 
-									ng-options="x for x in helpers.otherSelect.pre(field.settings)" 
-									ng-change="helpers.otherSelect.change(con.options[field.fieldID])" class="form-control">
-								</select>
-								<input type="text" ng-show="helpers.otherSelect.isOther" class="form-control" style="margin-top:1em" ng-model="con.options[field.fieldID]" />
-								<p class="help-block" ng-if="field.help" ng-bind-html="trustHTML(field.help)"></p>
-							</div>
-						</div>
-
-						<div ng-switch-when="otherCheckbox">
-							<label class="col-sm-4 control-label">{{field.name}} <span ng-show="field.required">*</span></label>
-							<div class="col-sm-8">
-								<div ng-repeat="option in field.settings">
-									<label>
-										<input type="checkbox" 
-											ng-checked="helpers.otherCheckbox.isSelected(option, field.fieldID)" 
-											ng-click="helpers.otherCheckbox.toggle(option, field.fieldID)">&nbsp;{{option}}
-									</label>
-								</div>
-								<label>
-									<input type="checkbox" 
-										ng-checked="helpers.otherCheckbox.isSelected('Other: ', field.fieldID)" 
-										ng-click="helpers.otherCheckbox.oToggle(field.fieldID)">
-									Other:&nbsp;
-									<input type="text" ng-model="temp[field.fieldID]" placeholder="Other" 
-										ng-change="helpers.otherCheckbox.other(field.fieldID)" ></input>
-								</label>
-								<p class="help-block" ng-if="field.help" ng-bind-html="trustHTML(field.help)"></p>
-							</div>
-						</div>
-
-						<div ng-switch-when="checkboxes">
-							<label class="col-sm-4 control-label">{{field.name}} <span ng-show="field.required">*</span></label>
-							<div class="col-sm-8">
-								<div ng-repeat="option in field.settings">
-									<label>
-										<input type="checkbox" 
-											ng-checked="helpers.otherCheckbox.isSelected(option, field.fieldID)" 
-											ng-click="helpers.otherCheckbox.toggle(option, field.fieldID)">&nbsp;{{option}}
-									</label>
-								</div>
-								<p class="help-block" ng-if="field.help" ng-bind-html="trustHTML(field.help)"></p>
-							</div>
-						</div>
-
-						<hr ng-switch-when="divider" style="margin:0" />
-						<p ng-switch-when="helptext" style="margin:0 10px 10px;" ng-bind-html="trustHTML(field.help)"></p>
-
-						<div ng-switch-default>
-							<h4>Unknown question type ({{field.name}} - {{field.type}})</h4>
-						</div>
-
-					</div>
+					<span db-questions fields="con.fields" options="con.options" on-user="false"></span>
 				</div><!-- .well -->
 			</div><!-- .col-md-6 -->
 
@@ -192,7 +88,7 @@
 	</div>
 
 	<div class="form-actions navbar navbar-default" ng-hide="noFields">
-		<button type="submit" form="optionsForm" class="btn btn-primary" ng-click="save()" ng-disabled="equal(con.options, orig) || optionsForm.$invalid">Save</button>&nbsp;&nbsp;
+		<button type="submit" form="optionsForm" class="btn btn-primary" ng-click="save()" ng-disabled="optionsForm.$invalid">Save</button>&nbsp;&nbsp;
 		<button type="button" form="optionsForm" class="btn btn-warning" ng-click="reset()" ng-disabled="equal(con.options, orig)">Reset</button>
 		<a href="javascript:history.back()" class="btn btn-info pull-right">Cancel</a>
 	</div>

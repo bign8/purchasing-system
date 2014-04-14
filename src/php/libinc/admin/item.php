@@ -120,8 +120,8 @@ class Item extends NG {
 	// Change if field is required (by tie)
 	public function chgTie() {
 		$data = $this->getPostData();
-		$STH = $this->db->prepare("UPDATE tie SET required=? WHERE tieID=?;");
-		if (!$STH->execute( $data->required, $data->tieID )) $this->conflict();
+		$STH = $this->db->prepare("UPDATE tie SET required=?, onUser=? WHERE tieID=?;");
+		if (!$STH->execute( $data->required, $data->onUser, $data->tieID )) $this->conflict();
 		return $data;
 	}
 

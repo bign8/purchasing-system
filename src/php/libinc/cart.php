@@ -254,7 +254,7 @@ class Cart extends NG {
 	}
 	private function getProductFields( $itemID ) { // Helper: return question's options
 		list($ids, $marks) = $this->getItemParentIDs( $itemID );
-		$STH = $this->db->prepare("SELECT f.*, t.required FROM tie t JOIN field f ON f.fieldID=t.fieldID WHERE itemID in ($marks) ORDER BY `order`;");
+		$STH = $this->db->prepare("SELECT f.*, t.required, t.onUser FROM tie t JOIN field f ON f.fieldID=t.fieldID WHERE itemID in ($marks) ORDER BY `order`;");
 		if (!$STH->execute( $ids )) return -1; // on error
 
 		$retData = $STH->fetchAll();
