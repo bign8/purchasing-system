@@ -8,7 +8,7 @@
 <form class="form-horizontal css-form" name="registration" ng-switch="formState">
 	<div class="row" ng-switch-default >
 		<fieldset class="col-md-6 col-md-offset-3">
-			<legend>To begin Registration, please enter your email address</legend>
+			<legend>To register, please enter your email address</legend>
 
 			<div class="form-group">
 				<label class="col-sm-3 col-sm-3" for="email">Email Address *</label>
@@ -46,19 +46,24 @@
 				<div class="well-overlay" ng-hide=" user.firm.toString() === user.firm || (user.firm.firmID !== undefined || user.firm === undefined) "></div>
 				<button type="button" class="close" ng-click="clearFirm()" ng-hide="user.firm === undefined">&times;</button>
 				<div class="form-group">
-					<label class="col-sm-4" for="firmFind">Type your Firm Name</label>
+					<label class="col-sm-4" for="firmFind">Type your firm name to find your firm</label>
 					<div class="col-sm-7">
 						<input class="form-control" type="text" id="firmFind" ng-model="user.firm" typeahead="firm as firm.name for firm in firms | filter:{name:$viewValue} | limitTo:8" placeholder="Firm Search" typeahead-template-url="registerFirmTypeAheadTPL.html">
 					</div>
 				</div>
 			</div>
 
-			<p class="ctr">Or <strong>Register</strong> a new one</p>
+			<p class="ctr">
+				<strong>Or</strong><br/>
+				If your firm is not in the list above, you can add it.
+			</p>
 
 			<div class="well">
 
 				<div class="well-overlay" ng-show="(!firmModified && user.firm.firmID !== undefined) || (user.firm.toString() === user.firm && user.firm !== '')">
-					<button type="button" class="btn btn-warning well-clear-btn btn-lg" ng-click="modifyFirm()" ng-hide="user.firm.toString() === user.firm">Modify Firm</button>
+					<button type="button" class="btn btn-warning well-clear-btn btn-lg" ng-click="modifyFirm()" ng-hide="user.firm.toString() === user.firm" style="height: 68px; margin-top: -34px">
+						Modify Firm<br/>Contact Information
+					</button>
 				</div>
 
 				<button type="button" class="close" ng-click="clearFirm()" ng-hide="user.firm === undefined">&times;</button>
@@ -74,7 +79,7 @@
 					<label class="col-sm-3" for="firmWeb">Firm Website *</label>
 					<div class="col-sm-9">
 						<input class="form-control" type="text" id="firmWeb" ng-model="user.firm.website" placeholder="Firm Website" required>
-						<span class="help-inline">www.UpstreamAcademy.com</span>
+						<span class="help-inline">UpstreamAcademy.com</span>
 					</div>
 				</div>
 

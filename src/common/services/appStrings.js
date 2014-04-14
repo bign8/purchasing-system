@@ -13,7 +13,7 @@ factory('appStrings', function() {
 			},
 			disc_inv: { // Invalid Discount (notify object)
 				pre: 'Invalid!',
-				msg: 'Invalid discount code.',
+				msg: 'We do not have this code listed.<br/>Please try again or contact us at <a href="mailto:info@upstreamacademy.com">info@upstreamacademy.com</a> with questions.',
 				type:ERROR
 			},
 			disc_exp: { // Expired Discount (notify object)
@@ -32,8 +32,8 @@ factory('appStrings', function() {
 				type:SUCCESS
 			},
 			needOpt: { // Options needed (notify object)
-				pre: 'Options Needed',
-				msg: 'Some of the items in your cart require you to fill out a form. Please click the orange "Set" buttons to assign these options.',
+				pre: 'Information Needed',
+				msg: 'Some of the items in your cart require you to fill out a form.<br/>Please click the orange buttons to provide this information.',
 				type:ERROR, delay:20
 			},
 			prevPur: { // Previous Purchase (notify object)
@@ -76,8 +76,8 @@ factory('appStrings', function() {
 		},
 		payment: { // Custom payment form
 			success: {
-				pre:'Thanks!',
-				msg:'This custom payment has been added to your cart.',
+				pre:'Thank you!',
+				msg:'The payment amount you enterd has been added to your cart.',
 				type:SUCCESS, delay:5
 			},
 			failure: { // Server Error

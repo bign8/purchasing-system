@@ -1,9 +1,9 @@
 <div class="modal-header" ng-switch="addNew">
 	<h3 ng-switch-when="true" ng-switch="canChange">
-		<span ng-switch-when="true">Add Conference Attendee</span>
-		<span ng-switch-default>Edit Conference Attendee</span>
+		<span ng-switch-when="true">Add Attendee</span>
+		<span ng-switch-default>Edit Attendee</span>
 	</h3>
-	<h3 ng-switch-default>Select Conference Attendee</h3>
+	<h3 ng-switch-default>Select Attendee</h3>
 </div>
 <div class="modal-body">
 
@@ -75,7 +75,10 @@
 	</form>
 
 	<div ng-hide="addNew">
-		<p>Choose a contact to add to this conferenct or click "Add Employee" below to create a new contact. <span class="text-muted">Click a row to modify user information</span></p>
+		<p>
+			Choose a contact to add to this conference below by clicking on "Choose" or click "Add Employee" to create a new contact. 
+			<span class="text-muted">Click on a name to modify that person's contact information</span>
+		</p>
 		<table class="table table-striped table-hover">
 			<thead>
 				<tr>
@@ -96,7 +99,7 @@
 						{{person.addr.addr1}}<br/>
 						<span ng-show="person.addr.addr2">{{person.addr.addr2}}<br/></span>
 						{{person.addr.city}} {{person.addr.state}}, {{person.addr.zip}}
-						<button class="btn btn-primary btn-xs pull-right" ng-click="choose(person, $event)">choose</button>
+						<button class="btn btn-primary btn-xs pull-right" ng-click="choose(person, $event)">Choose</button>
 					</td>
 				</tr>
 			</tbody>
