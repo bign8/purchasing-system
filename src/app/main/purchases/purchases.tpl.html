@@ -3,14 +3,16 @@
 		<p ng-switch-when="0">There are no past purchases available.</p>
 
 		<div ng-switch-default>
-			<form class="pull-right col-sm-3">
-				<div class="input-group">
-					<input type="text" ng-model="criteria" class="input-medium search-query form-control" placeholder="Search">
-					<span class="input-group-btn">
-						<button type="reset" class="btn btn-default" ng-click="criteria=''">Clear</button>
-					</span>
-				</div>
-			</form>
+			<div class="row">
+				<form class="col-sm-offset-9 col-sm-3">
+					<div class="input-group">
+						<input type="text" ng-model="criteria" class="input-medium search-query form-control" placeholder="Search">
+						<span class="input-group-btn">
+							<button type="reset" class="btn btn-default" ng-click="criteria=''">Clear</button>
+						</span>
+					</div>
+				</form>
+			</div>
 			<table class="table table-striped table-hover">
 				<thead>
 					<tr>
