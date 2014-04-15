@@ -14,14 +14,26 @@
 			<table class="table table-striped table-hover">
 				<thead>
 					<tr>
-						<th>Name</th>
-						<th>Buyer</th>
-						<th>When</th>
-						<th>Options</th>
+						<th ng-click="change_order('name')">
+							Name&nbsp;
+							<i class="glyphicon" ng-class="order_class()" ng-show=" orderBy == 'name' "></i>
+						</th>
+						<th ng-click="change_order('legalName')">
+							Buyer&nbsp;
+							<i class="glyphicon" ng-class="order_class()" ng-show=" orderBy == 'legalName' "></i>
+						</th>
+						<th ng-click="change_order('stamp')">
+							When&nbsp;
+							<i class="glyphicon" ng-class="order_class()" ng-show=" orderBy == 'stamp' "></i>
+						</th>
+						<th ng-click="change_order('template.name')">
+							Options&nbsp;
+							<i class="glyphicon" ng-class="order_class()" ng-show=" orderBy == 'template.name' "></i>
+						</th>
 					</tr>
 				</thead>
 				<tbody>
-					<tr ng-repeat="item in filtered = (items | filter:criteria)">
+					<tr ng-repeat="item in filtered = (items | filter:criteria) | orderBy:orderBy:orderRev">
 						<td ng-switch="!item.url">
 							<span ng-switch-when="true">{{item.name}}</span>
 							<a ng-switch-default ng-href="{{item.url}}">{{item.name}}</a>

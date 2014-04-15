@@ -30,6 +30,21 @@ controller('ListPurchasesCtrl', ['$scope', 'items', '$modal', function ($scope, 
 			}
 		});
 	};
+
+	// Ordering
+	$scope.orderBy = 'name';
+	$scope.orderRev = false;
+	$scope.change_order = function (field) {
+		if ($scope.orderBy == field) {
+			$scope.orderRev = !$scope.orderRev;
+		} else {
+			$scope.orderRev = false;
+			$scope.orderBy = field;
+		}
+	};
+	$scope.order_class = function () {
+		return $scope.orderRev ? 'glyphicon-chevron-down' : 'glyphicon-chevron-up';
+	};
 }]).
 
 controller('ModalListAttendeesCtrl', ['$scope', '$modalInstance', 'item', '$location', function ($scope, $modalInstance, item, $location) {
