@@ -67,8 +67,7 @@ class File extends NG {
 		try {
 			$fieldName = 'file';
 			
-			ini_set('upload_max_filesize', '100M');
-			ini_set('post_max_size', '100M');
+			// SET IN PHP.INI: upload_max_filesize = 100M; post_max_size = 100M;
 			ini_set('max_execution_time', 300);
 
 			// Undefined | Multiple Files | $_FILES Corruption Attack, treat it invalid.
@@ -85,7 +84,7 @@ class File extends NG {
 			}
 
 			// You should also check filesize here. 
-			if ($_FILES[ $fieldName ]['size'] > 1000000) throw new RuntimeException('Exceeded filesize limit.');
+			if ($_FILES[ $fieldName ]['size'] > 104857600) throw new RuntimeException('Exceeded filesize limit.'); // 100M
 
 			// Naming file as desired
 			$fileName = $_SERVER['DOCUMENT_ROOT'] . DIRECTORY_SEPARATOR . 'files' . DIRECTORY_SEPARATOR . $_REQUEST['path'] . $_REQUEST['name'];
