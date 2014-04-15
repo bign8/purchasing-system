@@ -41,6 +41,28 @@ directive('uaPhone', function() {
 				elem.val(tel);
 				return tel;
 			});
+
+			// get that cursor back into position
+			var pos; // number of digits before cursor
+			ctrl.$parsers.unshift(function (val) { // start
+				if (!val) return val;
+				
+				// get cursor position and subtract count of non-numeric characters before cursor
+				pos = elem[0].selectionStart;
+				pos -= val.substr(0, pos).replace(/[0-9]/g, '').length;
+
+				return val;
+			});
+			ctrl.$parsers.push(function (val) { // end
+				if (!val) return val;
+
+				// find index of (pos)th number (newPos)
+				var newPos = 0, reg = new RegExp(/[0-9]/);
+				while (newPos < val.length && pos > 0) if (reg.test(val.charAt(newPos++))) pos--;
+
+				elem[0].selectionStart = elem[0].selectionEnd = newPos;
+				return val;
+			});
 		}
 	};
 });
