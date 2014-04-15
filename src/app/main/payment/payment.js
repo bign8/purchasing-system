@@ -26,6 +26,7 @@ controller('CustomPaymentCtrl', ['$scope', 'theCart', '$location', 'appStrings',
 			if (res) {
 				$scope.message = appStrings.payment.success();
 				$scope.item = angular.copy(orig);
+				$location.path('/cart');
 			} else {
 				$scope.message = appStrings.payment.failure();
 			}
