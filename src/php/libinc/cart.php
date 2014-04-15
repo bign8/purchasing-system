@@ -448,6 +448,7 @@ class Cart extends NG {
 		$html .= "<b>Time:</b> {$order['stamp']}<br />\r\n";
 		$html .= "<b>Total:</b> {$order['amount']}<br />\r\n";
 		$html .= "<hr/><b>Purchase Contact:</b><br />\r\n";
+		$html .= "<b>Email:</b> {$contact['email']}<br />\r\n";
 		$html .= "<a href=\"mailto:{$contact['email']}\" >{$contact['title']} {$contact['legalName']} ({$contact['preName']})</a><br />\r\n";
 		$html .= address($contact);
 		$html .= "Phone: <a href=\"tel:{$contact['phone']}\">{$contact['phone']}</a><br />\r\n";
@@ -489,6 +490,7 @@ class Cart extends NG {
 						foreach ($value as $row) {
 							$row = $this->object_to_array( $row );
 							$html .= "<li>";
+							$html .= "<b>Email:</b> {$row['email']}<br />\r\n";
 							$html .= "<a href=\"mailto:{$row['email']}\" >{$row['title']} {$row['legalName']} ({$row['preName']})</a><br />\r\n";
 							$html .= address($row['addr']);
 							$html .= "Phone: <a href=\"tel:{$row['phone']}\">{$row['phone']}</a><br />\r\n";
