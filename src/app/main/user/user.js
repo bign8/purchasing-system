@@ -68,6 +68,12 @@ controller('UserCtrl', ['$scope', 'myPage', '$modal', 'interface', 'security', '
 			$scope.message = appStrings.user.success(); // some sort of callback on close
 			security.forceCurrentUser();
 			myPage.setTitle("Account Settings", "for " + $scope.user.legalName);
+
+			// Clear password fields
+			$scope.user.oldPass = '';
+			$scope.user.password = '';
+			$scope.passVerify = '';
+
 			$scope.origUser = angular.copy( $scope.user );
 			$scope.settings.$setPristine(true);
 		}, function (err) {
