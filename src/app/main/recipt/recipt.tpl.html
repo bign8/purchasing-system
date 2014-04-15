@@ -48,8 +48,8 @@
 							<span class="text-muted">{{item.cost.reason}} Pricing</span>
 						</span>
 					</td>
-					<td ng-switch="item.template">
-						<span ng-switch-when="download">
+					<td ng-switch="item.cost.name">
+						<span ng-switch-when="Download">
 							<a ng-href="/files/{{item.settings.file}}" class="btn btn-info btn-xs" target="_Blank">Download</a>
 						</span>
 						<span ng-switch-when="Hardcopy">
