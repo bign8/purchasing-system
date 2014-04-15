@@ -353,8 +353,18 @@ class Cart extends NG {
 				if (!$purchaseSTH->execute($user['contactID'], null, $itemID, $orderID, json_encode($option), $isMember)) return $this->conflict();
 			}
 		}
+
+		// Save Invoices
+		$invoiceSTH = $this->db->prepare("INSERT INTO invoice (orderID,cost,\"desc\") VALUES (?,?,?);");
+		foreach ($_SESSION['cart'] as $item) {
+			if (
+				$item['itemID'] == -1 &&
+				!$invoiceSTH->execute($orderID, $item['cost'], $item['desc'])
+			) return $this->conflict();
+		}
+
 		$this->emailCart($orderID);
-		$this->clr();
+		// $this->clr();
 		return $orderID;
 	}
 
@@ -416,6 +426,11 @@ class Cart extends NG {
 		$itemsSTH->execute( $orderID );
 		$items = $itemsSTH->fetchAll();
 
+		// grab invoices
+		$invoiceSTH = $this->db->prepare("SELECT * FROM invoice WHERE orderID=?;");
+		$invoiceSTH->execute( $orderID );
+		$invoices = $invoiceSTH->fetchAll();
+
 		// Pretty print addresses
 		function address($data) {
 			$str  = "{$data['addr1']}<br />\r\n";
@@ -439,8 +454,15 @@ class Cart extends NG {
 		$html .= "<hr/><b>Purchase Firm:</b><br />\r\n";
 		$html .= "<a href=\"{$firm['website']}\">{$firm['name']}</a><br />\r\n";
 		$html .= address($firm);
-		$html .= "<hr/>Items:<br /><ul>\r\n";
+		$html .= "<hr/>Invoices:<br/><ul>\r\n";
 
+		// Print invoices
+		foreach ($invoices as $invoice) {
+			$html .= "<li>{$invoice['desc']}: \${$invoice['cost']}</li>\r\n";
+		}
+
+		// Print cart items
+		$html .= "</ul>\r\n<hr/>Items:<br /><ul>\r\n";
 		$mail = new UAMail();
 		$files = array();
 		// $mail->SMTPDebug  = 2;
