@@ -150,7 +150,7 @@ factory('appStrings', function() {
 			},
 			success: { // Account created
 				pre:'Success!',
-				msg:'Your account modifications have been successfully been stored',
+				msg:'Your Account has been updated.',
 				type:SUCCESS
 			},
 			dupEmail: { // Duplicate email
