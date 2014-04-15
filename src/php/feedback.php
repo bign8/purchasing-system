@@ -41,8 +41,10 @@ if (!isset($_REQUEST['submit'])) {
 	<div id="wrap">
 		<div class="container">
 			<div class="header">
-				<div class="page-header">
-					<h1>Upstream Academy Payment <small>Feedback</small></h1>
+				<div class="page-header" style="padding-top:1px">
+					<!-- <h1>Upstream Academy Payment <small>Feedback</small></h1> -->
+					<img src="/UAlogo.png" alt="Upstream Academy" width="150" />
+					<h2>&nbsp;</h2>
 				</div>
 
 				<ul class="breadcrumb">
