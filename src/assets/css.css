@@ -198,3 +198,7 @@ html, body {
 .cart-link {
 	padding-top: 20px;
 }
+
+.table-hover tbody tr {
+	cursor: pointer;
+}

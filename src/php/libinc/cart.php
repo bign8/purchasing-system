@@ -364,7 +364,7 @@ class Cart extends NG {
 		}
 
 		$this->emailCart($orderID);
-		// $this->clr();
+		$this->clr();
 		return $orderID;
 	}
 
