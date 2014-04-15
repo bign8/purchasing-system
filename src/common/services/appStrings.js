@@ -125,6 +125,11 @@ factory('appStrings', function() {
 				pre:'Reset Error',
 				msg:'There has been an error resetting your password.  Please try again soon',
 				type:ERROR
+			},
+			invalidPhone: { // invalid phone number
+				pre:'Invalid Phone Number',
+				msg:'Please include only 10 digits in your phone number',
+				type:ERROR
 			}
 		},
 		user: { // Account settings Form
@@ -182,6 +187,11 @@ factory('appStrings', function() {
 				pre:'Success!',
 				msg:'Your Firm membership has been approved and has been added to your account.',
 				type:SUCCESS
+			},
+			invalidPhone: { // invalid phone number
+				pre:'Invalid Phone Number',
+				msg:'Please include only 10 digits in your phone number',
+				type:ERROR
 			}
 		},
 		address: {

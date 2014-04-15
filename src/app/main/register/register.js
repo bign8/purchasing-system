@@ -70,6 +70,11 @@ controller('RegisterFormCtrl', ['$scope', '$modal', 'interface', 'security', 'fi
 			$scope.message = appStrings.register.userAddr();
 			return;
 		}
+		if ($scope.user.phone.replace(/[^0-9]/g, '').length != 10) {
+			$scope.message = appStrings.register.invalidPhone();
+			return;
+		}
+
 		interface.user('addUser', $scope.user).then(function() {
 			$scope.message = appStrings.register.success(); // some sort of callback on close
 			security.requestCurrentUser();

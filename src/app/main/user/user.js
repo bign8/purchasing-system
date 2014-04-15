@@ -63,6 +63,10 @@ controller('UserCtrl', ['$scope', 'myPage', '$modal', 'interface', 'security', '
 			$scope.message = appStrings.user.userAddr();
 			return;
 		}
+		if ($scope.user.phone.replace(/[^0-9]/g, '').length != 10) {
+			$scope.message = appStrings.register.invalidPhone();
+			return;
+		}
 		
 		interface.user('updateUser', $scope.user).then(function() {
 			$scope.message = appStrings.user.success(); // some sort of callback on close
