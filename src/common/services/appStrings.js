@@ -145,7 +145,7 @@ factory('appStrings', function() {
 			},
 			success: { // Account created
 				pre:'Success!',
-				msg:'Your account has successfully been created',
+				msg:'Your account modifications have been successfully been stored',
 				type:SUCCESS
 			},
 			dupEmail: { // Duplicate email
