@@ -45,6 +45,9 @@
 							<span ng-switch-when="Download">
 								<a ng-href="/files/{{item.settings.file}}" class="btn btn-info btn-xs" target="_Blank">Download</a>
 							</span>
+							<span ng-switch-when="Hardcopy">
+								<a ng-href="/files/{{item.settings.file}}" class="btn btn-info btn-xs" target="_Blank">Download</a>
+							</span>
 							<span ng-switch-when="Conference">
 								<button class="btn btn-xs" ng-click="showAttendees(item)">Attendees</button>
 							</span>
