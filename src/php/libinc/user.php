@@ -423,6 +423,11 @@ HTML;
 			} else return $this->conflict('badPass');
 		}
 
+		// Grab old firm data
+		$getCurrentFirmSTH = $this->db->prepare("SELECT * FROM firm WHERE firmID = ? LIMIT 1;");
+		$getCurrentFirmSTH->execute( $_SESSION['user']['firmID'] );
+		$oldFirm = $getCurrentFirmSTH->fetch();
+
 		// Add/modify firm
 		if (isset($d->firm->firmID)) {
 			$getFirmSTH = $this->db->prepare("SELECT f.firmID, f.name, f.website, a.* FROM `firm` f JOIN `address` a ON f.addressID=a.addressID WHERE `firmID`=?;"); // Get Old data
@@ -441,6 +446,10 @@ HTML;
 			$this->newFirmEmail($firmID, $user);
 		}
 
+		// Get new firm data
+		$getCurrentFirmSTH->execute( $firmID );
+		$newFirm = $getCurrentFirmSTH->fetch();
+
 		// Update Contact
 		$userSTH = $this->db->prepare("UPDATE `contact` SET addressID=?,legalName=?,preName=?,title=?,email=?,phone=?,firmID=? WHERE contactID=?;");
 		if (!$userSTH->execute($d->addr->addressID, $d->legalName, $d->preName, $d->title, $d->email, $d->phone, $firmID, $d->contactID))
@@ -448,13 +457,20 @@ HTML;
 
 		// Save user changes
 		$STH = $this->db->prepare("SELECT * FROM `contact` WHERE `contactID`=? LIMIT 1;");
-		if ( $STH->execute( $user['contactID'] ) && $STH->rowCount() > 0 ) {
+		if ( $STH->execute( $user['contactID'] ) ) {
 			$newUser = $STH->fetch( PDO::FETCH_ASSOC );
 			$newUser['admin'] = $newUser['isAdmin'] == 'true';
 			unset( $newUser['pass'], $newUser['resetHash'], $newUser['resetExpires'], $newUser['isAdmin'] );
 
 			$updateSTH = $this->db->prepare( "UPDATE `contact` SET lastLogin=CURRENT_TIMESTAMP WHERE `contactID`=?;" );
 			$updateSTH->execute( $newUser['contactID'] );
+
+			// Prep data
+			$_SESSION['user']['name'] = $oldFirm['name'];
+			$_SESSION['user']['website'] = $oldFirm['website'];
+			$newUser['name'] = $newFirm['name'];
+			$newUser['website'] = $newFirm['website'];
+
 			$this->modifyUserEmail($_SESSION['user'], $newUser);
 			$_SESSION['user'] = $newUser;
 		}
@@ -542,7 +558,9 @@ HTML;
 			$old['email'] == $new['email'] &&
 			$old['phone'] == $new['phone'] &&
 			$old['firmID'] == $new['firmID'] &&
-			$old['addressID'] == $new['addressID']
+			$old['addressID'] == $new['addressID'] &&
+			$old['name'] == $new['name'] &&
+			$old['website'] == $new['website'] 
 		) return; // User hasn't changed
 
 		$dataSTH = $this->db->prepare("SELECT a.*, f.firmID, f.name, f.website FROM `address` a, `firm` f WHERE a.addressID=? AND f.firmID=?;");
