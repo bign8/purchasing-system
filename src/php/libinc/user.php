@@ -282,8 +282,11 @@ HTML;
 		if (!$testSTH->execute( $d->email )) return $this->conflict();
 		if ($testSTH->rowCount() > 0) return $this->conflict('dup');
 
+		// Dumb phone
+		$phone = (property_exists($d, 'phone')) ? $d->phone : '';
+
 		$STH = $this->db->prepare("INSERT INTO `contact` (firmID, addressID, legalName, preName, title, email, phone) VALUES (?,?,?,?,?,?,?);");
-		if (!$STH->execute( $user['firmID'], $d->addr->addressID, $d->legalName, $d->preName, $d->title, $d->email, $d->phone )) return $this->conflict();
+		if (!$STH->execute( $user['firmID'], $d->addr->addressID, $d->legalName, $d->preName, $d->title, $d->email, $phone )) return $this->conflict();
 		// send email -> add people to firm
 		$contactID = $this->db->lastInsertId();
 		$this->addContactToFirmEmail($contactID);
