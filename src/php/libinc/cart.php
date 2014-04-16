@@ -1,5 +1,7 @@
 <?php
 
+require_once('main_include.php');
+
 class Cart extends NG {
 
 	private $usr;
@@ -358,6 +360,7 @@ class Cart extends NG {
 		$invoiceSTH = $this->db->prepare("INSERT INTO invoice (orderID,cost,\"desc\") VALUES (?,?,?);");
 		foreach ($_SESSION['cart'] as $item) {
 			if (
+				is_array( $item ) &&
 				$item['itemID'] == -1 &&
 				!$invoiceSTH->execute($orderID, $item['cost'], $item['desc'])
 			) return $this->conflict();
@@ -458,9 +461,7 @@ class Cart extends NG {
 		$html .= "<hr/>Invoices:<br/><ul>\r\n";
 
 		// Print invoices
-		foreach ($invoices as $invoice) {
-			$html .= "<li>{$invoice['desc']}: \${$invoice['cost']}</li>\r\n";
-		}
+		foreach ($invoices as $invoice) $html .= "<li>{$invoice['desc']}: \${$invoice['cost']}</li>\r\n";
 
 		// Print cart items
 		$html .= "</ul>\r\n<hr/>Items:<br /><ul>\r\n";
@@ -468,53 +469,18 @@ class Cart extends NG {
 		$files = array();
 		// $mail->SMTPDebug  = 2;
 
-		foreach ($items as $item) { // items in cart
-
+		// items in cart
+		foreach ($items as $item) {
 			$html .= (isset($item['url'])) ? "<li><a href=\"{$item['url']}\">{$item['name']}</a><ul>" : "<li><strong>{$item['name']}</strong><ul>";
 			$data = json_decode($item['data']);
-			foreach ($data as $key => $value) { // questions on item
-				if (!$fieldSTH->execute( $key )) continue;
-				$fieldData = $fieldSTH->fetch();
-				if ($fieldData == false) continue;
 
-				// special question formatters
-				switch ($fieldData['fieldID']) {
-					case '2': $value = '$'.number_format($value, 2); break;
-				}
-
-				// type display
-				switch ($fieldData['type']) {
-					case 'attendees': // pretty print attendees
-						$html .= "<li><b>Attendee(s):</b><ul>";
-						// $html .= print_r($value, true);
-						foreach ($value as $row) {
-							$row = $this->object_to_array( $row );
-							$html .= "<li>";
-							$html .= "<b>Email:</b> {$row['email']}<br />\r\n";
-							$html .= "<a href=\"mailto:{$row['email']}\" >{$row['title']} {$row['legalName']} ({$row['preName']})</a><br />\r\n";
-							$html .= address($row['addr']);
-							$html .= "Phone: <a href=\"tel:{$row['phone']}\">{$row['phone']}</a><br />\r\n";
-							$html .= "</li>";
-						}
-						$html .= "</ul></li>";
-						break;
-
-					case 'image':
-						$fileName = $firm['name'] . ', ' . $contact['legalName'] . '.' . pathinfo($value, PATHINFO_EXTENSION);
-						$mail->addAttachment($_SERVER['DOCUMENT_ROOT'].$value, $fileName);
-						$html .= "<li><b>" . $fieldData['name'] . ':</b>' . $fileName . "</li>";
-						array_push($files, $_SERVER['DOCUMENT_ROOT'] . $value);
-						break;
-
-					default:
-						$html .= "<li><b>" . $fieldData['name'] . ':</b> ' . $value . "</li>";
-						break;
-				}
-			}
+			// questions on item
+			foreach ($data as $key => $value) $this->print_field($key, $value, $html, $files, $fieldSTH); // HTML + files by reference!
 			$html .= "</ul></li>";
 		}
-
 		$html .= "</ul>\r\n";
+
+		echo $html;
 
 		$mail->addAddress(config::notifyEmail, config::notifyName);
 		$mail->Subject = "UpstreamAcademy Checkout";
@@ -526,4 +492,51 @@ class Cart extends NG {
 			foreach ($files as $file) unlink($file); // delete sent files
 		}
 	}
+	private function print_field($fieldID, $data, &$html, &$files, &$fieldSTH) {
+		if (!$fieldSTH->execute( $fieldID )) return;
+		$fieldData = $fieldSTH->fetch();
+		if ($fieldData == false) return;
+
+		// special question formatters
+		switch ($fieldData['fieldID']) {
+			case '2': $data = '$'.number_format($data, 2); break;
+		}
+
+		// type display
+		switch ($fieldData['type']) {
+			case 'attendees': // pretty print attendees
+				$html .= "<li><b>Attendee(s):</b><ul>";
+				foreach ($data as $row) {
+					$row = $this->object_to_array( $row );
+					$html .= "<li>";
+					$html .= "<b>Email:</b> {$row['email']}<br />\r\n";
+					$html .= "<a href=\"mailto:{$row['email']}\" >{$row['title']} {$row['legalName']} ({$row['preName']})</a><br />\r\n";
+					$html .= address($row['addr']);
+					$html .= "<b>Phone:</b> <a href=\"tel:{$row['phone']}\">{$row['phone']}</a><br />\r\n";
+					$html .= "<ul>";
+					foreach ($row['options'] as $key => $value) {
+						$this->print_field($key, $value, $html, $files, $fieldSTH); // HTML + files by reference!
+					}
+					$html .= "</ul></li>";
+				}
+				$html .= "</ul></li>";
+				break;
+
+			case 'image':
+				$fileName = $firm['name'] . ', ' . $contact['legalName'] . '.' . pathinfo($data, PATHINFO_EXTENSION);
+				$mail->addAttachment($_SERVER['DOCUMENT_ROOT'].$data, $fileName);
+				$html .= "<li><b>" . $fieldData['name'] . ':</b>' . $fileName . "</li>";
+				array_push($files, $_SERVER['DOCUMENT_ROOT'] . $data);
+				break;
+
+			default:
+				$html .= "<li><b>" . $fieldData['name'] . ':</b> ' . print_r($data, true) . "</li>";
+				break;
+		}
+	}
 }
+
+// if (isset($_REQUEST['test'])) {
+// 	$cart = new Cart();
+// 	$cart->emailCart($_REQUEST['test']);
+// }
