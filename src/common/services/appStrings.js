@@ -259,7 +259,7 @@ factory('appStrings', function() {
 				'AMOUNT': '0',
 				'DESCRIPTION': 'Upstream Academy Purchase',
 				'LOGIN': 'UpstreamAcademy',
-				'MODE': 'TEST',
+				// 'MODE': 'TEST',
 				'PARTNER': 'PayPal',
 				'SHOWCONFIRM': 'FALSE',
 				'TYPE': 'S'

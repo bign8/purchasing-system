@@ -73,11 +73,16 @@ controller('CartCtrl', ['$scope', '$modal', 'interface', '$location', 'theCart',
 			if (medium == 'online') { // direct accordingly
 				var obj = appStrings.paypal.uri;
 				obj[appStrings.paypal.totalParam] = cart.total;
-				document.location = appStrings.paypal.url + '?' + $.param(obj);
+				document.location = appStrings.paypal.url + '?' + param(obj);
 			} else {
 				$location.path('/receipt'); // go to checkout page
 			}
 			theCart.setDirty(); // make sure empty cart gets loaded into the system
 		});
+		var param = function(obj) {
+			var ret = [];
+			for ( var idx in obj ) ret.push( encodeURIComponent(idx) + '=' + encodeURIComponent(obj[idx]) );
+			return ret.join( '&' ).replace(/%20/g, '+');
+		};
 	};
 }]);
