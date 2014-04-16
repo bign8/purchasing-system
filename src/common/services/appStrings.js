@@ -64,8 +64,8 @@ factory('appStrings', function() {
 				type:ERROR
 			},
 			error: { // Server error (notify object)
-				pre: 'Server error!',
-				msg: 'There was an error on our side of things, please try again later or contact us.',
+				pre: 'Duplicate Email!',
+				msg: 'This email already has an account.  Please choose a different email address.',
 				type:ERROR
 			},
 			duplicate: { // Duplicate email
