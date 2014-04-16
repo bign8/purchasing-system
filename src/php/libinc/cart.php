@@ -488,7 +488,7 @@ class Cart extends NG {
 		if (isset($_REQUEST['test'])) echo $html;
 
 		$mail->addAddress(config::notifyEmail, config::notifyName);
-		$mail->Subject = "UpstreamAcademy Checkout";
+		$mail->Subject = "Upstream Academy Checkout";
 		$mail->Body    = $html;
 		$mail->AltBody = strip_tags($html);
 		if (!$mail->send()) {

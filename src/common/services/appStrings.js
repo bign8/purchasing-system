@@ -180,7 +180,7 @@ factory('appStrings', function() {
 			},
 			errCode: {
 				pre:'Error!',
-				msg:'There was an unknown error checking you group access code.  Please try again or contact UpstreamAcademy for help.',
+				msg:'There was an unknown error checking you group access code.  Please try again or contact Upstream Academy for help.',
 				type:ERROR
 			},
 			goodCode: {

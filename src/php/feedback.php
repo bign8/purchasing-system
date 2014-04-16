@@ -22,7 +22,7 @@ if (!isset($_REQUEST['submit'])) {
 	$html .= "<tr><td>SessionID</td><td>{$sessionID}</td></tr>";
 	$html .= "<tr><td>Feedback</td><td>{$_REQUEST['feedback']}</td></tr>";
 	$mail = new UAMail();
-	$sent = ($mail->notify("UpstreamAcademy Feedback", '<table>' . $html . '</table>')) ? 2 : 1;
+	$sent = ($mail->notify("Upstream Academy Feedback", '<table>' . $html . '</table>')) ? 2 : 1;
 }
 
 ?>
@@ -117,7 +117,7 @@ if (!isset($_REQUEST['submit'])) {
 	</div>
 	<div id="footer" class="navbar navbar-default">
 		<div class="container">
-			<p class="text-muted credit">Copyright &copy; <script type="text/javascript">document.write(new Date().getFullYear())</script> <a href="http://upstreamacademy.com">UpstreamAcademy</a>.</p>
+			<p class="text-muted credit">Copyright &copy; <script type="text/javascript">document.write(new Date().getFullYear())</script> <a href="http://upstreamacademy.com">Upstream Academy</a>.</p>
 		</div>
 	</div>
 </body>

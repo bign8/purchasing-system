@@ -120,7 +120,7 @@ class User extends NG {
 			</table>
 HTML;
 		$mail = new UAMail();
-		if (!$mail->notify("UpstreamAcademy New Firm Notification", $html)) $this->conflict('mail');
+		if (!$mail->notify("Upstream Academy New Firm Notification", $html)) $this->conflict('mail');
 	}
 
 	// Worker(settings/firmCode): returns firm membership data
@@ -312,7 +312,7 @@ HTML;
 			</table>
 HTML;
 		$mail = new UAMail();
-		if (!$mail->notify("UpstreamAcademy Modify Contact Added to Firm", $html)) $this->conflict('mail');
+		if (!$mail->notify("Upstream Academy Modify Contact Added to Firm", $html)) $this->conflict('mail');
 	}
 
 	// Worker: add contact to system
@@ -389,7 +389,7 @@ HTML;
 			</table>
 HTML;
 		$mail = new UAMail();
-		if (!$mail->notify("UpstreamAcademy New User Notification", $html)) $this->conflict('mail');
+		if (!$mail->notify("Upstream Academy New User Notification", $html)) $this->conflict('mail');
 	}
 
 	// Worker: returns full user object
@@ -504,7 +504,7 @@ HTML;
 			</table>
 HTML;
 		$mail = new UAMail();
-		if (!$mail->notify("UpstreamAcademy New Firm Notification", $html)) $this->conflict('mail');
+		if (!$mail->notify("Upstream Academy New Firm Notification", $html)) $this->conflict('mail');
 	}
 	private function modifyFirmEmail($firmID, $oldDataSTH, $user) { // Helper: updatUser + addUser
 		$newDataSTH = $this->db->prepare("SELECT f.firmID, f.name, f.website, a.* FROM `firm` f JOIN `address` a ON f.addressID=a.addressID WHERE `firmID`=?;");
@@ -551,7 +551,7 @@ HTML;
 HTML;
 
 		$mail = new UAMail();
-		if (!$mail->notify("UpstreamAcademy Modify Firm Notification", $html)) $this->conflict('mail');
+		if (!$mail->notify("Upstream Academy Modify Firm Notification", $html)) $this->conflict('mail');
 	}
 	private function modifyUserEmail($old, $new) {
 		if (
@@ -596,7 +596,7 @@ HTML;
 		$html .= "</table>";
 
 		$mail = new UAMail();
-		if (!$mail->notify("UpstreamAcademy Modify User Notification", $html)) $this->conflict('mail');
+		if (!$mail->notify("Upstream Academy Modify User Notification", $html)) $this->conflict('mail');
 	}
 
 	private function table_row_compare($title, $old, $new) {
