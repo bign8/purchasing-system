@@ -525,18 +525,20 @@ HTML;
 		) return; // Firm data is the same
 
 		// This is called HEREDOC syntax : http://www.php.net/manual/en/language.types.string.php#language.types.string.syntax.heredoc
-		$html = <<<HTML
-			<p>The following changes have been made to a firm.</p>
-			<table>
-				<tr><th>Attribute</th><th>Old Version</th><th>New Version</th></tr>
-				<tr><td>Name</td><td>{$oldData['name']}</td><td>{$newData['name']}</td></tr>
-				<tr><td>Website</td><td>{$oldData['website']}</td><td>{$newData['website']}</td></tr>
-				<tr><td>Address Name</td><td>{$oldData['addrName']}</td><td>{$newData['addrName']}</td></tr>
-				<tr><td>Address 1</td><td>{$oldData['addr1']}</td><td>{$newData['addr1']}</td></tr>
-				<tr><td>Address 2</td><td>{$oldData['addr2']}</td><td>{$newData['addr2']}</td></tr>
-				<tr><td>City</td><td>{$oldData['city']}</td><td>{$newData['city']}</td></tr>
-				<tr><td>State</td><td>{$oldData['state']}</td><td>{$newData['state']}</td></tr>
-				<tr><td>Zip</td><td>{$oldData['zip']}</td><td>{$newData['zip']}</td></tr>
+		$html = "<p>The following changes have been made to a firm.</p><table>\n<tr><th>Attribute</th><th>Old Version</th><th>New Version</th></tr>\n";
+
+		$data = array(
+			'Name' => 'name',
+			'Website' => 'website',
+			'Address Name' => 'addrName',
+			'Address 1' => 'addr1',
+			'Address 2' => 'addr2',
+			'City' => 'city',
+			'State' => 'state',
+			'Zip' => 'zip',
+		);
+		foreach ($data as $key => $value) $html .= $this->table_row_compare( $key, $oldData[$value], $newData[$value]);
+		$html .= <<<HTML
 			</table>
 			<p>The above changes were made by the following person</p>
 			<table>
@@ -547,6 +549,7 @@ HTML;
 				<tr><td>Phone</td><td>{$user['phone']}</td></tr>
 			</table>
 HTML;
+
 		$mail = new UAMail();
 		if (!$mail->notify("UpstreamAcademy Modify Firm Notification", $html)) $this->conflict('mail');
 	}
@@ -563,33 +566,42 @@ HTML;
 			$old['website'] == $new['website'] 
 		) return; // User hasn't changed
 
-		$dataSTH = $this->db->prepare("SELECT a.*, f.firmID, f.name, f.website FROM `address` a, `firm` f WHERE a.addressID=? AND f.firmID=?;");
-		$dataSTH->execute($old['addressID'], $old['firmID']);
+		$dataSTH = $this->db->prepare("SELECT * FROM `address` a WHERE a.addressID=? ;");
+		$dataSTH->execute($old['addressID']);
 		$oldData = $dataSTH->fetch(PDO::FETCH_ASSOC);
-		$dataSTH->execute($new['addressID'], $new['firmID']);
+		$dataSTH->execute($new['addressID']);
 		$newData = $dataSTH->fetch(PDO::FETCH_ASSOC);
 
-		$html = <<<HTML
-			<p>The following changes have been made to a user</p>
-			<table>
-				<tr><th>Attribute</th><th>Old Version</th><th>New Version</th></tr>
-				<tr><td>Name</td><td>{$old['legalName']}</td><td>{$new['legalName']}</td></tr>
-				<tr><td>Preferred</td><td>{$old['preName']}</td><td>{$new['preName']}</td></tr>
-				<tr><td>Title</td><td>{$old['title']}</td><td>{$new['title']}</td></tr>
-				<tr><td>Email</td><td>{$old['email']}</td><td>{$new['email']}</td></tr>
-				<tr><td>Phone</td><td>{$old['phone']}</td><td>{$new['phone']}</td></tr>
-				<tr><td>Address Name</td><td>{$oldData['addrName']}</td><td>{$newData['addrName']}</td></tr>
-				<tr><td>Address 1</td><td>{$oldData['addr1']}</td><td>{$newData['addr1']}</td></tr>
-				<tr><td>Address 2</td><td>{$oldData['addr2']}</td><td>{$newData['addr2']}</td></tr>
-				<tr><td>City</td><td>{$oldData['city']}</td><td>{$newData['city']}</td></tr>
-				<tr><td>State</td><td>{$oldData['state']}</td><td>{$newData['state']}</td></tr>
-				<tr><td>Zip</td><td>{$oldData['zip']}</td><td>{$newData['zip']}</td></tr>
-				<tr><td>Firm Name</td><td>{$oldData['name']}</td><td>{$newData['name']}</td></tr>
-				<tr><td>Firm Website</td><td>{$oldData['website']}</td><td>{$newData['website']}</td></tr>
-			</table>
-HTML;
+		$data1 = array(
+			'Name' => 'legalName',
+			'Preferred' => 'preName',
+			'Title' => 'title',
+			'Email' => 'email',
+			'Phone' => 'phone',
+			'Firm Name' => 'name',
+			'Firm Website' => 'website',
+		);
+		$data2 = array(
+			'Address Name' => 'addrName',
+			'Address 1' => 'addr1',
+			'Address 2' => 'addr2',
+			'City' => 'city',
+			'State' => 'state',
+			'Zip' => 'zip',
+		);
+
+		$html = "<p>The following changes have been made to a user</p><table>\n<tr><th>Attribute</th><th>Old Version</th><th>New Version</th></tr>\n";
+		foreach ($data1 as $key => $value) $html .= $this->table_row_compare( $key, $old[$value], $new[$value] );
+		foreach ($data2 as $key => $value) $html .= $this->table_row_compare( $key, $oldData[$value], $newData[$value] );
+		$html .= "</table>";
+
 		$mail = new UAMail();
 		if (!$mail->notify("UpstreamAcademy Modify User Notification", $html)) $this->conflict('mail');
 	}
 
+	private function table_row_compare($title, $old, $new) {
+		$str = "<tr";
+		if ($old != $new) $str .= ' style="background-color:red"';
+		return $str . "><td>$title</td><td>$old</td><td>$new</td></tr>\n";
+	}
 }
