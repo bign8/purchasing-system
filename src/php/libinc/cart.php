@@ -476,7 +476,7 @@ class Cart extends NG {
 
 			// questions on item
 			if ( is_array($data) || is_object($data)) foreach ($data as $key => $value) {
-				$this->print_field($key, $value, $html, $files, $fieldSTH); // HTML + files by reference!
+				$this->print_field($key, $value, $firm, $contact, $mail, $html, $files, $fieldSTH); // HTML + files by reference!
 			} else {
 				$html .= "<li>" . ($data ? 'Hardcopy' : 'Softcopy') . "</li>";
 			}
@@ -494,10 +494,10 @@ class Cart extends NG {
 		if (!$mail->send()) {
 			$this->conflict('mail');
 		} else {
-			foreach ($files as $file) unlink($file); // delete sent files
+			foreach ($files as $file) if (file_exists($file)) unlink($file); // delete sent files
 		}
 	}
-	private function print_field($fieldID, $data, &$html, &$files, &$fieldSTH) {
+	private function print_field($fieldID, $data, $firm, $contact, &$mail, &$html, &$files, &$fieldSTH) {
 		if (!$fieldSTH->execute( $fieldID )) return;
 		$fieldData = $fieldSTH->fetch();
 		if ($fieldData == false) return;
@@ -520,7 +520,7 @@ class Cart extends NG {
 					$html .= "<b>Phone:</b> <a href=\"tel:{$row['phone']}\">{$row['phone']}</a><br />\r\n";
 					$html .= "<ul>";
 					foreach ($row['options'] as $key => $value) {
-						$this->print_field($key, $value, $html, $files, $fieldSTH); // HTML + files by reference!
+						$this->print_field($key, $value, $firm, $contact, $mail, $html, $files, $fieldSTH); // HTML + files by reference!
 					}
 					$html .= "</ul></li>";
 				}
@@ -528,7 +528,9 @@ class Cart extends NG {
 				break;
 
 			case 'image':
-				$fileName = $firm['name'] . ', ' . $contact['legalName'] . '.' . pathinfo($data, PATHINFO_EXTENSION);
+				// $fileName = $firm['name'] . ', ' . $contact['legalName'] . '.' . pathinfo($data, PATHINFO_EXTENSION);
+				// $fileName = $_SERVER['DOCUMENT_ROOT'].$data;
+				$fileName = rand() . '.' . pathinfo($data, PATHINFO_EXTENSION);
 				$mail->addAttachment($_SERVER['DOCUMENT_ROOT'].$data, $fileName);
 				$html .= "<li><b>" . $fieldData['name'] . ':</b>' . $fileName . "</li>";
 				array_push($files, $_SERVER['DOCUMENT_ROOT'] . $data);
