@@ -480,7 +480,7 @@ class Cart extends NG {
 		}
 		$html .= "</ul>\r\n";
 
-		echo $html;
+		if (isset($_REQUEST['test'])) echo $html;
 
 		$mail->addAddress(config::notifyEmail, config::notifyName);
 		$mail->Subject = "UpstreamAcademy Checkout";
