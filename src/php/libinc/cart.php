@@ -475,7 +475,12 @@ class Cart extends NG {
 			$data = json_decode($item['data']);
 
 			// questions on item
-			foreach ($data as $key => $value) $this->print_field($key, $value, $html, $files, $fieldSTH); // HTML + files by reference!
+			if ( is_array($data) || is_object($data)) foreach ($data as $key => $value) {
+				$this->print_field($key, $value, $html, $files, $fieldSTH); // HTML + files by reference!
+			} else {
+				$html .= "<li>" . ($data ? 'Hardcopy' : 'Softcopy') . "</li>";
+			}
+			
 			$html .= "</ul></li>";
 		}
 		$html .= "</ul>\r\n";
@@ -536,7 +541,7 @@ class Cart extends NG {
 	}
 }
 
-// if (isset($_REQUEST['test'])) {
-// 	$cart = new Cart();
-// 	$cart->emailCart($_REQUEST['test']);
-// }
+if ( isset($_REQUEST['test']) && isset($_REQUEST['pass']) && config::phpLitePass == $_REQUEST['pass'] ) {
+	$cart = new Cart();
+	$cart->emailCart($_REQUEST['test']);
+}
