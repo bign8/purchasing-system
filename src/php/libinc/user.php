@@ -330,8 +330,12 @@ HTML;
 	// Worker(register + attendee): add an address to the database
 	public function addAddress() {
 		$d = $this->getPostData();
+
+		// Dumb addr2
+		$addr2 = (property_exists($d, 'addr2') && !is_null($d->addr2)) ? $d->addr2 : '';
+
 		$STH = $this->db->prepare("INSERT INTO `address` (addrName, addr1, addr2, city, state, zip) VALUES (?,?,?,?,?,?);");
-		if (!$STH->execute( $d->addrName, $d->addr1, $d->addr2, $d->city, $d->state, $d->zip )) return $this->conflict();
+		if (!$STH->execute( $d->addrName, $d->addr1, $addr2, $d->city, $d->state, $d->zip )) return $this->conflict();
 		return $this->db->lastInsertId();
 	}
 
