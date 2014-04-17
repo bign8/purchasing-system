@@ -45,10 +45,12 @@
 						<td class="nowrap">{{(item.stamp | date:'MMM d, y') || '-'}}</td>
 						<td ng-switch="item.template.name">
 							<span ng-switch-when="Download">
-								<a ng-href="/files/{{item.settings.file}}" class="btn btn-info btn-xs" target="_Blank">Download</a>
+								<a ng-href="/files/{{item.settings.file}}" class="btn btn-info btn-xs" target="_Blank" ng-show="item.settings.file">Download</a>
+								<span ng-hide="item.settings.file">-</span>
 							</span>
 							<span ng-switch-when="Hardcopy">
-								<a ng-href="/files/{{item.settings.file}}" class="btn btn-info btn-xs" target="_Blank">Download</a>
+								<a ng-href="/files/{{item.settings.file}}" class="btn btn-info btn-xs" target="_Blank" ng-show="item.settings.file">Download</a>
+								<span ng-hide="item.settings.file">-</span>
 							</span>
 							<span ng-switch-when="Conference">
 								<button class="btn btn-xs" ng-click="showAttendees(item)">Attendees</button>
