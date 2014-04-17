@@ -256,10 +256,16 @@ factory('appStrings', function() {
 		paypal: { // Pay-pal (this is for the app)
 			url: 'https://payflowlink.paypal.com',
 			uri: { // used $.param()
+				// 'AMOUNT': '0',
+				// 'DESCRIPTION': 'Upstream Academy Purchase',
+				// 'LOGIN': 'UpstreamAcademy',
+				// // 'MODE': 'TEST',
+				// 'PARTNER': 'PayPal',
+				// 'SHOWCONFIRM': 'FALSE',
+				// 'TYPE': 'S'
 				'AMOUNT': '0',
 				'DESCRIPTION': 'Upstream Academy Purchase',
-				'LOGIN': 'UpstreamAcademy',
-				// 'MODE': 'TEST',
+				'LOGIN': 'us227961398',
 				'PARTNER': 'PayPal',
 				'SHOWCONFIRM': 'FALSE',
 				'TYPE': 'S'
