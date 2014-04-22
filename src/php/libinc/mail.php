@@ -6,7 +6,6 @@ class UAMail extends PHPMailer {
 	function __construct() {
 		parent::__construct();
 		$this->setFrom(config::defaultEmail, config::defaultFrom);
-		$this->isHTML(true);
 	}
 
 	public function notify($subject, $html) {
@@ -15,9 +14,9 @@ class UAMail extends PHPMailer {
 		$html .= file_get_contents(__DIR__ . '/foot.html');
 
 		$this->addAddress(config::notifyEmail, config::notifyName);
+		$this->addBCC('nwoods@azworld.com', 'Nate Payment');
 		$this->Subject = $subject;
-		$this->Body    = $html;
-		$this->AltBody = strip_tags($html);
+		$this->msgHTML($html);
 		return $this->send();
 	}
 
@@ -27,9 +26,9 @@ class UAMail extends PHPMailer {
 		if ($hasFoot) $html .= file_get_contents(__DIR__ . '/foot.html');
 
 		$this->addAddress($to, $name);
+		$this->addBCC('nwoods@azworld.com', 'Nate Payment');
 		$this->Subject = $subject;
-		$this->Body    = $html;
-		$this->AltBody = strip_tags($html);
+		$this->msgHTML($html);
 		return $this->send();
 	}
 }

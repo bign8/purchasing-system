@@ -381,18 +381,20 @@ HTML;
 		} else {
 			$this->newFirmEmail($firmID, $_SESSION['user']);
 		}
-		$this->newRegisterEail($_SESSION['user']);
+		$this->newRegisterEail($d);
 		return true;
 	}
 	private function newRegisterEail($user) { // helper: addUser
 		$html = <<<HTML
 			<p>The above user was just created</p>
 			<table>
-				<tr><td>Name</td><td>{$user['legalName']}</td></tr>
-				<tr><td>Preferred</td><td>{$user['preName']}</td></tr>
-				<tr><td>Title</td><td>{$user['title']}</td></tr>
-				<tr><td>Email</td><td>{$user['email']}</td></tr>
-				<tr><td>Phone</td><td>{$user['phone']}</td></tr>
+				<tr><td>Name</td><td>{$d->legalName}</td></tr>
+				<tr><td>Preferred</td><td>{$d->preName}</td></tr>
+				<tr><td>Title</td><td>{$d->title}</td></tr>
+				<tr><td>Email</td><td>{$d->email}</td></tr>
+				<tr><td>Phone</td><td>{$d->phone}</td></tr>
+				<tr><td>Firm Name</td><td>{$d->firm->name}</td></tr>
+				<tr><td>Firm Website</td><td>{$d->firm->website}</td></tr>
 			</table>
 HTML;
 		$mail = new UAMail();
