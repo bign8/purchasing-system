@@ -487,11 +487,8 @@ class Cart extends NG {
 
 		if (isset($_REQUEST['test'])) echo $html;
 
-		$mail->addAddress(config::notifyEmail, config::notifyName);
-		$mail->Subject = "Upstream Academy Checkout";
-		$mail->Body    = $html;
-		$mail->AltBody = strip_tags($html);
-		if (!$mail->send()) {
+		// Send Email
+		if (!$mail->notify("Upstream Academy Checkout", $html)) {
 			$this->conflict('mail');
 		} else {
 			foreach ($files as $file) if (file_exists($file)) unlink($file); // delete sent files
