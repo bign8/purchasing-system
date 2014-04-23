@@ -38,7 +38,7 @@
 		<div class="col-sm-8">
 			<div ng-repeat="option in field.settings">
 				<label>
-					<input type="radio" name="optionsRadios" ng-model="options[field.fieldID]" value="{{option}}" ng-required="field.required" style="float:left">
+					<input type="radio" name="optionsRadios_{{field.fieldID}}" ng-model="options[field.fieldID]" value="{{option}}" ng-required="field.required" style="float:left">
 					&nbsp;
 					<div ng-bind-html="trustHTML(option)" style="float:left;margin-left:5px"></div>
 				</label>
