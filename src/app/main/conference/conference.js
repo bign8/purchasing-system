@@ -330,7 +330,8 @@ directive('dbQuestions', ['$sce', function ($sce) {
 
 						// Default options
 						case 'radioboxes':
-							$scope.options[ value.fieldID ] = value.settings[ value.settings.length - 1 ];
+							if ($scope.onUser == (value.onUser == 'true'))
+								$scope.options[ value.fieldID ] = value.settings[ value.settings.length - 1 ];
 							break;
 					}
 				});
