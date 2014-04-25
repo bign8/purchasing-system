@@ -297,7 +297,7 @@ class Cart extends NG {
 		if (!$codeSTH->execute( $data->code )) return $this->conflict();
 		$discount = $codeSTH->fetch();
 		if ($discount == false) return $this->conflict('inv'); // is not code
-		if ($discount['active'] != 'yes') return $this->conflict('exp'); // is expired
+		if ($discount['active'] != 'true') return $this->conflict('exp'); // is expired
 
 		// server duplicate check
 		foreach ($_SESSION['cart.discounts'] as $myDiscount)
