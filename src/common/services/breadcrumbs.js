@@ -37,7 +37,10 @@ factory('breadcrumbs', ['$rootScope', '$location', 'interface', function ($rootS
 			pathElements.shift();
 
 			for (i=0; i<pathElements.length; i++) {
-				if (pathElements[i] == 'conference') pathElements[i] = 'event';
+				switch (pathElements[i]) {
+					case 'conference': pathElements[i] = 'event';          break;
+					case 'payment':    pathElements[i] = 'Pay an Invoice'; break;
+				}
 				var obj = {
 					name: ucfirst(pathElements[i]),
 					path: breadcrumbPath(i),
