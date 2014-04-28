@@ -264,7 +264,7 @@ factory('appStrings', function() {
 				// 'SHOWCONFIRM': 'FALSE',
 				// 'TYPE': 'S'
 				'AMOUNT': '0',
-				'DESCRIPTION': 'Upstream Academy Purchase #',
+				'DESCRIPTION': 'Upstream Academy Purchase ',
 				'LOGIN': 'us227961398',
 				'PARTNER': 'PayPal',
 				'SHOWCONFIRM': 'FALSE',
