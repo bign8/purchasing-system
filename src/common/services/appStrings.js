@@ -264,13 +264,14 @@ factory('appStrings', function() {
 				// 'SHOWCONFIRM': 'FALSE',
 				// 'TYPE': 'S'
 				'AMOUNT': '0',
-				'DESCRIPTION': 'Upstream Academy Purchase',
+				'DESCRIPTION': 'Upstream Academy Purchase #',
 				'LOGIN': 'us227961398',
 				'PARTNER': 'PayPal',
 				'SHOWCONFIRM': 'FALSE',
 				'TYPE': 'S'
 			},
-			totalParam: 'AMOUNT'
+			totalParam: 'AMOUNT',
+			descParam: 'DESCRIPTION',
 		},
 		pay: {
 			customPayName: 'Custom Payment' // shows up in cart

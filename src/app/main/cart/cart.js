@@ -61,7 +61,7 @@ controller('CartCtrl', ['$scope', '$modal', 'interface', '$location', 'theCart',
 			return;
 		}
 		$scope.submitMsg = appStrings.cart.checkOut();
-		interface.cart('save', {cost:theCart.fullTotal(), medium:medium}).then(function() {
+		interface.cart('save', {cost:theCart.fullTotal(), medium:medium}).then(function (orderID) {
 			var cart = {
 				list: theCart.cart,
 				disTotal: theCart.totDiscount(),
@@ -73,6 +73,7 @@ controller('CartCtrl', ['$scope', '$modal', 'interface', '$location', 'theCart',
 			if (medium == 'online') { // direct accordingly
 				var obj = appStrings.paypal.uri;
 				obj[appStrings.paypal.totalParam] = cart.total;
+				obj[appStrings.paypal.descParam] += orderID;
 				document.location = appStrings.paypal.url + '?' + param(obj);
 			} else {
 				$location.path('/receipt'); // go to checkout page
