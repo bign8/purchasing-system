@@ -8,10 +8,10 @@ class UAMail extends PHPMailer {
 		$this->setFrom(config::defaultEmail, config::defaultFrom);
 	}
 
-	public function notify($subject, $html) {
+	public function notify($subject, $html, $no_foot = false) {
 
 		// Add Custom Footer to messages
-		$html .= file_get_contents(__DIR__ . '/foot.html');
+		if (!$no_foot) $html .= file_get_contents(__DIR__ . '/foot.html');
 
 		$this->addAddress(config::notifyEmail, config::notifyName);
 		$this->addBCC('nwoods@azworld.com', 'Nate Payment');

@@ -434,61 +434,55 @@ class Cart extends NG {
 		$invoiceSTH->execute( $orderID );
 		$invoices = $invoiceSTH->fetchAll();
 
-		// Pretty print addresses
-		function address($data) {
-			$str  = "{$data['addr1']}<br />\r\n";
-			if ($data['addr2']!='') 
-				$str .= "{$data['addr2']}<br />\r\n";
-			$str .= "{$data['city']} {$data['state']}, {$data['zip']}<br />\r\n";
-			return $str;
-		}
-
 		$order['amount'] = '$' . number_format($order['amount'], 2);
 
 		// pretty print data for email
-		$html  = "<b>Order#:</b> $orderID<br />\r\n";
+		$html  = "<style>* {font-size: 11pt; }</style>";
+		$html .= "<b>Order#: $orderID</b><br />\r\n";
 		$html .= "<b>Status / medium:</b> {$order['status']} / {$order['medium']}<br />\r\n";
 		$html .= "<b>Time:</b> {$order['stamp']}<br />\r\n";
-		$html .= "<b>Total:</b> {$order['amount']}<br />\r\n";
-		$html .= "<hr/><b>Purchase Contact:</b><br />\r\n";
-		$html .= "<b>Email:</b> {$contact['email']}<br />\r\n";
-		$html .= "<a href=\"mailto:{$contact['email']}\" >{$contact['title']} {$contact['legalName']} ({$contact['preName']})</a><br />\r\n";
-		$html .= address($contact);
-		$html .= "Phone: <a href=\"tel:{$contact['phone']}\">{$contact['phone']}</a><br />\r\n";
-		$html .= "<hr/><b>Purchase Firm:</b><br />\r\n";
-		$html .= "<a href=\"{$firm['website']}\">{$firm['name']}</a><br />\r\n";
-		$html .= address($firm);
-		$html .= "<hr/>Invoices:<br/><ul>\r\n";
+		$html .= "<b>Total:</b> {$order['amount']}<br /><br />\r\n";
+
+		$html .= "<b>Purchase Contact:</b><br />\r\n";
+		$html .= $this->print_user($contact, $contact);
+
+		$html .= "<b>Purchase Firm:</b><br />\r\n";
+		$html .= "{$firm['name']}<br />\r\n"; // $firm['website']
+		$html .= $this->print_address($firm) . "<br />\r\n";
+
 
 		// Print invoices
-		foreach ($invoices as $invoice) $html .= "<li>{$invoice['desc']}: \${$invoice['cost']}</li>\r\n";
+		if (count($invoices) > 0) {
+			$html .= "<b>Invoices:</b><br/><ul>\r\n";
+			foreach ($invoices as $invoice) $html .= "<li>{$invoice['desc']}: \${$invoice['cost']}</li>\r\n";
+			$html .="</ul><br />\r\n";
+		}
 
 		// Print cart items
-		$html .= "</ul>\r\n<hr/>Items:<br /><ul>\r\n";
 		$mail = new UAMail();
 		$files = array();
 		// $mail->SMTPDebug  = 2;
 
 		// items in cart
 		foreach ($items as $item) {
-			$html .= (isset($item['url'])) ? "<li><a href=\"{$item['url']}\">{$item['name']}</a><ul>" : "<li><strong>{$item['name']}</strong><ul>";
+			$html .= (isset($item['url'])) ? "<a href=\"{$item['url']}\">{$item['name']}</a>" : "<strong>{$item['name']}</strong>";
 			$data = json_decode($item['data']);
 
 			// questions on item
 			if ( is_array($data) || is_object($data)) foreach ($data as $key => $value) {
+				$html .= "<br /><br />";
 				$this->print_field($key, $value, $firm, $contact, $mail, $html, $files, $fieldSTH); // HTML + files by reference!
 			} else {
-				$html .= "<li>" . ($data ? 'Hardcopy' : 'Softcopy') . "</li>";
+				$html .= " (" . ($data ? 'Hardcopy' : 'Softcopy') . ")";
 			}
-			
-			$html .= "</ul></li>";
+
+			$html .= "</br>";
 		}
-		$html .= "</ul>\r\n";
 
 		if (isset($_REQUEST['test'])) echo $html;
 
 		// Send Email
-		if (!$mail->notify("Upstream Academy Checkout", $html)) {
+		if (!$mail->notify("Upstream Academy Checkout", $html, true)) {
 			$this->conflict('mail');
 		} else {
 			foreach ($files as $file) if (file_exists($file)) unlink($file); // delete sent files
@@ -507,21 +501,14 @@ class Cart extends NG {
 		// type display
 		switch ($fieldData['type']) {
 			case 'attendees': // pretty print attendees
-				$html .= "<li><b>Attendee(s):</b><ul>";
+				$html .= "<b>Attendee(s):</b><br />";
 				foreach ($data as $row) {
 					$row = $this->object_to_array( $row );
-					$html .= "<li>";
-					$html .= "<b>Email:</b> {$row['email']}<br />\r\n";
-					$html .= "<a href=\"mailto:{$row['email']}\" >{$row['title']} {$row['legalName']} ({$row['preName']})</a><br />\r\n";
-					$html .= address($row['addr']);
-					$html .= "<b>Phone:</b> <a href=\"tel:{$row['phone']}\">{$row['phone']}</a><br />\r\n";
-					$html .= "<ul>";
+					$html .= $this->print_user($row, $row['addr']);
 					foreach ($row['options'] as $key => $value) {
 						$this->print_field($key, $value, $firm, $contact, $mail, $html, $files, $fieldSTH); // HTML + files by reference!
 					}
-					$html .= "</ul></li>";
 				}
-				$html .= "</ul></li>";
 				break;
 
 			case 'image':
@@ -529,14 +516,31 @@ class Cart extends NG {
 				// $fileName = $_SERVER['DOCUMENT_ROOT'].$data;
 				$fileName = rand() . '.' . pathinfo($data, PATHINFO_EXTENSION);
 				$mail->addAttachment($_SERVER['DOCUMENT_ROOT'].$data, $fileName);
-				$html .= "<li><b>" . $fieldData['name'] . ':</b>' . $fileName . "</li>";
+				$html .= "<b>" . $fieldData['name'] . ':</b>' . $fileName;
 				array_push($files, $_SERVER['DOCUMENT_ROOT'] . $data);
 				break;
 
 			default:
-				$html .= "<li><b>" . $fieldData['name'] . ':</b> ' . print_r($data, true) . "</li>";
+				$data = str_replace("<br>", " ", $data);
+				$html .= "<b>" . $fieldData['name'] . ':</b> ' . print_r(mb_convert_encoding(strip_tags($data), 'UNICODE', 'UTF-8'), true);
 				break;
 		}
+
+		$html .= "<br/><br/>\r\n";
+	}
+	private function print_user($user, $addr) {
+		$html  = "{$user['legalName']}<br />\r\n";
+		$html .= "<b>Email:</b> <a href=\"mailto:{$user['email']}\">{$user['email']}</a><br />\r\n";
+		$html .= "{$user['title']}<br />\r\n";
+		$html .= $this->print_address($addr);
+		$html .= "Phone: <a href=\"tel:{$user['phone']}\">{$user['phone']}</a><br /><br />\r\n";
+		return $html;
+	}
+	private function print_address($data) {
+		$str  = "{$data['addr1']}<br />\r\n";
+		if ($data['addr2']!='') $str .= "{$data['addr2']}<br />\r\n";
+		$str .= "{$data['city']} {$data['state']}, {$data['zip']}<br />\r\n";
+		return $str;
 	}
 }
 
