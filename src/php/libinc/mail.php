@@ -6,6 +6,7 @@ class UAMail extends PHPMailer {
 	function __construct() {
 		parent::__construct();
 		$this->setFrom(config::defaultEmail, config::defaultFrom);
+		$this->CharSet = 'UTF-8';
 	}
 
 	public function notify($subject, $html, $no_foot = false) {

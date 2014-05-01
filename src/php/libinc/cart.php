@@ -437,7 +437,7 @@ class Cart extends NG {
 		$order['amount'] = '$' . number_format($order['amount'], 2);
 
 		// pretty print data for email
-		$html  = "<style>* {font-size: 11pt; }</style>";
+		$html  = "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" /><style>* {font-size: 11pt; }</style>";
 		$html .= "<b>Order#: $orderID</b><br />\r\n";
 		$html .= "<b>Status / medium:</b> {$order['status']} / {$order['medium']}<br />\r\n";
 		$html .= "<b>Time:</b> {$order['stamp']}<br />\r\n";
@@ -522,7 +522,7 @@ class Cart extends NG {
 
 			default:
 				$data = str_replace("<br>", " ", $data);
-				$html .= "<b>" . $fieldData['name'] . ':</b> ' . print_r(mb_convert_encoding(strip_tags($data), 'UNICODE', 'UTF-8'), true);
+				$html .= "<b>" . $fieldData['name'] . ':</b> ' . print_r(strip_tags($data), true);
 				break;
 		}
 
