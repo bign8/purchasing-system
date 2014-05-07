@@ -53,7 +53,7 @@ factory('appStrings', function() {
 			},
 			warn: {
 				pre: 'Previously purchased items in cart',
-				msg: 'You will have to remove the items marked in <span style="color:red">RED</span> before you can checkout',
+				msg: 'You will have to remove the items marked in <span style="color:red">RED</span> before you can checkout.<br/><br/>Management Presentations and LeaderSkills Lessons can be used by anyone in the firm once purchased.<br/><br/>Conference attendees can only be listed once.',
 				type:INFO, delay:60
 			}
 		},
