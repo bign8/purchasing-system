@@ -529,7 +529,8 @@ class Cart extends NG {
 		$html .= "<br/><br/>\r\n";
 	}
 	private function print_user($user, $addr) {
-		$html  = "{$user['legalName']}<br />\r\n";
+		$pre_name = (isset($user['preName']) && $user['preName'] != '') ? (' (' . $user['preName'] . ')') : '';
+		$html  = "{$user['legalName']}{$pre_name}<br />\r\n";
 		$html .= "<b>Email:</b> <a href=\"mailto:{$user['email']}\">{$user['email']}</a><br />\r\n";
 		$html .= "{$user['title']}<br />\r\n";
 		$html .= $this->print_address($addr);
