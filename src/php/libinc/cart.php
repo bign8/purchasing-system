@@ -495,7 +495,7 @@ class Cart extends NG {
 
 		// special question formatters
 		switch ($fieldData['fieldID']) {
-			case '2': $data = '$'.number_format($data, 2); break;
+			case '2': $data = is_numeric($data) ? '$'.number_format($data, 2) : $data; break;
 		}
 
 		// type display
@@ -505,7 +505,7 @@ class Cart extends NG {
 				foreach ($data as $row) {
 					$row = $this->object_to_array( $row );
 					$html .= $this->print_user($row, $row['addr']);
-					foreach ($row['options'] as $key => $value) {
+					if (!is_null($row['options'])) foreach ($row['options'] as $key => $value) {
 						$this->print_field($key, $value, $firm, $contact, $mail, $html, $files, $fieldSTH); // HTML + files by reference!
 					}
 				}
