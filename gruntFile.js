@@ -38,7 +38,7 @@ module.exports = function(grunt) {
 			options: { nospawn: true },
 			app: {
 				options: {
-					livereload: 1337,
+					livereload: 13337,
 					interval: 5007
 					//interrupt: true
 				},
