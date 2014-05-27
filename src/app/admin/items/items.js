@@ -26,6 +26,10 @@ controller('ItemListCtrl', ['$scope', 'items', '$location', 'ItemService', funct
 	$scope.fields = ItemService.getFields();
 	$scope.allItems = ItemService.allItems();
 
+	$scope.files_first = function (value) {
+		return value.count == '0';
+	};
+
 	// nav functions
 	$scope.go = function (itemID) {
 		$scope.origin.isActive = false;
