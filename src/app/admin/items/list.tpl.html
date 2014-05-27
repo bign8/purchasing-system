@@ -35,7 +35,10 @@
 
 	<!-- itemForm -->
 	<form name="itemForm" class="col-md-4 form-horizontal" ng-show="active">
-		<h3>Details</h3>
+		<h3>
+			<button type="button" class="btn btn-danger pull-right btn-xs" ng-click="move()">Move</button>
+			Details
+		</h3>
 		<div class="form-group">
 			<label class="control-label" for="name">Name *</label>
 			<input class="form-control" type="text" id="name" placeholder="Name" ng-model="active.name" required>

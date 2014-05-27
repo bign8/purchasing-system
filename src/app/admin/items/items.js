@@ -1,5 +1,6 @@
 angular.module('myApp.admin.items', [
 	'myApp.common.services',
+	'myApp.common.filters',
 	'ui.bootstrap'
 ]).
 
@@ -17,7 +18,59 @@ config(['$routeProvider', 'securityAuthorizationProvider', function ($routeProvi
 	});
 }]).
 
-controller('ItemListCtrl', ['$scope', 'items', '$location', 'ItemService', function ($scope, items, $location, ItemService){
+
+controller('ItemListModal', ['$scope', '$modalInstance', 'item', 'ItemService', function ($scope, $modalInstance, item, ItemService) {
+	$scope.item = item;
+	$scope.items = ItemService.allItems();
+
+	var blank_item = function (parent_id) {
+		return {};
+	};
+	$scope.clearItem = function( index, parentID ) {
+		$scope.viewItems = $scope.viewItems.slice(0, index+1);
+		$scope.viewItems[index] = blank_item(parentID);
+	};
+	var initValues = function() {
+		$scope.viewItems = [];
+
+		if ($scope.item.parentID) {
+			var activeID = $scope.item.parentID, nextItem, hasMore = false;
+
+			// hunt for children
+			angular.forEach($scope.items, function (ele) {
+				if (ele.parentID == activeID) hasMore = true;
+			});
+			$scope.viewItems.push( hasMore ? blank_item( activeID ) : null );
+
+			// hunt for parents (including self)
+			do {
+				nextItem = $scope.items[ activeID ];
+				$scope.viewItems.unshift( nextItem );
+				activeID = nextItem.parentID;
+			} while ( activeID );
+		} else {
+			$scope.viewItems.push( blank_item( null ) );
+		}
+	};
+	initValues();
+
+	$scope.$watch('viewItems', function (newValue, oldValue) {
+		if (newValue === oldValue) return; // don't execute on initialization
+		for (var i = 0; i < newValue.length; i++) {
+			if ( !angular.equals(newValue[i], oldValue[i]) ) {
+				if (newValue[i] !== null) // item changed : cleared : global
+					$scope.item.parentID = newValue[i].itemID ? newValue[i].itemID : i > 0 ? newValue[i-1].itemID : null ;
+				initValues();
+				break;
+			}
+		}
+	}, true);
+
+	$scope.ok = function () { $modalInstance.close( $scope.item ); };
+	$scope.cancel = function () { $modalInstance.dismiss('cancel'); };
+}]).
+
+controller('ItemListCtrl', ['$scope', 'items', '$location', 'ItemService', '$modal', function ($scope, items, $location, ItemService, $modal){
 	$scope.items = items.list;
 	$scope.myItem = items.item;
 	$scope.active = false; // holds copied new item for editing
@@ -25,10 +78,26 @@ controller('ItemListCtrl', ['$scope', 'items', '$location', 'ItemService', funct
 	$scope.tpls = ItemService.getTpls();
 	$scope.fields = ItemService.getFields();
 	$scope.allItems = ItemService.allItems();
+	$scope.files_first = function (value) { return value.count == '0'; };
+	$scope.equals = function (a,b) { return angular.equals(a,b); };
 
-	$scope.files_first = function (value) {
-		return value.count == '0';
+	// Item moving functions
+	$scope.move = function () {
+		var instance = $modal.open({
+			templateUrl: 'app/admin/items/move.modal.tpl.html',
+			controller: 'ItemListModal',
+			resolve: {
+				item: function () { return $scope.active; },
+				items: ItemService.getItems,
+			},
+		});
+		instance.result.then( function (new_item) {
+			$scope.save().then(function () {
+				$scope.go( new_item.parentID );
+			});
+		});
 	};
+
 
 	// nav functions
 	$scope.go = function (itemID) {
@@ -71,9 +140,8 @@ controller('ItemListCtrl', ['$scope', 'items', '$location', 'ItemService', funct
 		$scope.active = angular.copy( $scope.origin );
 		$scope.active.addr = addr;
 	};
-	$scope.equals = function (a,b) { return angular.equals(a,b); };
 	$scope.save = function() {
-		ItemService.save($scope.active).then(function (res) {
+		return ItemService.save($scope.active).then(function (res) {
 			$scope.active = angular.copy( res );
 			$scope.origin = res;
 			$scope.items = ItemService.theList().list;

@@ -1,0 +1,36 @@
+<div class="modal-header">
+	<h3 class="modal-title">
+		Move&nbsp;
+		<small>{{item.name}}</small>
+	</h3>
+</div>
+<div class="modal-body">
+	<div class="form-horizontal">
+		<div class="well">
+			<div ng-repeat="myItem in viewItems" ng-switch="myItem">
+				<div ng-switch-when="null" style="text-align:center">No More Children</div>
+				<div ng-switch-default class="form-group">
+					<label class="col-sm-2 control-label" ng-switch="$first">
+						<span ng-switch-when="true">Item</span>
+						<span ng-switch-default>Child {{$index}}</span>
+					</label>
+					<div class="col-sm-10">
+						<div class="input-group">
+							<select ng-model="viewItems[$index]" class="form-control" 
+								ng-options="value.name for value in (items | obj2arr | filter:{parentID:myItem.parentID}:true) ">
+								<option value=""> &mdash; Choose &mdash; </option>
+							</select>
+							<span class="input-group-btn">
+								<button type="button" class="btn btn-danger" ng-click="clearItem($index, myItem.parentID)">Clear</button>
+							</span>
+						</div>
+					</div>
+				</div><!-- /form-gorup -->
+			</div><!-- /ng-repeat -->
+		</div>
+	</div>
+</div>
+<div class="modal-footer">
+	<button class="btn btn-primary" ng-click="ok()">OK</button>
+	<button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+</div>

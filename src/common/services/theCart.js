@@ -107,7 +107,7 @@ factory('theCart', ['$rootScope', 'interface', 'security', '$q', function ($root
 			return service.cartPromise;
 		},
 		len: function() {
-			return service.cart.length || '';
+			return (service.cart || []).length || '';
 		},
 		add: function(item) {
 			return dbCall('add', item);
