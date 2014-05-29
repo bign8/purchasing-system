@@ -12,7 +12,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr ng-repeat="field in fields | obj2arr" ng-click="edit(field)" ng-class="{info:field.active}">
+					<tr ng-repeat="field in fields | obj2arr | orderBy:['type','name']" ng-click="edit(field)" ng-class="{info:field.active}">
 						<td>{{field.name}}</td>
 						<td>{{field.type}}</td>
 					</tr>
@@ -64,7 +64,12 @@
 				</label>
 				<div class="col-sm-9" ng-if="isList">
 					<div class="col-sm-12" ng-repeat="value in editing.settings" style="margin-bottom:0.2em">
-						<input type="text" ng-model="value" ng-blur="editing.settings[$index] = value" class="form-control" />
+						<div class="input-group">
+							<input type="text" ng-model="value" ng-blur="editing.settings[$index] = value" class="form-control" />
+							<span class="input-group-btn">
+								<button class="btn btn-danger" ng-click="drop(value)">&times;</button>
+							</span>
+						</div>
 					</div>
 				</div>
 				<div class="col-sm-9" ng-switch="editing.type" ng-hide="isList">

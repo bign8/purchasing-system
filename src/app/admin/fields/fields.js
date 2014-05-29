@@ -59,6 +59,10 @@ controller('FieldListCtrl', ['$scope', 'fields', 'FieldService', function ($scop
 		if ( $scope.isList && value.length ) $scope.isLastEmpty = (value[ value.length - 1 ] === '');
 	}, true);
 
+	$scope.drop = function (item) {
+		var idx = $scope.editing.settings.indexOf(item);
+		$scope.editing.settings.splice(idx, 1);
+	};
 	$scope.save = function () {
 		FieldService.save($scope.editing).then(function (res) {
 			$scope.editing.fieldID = angular.copy( res.fieldID ); // get new firmID if it's a new item
