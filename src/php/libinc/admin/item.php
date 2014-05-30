@@ -61,9 +61,9 @@ class Item extends NG {
 	public function set() {
 		$d = $this->getPostData();
 		if (isset($d->itemID)) {
-			$STH = $this->db->prepare("UPDATE item SET name=?,desc=?,templateID=?,code=?,image=?,onFirm=?,settings=? WHERE itemID=?;");
+			$STH = $this->db->prepare("UPDATE item SET name=?,parentID=?,desc=?,templateID=?,code=?,image=?,onFirm=?,settings=? WHERE itemID=?;");
 			if (!$STH->execute(
-				$d->name, $d->desc, $d->templateID, $d->code, $d->image, $d->onFirm, json_encode($d->settings), $d->itemID
+				$d->name, $d->parentID, $d->desc, $d->templateID, $d->code, $d->image, $d->onFirm, json_encode($d->settings), $d->itemID
 			)) return $this->conflict();
 		} else {
 			$STH = $this->db->prepare("INSERT INTO item (parentID,name,desc,settings,templateID,code,image,onFirm) VALUES (?,?,?,?,?,?,?,?);");
