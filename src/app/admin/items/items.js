@@ -240,7 +240,7 @@ controller('ItemListCtrl', ['$scope', 'items', '$location', 'ItemService', '$mod
 	$scope.priceAdd = function () {
 		var obj = {
 			itemID: $scope.active.itemID,
-			reasonID: "-1",
+			reasonID: $scope.myPrices.length ? "-1" : null,
 			inCart: 'true',
 			templateID: $scope.myTemplate.templateID,
 			costReq: $scope.myTemplate.costReq,
